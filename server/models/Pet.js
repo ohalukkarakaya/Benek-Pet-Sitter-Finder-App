@@ -34,15 +34,19 @@ const petSchema = new Schema(
         },
         vaccinations: {
             type: Array,
-            default: [],
+            default: []
         },
         careGiverHistory: {
             type: Array,
-            default: [],
+            default: []
         },
-        careHistory: {
+        primaryOwner: {
+            type: String,
+            required: true
+        },
+        allOwners: {
             type: Array,
-            default: [],
+            default: []
         },
     },
     {
