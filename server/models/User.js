@@ -117,7 +117,8 @@ const userSchema = new Schema(
             default: []
         },
         depandedUsers: {
-            
+            type: Array,
+            default: []
         }
     },
     {
