@@ -82,29 +82,43 @@ const userSchema = new Schema(
             },
             lng: {
                 type: String,
-                required: true,
+                required: true
             },
         },
         profileImgUrl: {
-            type: String,
+            type: String
         },
         pets: {
             type: Array,
-            default: [],
+            default: []
         },
         isCareGiver: {
             type: Boolean,
-            default: false,
+            default: false
         },
         pastCaregivers: {
             type: Array,
-            default: [],
+            default: []
         },
         caregiverCareer: {
             type: Array,
-            default: [],
+            default: []
         },
-        
+        savedUsersOrPets: {
+            type: Array,
+            default: []
+        },
+        savers: {
+            type: Array,
+            default: []
+        },
+        stars: {
+            type: Array,
+            default: []
+        },
+        depandedUsers: {
+            
+        }
     },
     {
         timestamps: true

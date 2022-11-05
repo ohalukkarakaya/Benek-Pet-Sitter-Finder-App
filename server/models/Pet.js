@@ -48,6 +48,10 @@ const petSchema = new Schema(
             type: Array,
             default: []
         },
+        savers: {
+            type: Array,
+            default: []
+        },
     },
     {
         timestamps: true
