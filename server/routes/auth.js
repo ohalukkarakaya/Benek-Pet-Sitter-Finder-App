@@ -1,7 +1,8 @@
 import { Router } from "express";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
-import { signUpBodyValidation } from "../utils/validationSchema.js";
+import generateTokens from "../utils/generateTokens.js";
+import { loginBodyValidation, signUpBodyValidation } from "../utils/validationSchema.js";
 
 const router = Router();
 
@@ -59,6 +60,65 @@ router.post(
         );
     }
   }
+);
+
+//LogIn
+router.post(
+    "/login",
+    async (req, res) => {
+      try{
+        const { error } = loginBodyValidation(req.body);
+        if(error)
+          res.status(400).json(
+            {
+                error: true,
+                message: error.details[0].message
+            }
+          );
+        const user = await User.findOne(
+            {
+                email: req.body.email
+            }
+        );
+        if(!user)
+            return res.status(401).json(
+                {
+                    error: true,
+                    message: "Invalid email or password"
+                }
+            );
+        const verifiedPassword = await bcrypt.compare(
+            req.body.password,
+            user.password
+        );
+        if(!verifiedPassword)
+            return res.status(401).json(
+                {
+                    error: true,
+                    message: "Invalid email or password"
+                }
+            );
+
+        const { accessToken, refreshToken } = await generateTokens(user);
+
+        res.status(200).json(
+            {
+                error: false,
+                accessToken,
+                refreshToken,
+                message: "Logged In Successfully"
+            }
+        );
+      }catch(err){
+        console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+      }
+    }
 );
 
 export default router;
