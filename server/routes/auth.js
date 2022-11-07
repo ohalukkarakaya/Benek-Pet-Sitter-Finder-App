@@ -78,38 +78,43 @@ router.post(
       async (req, res) => {
         try{
           const { error } = loginBodyValidation(req.body);
-          if(error)
+          if(error){
             res.status(400).json(
               {
                   error: true,
                   message: error.details[0].message
               }
             );
-          const user = await User.findOne(
+          }else{
+            const user = await User.findOne(
               {
                   email: req.body.email
               }
-          );
-          if(!user)
+            );
+            if(!user){
               return res.status(401).json(
                   {
                       error: true,
                       message: "Invalid email or password"
                   }
               );
-          const verifiedPassword = await bcrypt.compare(
-              req.body.password,
-              user.password
-          );
-          if(!verifiedPassword)
-              return res.status(401).json(
-                  {
-                      error: true,
-                      message: "Invalid email or password"
-                  }
+            }else{
+              const verifiedPassword = await bcrypt.compare(
+                req.body.password,
+                user.password
               );
-  
-          const { accessToken, refreshToken } = await generateTokens(user);
+              if(!verifiedPassword){
+                return res.status(401).json(
+                    {
+                        error: true,
+                        message: "Invalid email or password"
+                    }
+                );
+              }else{
+                const { accessToken, refreshToken } = await generateTokens(user);
+              }
+            }
+          }
   
           res.status(200).json(
               {
@@ -197,6 +202,38 @@ router.post(
         {
           error: true,
           message: "Internal server error"
+        }
+      );
+    }
+  });
+
+  // Resend OTP Code
+  router.post("/resendOtp", async (req, res) => {
+    try{
+      let { userId, email } = req.body;
+      if(!userId || !email){
+        res.status(400).json(
+          {
+            error: true,
+            message: "Empty otp details are not allowed"
+          }
+        );
+      }else{
+        //delete existing records and re send
+        await UserOTPVerification.deleteMany({ userId });
+        sendOTPVerificationEmail(
+          {
+            _id: userId,
+            email
+          },
+          res
+        );
+      }
+    }catch(err){
+      res.status(500).json(
+        {
+          error: true,
+          message: err.message
         }
       );
     }
