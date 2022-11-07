@@ -1,10 +1,25 @@
 import express from "express";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+import nodemailer from "nodemailer";
 import generateTokens from "../utils/generateTokens.js";
+import UserOTPVerification from "../models/UserOtpVerification.js";
 import { loginBodyValidation, signUpBodyValidation } from "../utils/validationSchema.js";
 
+dotenv.config();
+
 const router = express.Router();
+
+let transporter = nodemailer.createTransport(
+  {
+    host: "smtp-mail.outlook.com",
+    auth: {
+      user: process.env.AUTH_EMAIL,
+      pass: process.env.AUTH_PASS,
+    }
+  }
+);
 
 //SignUp
 router.post(
@@ -41,12 +56,11 @@ router.post(
           ...req.body,
           password: hashPassword
         }
-      ).save();
-  
-      res.status(200).json(
-        {
-          error: false,
-          message: "Account Created Succesfully"  
+      ).save().then(
+        (result) => {
+          // Handle account verification
+          // Send verification code
+          sendOTPVerificationEmail(result, res);
         }
       );
   
@@ -120,5 +134,52 @@ router.post(
         }
       }
   );
+
+  //send OTP verification
+  const sendOTPVerificationEmail = async ({_id, email}, res) => {
+    try {
+      const otp = `${Math.floor(1000 + Math.random() * 9000)}`
+
+      //mail options
+      const mailOptions = {
+        from: process.env.AUTH_EMAIL,
+        to: email,
+        subject: "Verify your email",
+        html: `<p>Enter <b>${otp}</b> in the app to verify your email adress and complate the signup</p>
+        <p>This code <b>expires in 1 hour</b></p>`,
+
+      };
+
+      //hesh the otp
+      const saltRounds = 10;
+
+      const hashedOtp = bcrypt.hash(otp, saltRounds);
+      const newOtpVerification = await new UserOTPVerification({
+        userId: _id,
+        otp: hashedOtp,
+      });
+
+      //save otp record
+      await newOtpVerification.save();
+      await transporter.sendMail(mailOptions);
+      res.json(
+        {
+          status: "PENDING",
+          message: "Verification mail send to Email",
+          data: {
+            userId: _id,
+            email,
+          }
+        }
+      );
+    }catch(e){
+      res.status(500).json(
+        {
+          error: true,
+          message: "Failed to send verification mail",
+        }
+      )
+    }
+  }
 
 export default router;
