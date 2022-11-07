@@ -6,7 +6,7 @@ import nodemailer from "nodemailer";
 import generateTokens from "../utils/generateTokens.js";
 import UserOTPVerification from "../models/UserOtpVerification.js";
 import sendOTPVerificationEmail from "../utils/sendValidationEmail.js";
-import { loginBodyValidation, signUpBodyValidation } from "../utils/validationSchema.js";
+import signUpBodyValidation from "../utils/validationSchema.js";
 
 dotenv.config();
 
@@ -77,15 +77,6 @@ router.post(
       "/login",
       async (req, res) => {
         try{
-          const { error } = loginBodyValidation(req.body);
-          if(error){
-            res.status(400).json(
-              {
-                  error: true,
-                  message: error.details[0].message
-              }
-            );
-          }else{
             const user = await User.findOne(
               {
                   email: req.body.email
@@ -112,24 +103,23 @@ router.post(
                 );
               }else{
                 const { accessToken, refreshToken } = await generateTokens(user);
+                res.status(200).json(
+                  {
+                      error: false,
+                      isEmailVerified: user.isEmailVerified,
+                      accessToken,
+                      refreshToken,
+                      message: "Logged In Successfully"
+                  }
+                );
               }
             }
-          }
-  
-          res.status(200).json(
-              {
-                  error: false,
-                  accessToken,
-                  refreshToken,
-                  message: "Logged In Successfully"
-              }
-          );
         }catch(err){
           console.log(err);
           res.status(500).json(
               {
                   error: true,
-                  message: "Internal Server Error"
+                  message: err.message
               }
           );
         }

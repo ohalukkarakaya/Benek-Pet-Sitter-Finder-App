@@ -26,13 +26,4 @@ const signUpBodyValidation = (body) => {
     return schema.validate(body);
 };
 
-const loginBodyValidation = (body) => {
-    const schema = Joi.object(
-        {
-          email: Joi.string().email().required().label("Email"),
-          password: passwordComplexity().required().label("Password"),
-        }
-    );
-};
-
-export { signUpBodyValidation, loginBodyValidation }
+export default signUpBodyValidation;

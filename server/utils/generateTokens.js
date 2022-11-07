@@ -19,14 +19,14 @@ const generateTokens = async (user) => {
 
         const userToken = await UserToken.findOne(
             {
-                userId: user_id
+                userId: user._id
             }
         );
         if(userToken) await userToken.remove();
 
         await new UserToken(
             {
-                userId: user_id, 
+                userId: user._id, 
                 token: refreshToken
             }
         ).save();
