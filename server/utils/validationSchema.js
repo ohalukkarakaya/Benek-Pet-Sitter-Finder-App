@@ -6,14 +6,20 @@ const signUpBodyValidation = (body) => {
         {
           userName: Joi.string().required().label("User Name"),
           email: Joi.string().email().required().label("Email"),
-          identity: Joi.string().email().required().label("identity"),
-          firstName: Joi.string().email().label("identity").required().label("firstName"),
-          lastName: Joi.string().email().label("identity").required().label("lastName"),
-          location: Joi.string().email().required().label("location"),
-          country: Joi.string().email().label("location").required().label("country"),
-          city: Joi.string().email().label("location").required().label("city"),
-          lat: Joi.string().email().label("location").required().label("lat"),
-          lng: Joi.string().email().label("location").required().label("lng"),
+          identity: Joi.object().required().label("identity").keys(
+            {
+              firstName: Joi.string(),
+              lastName: Joi.string()
+            }
+          ),
+          location: Joi.object().required().label("location").keys(
+            {
+              country : Joi.string(),
+              city: Joi.string(),
+              lat: Joi.string(),
+              lng: Joi.string()
+            }
+          ),
           password: passwordComplexity().required().label("Password"),
         }
     );

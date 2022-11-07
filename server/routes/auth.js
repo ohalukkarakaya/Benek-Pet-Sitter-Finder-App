@@ -13,7 +13,8 @@ const router = express.Router();
 
 let transporter = nodemailer.createTransport(
   {
-    host: "smtp-mail.outlook.com",
+    host: "smtp.gmail.com",
+    port: 587,
     auth: {
       user: process.env.AUTH_EMAIL,
       pass: process.env.AUTH_PASS,
@@ -60,7 +61,13 @@ router.post(
         (result) => {
           // Handle account verification
           // Send verification code
-          sendOTPVerificationEmail(result, res);
+          sendOTPVerificationEmail(
+            {
+              _id: result._id,
+              email: result.email
+            },
+            res
+          );
         }
       );
   
@@ -135,6 +142,59 @@ router.post(
       }
   );
 
+  // Verify OTP
+  router.post("/verifyOTP", async (req, res) => {
+    try{
+      let { userId, otp } = req.body;
+      if(!userId || !otp){
+        throw Error("Empty otp details are not allowed");
+      }else{
+        const UserOTPVerificationRecords = await UserOTPVerification.find({
+          userId,
+        });
+        if(UserOTPVerificationRecords.length <= 0){
+          //no record found
+          throw Error(
+            "Account record doesn't exist or has been verified already"
+          );
+        }else{
+          //user otp record exists
+          const { expiresAt } = UserOTPVerificationRecords[0];
+          const hashedOTP = UserOTPVerificationRecords[0].otp;
+
+          if( expiresAt < Date.now()){
+            //user Otp record has expired
+            await UserOTPVerification.deleteMany({ userId });
+            throw new Error("Code has expired. Please request again");
+          }else{
+            const validOTP = await bcrypt.compare(otp, hashedOTP);
+
+            if(!validOTP){
+             //supplied OTP is wrong
+              throw Error("Invalid code passed. Check your inbox");
+            }else{
+              //success
+              await User.updateOne({_id: userId}, {isEmailVerified: true});
+              await UserOTPVerification.deleteMany({ userId });
+              res.status(200).json(
+                {
+                  message: "User email verified succesfuly"
+                }
+              );
+            }
+          }
+        }
+      }
+    }catch(err){
+      res.status(500).json(
+        {
+          error: true,
+          message: "Internal server error"
+        }
+      );
+    }
+  });
+
   //send OTP verification
   const sendOTPVerificationEmail = async ({_id, email}, res) => {
     try {
@@ -152,8 +212,8 @@ router.post(
 
       //hesh the otp
       const saltRounds = 10;
-
-      const hashedOtp = bcrypt.hash(otp, saltRounds);
+      const salt = await bcrypt.genSalt(Number(process.env.SALT));
+      const hashedOtp = await bcrypt.hash(otp, salt);
       const newOtpVerification = await new UserOTPVerification({
         userId: _id,
         otp: hashedOtp,
@@ -176,7 +236,7 @@ router.post(
       res.status(500).json(
         {
           error: true,
-          message: "Failed to send verification mail",
+          message: e.message,
         }
       )
     }

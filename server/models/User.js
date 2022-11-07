@@ -7,7 +7,9 @@ const UserSchema = new mongoose.Schema(
             required: true,
         },
         identity: {
-            firstName: {
+            "description": "idetitiy informations of the user",
+            "type": "object",
+            "firstName": {
                 type: String,
                 required: true,
                 maxLength: [
@@ -15,14 +17,14 @@ const UserSchema = new mongoose.Schema(
                     '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                 ],
             },
-            middleName: {
+            "middleName": {
                 type: String,
                 maxLength: [
                     10,
                     '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                 ],
             },
-            lastName: {
+            "lastName": {
                 type: String,
                 required: true,
                 maxLength: [
@@ -30,18 +32,18 @@ const UserSchema = new mongoose.Schema(
                     '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                 ],
             },
-            job: {
+            "job": {
                 type: String,
                 maxLength: [
                     30,
                     '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                 ],
             },
-            certificates: {
+            "certificates": {
                 type: Array,
                 default: []
             },
-            bio: {
+            "bio": {
                 type: String,
                 maxLength: [
                     150,
