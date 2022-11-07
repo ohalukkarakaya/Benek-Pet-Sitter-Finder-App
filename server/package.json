@@ -1,11 +1,23 @@
 {
-  "name": "node-ders",
-  "version": "0.0.0",
+  "name": "benek",
+  "version": "1.0.0",
+  "description": "pet sitter finder app - server side",
+  "main": "index.js",
   "type": "module",
-  "private": true,
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ohalukkarakaya/Benek-Pet-Sitter-Finder-App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ohalukkarakaya/Benek-Pet-Sitter-Finder-App/issues"
+  },
+  "homepage": "https://github.com/ohalukkarakaya/Benek-Pet-Sitter-Finder-App#readme",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "core-util-is": "^1.0.3",
