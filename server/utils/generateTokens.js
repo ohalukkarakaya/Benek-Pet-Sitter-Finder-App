@@ -26,7 +26,10 @@ const generateTokens = async (user) => {
 
         await new UserToken(
             {
-                userId: user._id, 
+                userId: user._id,
+                isCareGiver: user.isCareGiver,
+                isEmailVerified: user.isEmailVerified,
+                isPhoneVerified: user.isPhoneVerified,
                 token: refreshToken
             }
         ).save();

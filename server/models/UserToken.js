@@ -6,6 +6,9 @@ const UserTokenSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             require: true
         },
+        isCareGiver: Boolean,
+        isEmailVerified: Boolean,
+        isPhoneVerified: Boolean,
         token: {
             type: String,
             required: true
