@@ -147,15 +147,23 @@ router.post(
     try{
       let { userId, otp } = req.body;
       if(!userId || !otp){
-        throw Error("Empty otp details are not allowed");
+        req.status(400).json(
+          {
+            error: true,
+            message: "Empty otp details are not allowed"
+          }
+        );
       }else{
         const UserOTPVerificationRecords = await UserOTPVerification.find({
           userId,
         });
         if(UserOTPVerificationRecords.length <= 0){
           //no record found
-          throw Error(
-            "Account record doesn't exist or has been verified already"
+          req.status(404).json(
+            {
+              error: true,
+              message: "Account record doesn't exist or has been verified already"
+            }
           );
         }else{
           //user otp record exists
@@ -165,13 +173,23 @@ router.post(
           if( expiresAt < Date.now()){
             //user Otp record has expired
             await UserOTPVerification.deleteMany({ userId });
-            throw new Error("Code has expired. Please request again");
+            res.status(405).json(
+              {
+                error: true,
+                message: "Code has expired. Please request again"
+              }
+            );
           }else{
             const validOTP = await bcrypt.compare(otp, hashedOTP);
 
             if(!validOTP){
              //supplied OTP is wrong
-              throw Error("Invalid code passed. Check your inbox");
+             req.status(406).json(
+              {
+                error: true,
+                message: "Invalid code passed. Check your inbox"
+              }
+            );
             }else{
               //success
               await User.updateOne({_id: userId}, {isEmailVerified: true});
