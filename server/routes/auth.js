@@ -1,5 +1,5 @@
 import { Router } from "express";
-const User = require("../models/User.js");
+import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import generateTokens from "../utils/generateTokens.js";
 import { loginBodyValidation, signUpBodyValidation } from "../utils/validationSchema.js";

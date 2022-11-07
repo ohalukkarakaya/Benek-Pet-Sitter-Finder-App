@@ -1,6 +1,6 @@
 import express from "express";
 import { config } from "dotenv";
-import dbConnect from "../dbConnect.js";
+const dbConnect = require("dbConnect.js");
 import authRoutes from "./routes/auth.js"
 
 const app = express();

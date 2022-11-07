@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require( 'mongoose' );
 
 const dbConnect = () => {
     const connectionParams = { useNewUrlParser: true };
@@ -25,5 +25,3 @@ const dbConnect = () => {
         }
     );
 };
-
-export default dbConnect;
