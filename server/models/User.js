@@ -66,6 +66,14 @@ const userSchema = new Schema(
             type: String,
             required: true,
         },
+        isEmailVerified: {
+            type: Boolean,
+            default: false,
+        },
+        isPhoneVerified: {
+            type: Boolean,
+            default: false
+        },
         location: {
             required: true,
             country: {
