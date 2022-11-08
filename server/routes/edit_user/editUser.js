@@ -1,7 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
-import upload from "../../middleware/profileImage.js";;
+import s3Uploadv2 from "../../middleware/s3Service.js";;
 import auth from "../../middleware/auth.js";
+import getRegionEndPoint from "../../middleware/regionEndPoint.js";
 
 dotenv.config();
 const router = express.Router();
@@ -33,12 +34,13 @@ const router = express.Router();
 router.post(
     "/uploadProfile",
     auth,
-    upload.single("file"),
+    getRegionEndPoint,
+    s3Uploadv2,
     (req, res) => {
         res.status(200).json(
             {
                 error: false,
-                message: "uploaded"
+                message: req.uploadedData
             }
         );
     }
