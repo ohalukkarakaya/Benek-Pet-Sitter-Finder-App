@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth/auth.js';
 import refreshTokenRoutes from './routes/auth/refreshToken.js';
 import editUserRoutes from './routes/edit_user/editUser.js';
+import getRegionEndPoint from './middleware/regionEndPoint.js';
 
 const app = express();
 dotenv.config();
