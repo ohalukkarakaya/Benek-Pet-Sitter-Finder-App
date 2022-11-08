@@ -1,8 +1,9 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import authRoutes from './routes/auth.js';
-import refreshTokenRoutes from './routes/refreshToken.js';
+import authRoutes from './routes/auth/auth.js';
+import refreshTokenRoutes from './routes/auth/refreshToken.js';
+import editUserRoutes from './routes/edit_user/editUser.js';
 
 const app = express();
 dotenv.config();
@@ -21,7 +22,8 @@ const connect = () => {
 
 app.use(express.json());
 app.use("/auth", authRoutes);
-app.use("/api/refreshToken", refreshTokenRoutes); 
+app.use("/api/refreshToken", refreshTokenRoutes);
+app.use("/api/user", editUserRoutes);
 
 app.use((err, req, res, next) => {
   const status = err.status || 500;
