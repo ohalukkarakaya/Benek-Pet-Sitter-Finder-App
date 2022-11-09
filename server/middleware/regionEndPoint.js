@@ -12,8 +12,6 @@ const getRegionEndPoint = async (req, res, next) => {
         body
     ).then(
     regionResponse => {
-        console.log(`Status Code: ${regionResponse.status}`);
-        console.log(`end-point: ${regionResponse.data.domain_name}`);
         if(regionResponse.data.resp_code < 0){
             return res.status(500).json(
                 {

@@ -8,7 +8,9 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         const { originalname } = file;
         const userId = req.user._id;
-        cb(null, `profile-${userId}.${originalname.split(".")[1]}`);
+        const newFileName = `profile-${userId}.${originalname.split(".")[1]}`;
+        req.newFileName = newFileName;
+        cb(null, newFileName);
     }
 });
 

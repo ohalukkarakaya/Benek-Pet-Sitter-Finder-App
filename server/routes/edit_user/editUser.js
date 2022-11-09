@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import s3Uploadv2 from "../../middleware/s3Service.js";;
 import auth from "../../middleware/auth.js";
 import getRegionEndPoint from "../../middleware/regionEndPoint.js";
+import upload from "../../middleware/profileImage.js";
 
 dotenv.config();
 const router = express.Router();
@@ -35,15 +36,8 @@ router.post(
     "/uploadProfile",
     auth,
     getRegionEndPoint,
-    s3Uploadv2,
-    (req, res) => {
-        res.status(200).json(
-            {
-                error: false,
-                message: req.uploadedData
-            }
-        );
-    }
+    upload.single("file"),
+    s3Uploadv2
   );
 
 export default router;
