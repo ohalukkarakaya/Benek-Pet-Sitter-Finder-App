@@ -4,7 +4,7 @@ import axios from "axios";
 dotenv.config();
 
 const getRegionEndPoint = async (req, res, next) => {
-    const host = 'https://api.idrivee2.com/api/service/get_region_end_point'
+    const host = process.env.IDRIVE_PROFILE_GET_REGION_ENDPOINT;
     const body = { access_key: process.env.IDRIVE_ACCESS_KEY };
 
     const regionRequest = axios.post(
