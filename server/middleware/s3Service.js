@@ -1,5 +1,4 @@
 import AWS from "aws-sdk";
-import PATH from "path";
 import FS from "fs";
 import dotenv from "dotenv";
 import { promisify } from "util";
@@ -9,7 +8,7 @@ dotenv.config();
 const unlinkAsync = promisify(FS.unlink);
 
 const s3Uploadv2 = async (req, res) => {
-  const filePath = `uploads/${req.newFileName}`;
+  const filePath = `s3UploadBridge/${req.newFileName}`;
   const fileStream = new FS.createReadStream(filePath);
         
   const endpoint = new AWS.Endpoint(req.regionEndPoint);
