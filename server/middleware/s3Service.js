@@ -2,11 +2,15 @@ import AWS from "aws-sdk";
 import PATH from "path";
 import FS from "fs";
 import dotenv from "dotenv";
+import { promisify } from "util";
 
 dotenv.config();
 
+const unlinkAsync = promisify(FS.unlink);
+
 const s3Uploadv2 = async (req, res) => {
-  const fileStream = new FS.createReadStream(`uploads/${req.newFileName}`);
+  const filePath = `uploads/${req.newFileName}`;
+  const fileStream = new FS.createReadStream(filePath);
         
   const endpoint = new AWS.Endpoint(req.regionEndPoint);
   const s3 = new AWS.S3(
@@ -42,12 +46,16 @@ const s3Uploadv2 = async (req, res) => {
       });
     }else{
       req.uploadedData = data;
-      res.status(200).json(
-          {
-              error: false,
-              iDriveId: req.uploadedData,
-              objectName: req.newFileName
-          }
+      unlinkAsync(filePath).then(
+        (val) => {
+          res.status(200).json(
+            {
+                error: false,
+                iDriveId: req.uploadedData,
+                objectName: req.newFileName
+            }
+          );
+        }
       );
     }
   });
