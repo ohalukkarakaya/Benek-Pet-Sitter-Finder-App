@@ -2,7 +2,7 @@ import multer from "multer";
 
 //Rename profile image
 const storage = multer.diskStorage({
-    destination: (req, profileImg, cb) => {
+    destination: (req, fiprofileImgle, cb) => {
         cb(null, "s3UploadBridge");
     },
     filename: (req, profileImg, cb) => {

@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import s3Uploadv2 from "../../middleware/s3Service.js";;
+import s3Upload from "../../middleware/s3Service.js";;
 import auth from "../../middleware/auth.js";
 import getRegionEndPoint from "../../middleware/regionEndPoint.js";
 import upload from "../../middleware/serverHandleProfileImage.js";
@@ -14,7 +14,7 @@ router.post(
     auth,
     getRegionEndPoint,
     upload.single("profileImg"),
-    s3Uploadv2
+    s3Upload
   );
 
 export default router;
