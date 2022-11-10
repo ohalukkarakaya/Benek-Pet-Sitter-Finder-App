@@ -92,12 +92,19 @@ const UserSchema = new mongoose.Schema(
                 required: true
             },
         },
-        profileImgUrl: {
+        profileImg: {
             isDefaultImg: {
                 type: Boolean,
                 default: true,
             },
-            imgUrl: String,
+            recordedImgName: {
+                type: String,
+                default: "",
+            },
+            imgUrl: {
+                type: String,
+                default: ""
+            },
         },
         pets: {
             type: Array,

@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import auth from "../../middleware/auth.js";
-import { upload } from "../../middleware/serverHandleProfileImage.js";
+import { updateProfileImg } from "../../middleware/serverHandleProfileImage.js";
 
 dotenv.config();
 const router = express.Router();
@@ -10,7 +10,7 @@ const router = express.Router();
 router.post(
     "/moreUserInfo",
     auth,
-    upload.single("profileImg"),
+    updateProfileImg,
     async (req, res) => {
       if (req.file) { // Checking if req.file is not empty.
         const uploadedImage = req.file.location;
@@ -18,8 +18,7 @@ router.post(
         return res.status(200).json(
           {
             error: false,
-            objectName: req.newFileName,
-            url: uploadedImage
+            imgUrl: uploadedImage
           }
         );
       }
