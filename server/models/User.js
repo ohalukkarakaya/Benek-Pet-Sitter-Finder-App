@@ -97,8 +97,7 @@ const UserSchema = new mongoose.Schema(
                 type: Boolean,
                 default: true,
             },
-            s3BucketName: String,
-            s3ObjectName: String,
+            imgUrl: String,
         },
         pets: {
             type: Array,

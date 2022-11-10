@@ -1,18 +1,37 @@
+import aws from "@aws-sdk/client-s3";
 import multer from "multer";
+import multerS3 from "multer-s3";
+import dotenv from "dotenv";
 
-//Rename profile image
-const storage = multer.diskStorage({
-    destination: (req, fiprofileImgle, cb) => {
-        cb(null, "s3UploadBridge");
-    },
-    filename: (req, profileImg, cb) => {
-        const { originalname } = profileImg;
-        const userId = req.user._id;
-        const newFileName = `profile-${userId}.${originalname.split(".")[1]}`;
-        req.newFileName = newFileName;
-        cb(null, newFileName);
+dotenv.config();
+const s3 = new aws.S3(
+    {
+        forcePathStyle: true,
+        endpoint: process.env.S3_ENDPOINT,
+        region: "us-east-1",
+        credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+        }
     }
-});
+);
+
+//Storage
+const storage = multerS3(
+    {
+        s3,
+        bucket: process.env.BUCKET_NAME,
+        acl: 'public-read',
+        key: (req, profileImg, cb) => {
+            const { originalname } = profileImg;
+            const userId = req.user._id;
+            const newFileName = `profile-${userId}.${originalname.split(".")[1]}`;
+            req.newFileName = newFileName;
+            console.log("profileImages/"+newFileName);
+            cb(null, "profileImages/"+newFileName);
+        }
+    }
+);
 
 //File Filter
 const fileFilter = (req, profileImg, cb) => {
@@ -25,10 +44,11 @@ const fileFilter = (req, profileImg, cb) => {
 
 const upload = multer(
     {
-      storage,
-      fileFilter,
-      limits: { fileSize: 1000000 }
+        storage: storage,
+        fileFilter,
+        limits: { fileSize: 1000000 }
+
     }
 );
 
-export default upload;
+export { upload, s3 };

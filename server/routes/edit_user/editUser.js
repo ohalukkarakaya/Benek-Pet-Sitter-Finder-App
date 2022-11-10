@@ -1,9 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
-import s3Upload from "../../middleware/s3Service.js";;
 import auth from "../../middleware/auth.js";
-import getRegionEndPoint from "../../middleware/regionEndPoint.js";
-import upload from "../../middleware/serverHandleProfileImage.js";
+import { upload } from "../../middleware/serverHandleProfileImage.js";
 
 dotenv.config();
 const router = express.Router();
@@ -12,9 +10,20 @@ const router = express.Router();
 router.post(
     "/moreUserInfo",
     auth,
-    getRegionEndPoint,
     upload.single("profileImg"),
-    s3Upload
+    async (req, res) => {
+      if (req.file) { // Checking if req.file is not empty.
+        const uploadedImage = req.file.location;
+        console.log(uploadedImage);
+        return res.status(200).json(
+          {
+            error: false,
+            objectName: req.newFileName,
+            url: uploadedImage
+          }
+        );
+      }
+    }
   );
 
 export default router;
