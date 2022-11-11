@@ -55,7 +55,7 @@ const upload = multer(
 
 const deleteImg = async (deleteParams) => {
     try {
-      const data = await s3.send(new DeleteObjectCommand(deleteParams));
+      const data = await s3.send(new aws.DeleteObjectCommand(deleteParams));
       console.log("Success", data);
       return data;
     } catch (err) {
@@ -71,24 +71,27 @@ const updateProfileImg = async (req, res, next) => {
             (err, user) => {
                 const isDefaultImg = user.profileImg.isDefaultImg;
                 if(isDefaultImg){
-                    Promise.resolve(upload(req, res, next)).then(
+                    Promise.resolve(
+                        upload(req, res, next)
+                    ).then(
                         (val) => {
                             console.log(req.newFileName);
                             User.findOneAndUpdate(
                                 { _id: userId },
                                 {
-                                    $set: {
-                                        "profileImg": {
-                                            "isDefaultImg": false,
-                                            "recordedImageName": req.newFileName,
-                                        },
-                                    }
+                                    "profileImg.imgUrl": `https://fra1.digitaloceanspaces.com/beneksrc/profileImages/${req.newFileName}`,
+                                    "profileImg.recordedImgName": req.newFileName,
+                                    "profileImg.isDefaultImg": false,
+                                },
+                                {
+                                    new: true,
+                                    upsert: true,
                                 },
                                 (err, updated) => {
                                     if(err){
                                         console.log(err);
                                     }else{
-                                        console.log("OK");
+                                        console.log(updated);
                                     }
                                 }
                             );
@@ -97,19 +100,41 @@ const updateProfileImg = async (req, res, next) => {
                 }else{
                     const deleteParam = {
                         Bucket: process.env.BUCKET_NAME,
-                        Key: user.profileImg.recordedImgName
+                        Key: `profileImages/${user.profileImg.recordedImgName}`
                     };
-            
-                    deleteImg(deleteParam);
-                    upload(req, res, next);
-                    User.findByIdAndUpdate(
-                        { userId },
-                        {
-                            "isDefaultImg": false,
-                            "recordedImageName": req.newFileName,
-                            "imgUrl": req.file.location
+                    Promise.resolve(
+                        deleteImg(deleteParam)
+                    ).then(
+                        (_) => {
+                            console.log("silindi");
+                            Promise.resolve(
+                                upload(req, res, next)
+                            ).then(
+                                (_) => {
+                                    console.log(req.newFileName);
+                                    User.findOneAndUpdate(
+                                        { _id: userId },
+                                        {
+                                            "profileImg.imgUrl": `https://fra1.digitaloceanspaces.com/beneksrc/profileImages/${req.newFileName}`,
+                                            "profileImg.recordedImgName": req.newFileName,
+                                            "profileImg.isDefaultImg": false,
+                                        },
+                                        {
+                                            new: true,
+                                            upsert: true,
+                                        },
+                                        (err, updated) => {
+                                            if(err){
+                                                console.log(err);
+                                            }else{
+                                                console.log(updated);
+                                            }
+                                        }
+                                    );
+                                }
+                            );
                         }
-                    );
+                    )
                 }
             }
         );
