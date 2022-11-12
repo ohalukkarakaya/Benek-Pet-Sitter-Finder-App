@@ -110,7 +110,7 @@ const updateProfileImg = async (req, res, next) => {
                                         User.findOneAndUpdate(
                                             { _id: userId },
                                             {
-                                                "profileImg.imgUrl": `https://fra1.digitaloceanspaces.com/beneksrc/profileImages/${req.newFileName}`,
+                                                "profileImg.imgUrl": req.file.location,
                                                 "profileImg.recordedImgName": req.newFileName,
                                                 "profileImg.isDefaultImg": false,
                                             },
