@@ -18,11 +18,6 @@ const s3 = new aws.S3(
     }
 );
 
-//there is no image in req
-const checkFile = (req, areThereFile) => {
-    req.areThereFile = areThereFile
-};
-
 //Storage
 const storage = multerS3(
     {
@@ -30,17 +25,18 @@ const storage = multerS3(
         bucket: process.env.BUCKET_NAME,
         acl: 'public-read',
         key: (req, profileImg, cb) => {
+            console.log(profileImg);
             const { originalname } = profileImg;
             const userId = req.user._id;
-            const newFileName = `profile-${userId}.${originalname.split(".")[1]}`;
+            const newFileName = `${userId}_profileImg.${originalname.split(".")[1]}`;
             req.newFileName = newFileName;
-            cb(null, "profileImages/"+newFileName);
+            cb(null, "profileAssets/"+userId+"/"+newFileName);
         }
     }
 );
 
 //File Filter
-const fileFilter = (req, profileImg, cb, next) => {
+const fileFilter = (req, profileImg, cb) => {
     if(profileImg){
         if(profileImg.mimetype === 'image/jpeg'){
             cb( null, true );
@@ -61,7 +57,7 @@ const upload = multer(
 
 const deleteImg = async (deleteParams) => {
     try {
-      const data = await s3.send(new aws.DeleteObjectCommand(deleteParams));
+      await s3.deleteObject(deleteParams).promise();
       console.log("Success", data);
       return data;
     } catch (err) {
@@ -106,17 +102,16 @@ const updateProfileImg = async (req, res, next) => {
                     }else{
                         const deleteParam = {
                             Bucket: process.env.BUCKET_NAME,
-                            Key: `profileImages/${user.profileImg.recordedImgName}`
+                            Key: `profileAssets/${userId}/${user.profileImg.recordedImgName}`
                         };
                         Promise.resolve(
                             deleteImg(deleteParam)
                         ).then(
                             (_) => {
-                                Promise.resolve(
-                                    upload(req, res, next)
-                                ).then(
-                                    (_) => {
-                                        console.log(req.newFileName);
+                                console.log("ready to upload");
+                                upload.single("profileImg")(req, {}, (err) => {
+                                    console.log(req.file);
+                                    if(req.file){
                                         User.findOneAndUpdate(
                                             { _id: userId },
                                             {
@@ -132,12 +127,15 @@ const updateProfileImg = async (req, res, next) => {
                                                 if(err){
                                                     console.log(err);
                                                 }else{
-                                                    console.log("silindi");
+                                                    console.log("Old image deleted and new one inserted");
                                                 }
                                             }
                                         );
+                                        next();
+                                    }else{
+                                        next();
                                     }
-                                );
+                                });
                             }
                         )
                     }
