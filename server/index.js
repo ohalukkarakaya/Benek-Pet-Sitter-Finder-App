@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth/auth.js';
 import refreshTokenRoutes from './routes/auth/refreshToken.js';
 import editUserRoutes from './routes/edit_user/editUser.js';
+import bodyParser from 'body-parser';
 
 const app = express();
 dotenv.config();
@@ -21,6 +22,8 @@ const connect = () => {
 }
 
 app.use(express.json());
+app.use(bodyParser.urlencoded({extended : true}));
+app.use(bodyParser.json());
 app.use("/auth", authRoutes);
 app.use("/api/refreshToken", refreshTokenRoutes);
 app.use("/api/user", editUserRoutes);
