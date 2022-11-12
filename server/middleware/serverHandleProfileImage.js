@@ -18,6 +18,11 @@ const s3 = new aws.S3(
     }
 );
 
+//there is no image in req
+const checkFile = (req, areThereFile) => {
+    req.areThereFile = areThereFile
+};
+
 //Storage
 const storage = multerS3(
     {
@@ -35,11 +40,13 @@ const storage = multerS3(
 );
 
 //File Filter
-const fileFilter = (req, profileImg, cb) => {
-    if(profileImg.mimetype === 'image/jpeg'){
-        cb( null, true );
-    }else{
-        cb( new Error("You can just upload '.jpg"), false );
+const fileFilter = (req, profileImg, cb, next) => {
+    if(profileImg){
+        if(profileImg.mimetype === 'image/jpeg'){
+            cb( null, true );
+        }else{
+            cb( new Error("You can just upload '.jpg"), false );
+        }
     }
 };
 
@@ -70,28 +77,31 @@ const updateProfileImg = async (req, res, next) => {
                 (err, user) => {
                     const isDefaultImg = user.profileImg.isDefaultImg;
                     if(isDefaultImg){
-                             upload.single("profileImg")(req, {}, (err) => {
-                                console.log(req.file.location);
-                                User.findOneAndUpdate(
-                                    { _id: userId },
-                                    {
-                                        "profileImg.imgUrl": req.file.location,
-                                        "profileImg.recordedImgName": req.newFileName,
-                                        "profileImg.isDefaultImg": false,
-                                    },
-                                    {
-                                        new: true,
-                                        upsert: true,
-                                    },
-                                    (err, updated) => {
-                                        if(err){
-                                            console.log(err);
-                                        }else{
-                                            console.log(updated);
+                            upload.single("profileImg")(req, {}, (err) => {
+                                if(req.file){
+                                    User.findOneAndUpdate(
+                                        { _id: userId },
+                                        {
+                                            "profileImg.imgUrl": req.file.location,
+                                            "profileImg.recordedImgName": req.newFileName,
+                                            "profileImg.isDefaultImg": false,
+                                        },
+                                        {
+                                            new: true,
+                                            upsert: true,
+                                        },
+                                        (err, updated) => {
+                                            if(err){
+                                                console.log(err);
+                                            }else{
+                                                console.log("profile image updated");
+                                            }
                                         }
-                                    }
-                                );
-                                next();
+                                    );
+                                    next();
+                                }else{
+                                    next();
+                                }
                             });
                     }else{
                         const deleteParam = {
