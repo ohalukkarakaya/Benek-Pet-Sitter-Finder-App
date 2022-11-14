@@ -43,8 +43,12 @@ router.post(
   
       await new User(
         {
-          ...req.body,
-          password: hashPassword
+          userName: req.body.userName,
+          email: req.body.email,
+          identity: req.body.identity,
+          location: req.body.location,
+          password: hashPassword,
+          trustedIps: [req.body.ip]
         }
       ).save().then(
         (result) => {

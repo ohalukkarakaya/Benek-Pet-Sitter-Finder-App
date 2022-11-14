@@ -5,6 +5,7 @@ const UserSchema = new mongoose.Schema(
         userName: {
             type: String,
             required: true,
+            unique: true,
         },
         identity: {
             "description": "idetitiy informations of the user",
@@ -106,6 +107,24 @@ const UserSchema = new mongoose.Schema(
                 default: ""
             },
         },
+        coverImg: {
+            isDefaultImg: {
+                type: Boolean,
+                default: true,
+            },
+            recordedImgName: {
+                type: String,
+                default: "",
+            },
+            imgUrl: {
+                type: String,
+                default: ""
+            },
+        },
+        trustedIps: {
+            type: Array,
+            default: []
+        },
         pets: {
             type: Array,
             default: []
@@ -126,7 +145,7 @@ const UserSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
-        savers: {
+        saved: {
             type: Array,
             default: []
         },

@@ -1,22 +1,9 @@
-import aws from "@aws-sdk/client-s3";
 import multer from "multer";
 import multerS3 from "multer-s3";
 import dotenv from "dotenv";
 import User from "../models/User.js";
-
+import s3 from "../utils/s3Service.js";
 dotenv.config();
-
-const s3 = new aws.S3(
-    {
-        forcePathStyle: true,
-        endpoint: process.env.S3_ENDPOINT,
-        region: "us-east-1",
-        credentials: {
-            accessKeyId: process.env.AWS_ACCESS_KEY,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-        }
-    }
-);
 
 //Storage
 const storage = multerS3(
@@ -24,21 +11,32 @@ const storage = multerS3(
         s3,
         bucket: process.env.BUCKET_NAME,
         acl: 'public-read',
-        key: (req, profileImg, cb) => {
-            console.log(profileImg);
-            const { originalname } = profileImg;
+        key: (req, file, cb) => {
+            
+            console.log(file.fieldname);
+            const { originalname } = file;
             const userId = req.user._id;
-            const newFileName = `${userId}_profileImg.${originalname.split(".")[1]}`;
-            req.newFileName = newFileName;
-            cb(null, "profileAssets/"+userId+"/"+newFileName);
+
+            if(file.fieldname == "profileImg"){
+                const newFileName = `${userId}_profileImg.${originalname.split(".")[1]}`;
+                req.profileImgNewFileName = newFileName;
+                
+                cb(null, "profileAssets/"+userId+"/"+newFileName);
+
+            }else if(file.fieldname == "coverImg"){
+                const newFileName = `${userId}_coverImg.${originalname.split(".")[1]}`;
+                req.coverImgNewFileName = newFileName;
+                
+                cb(null, "profileAssets/"+userId+"/"+newFileName);
+            }
         }
     }
 );
 
 //File Filter
-const fileFilter = (req, profileImg, cb) => {
-    if(profileImg){
-        if(profileImg.mimetype === 'image/jpeg'){
+const fileFilter = (req, file, cb) => {
+    if(file){
+        if(file.mimetype === 'image/jpeg'){
             cb( null, true );
         }else{
             cb( new Error("You can just upload '.jpg"), false );
@@ -55,15 +53,42 @@ const upload = multer(
     }
 );
 
-const deleteImg = async (deleteParams) => {
+const deleteImg = async (req, file, deleteParams) => {
     try {
-      await s3.deleteObject(deleteParams).promise();
-      console.log("Success", data);
-      return data;
+        fileFilter.then(
+            (_) => {
+                s3.deleteObject(deleteParams).promise();
+                console.log("Success", data);
+                return data;
+            }
+        );
     } catch (err) {
-      console.log("Error", err);
+        console.log("Error", err);
     }
   };
+
+const ValidateAndCleanBucket = async (
+    req,
+    user,
+    isDefaultProfileImg,
+    isDefaultCoverImg,
+    recordedImgName
+) => {
+    if(!isDefaultProfileImg && user.profileImg.recordedImgName !== undefined){
+        const deleteProfileImageParams = {
+            Bucket: process.env.BUCKET_NAME,
+            Key: `profileAssets/${user._id}/${recordedImgName}`
+        };
+        await deleteImg(deleteProfileImageParams);
+    }
+    if(!isDefaultCoverImg && user.coverImg.recordedImgName !== undefined){
+        const deleteCoverImageParams = {
+            Bucket: process.env.BUCKET_NAME,
+            Key: `profileAssets/${user._id}/${recordedImgName}`
+        };
+        await deleteImg(deleteCoverImageParams);
+    }
+}
 
 const updateProfileImg = async (req, res, next) => {
     try{
@@ -71,54 +96,58 @@ const updateProfileImg = async (req, res, next) => {
             User.findOne(
                 { _id: userId},
                 (err, user) => {
-                    const isDefaultImg = user.profileImg.isDefaultImg;
-                    if(isDefaultImg){
-                            upload.single("profileImg")(req, {}, (err) => {
-                                if(req.file){
-                                    User.findOneAndUpdate(
-                                        { _id: userId },
-                                        {
-                                            "profileImg.imgUrl": req.file.location,
-                                            "profileImg.recordedImgName": req.newFileName,
-                                            "profileImg.isDefaultImg": false,
-                                        },
-                                        {
-                                            new: true,
-                                            upsert: true,
-                                        },
-                                        (err, updated) => {
-                                            if(err){
-                                                console.log(err);
-                                            }else{
-                                                console.log("profile image updated");
+                    const isDefaultProfileImg = user.profileImg.isDefaultImg;
+                    const isDefaultCoverImg = user.coverImg.isDefaultImg;
+                    ValidateAndCleanBucket(
+                        req,
+                        isDefaultProfileImg,
+                        isDefaultCoverImg,
+                        user.profileImg.recordedImgName
+                    ).then(
+                        (_) => {
+                            upload.fields(
+                                [
+                                    {
+                                        name: "profileImg",
+                                        maxCount: 1
+                                    },
+                                    {
+                                        name: "coverImg",
+                                        maxCount: 1
+                                    }
+                                ]
+                            )(
+                                req,
+                                {},
+                                (err) => {
+                                    if(req.files.profileImg || req.files.coverImg){
+                                        let updateParams;
+                                        if(req.files.profileImg && req.files.coverImg){
+                                            updateParams = {
+                                                "profileImg.imgUrl": req.files.profileImg[0].location,
+                                                "profileImg.recordedImgName": req.profileImgNewFileName,
+                                                "profileImg.isDefaultImg": false,
+                                                "coverImg.imgUrl": req.files.coverImg[0].location,
+                                                "coverImg.recordedImgName": req.coverImgNewFileName,
+                                                "coverImg.isDefaultImg": false,
+                                            }
+                                        }else if(req.files.profileImg && !req.files.coverImg){
+                                            updateParams = {
+                                                "profileImg.imgUrl": req.files.profileImg[0].location,
+                                                "profileImg.recordedImgName": req.profileImgNewFileName,
+                                                "profileImg.isDefaultImg": false,
+                                            }
+                                        }else if(!req.files.profileImg && req.files.coverImg){
+                                            updateParams = {
+                                                "coverImg.imgUrl": req.files.coverImg[0].location,
+                                                "coverImg.recordedImgName": req.coverImgNewFileName,
+                                                "coverImg.isDefaultImg": false,
                                             }
                                         }
-                                    );
-                                    next();
-                                }else{
-                                    next();
-                                }
-                            });
-                    }else{
-                        const deleteParam = {
-                            Bucket: process.env.BUCKET_NAME,
-                            Key: `profileAssets/${userId}/${user.profileImg.recordedImgName}`
-                        };
-                        Promise.resolve(
-                            deleteImg(deleteParam)
-                        ).then(
-                            (_) => {
-                                console.log("ready to upload");
-                                upload.single("profileImg")(req, {}, (err) => {
-                                    console.log(req.file);
-                                    if(req.file){
+
                                         User.findOneAndUpdate(
                                             { _id: userId },
-                                            {
-                                                "profileImg.imgUrl": req.file.location,
-                                                "profileImg.recordedImgName": req.newFileName,
-                                                "profileImg.isDefaultImg": false,
-                                            },
+                                            updateParams,
                                             {
                                                 new: true,
                                                 upsert: true,
@@ -127,7 +156,7 @@ const updateProfileImg = async (req, res, next) => {
                                                 if(err){
                                                     console.log(err);
                                                 }else{
-                                                    console.log("Old image deleted and new one inserted");
+                                                    console.log("profile image updated");
                                                 }
                                             }
                                         );
@@ -139,17 +168,16 @@ const updateProfileImg = async (req, res, next) => {
                             }
                         )
                     }
+                );
+        }catch(err){
+            return res.status(500).json(
+                {
+                    error: true,
+                    message: err.message
                 }
-            );
-    }catch(err){
-        return res.status(500).json(
-            {
-                error: true,
-                message: err.message
-            }
-        )
-    }
+            )
+        }
     
-} 
+    } 
 
-export { updateProfileImg, s3 };
+    export { updateProfileImg };

@@ -21,6 +21,7 @@ const signUpBodyValidation = (body) => {
             }
           ),
           password: passwordComplexity().required().label("Password"),
+          ip: Joi.string().required().label("Ip"),
         }
     );
     return schema.validate(body);
