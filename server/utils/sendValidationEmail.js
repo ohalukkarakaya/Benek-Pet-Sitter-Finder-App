@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+import fs from "fs";
 import UserOTPVerification from "../models/UserOtpVerification.js";
 
 dotenv.config();
@@ -10,6 +11,13 @@ let transporter = nodemailer.createTransport(
       host: process.env.AUTH_EMAIL_HOST,
       port: process.env.AUTH_EMAIL_PORT,
       secure: true,
+      dkim: {
+        domainName: "benekapp.com",
+        keySelector: "benekAppDKIMSelector45",
+        privateKey: fs.readFileSync('./certificates/dkim/benekAppDKIMSelector45.benekapp.com.pem', "utf8"),
+        cacheDir: '/tmp',
+        cacheTreshold: 2048,
+      },
       auth: {
         user: process.env.AUTH_EMAIL,
         pass: process.env.AUTH_PASS,
