@@ -1,3 +1,5 @@
+.server/certificates/dkim/benekAppDKIMSelector45.benekapp.com.pem
+
 # Logs
 logs
 *.log
