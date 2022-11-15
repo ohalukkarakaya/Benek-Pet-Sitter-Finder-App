@@ -12,9 +12,9 @@ let transporter = nodemailer.createTransport(
       port: process.env.AUTH_EMAIL_PORT,
       secure: true,
       dkim: {
-        domainName: "benekapp.com",
-        keySelector: "benekAppDKIMSelector45",
-        privateKey: fs.readFileSync('./certificates/dkim/benekAppDKIMSelector45.benekapp.com.pem', "utf8"),
+        domainName: process.env.DKIM_DOMAIN,
+        keySelector: process.env.DKIM_SELECTOR,
+        privateKey: fs.readFileSync(process.env.DKIM_PRIVATE_KEY_FILE_PATH, "utf8"),
         cacheDir: '/tmp',
         cacheTreshold: 2048,
       },
