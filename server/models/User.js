@@ -121,9 +121,10 @@ const UserSchema = new mongoose.Schema(
                 default: ""
             },
         },
-        trustedIps: {
-            type: Array,
-            default: []
+        trustedIps: [ String ],
+        isLoggedInIpTrusted: {
+            type: Boolean,
+            default: true,
         },
         pets: {
             type: Array,

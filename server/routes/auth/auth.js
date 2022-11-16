@@ -7,6 +7,7 @@ import generateTokens from "../../utils/generateTokens.js";
 import UserOTPVerification from "../../models/UserOtpVerification.js";
 import sendOTPVerificationEmail from "../../utils/sendValidationEmail.js";
 import { signUpBodyValidation } from "../../utils/validationSchema.js";
+import UserToken from "../../models/UserToken.js";
 
 dotenv.config();
 
@@ -79,7 +80,7 @@ router.post(
   //LogIn
   router.post(
       "/login",
-      async (req, res) => {
+      async (req, res, next) => {
         try{
             const user = await User.findOne(
               {
@@ -94,6 +95,14 @@ router.post(
                   }
               );
             }else{
+              const userToken = await UserToken.findOne(
+                {
+                    userId: user._id
+                }
+              );
+              if(userToken){
+                await userToken.remove();
+              }
               const verifiedPassword = await bcrypt.compare(
                 req.body.password,
                 user.password
@@ -106,21 +115,59 @@ router.post(
                     }
                 );
               }else{
-                const { accessToken, refreshToken } = await generateTokens(user);
-                res.status(200).json(
-                  {
-                      error: false,
-                      isEmailVerified: user.isEmailVerified,
-                      accessToken,
-                      refreshToken,
-                      message: "Logged In Successfully"
+                if(!user.isEmailVerified){
+                  await UserOTPVerification.deleteMany({ userId: user._id });
+                  await sendOTPVerificationEmail(
+                    {
+                      _id: user._id,
+                      email: user.email,
+                    },
+                    null,
+                    next
+                  );
+                  return res.status(401).json(
+                    {
+                        error: true,
+                        message: "Email verification is required please check your inbox"
+                    }
+                  );
+                }else{
+                  if(!user.trustedIps.includes(req.body.ip) || !user.isLoggedInIpTrusted){
+                    await UserOTPVerification.deleteMany({ userId: user._id });
+                    await User.updateOne({_id: user._id}, {isLoggedInIpTrusted: false});
+                    await sendOTPVerificationEmail(
+                      {
+                        _id: user._id,
+                        email: user.email,
+                      },
+                      null,
+                      next
+                    );
+                    return res.status(401).json(
+                      {
+                          error: true,
+                          message: "Ip is not trusted, therefore verification code send to your email"
+                      }
+                    );
+                  }else{
+                    const { accessToken, refreshToken } = await generateTokens(user);
+                    return res.status(200).json(
+                      {
+                        error: false,
+                        isLoggedInIpTrusted: user.isLoggedInIpTrusted,
+                        isEmailVerified: user.isEmailVerified,
+                        accessToken,
+                        refreshToken,
+                        message: "Logged In Successfully"
+                      }
+                    );
                   }
-                );
+                }
               }
             }
         }catch(err){
           console.log(err);
-          res.status(500).json(
+          return res.status(500).json(
               {
                   error: true,
                   message: err.message
@@ -133,8 +180,8 @@ router.post(
   // Verify OTP
   router.post("/verifyOTP", async (req, res) => {
     try{
-      let { userId, otp } = req.body;
-      if(!userId || !otp){
+      let { userId, otp, ip } = req.body;
+      if(!userId || !otp || !ip){
         req.status(400).json(
           {
             error: true,
@@ -179,12 +226,47 @@ router.post(
               }
             );
             }else{
-              //success
-              await User.updateOne({_id: userId}, {isEmailVerified: true});
-              await UserOTPVerification.deleteMany({ userId });
-              res.status(200).json(
-                {
-                  message: "User email verified succesfuly"
+              const user = User.findOne(
+                {_id: userId},
+                async (err, user) => {
+                  if(err){
+                    res.status(404).json(
+                      {
+                        error: true,
+                        message: "User not found"
+                      }
+                    );
+                  }else{
+                    if(!user.trustedIps.includes(ip) && user.isLoggedInIpTrusted){
+                      res.status(405).json(
+                        {
+                          error: true,
+                          message: "Ip is not trusted. Please try to login from your device"
+                        }
+                      );
+                    }else if(!user.trustedIps.includes(ip) && !user.isLoggedInIpTrusted && user.isEmailVerified){
+                      await User.updateOne(
+                        {_id: userId},
+                        { $push: { trustedIps: ip }}
+                       );
+                      await User.updateOne({_id: userId}, {isLoggedInIpTrusted: true});
+                      await UserOTPVerification.deleteMany({ userId });
+                      res.status(200).json(
+                        {
+                          message: "Ip verified succesfuly"
+                        }
+                      );
+                    }else{
+                      //success
+                      await User.updateOne({_id: userId}, {isEmailVerified: true});
+                      await UserOTPVerification.deleteMany({ userId });
+                      res.status(200).json(
+                        {
+                          message: "User email verified succesfuly"
+                        }
+                      );
+                    }
+                  }
                 }
               );
             }
@@ -220,7 +302,8 @@ router.post(
             _id: userId,
             email
           },
-          res
+          null,
+          next
         );
       }
     }catch(err){

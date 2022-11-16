@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import fs from "fs";
 import UserOTPVerification from "../models/UserOtpVerification.js";
+import { nextTick } from "process";
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ let transporter = nodemailer.createTransport(
   );
 
  //send OTP verification
- const sendOTPVerificationEmail = async ({_id, email}, res) => {
+ const sendOTPVerificationEmail = async ({_id, email}, res, next) => {
     try {
       const otp = `${Math.floor(1000 + Math.random() * 9000)}`
 
@@ -51,16 +52,20 @@ let transporter = nodemailer.createTransport(
       //save otp record
       await newOtpVerification.save();
       await transporter.sendMail(mailOptions);
-      res.json(
-        {
-          status: "PENDING",
-          message: "Verification mail send to Email",
-          data: {
-            userId: _id,
-            email,
+      if( res !== null ){
+        res.json(
+          {
+            status: "PENDING",
+            message: "Verification mail send to Email",
+            data: {
+              userId: _id,
+              email,
+            }
           }
-        }
-      );
+        );
+      }else{
+        next();
+      }
     }catch(e){
       res.status(500).json(
         {
