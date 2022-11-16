@@ -74,14 +74,14 @@ const ValidateAndCleanBucket = async (
     isDefaultCoverImg,
     recordedImgName
 ) => {
-    if(!isDefaultProfileImg && user.profileImg.recordedImgName !== undefined){
+    if(!isDefaultProfileImg && user.profileImg !== undefined && user.profileImg.recordedImgName !== undefined){
         const deleteProfileImageParams = {
             Bucket: process.env.BUCKET_NAME,
             Key: `profileAssets/${user._id}/${recordedImgName}`
         };
         await deleteImg(deleteProfileImageParams);
     }
-    if(!isDefaultCoverImg && user.coverImg.recordedImgName !== undefined){
+    if(!isDefaultCoverImg && user.coverImg !== undefined && user.coverImg.recordedImgName !== undefined){
         const deleteCoverImageParams = {
             Bucket: process.env.BUCKET_NAME,
             Key: `profileAssets/${user._id}/${recordedImgName}`
@@ -120,7 +120,7 @@ const updateProfileImg = async (req, res, next) => {
                                 req,
                                 {},
                                 (err) => {
-                                    if(req.files.profileImg || req.files.coverImg){
+                                    if(req.files !== undefined && req.files.profileImg || req.files !== undefined && req.files.coverImg){
                                         let updateParams;
                                         if(req.files.profileImg && req.files.coverImg){
                                             updateParams = {
@@ -169,15 +169,14 @@ const updateProfileImg = async (req, res, next) => {
                         )
                     }
                 );
-        }catch(err){
-            return res.status(500).json(
-                {
-                    error: true,
-                    message: err.message
-                }
-            )
-        }
-    
-    } 
+    }catch(err){
+        return res.status(500).json(
+            {
+                error: true,
+                message: err.message
+            }
+        )
+    }
+} 
 
     export { updateProfileImg };
