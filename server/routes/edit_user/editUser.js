@@ -56,7 +56,7 @@ router.post(
           }
         }
 
-        next();
+        // next();
       }
 
       //save job info if its not null
@@ -78,6 +78,7 @@ router.post(
                 }
               )
             }else{
+              // console.log(data);
               return res.status(200).json(
                 {
                   data
@@ -85,7 +86,7 @@ router.post(
               )
             }
           }
-        );
+        ).clone();
       }else{
         return res.status(404).json({
           error: true,
