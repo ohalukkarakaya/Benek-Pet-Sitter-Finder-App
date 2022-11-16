@@ -35,6 +35,7 @@ const UserSchema = new mongoose.Schema(
             },
             "job": {
                 type: String,
+                default: null,
                 maxLength: [
                     30,
                     '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
@@ -46,6 +47,7 @@ const UserSchema = new mongoose.Schema(
             },
             "bio": {
                 type: String,
+                default: null,
                 maxLength: [
                     150,
                     '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
@@ -154,7 +156,7 @@ const UserSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
-        depandedUsers: {
+        dependedUsers: {
             type: Array,
             default: []
         }

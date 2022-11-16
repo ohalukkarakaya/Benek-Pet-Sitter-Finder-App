@@ -2,7 +2,6 @@ import express from "express";
 import User from "../../models/User.js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import nodemailer from "nodemailer";
 import generateTokens from "../../utils/generateTokens.js";
 import UserOTPVerification from "../../models/UserOtpVerification.js";
 import sendOTPVerificationEmail from "../../utils/sendValidationEmail.js";
