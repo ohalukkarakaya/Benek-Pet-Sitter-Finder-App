@@ -15,14 +15,17 @@ router.post(
     updateProfileImg,
     async (req, res, next) => {
 
-      let succesResponse;
+      let profileImageSucces;
+      let coverImageSucces;
+      let jobSucces;
+      let successResponse;
 
       //if there is existing images and they uploaded to media server
       if (req.files) {
 
         if(req.files.profileImg){
           var uploadedProfileImgImage = req.files.profileImg[0].location;
-          console.log(` Profile Image: ${uploadedProfileImgImage}`);
+          console.log(`Profile Image: ${uploadedProfileImgImage}`);
         }
         if(req.files.coverImg){
           var uploadedCoverImgImage = req.files.coverImg[0].location;
@@ -33,64 +36,65 @@ router.post(
           req.files.profileImg
           && req.files.coverImg
         ) {
-          succesResponse = {
-            error: false,
-            profileImgUrl: uploadedProfileImgImage,
-            coverImgUrl: uploadedCoverImgImage
-          }
+          //if there is profile image and cover image both
+          profileImageSucces = uploadedProfileImgImage;
+          coverImageSucces = uploadedCoverImgImage;
         }else if(
           req.files.profileImg
           && !req.files.coverImg
         ) {
-          succesResponse = {
-            error: false,
-            profileImgUrl: uploadedProfileImgImage,
-          }
+          //if there is only profile image
+          profileImageSucces = uploadedProfileImgImage;
         }else if(
           !req.files.profileImg
           && req.files.coverImg
         ) {
-          succesResponse = {
-            error: false,
-            coverImgUrl: uploadedCoverImgImage
-          }
+          //if there is only cover image
+          coverImageSucces = uploadedCoverImgImage;
         }
-
         next();
       }
 
       //save job info if its not null
       if(req.body.job){
-        console.log(req.body.job);
-        await User.findByIdAndUpdate(
-          req.user._id,
-          { "identity.job": req.body.job },
-          {
-            new: true,
-            upsert: true,
-          },
-          (err, data) => {
-            if(err){
-              res.status(500).json(
-                {
-                  error: true,
-                  message: "Internal server error"
-                }
-              )
-            }else{
-              return res.status(200).json(
-                {
-                  data
-                }
-              )
+        req.user.identity.job = req.body.job;
+        jobSucces = req.user.identity.job;
+        req.user.markModified('identity');
+      }
+
+      //check what id updated
+      if(
+        profileImageSucces !== null
+        || coverImageSucces !== null
+        || jobSucces !== null
+      ){
+        successResponse = {
+          error: false,
+          profileImageUrl: profileImageSucces,
+          coverImageUrl: coverImageSucces,
+          job: jobSucces,
+        };
+        next();
+      }
+
+      if(successResponse !== null){
+        await req.user.save(
+          function (err) {
+            if(err) {
+                console.error('ERROR: While Update!');
             }
           }
         );
+        return res.status(200).json(
+          successResponse
+        );
       }else{
-        return res.status(404).json({
-          error: true,
-          message: "empty request"
-        });
+        return res.status(400).json(
+          {
+            error: true,
+            message: "Empty Request Body"
+          }
+        );
       }
     });
 

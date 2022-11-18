@@ -74,6 +74,7 @@ const ValidateAndCleanBucket = async (
     isDefaultCoverImg,
     recordedImgName
 ) => {
+    // console.log(`profile: ${user.profileImg.recordedImgName !== undefined} cover: ${user.coverImg.recordedImgName !== undefined}`)
     if(!isDefaultProfileImg && user.profileImg !== undefined && user.profileImg.recordedImgName !== undefined){
         const deleteProfileImageParams = {
             Bucket: process.env.BUCKET_NAME,
@@ -93,16 +94,18 @@ const ValidateAndCleanBucket = async (
 const updateProfileImg = async (req, res, next) => {
     try{
         const userId = req.user._id;
-            User.findOne(
+            await User.findOne(
                 { _id: userId},
                 (err, user) => {
+                    req.user = user;
                     const isDefaultProfileImg = user.profileImg.isDefaultImg;
                     const isDefaultCoverImg = user.coverImg.isDefaultImg;
                     ValidateAndCleanBucket(
                         req,
                         isDefaultProfileImg,
                         isDefaultCoverImg,
-                        user.profileImg.recordedImgName
+                        user.profileImg.recordedImgName,
+                        user.coverImg.recordedImgName
                     ).then(
                         (_) => {
                             upload.fields(
@@ -123,43 +126,26 @@ const updateProfileImg = async (req, res, next) => {
                                     if(req.files !== undefined && req.files.profileImg || req.files !== undefined && req.files.coverImg){
                                         let updateParams;
                                         if(req.files.profileImg && req.files.coverImg){
-                                            updateParams = {
-                                                "profileImg.imgUrl": req.files.profileImg[0].location,
-                                                "profileImg.recordedImgName": req.profileImgNewFileName,
-                                                "profileImg.isDefaultImg": false,
-                                                "coverImg.imgUrl": req.files.coverImg[0].location,
-                                                "coverImg.recordedImgName": req.coverImgNewFileName,
-                                                "coverImg.isDefaultImg": false,
-                                            }
-                                        }else if(req.files.profileImg && !req.files.coverImg){
-                                            updateParams = {
-                                                "profileImg.imgUrl": req.files.profileImg[0].location,
-                                                "profileImg.recordedImgName": req.profileImgNewFileName,
-                                                "profileImg.isDefaultImg": false,
-                                            }
-                                        }else if(!req.files.profileImg && req.files.coverImg){
-                                            updateParams = {
-                                                "coverImg.imgUrl": req.files.coverImg[0].location,
-                                                "coverImg.recordedImgName": req.coverImgNewFileName,
-                                                "coverImg.isDefaultImg": false,
-                                            }
-                                        }
 
-                                        User.findOneAndUpdate(
-                                            { _id: userId },
-                                            updateParams,
-                                            {
-                                                new: true,
-                                                upsert: true,
-                                            },
-                                            (err, updated) => {
-                                                if(err){
-                                                    console.log(err);
-                                                }else{
-                                                    console.log("profile image updated");
-                                                }
-                                            }
-                                        );
+                                                req.user.profileImg.imgUrl = req.files.profileImg[0].location;
+                                                req.user.profileImg.recordedImgName = req.profileImgNewFileName;
+                                                req.user.profileImg.isDefaultImg = false;
+                                                req.user.coverImg.imgUrl = req.files.coverImg[0].location;
+                                                req.user.coverImg.recordedImgName = req.coverImgNewFileName;
+                                                req.user.coverImg.isDefaultImg = false;
+
+                                        }else if(req.files.profileImg && !req.files.coverImg){
+
+                                                req.user.profileImg.imgUrl = req.files.profileImg[0].location;
+                                                req.user.profileImg.recordedImgName = req.profileImgNewFileName;
+                                                req.user.profileImg.isDefaultImg = false;
+
+                                        }else if(!req.files.profileImg && req.files.coverImg){
+                                            
+                                                req.user.coverImg.imgUrl= req.files.coverImg[0].location;
+                                                req.user.coverImg.recordedImgName = req.coverImgNewFileName;
+                                                req.user.coverImg.isDefaultImg = false;
+                                        }
                                         next();
                                     }else{
                                         next();
@@ -168,7 +154,7 @@ const updateProfileImg = async (req, res, next) => {
                             }
                         )
                     }
-                );
+                ).clone();
     }catch(err){
         return res.status(500).json(
             {
