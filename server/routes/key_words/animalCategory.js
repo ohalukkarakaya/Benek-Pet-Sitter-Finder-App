@@ -27,8 +27,9 @@ router.post(
         );
         if(animal){
             if(
-                animal.animalName.includes(
-                    req.body.animalName
+                animal.animalName.some(
+                    item => item.tr === req.body.animalName.tr
+                        && item.en === req.body.animalName.en
                 )
             ){
                 return res.status(400).json(
