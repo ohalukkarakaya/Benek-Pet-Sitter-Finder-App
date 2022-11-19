@@ -18,6 +18,7 @@ router.post(
       let profileImageSucces;
       let coverImageSucces;
       let jobSucces;
+      let bioSucces;
       let successResponse;
 
       //if there is existing images and they uploaded to media server
@@ -62,17 +63,35 @@ router.post(
         req.user.markModified('identity');
       }
 
+      //save bio info if its not null
+      if(req.body.bio){
+        if(req.body.bio.length <= 150){
+          req.user.identity.bio = req.body.bio;
+          bioSucces = req.user.identity.bio;
+          req.user.markModified('identity');
+        }else{
+          return res.status(418).json(
+            {
+              error: true,
+              message: "Bio info can't take more than 150 character."
+            }
+          );
+        }
+      }
+
       //check what id updated
       if(
         profileImageSucces !== null
         || coverImageSucces !== null
         || jobSucces !== null
+        || bioSucces !== null
       ){
         successResponse = {
           error: false,
           profileImageUrl: profileImageSucces,
           coverImageUrl: coverImageSucces,
           job: jobSucces,
+          bio: bioSucces
         };
         next();
       }

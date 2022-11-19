@@ -74,7 +74,6 @@ const ValidateAndCleanBucket = async (
     isDefaultCoverImg,
     recordedImgName
 ) => {
-    // console.log(`profile: ${user.profileImg.recordedImgName !== undefined} cover: ${user.coverImg.recordedImgName !== undefined}`)
     if(!isDefaultProfileImg && user.profileImg !== undefined && user.profileImg.recordedImgName !== undefined){
         const deleteProfileImageParams = {
             Bucket: process.env.BUCKET_NAME,
@@ -126,7 +125,7 @@ const updateProfileImg = async (req, res, next) => {
                                     if(req.files !== undefined && req.files.profileImg || req.files !== undefined && req.files.coverImg){
                                         let updateParams;
                                         if(req.files.profileImg && req.files.coverImg){
-
+                                                //if there is profile image and cover image both
                                                 req.user.profileImg.imgUrl = req.files.profileImg[0].location;
                                                 req.user.profileImg.recordedImgName = req.profileImgNewFileName;
                                                 req.user.profileImg.isDefaultImg = false;
@@ -135,13 +134,13 @@ const updateProfileImg = async (req, res, next) => {
                                                 req.user.coverImg.isDefaultImg = false;
 
                                         }else if(req.files.profileImg && !req.files.coverImg){
-
+                                                //if there is only profile image
                                                 req.user.profileImg.imgUrl = req.files.profileImg[0].location;
                                                 req.user.profileImg.recordedImgName = req.profileImgNewFileName;
                                                 req.user.profileImg.isDefaultImg = false;
 
                                         }else if(!req.files.profileImg && req.files.coverImg){
-                                            
+                                                //if there is only cover image
                                                 req.user.coverImg.imgUrl= req.files.coverImg[0].location;
                                                 req.user.coverImg.recordedImgName = req.coverImgNewFileName;
                                                 req.user.coverImg.isDefaultImg = false;
