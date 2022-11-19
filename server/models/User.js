@@ -159,7 +159,13 @@ const UserSchema = new mongoose.Schema(
         dependedUsers: {
             type: Array,
             default: []
-        }
+        },
+        interestsTags: [
+            {
+                tagId: String,
+                tag: String
+            }
+        ]
     },
     {
         timestamps: true
