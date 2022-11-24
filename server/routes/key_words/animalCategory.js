@@ -1,6 +1,4 @@
 import express from "express";
-import fs from "fs";
-import AnimalCategories from "../../models/AnimalCategories.js";
 import { animalCategoryReqValidation } from "../../utils/animalCategoryReqValidationSchema.js";
 import auth from "../../middleware/auth.js";
 import { createRequire } from "module";
@@ -11,28 +9,11 @@ const petDataset = JSON.parse(JSON.stringify(rawPetDataset));
 
 const router = express.Router();
 
-//Send Pet Keywords
+//Get Pet Keywords
 router.get(
     "/:language",
     auth,
     async (req, res) => {
-    
-    // let rawPetDataset = fs.readFile(
-    //     '../../src/pet_dataset.json',
-    //     "utf8",
-    //     (err, data) => {
-    //         if(err){
-    //             return res.status(500).json(
-    //                 {
-    //                     error: true,
-    //                     message: err.message
-    //                 }
-    //             );
-    //         };
-    //         console.log(data);
-    //     }
-    // );
-    // let petDataset = JSON.parse(rawPetDataset);
 
     const userLanguage = req.params.language;
 
