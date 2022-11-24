@@ -3,6 +3,11 @@ import fs from "fs";
 import AnimalCategories from "../../models/AnimalCategories.js";
 import { animalCategoryReqValidation } from "../../utils/animalCategoryReqValidationSchema.js";
 import auth from "../../middleware/auth.js";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const rawPetDataset = require('../../src/pet_dataset.json');
+
+const petDataset = JSON.parse(JSON.stringify(rawPetDataset));
 
 const router = express.Router();
 
@@ -12,35 +17,35 @@ router.get(
     auth,
     async (req, res) => {
     
-    let rawPetDataset = fs.readFile(
-        '../../src/petDataset.json',
-        "utf8",
-        (err, data) => {
-            if(err){
-                return res.status(500).json(
-                    {
-                        error: true,
-                        message: err.message
-                    }
-                );
-            };
-            console.log(data);
-        }
-    );
-    let petDataset = JSON.parse(rawPetDataset);
+    // let rawPetDataset = fs.readFile(
+    //     '../../src/pet_dataset.json',
+    //     "utf8",
+    //     (err, data) => {
+    //         if(err){
+    //             return res.status(500).json(
+    //                 {
+    //                     error: true,
+    //                     message: err.message
+    //                 }
+    //             );
+    //         };
+    //         console.log(data);
+    //     }
+    // );
+    // let petDataset = JSON.parse(rawPetDataset);
 
     const userLanguage = req.params.language;
 
     if(userLanguage === "tr"){
         const trResponse = [];
-        for(var pet in petDataset.pets){
-            var petGeneralId = pet.id;
-            var petName = pet.name.tr;
+        for(var i = 0; i < petDataset.pets.length; i ++){
+            var petGeneralId = petDataset.pets[i].id;
+            var petName = petDataset.pets[i].name.tr;
 
             var petSpecies = [];
-            for(var species in pet.species){
-                var speciesId = species.id;
-                var speciesName = species.tr;
+            for(var index = 0; index < petDataset.pets[i].species.length; index ++){
+                var speciesId = petDataset.pets[i].species[index].id;
+                var speciesName = petDataset.pets[i].species[index].tr;
 
                 var speciesObject = {
                     "id": speciesId,
