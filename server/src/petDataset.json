@@ -1,0 +1,3393 @@
+{
+    "description": "list of pets",
+    "pets": [
+        {
+            "id": "P0",
+            "name": {
+                "tr": "Köpek",
+                "en": "Dog"
+            },
+            "species" : [
+                {
+                    "id": "D0",
+                    "tr": "Diğer",
+                    "en": "Other"
+                },
+                {
+                    "id": "D1",
+                    "tr": "Affenpinscher",
+                    "en": "Affenpinscher"
+                },
+                {
+                    "id": "D2",
+                    "tr": "Afgan Tazısı",
+                    "en": "Afghan Hound"
+                },
+                {
+                    "id": "D3",
+                    "tr": "Aidi",
+                    "en": "Aidi"
+                },
+                {
+                    "id": "D4",
+                    "tr": "Airedale Teriyeri",
+                    "en": "Airedale Terrier"
+                },
+                {
+                    "id": "D5",
+                    "tr": "Akbaş",
+                    "en": "Akbash Dog"
+                },
+                {
+                    "id": "D6",
+                    "tr": "Akita",
+                    "en": "Akita"
+                },
+                {
+                    "id": "D7",
+                    "tr": "İspanyol Alano",
+                    "en": "Alano Español"
+                },
+                {
+                    "id": "D8",
+                    "tr": "Alaskan Klee Kai",
+                    "en": "Alaskan Klee Kai"
+                },
+                {
+                    "id": "D9",
+                    "tr": "Alaska Malamutu",
+                    "en": "Alaskan Malamute"
+                },
+                {
+                    "id": "D10",
+                    "tr": "Alp Dachsbracke",
+                    "en": "Alpine Dachsbracke"
+                },
+                {
+                    "id": "D11",
+                    "tr": "Alp Spaniel",
+                    "en": "Alpine Spaniel"
+                },
+                {
+                    "id": "D12",
+                    "tr": "Amerikan Bulldog",
+                    "en": "American Bulldog"
+                },
+                {
+                    "id": "D13",
+                    "tr": "Amerikan Cocker Spaniel",
+                    "en": "American Cocker Spaniel"
+                },
+                {
+                    "id": "D14",
+                    "tr": "Amerikan Eskimo Köpeği",
+                    "en": "American Eskimo Dog"
+                },
+                {
+                    "id": "D15",
+                    "tr": "Amerikan Tazısı",
+                    "en": "American Foxhound"
+                },
+                {
+                    "id": "D16",
+                    "tr": "Amerikan Tüysüz Teriyer",
+                    "en": "American Hairless Terrier"
+                },
+                {
+                    "id": "D17",
+                    "tr": "Amerikan Pit Bull Teriyeri",
+                    "en": "American Pit Bull Terrier"
+                },
+                {
+                    "id": "D18",
+                    "tr": "Amerikan Staffordshire Teriyer",
+                    "en": "American Staffordshire Terrier"
+                },
+                {
+                    "id": "D19",
+                    "tr": "Amerikan Water Spaniel",
+                    "en": "American Water Spaniel"
+                },
+                {
+                    "id": "D20",
+                    "tr": "Anglo-Français de Petite Vénerie",
+                    "en": "Anglo-Français de Petite Vénerie"
+                },
+                {
+                    "id": "D21",
+                    "tr": "Appenzell Dağ köpeği",
+                    "en": "Appenzeller Sennenhund"
+                },
+                {
+                    "id": "D22",
+                    "tr": "Ariege Pointer",
+                    "en": "Ariege Pointer"
+                },
+                {
+                    "id": "D23",
+                    "tr": "Ariegeois",
+                    "en": "Ariegeois"
+                },
+                {
+                    "id": "D24",
+                    "tr": "Armant",
+                    "en": "Armant"
+                },
+                {
+                    "id": "D25",
+                    "tr": "Ermeni Gampr Köpeği",
+                    "en": "Armenian Gampr Dog"
+                },
+                {
+                    "id": "D26",
+                    "tr": "Artois Tazısı",
+                    "en": "Artois Hound"
+                },
+                {
+                    "id": "D27",
+                    "tr": "Avustralya Sığır Köpeği",
+                    "en": "Australian Cattle Dog"
+                },
+                {
+                    "id": "D28",
+                    "tr": "Australya Kelpie",
+                    "en": "Australian Kelpie"
+                },
+                {
+                    "id": "D29",
+                    "tr": "Australya Çoban Köpeği",
+                    "en": "Australian Shepherd"
+                },
+                {
+                    "id": "D30",
+                    "tr": "Australian Silky Teriyer",
+                    "en": "Australian Silky Terrier"
+                },
+                {
+                    "id": "D31",
+                    "tr": "Avustralya Stumpy Tail Sığır Köpeği",
+                    "en": "Australian Stumpy Tail Cattle Dog"
+                },
+                {
+                    "id": "D32",
+                    "tr": "Australya Teriyer",
+                    "en": "Australian Terrier"
+                },
+                {
+                    "id": "D33",
+                    "tr": "Azavak",
+                    "en": "Azawakh"
+                },
+                {
+                    "id": "D34",
+                    "tr": "Baharwal Köpeği",
+                    "en": "Bakharwal Dog"
+                },
+                {
+                    "id": "D35",
+                    "tr": "Barbet",
+                    "en": "Barbet"
+                },
+                {
+                    "id": "D36",
+                    "tr": "Basenji",
+                    "en": "Basenji"
+                },
+                {
+                    "id": "D37",
+                    "en": "Bask Çoban Köpeği",
+                    "tr": "Basque Shepherd Dog"
+                },
+                {
+                    "id": "D38",
+                    "tr": "Basset Artésien Normand",
+                    "en": "Basset Artésien Normand"
+                },
+                {
+                    "id": "D39",
+                    "tr": "Basset Bleu de Gascogne",
+                    "en": "Basset Bleu de Gascogne"
+                },
+                {
+                    "id": "D40",
+                    "tr": "Basset Fauve de Bretagne",
+                    "en": "Basset Fauve de Bretagne"
+                },
+                {
+                    "id": "D41",
+                    "tr": "Basset Tazısı",
+                    "en": "Basset Hound"
+                },
+                {
+                    "id": "D42",
+                    "tr": "Bavyera Dağ Tazısı",
+                    "en": "Bavarian Mountain Hound"
+                },
+                {
+                    "id": "D43",
+                    "tr": "Beagle",
+                    "en": "Beagle"
+                },
+                {
+                    "id": "D44",
+                    "tr": "Beagle-Harrier",
+                    "en": "Beagle-Harrier"
+                },
+                {
+                    "id": "D45",
+                    "tr": "Sakallı Collie",
+                    "en": "Bearded Collie"
+                },
+                {
+                    "id": "D46",
+                    "tr": "Beauceron",
+                    "en": "Beauceron"
+                },
+                {
+                    "id": "D47",
+                    "tr": "Bedlington Teriyeri",
+                    "en": "Bedlington Terrier"
+                },
+                {
+                    "id": "D48",
+                    "tr": "Belçika Çoban Köpeği (Groenendael)",
+                    "en": "Belgian Shepherd Dog (Groenendael)"
+                },
+                {
+                    "id": "D49",
+                    "tr": "Belçika Çoban Köpeği (Laekenois)",
+                    "en": "Belgian Shepherd Dog (Laekenois)"
+                },
+                {
+                    "id": "D50",
+                    "tr": "Belçika Çoban Köpeği (Malinois)",
+                    "en": "Belgian Shepherd Dog (Malinois)"
+                },
+                {
+                    "id": "D51",
+                    "tr": "Bergamasco Çoban",
+                    "en": "Bergamasco Shepherd"
+                },
+                {
+                    "id": "D52",
+                    "tr": "Berger Blanc Suisse",
+                    "en": "Berger Blanc Suisse"
+                },
+                {
+                    "id": "D53",
+                    "tr": "Berger Picard",
+                    "en": "Berger Picard"
+                },
+                {
+                    "id": "D54",
+                    "tr": "Berner Laufhund",
+                    "en": "Berner Laufhund"
+                },
+                {
+                    "id": "D55",
+                    "tr": "Bernese dağ köpeği",
+                    "en": "Bernese Mountain Dog"
+                },
+                {
+                    "id": "D56",
+                    "tr": "Billy",
+                    "en": "Billy"
+                },
+                {
+                    "id": "D57",
+                    "tr": "Black and Tan Coonhound",
+                    "en": "Black and Tan Coonhound"
+                },
+                {
+                    "id": "D58",
+                    "tr": "Black and Tan Virginia Foxhound",
+                    "en": "Black and Tan Virginia Foxhound"
+                },
+                {
+                    "id": "D59",
+                    "tr": "Siyah Norveç Elkhound",
+                    "en": "Black Norwegian Elkhound"
+                },
+                {
+                    "id": "D60",
+                    "tr": "Siyah Rus Teriyeri",
+                    "en": "Black Russian Terrier"
+                },
+                {
+                    "id": "D61",
+                    "tr": "Tazı",
+                    "en": "Bloodhound"
+                },
+                {
+                    "id": "D62",
+                    "tr": "Blue Lacy",
+                    "en": "Blue Lacy"
+                },
+                {
+                    "id": "D63",
+                    "tr": "Mavi Paul Teriyer",
+                    "en": "Blue Paul Terrier"
+                },
+                {
+                    "id": "D64",
+                    "tr": "Boerboel",
+                    "en": "Boerboel"
+                },
+                {
+                    "id": "D65",
+                    "tr": "Bohem Çoban Köpeği",
+                    "en": "Bohemian Shepherd"
+                },
+                {
+                    "id": "D66",
+                    "tr": "Bolognese",
+                    "en": "Bolognese"
+                },
+                {
+                    "id": "D67",
+                    "tr": "Border Collie",
+                    "en": "Border Collie"
+                },
+                {
+                    "id": "D68",
+                    "tr": "Border Teriyer",
+                    "en": "Border Terrier"
+                },
+                {
+                    "id": "D69",
+                    "tr": "Borzoi",
+                    "en": "Borzoi"
+                },
+                {
+                    "id": "D70",
+                    "tr": "Boston Teriyer",
+                    "en": "Boston Terrier"
+                },
+                {
+                    "id": "D71",
+                    "tr": "Bouvier des Ardennes",
+                    "en": "Bouvier des Ardennes"
+                },
+                {
+                    "id": "D72",
+                    "tr": "Bouvier des Flandres",
+                    "en": "Bouvier des Flandres"
+                },
+                {
+                    "id": "D73",
+                    "tr": "Boxer",
+                    "en": "Boxer"
+                },
+                {
+                    "id": "D74",
+                    "tr": "Boykin Spaniel",
+                    "en": "Boykin Spaniel"
+                },
+                {
+                    "id": "D75",
+                    "tr": "Bracco Italyan",
+                    "en": "Bracco Italiano"
+                },
+                {
+                    "id": "D76",
+                    "tr": "Braque d'Auvergne",
+                    "en": "Braque d'Auvergne"
+                },
+                {
+                    "id": "D77",
+                    "tr": "Braque du Bourbonnais",
+                    "en": "Braque du Bourbonnais"
+                },
+                {
+                    "id": "D78",
+                    "tr": "Brak du Puy",
+                    "en": "Braque du Puy"
+                },
+                {
+                    "id": "D79",
+                    "tr": "Fransız Braque",
+                    "en": "Braque Francais"
+                },
+                {
+                    "id": "D80",
+                    "tr": "Braque Saint-Germain",
+                    "en": "Braque Saint-Germain"
+                },
+                {
+                    "id": "D81",
+                    "tr": "Brazilya Teriyer",
+                    "en": "Brazilian Terrier"
+                },
+                {
+                    "id": "D82",
+                    "tr": "Briard",
+                    "en": "Briard"
+                },
+                {
+                    "id": "D83",
+                    "tr": "Briket Griffon Vendeen",
+                    "en": "Briquet Griffon Vendéen"
+                },
+                {
+                    "id": "D84",
+                    "tr": "Brittany",
+                    "en": "Brittany"
+                },
+                {
+                    "id": "D85",
+                    "tr": "Broholmer",
+                    "en": "Broholmer"
+                },
+                {
+                    "id": "D86",
+                    "tr": "Bruno Jura Tazısı",
+                    "en": "Bruno Jura Hound"
+                },
+                {
+                    "id": "D87",
+                    "tr": "Bucovina Çoban Köpeği",
+                    "en": "Bucovina Shepherd Dog"
+                },
+                {
+                    "id": "D88",
+                    "tr": "Bull and Terrier",
+                    "en": "Bull and Terrier"
+                },
+                {
+                    "id": "D89",
+                    "tr": "Bull Terrier (Miniature)",
+                    "en": "Bull Terrier (Miniature)"
+                },
+                {
+                    "id": "D90",
+                    "tr": "Bull Terrier",
+                    "en": "Bull Terrier"
+                },
+                {
+                    "id": "D91",
+                    "tr": "Bulldog",
+                    "en": "Bulldog"
+                },
+                {
+                    "id": "D92",
+                    "tr": "Bullenbeisser",
+                    "en": "Bullenbeisser"
+                },
+                {
+                    "id": "D93",
+                    "tr": "Bullmastiff",
+                    "en": "Bullmastiff"
+                },
+                {
+                    "id": "D94",
+                    "tr": "Bully Kutta",
+                    "en": "Bully Kutta"
+                },
+                {
+                    "id": "D95",
+                    "tr": "Burgos Pointer",
+                    "en": "Burgos Pointer"
+                },
+                {
+                    "id": "D96",
+                    "tr": "Cairn Teriyer",
+                    "en": "Cairn Terrier"
+                },
+                {
+                    "id": "D97",
+                    "tr": "Canaan Dog",
+                    "en": "Canaan Dog"
+                },
+                {
+                    "id": "D98",
+                    "tr": "Kanada Eskimo Köpeği",
+                    "en": "Canadian Eskimo Dog"
+                },
+                {
+                    "id": "D99",
+                    "tr": "Cane Corso",
+                    "en": "Cane Corso"
+                },
+                {
+                    "id": "D100",
+                    "tr": "Cardigan Welsh Corgi",
+                    "en": "Cardigan Welsh Corgi"
+                },
+                {
+                    "id": "D101",
+                    "tr": "Carolina Dog",
+                    "en": "Carolina Dog"
+                },
+                {
+                    "id": "D102",
+                    "tr": "Karpat Çoban Köpeği",
+                    "en": "Carpathian Shepherd Dog"
+                },
+                {
+                    "id": "D103",
+                    "tr": "Katahoula Cur",
+                    "en": "Catahoula Cur"
+                },
+                {
+                    "id": "D104",
+                    "tr": "Katalan Çoban Köpeği",
+                    "en": "Catalan Sheepdog"
+                },
+                {
+                    "id": "D105",
+                    "tr": "Kafkas Çoban Köpeği",
+                    "en": "Caucasian Shepherd Dog"
+                },
+                {
+                    "id": "D106",
+                    "tr": "Cavalier King Charles Spaniel",
+                    "en": "Cavalier King Charles Spaniel"
+                },
+                {
+                    "id": "D107",
+                    "tr": "Orta Asya Çoban Köpeği",
+                    "en": "Central Asian Shepherd Dog"
+                },
+                {
+                    "id": "D108",
+                    "tr": "Cesky Fousek",
+                    "en": "Cesky Fousek"
+                },
+                {
+                    "id": "D109",
+                    "tr": "Cesky Teriyer",
+                    "en": "Cesky Terrier"
+                },
+                {
+                    "id": "D110",
+                    "tr": "Chesapeake Bay Retriever",
+                    "en": "Chesapeake Bay Retriever"
+                },
+                {
+                    "id": "D111",
+                    "tr": "Chien Français Blanc et Noir",
+                    "en": "Chien Français Blanc et Noir"
+                },
+                {
+                    "id": "D112",
+                    "tr": "Chien Français Blanc et Orange",
+                    "en": "Chien Français Blanc et Orange"
+                },
+                {
+                    "id": "D113",
+                    "tr": "Chien Français Tricolore",
+                    "en": "Chien Français Tricolore"
+                },
+                {
+                    "id": "D114",
+                    "tr": "Chien-gris",
+                    "en": "Chien-gris"
+                },
+                {
+                    "id": "D115",
+                    "tr": "Chihuahua",
+                    "en": "Chihuahua"
+                },
+                {
+                    "id": "D116",
+                    "tr": "Chilean Fox Teriyer",
+                    "en": "Chilean Fox Terrier"
+                },
+                {
+                    "id": "D117",
+                    "tr": "Çin Chongqing Köpeği",
+                    "en": "Chinese Chongqing Dog"
+                },
+                {
+                    "id": "D118",
+                    "en": "Chinese Crested Dog",
+                    "tr": "Çin Tepeli Köpek"
+                },
+                {
+                    "id": "D119",
+                    "tr": "Çin İmparatorluk Köpeği",
+                    "en": "Chinese Imperial Dog"
+                },
+                {
+                    "id": "D120",
+                    "tr": "Chinook",
+                    "en": "Chinook"
+                },
+                {
+                    "id": "D121",
+                    "tr": "Chippiparai",
+                    "en": "Chippiparai"
+                },
+                {
+                    "id": "D122",
+                    "tr": "Chow Chow",
+                    "en": "Chow Chow"
+                },
+                {
+                    "id": "D123",
+                    "tr": "Cierny Sery",
+                    "en": "Cierny Sery"
+                },
+                {
+                    "id": "D124",
+                    "tr": "Cimarrón Uruguayo",
+                    "en": "Cimarrón Uruguayo"
+                },
+                {
+                    "id": "D125",
+                    "tr": "Cirneco dell'Etna",
+                    "en": "Cirneco dell'Etna"
+                },
+                {
+                    "id": "D126",
+                    "tr": "Clumber Spaniel",
+                    "en": "Clumber Spaniel"
+                },
+                {
+                    "id": "D127",
+                    "tr": "Combai",
+                    "en": "Combai"
+                },
+                {
+                    "id": "D128",
+                    "tr": "Cordoba Dövüş Köpeği",
+                    "en": "Cordoba Fighting Dog"
+                },
+                {
+                    "id": "D129",
+                    "tr": "Coton de Tulear",
+                    "en": "Coton de Tulear"
+                },
+                {
+                    "id": "D130",
+                    "tr": "Cretan Hound",
+                    "en": "Cretan Hound"
+                },
+                {
+                    "id": "D131",
+                    "tr": "Hırvat Çoban Köpeği",
+                    "en": "Croatian Sheepdog"
+                },
+                {
+                    "id": "D132",
+                    "tr": "Cumberland Çoban Köpeği",
+                    "en": "Cumberland Sheepdog"
+                },
+                {
+                    "id": "D133",
+                    "tr": "Curly Coated Retriever",
+                    "en": "Curly Coated Retriever"
+                },
+                {
+                    "id": "D134",
+                    "tr": "Cursinu",
+                    "en": "Cursinu"
+                },
+                {
+                    "id": "D135",
+                    "tr": "Cao da Serra de Aires",
+                    "en": "Cão da Serra de Aires"
+                },
+                {
+                    "id": "D136",
+                    "tr": "Cão de Castro Laboreiro",
+                    "en": "Cão de Castro Laboreiro"
+                },
+                {
+                    "id": "D137",
+                    "tr": "Cao Fila de Sao Miguel",
+                    "en": "Cão Fila de São Miguel"
+                },
+                {
+                    "id": "D138",
+                    "tr": "Dachshund",
+                    "en": "Dachshund"
+                },
+                {
+                    "id": "D139",
+                    "tr": "Dalmatian",
+                    "en": "Dachshund"
+                },
+                {
+                    "id": "D140",
+                    "tr": "Dandie Dinmont Teriyer",
+                    "en": "Dandie Dinmont Terrier"
+                },
+                {
+                    "id": "D141",
+                    "tr": "Danish Swedish Farmdog",
+                    "en": "Danish Swedish Farmdog"
+                },
+                {
+                    "id": "D142",
+                    "tr": "Alman Bracke",
+                    "en": "Deutsche Bracke"
+                },
+                {
+                    "id": "D143",
+                    "tr": "Doberman Pinscher",
+                    "en": "Doberman Pinscher"
+                },
+                {
+                    "id": "D144",
+                    "tr": "Dogo Argentino",
+                    "en": "Dogo Argentino"
+                },
+                {
+                    "id": "D145",
+                    "tr": "Dogo Cubano",
+                    "en": "Dogo Cubano"
+                },
+                {
+                    "id": "D146",
+                    "tr": "Dogue de Bordeaux",
+                    "en": "Dogue de Bordeaux"
+                },
+                {
+                    "id": "D147",
+                    "tr": "Drentse Patrijshond",
+                    "en": "Drentse Patrijshond"
+                },
+                {
+                    "id": "D148",
+                    "tr": "Drever",
+                    "en": "Drever"
+                },
+                {
+                    "id": "D149",
+                    "tr": "Dunker",
+                    "en": "Dunker"
+                },
+                {
+                    "id": "D150",
+                    "tr": "Hollanda Çoban Köpeği",
+                    "en": "Dutch Shepherd Dog"
+                },
+                {
+                    "id": "D151",
+                    "tr": "Hollandalı Smoushond",
+                    "en": "Dutch Smoushond"
+                },
+                {
+                    "id": "D152",
+                    "tr": "Doğu Sibirya Laika",
+                    "en": "East Siberian Laika"
+                },
+                {
+                    "id": "D153",
+                    "tr": "Doğu Avrupa Çoban Köpeği",
+                    "en": "East-European Shepherd"
+                },
+                {
+                    "id": "D154",
+                    "en": "Elo",
+                    "tr": "Elo"
+                },
+                {
+                    "id": "D155",
+                    "tr": "İngiliz Cocker Spaniel",
+                    "en": "English Cocker Spaniel"
+                },
+                {
+                    "id": "D156",
+                    "tr": "İngiliz Tazısı",
+                    "en": "English Foxhound"
+                },
+                {
+                    "id": "D157",
+                    "tr": "İngiliz Mastifi",
+                    "en": "English Mastiff"
+                },
+                {
+                    "id": "D158",
+                    "tr": "İngiliz Setter",
+                    "en": "English Setter"
+                },
+                {
+                    "id": "D159",
+                    "tr": "İngiliz Çoban",
+                    "en": "English Shepherd"
+                },
+                {
+                    "id": "D160",
+                    "tr": "İngiliz Springer Spaniel",
+                    "en": "English Springer Spaniel"
+                },
+                {
+                    "id": "D161",
+                    "tr": "English Toy Terrier (Black &amp; Tan)",
+                    "en": "English Toy Terrier (Black &amp; Tan)"
+                },
+                {
+                    "id": "D162",
+                    "tr": "English Water Spaniel",
+                    "en": "English Water Spaniel"
+                },
+                {
+                    "id": "D163",
+                    "tr": "İngiliz Beyaz Teriyer",
+                    "en": "English White Terrier"
+                },
+                {
+                    "id": "D164",
+                    "tr": "Entlebucher Dağ Köpeği",
+                    "en": "Entlebucher Mountain Dog"
+                },
+                {
+                    "id": "D165",
+                    "tr": "Estonya Tazısı",
+                    "en": "Estonian Hound"
+                },
+                {
+                    "id": "D166",
+                    "tr": "Estrela Dağ Köpeği",
+                    "en": "Estrela Mountain Dog"
+                },
+                {
+                    "id": "D167",
+                    "tr": "Eurasier",
+                    "en": "Eurasier"
+                },
+                {
+                    "id": "D168",
+                    "tr": "Field Spaniel",
+                    "en": "Field Spaniel"
+                },
+                {
+                    "id": "D169",
+                    "tr": "Fila Brasileiro",
+                    "en": "Fila Brasileiro"
+                },
+                {
+                    "id": "D170",
+                    "tr": "Fin Tazısı",
+                    "en": "Finnish Hound"
+                },
+                {
+                    "id": "D171",
+                    "tr": "Finnish Lapphund",
+                    "en": "Finnish Lapphund"
+                },
+                {
+                    "id": "D172",
+                    "tr": "Fin Spitz",
+                    "en": "Finnish Spitz"
+                },
+                {
+                    "id": "D173",
+                    "tr": "Flat-Coated Retriever",
+                    "en": "Flat-Coated Retriever"
+                },
+                {
+                    "id": "D174",
+                    "tr": "Formosan Dağ Köpeği",
+                    "en": "Formosan Mountain Dog"
+                },
+                {
+                    "id": "D175",
+                    "tr": "Fox Terrier (Smooth)",
+                    "en": "Fox Terrier (Smooth)"
+                },
+                {
+                    "id": "D176",
+                    "tr": "Fransız Bulldog",
+                    "en": "French Bulldog"
+                },
+                {
+                    "id": "D177",
+                    "tr": "Fransız Spaniel",
+                    "en": "French Spaniel"
+                },
+                {
+                    "id": "D178",
+                    "tr": "İspanyol Tazısı",
+                    "en": "Galgo Español"
+                },
+                {
+                    "id": "D179",
+                    "tr": "Gascon Saintongeois",
+                    "en": "Gascon Saintongeois"
+                },
+                {
+                    "id": "D180",
+                    "tr": "German Longhaired Pointer",
+                    "en": "German Longhaired Pointer"
+                },
+                {
+                    "id": "D181",
+                    "tr": "Alman Pinscher",
+                    "en": "German Pinscher"
+                },
+                {
+                    "id": "D182",
+                    "tr": "Alman Kurdu",
+                    "en": "German Shepherd"
+                },
+                {
+                    "id": "D193",
+                    "tr": "Alman Shorthaired Pointer",
+                    "en": "German Shorthaired Pointer"
+                },
+                {
+                    "id": "D184",
+                    "tr": "Alman Spaniel",
+                    "en": "German Spaniel"
+                },
+                {
+                    "id": "D185",
+                    "tr": "Alamn Spitz",
+                    "en": "German Spitz"
+                },
+                {
+                    "id": "D186",
+                    "tr": "Alman Wirehaired Pointer",
+                    "en": "German Wirehaired Pointer"
+                },
+                {
+                    "id": "D187",
+                    "tr": "Giant Schnauzer",
+                    "en": "Giant Schnauzer"
+                },
+                {
+                    "id": "D188",
+                    "tr": "Glen of Imaal Terrier",
+                    "en": "Glen of Imaal Terrier"
+                },
+                {
+                    "id": "D189",
+                    "tr": "Golden Retriever",
+                    "en": "Golden Retriever"
+                },
+                {
+                    "id": "D190",
+                    "tr": "Gordon Setter",
+                    "en": "Gordon Setter"
+                },
+                {
+                    "id": "D191",
+                    "tr": "Gran Mastín de Borínquen",
+                    "en": "Gran Mastín de Borínquen"
+                },
+                {
+                    "id": "D192",
+                    "tr": "Grand Anglo-Français Blanc et Noir",
+                    "en": "Grand Anglo-Français Blanc et Noir"
+                },
+                {
+                    "id": "D193",
+                    "tr": "Grand Anglo-Français Blanc et Orange",
+                    "en": "Grand Anglo-Français Blanc et Orange"
+                },
+                {
+                    "id": "D194",
+                    "tr": "Grand Anglo-Français Tricolore",
+                    "en": "Grand Anglo-Français Tricolore"
+                },
+                {
+                    "id": "D195",
+                    "tr": "Grand Basset Griffon Vendéen",
+                    "en": "Grand Basset Griffon Vendéen"
+                },
+                {
+                    "id": "D196",
+                    "tr": "Grand Bleu de Gascogne",
+                    "en": "Grand Bleu de Gascogne"
+                },
+                {
+                    "id": "D197",
+                    "tr": "Grand Griffon Vendéen",
+                    "en": "Grand Griffon Vendéen"
+                },
+                {
+                    "id": "D198",
+                    "tr": "Great Dane",
+                    "en": "Great Dane"
+                },
+                {
+                    "id": "D199",
+                    "tr": "Great Pyrenees",
+                    "en": "Great Pyrenees"
+                },
+                {
+                    "id": "D200",
+                    "tr": "Greater İsviçre Dağ Köpeği",
+                    "en": "Greater Swiss Mountain Dog"
+                },
+                {
+                    "id": "D201",
+                    "tr": "Greek Harehound",
+                    "en": "Greek Harehound"
+                },
+                {
+                    "id": "D202",
+                    "tr": "Grönland Köpeği",
+                    "en": "Greenland Dog"
+                },
+                {
+                    "id": "D203",
+                    "tr": "Tazı",
+                    "en": "Greyhound"
+                },
+                {
+                    "id": "D204",
+                    "tr": "Griffon Bleu de Gascogne",
+                    "en": "Griffon Bleu de Gascogne"
+                },
+                {
+                    "id": "D205",
+                    "tr": "Griffon Bruxellois",
+                    "en": "Griffon Bruxellois"
+                },
+                {
+                    "id": "D206",
+                    "tr": "Griffon Fauve de Bretagne",
+                    "en": "Griffon Fauve de Bretagne"
+                },
+                {
+                    "id": "D207",
+                    "tr": "Griffon Nivernais",
+                    "en": "Griffon Fauve de Bretagne"
+                },
+                {
+                    "id": "D208",
+                    "tr": "Hamilton Tazısı",
+                    "en": "Hamiltonstövare"
+                },
+                {
+                    "id": "D209",
+                    "tr": "Hanover Tazısı",
+                    "en": "Hanover Hound"
+                },
+                {
+                    "id": "D210",
+                    "tr": "Sahtu Köpeği",
+                    "en": "Hare Indian Dog"
+                },
+                {
+                    "id": "D211",
+                    "tr": "Harrier",
+                    "en": "Harrier"
+                },
+                {
+                    "id": "D212",
+                    "tr": "Havanese",
+                    "en": "Havanese"
+                },
+                {
+                    "id": "D213",
+                    "tr": "Hawaiian Poi Dog",
+                    "en": "Hawaiian Poi Dog"
+                },
+                {
+                    "id": "D214",
+                    "tr": "Himalaya Çoban Köpeği",
+                    "en": "Himalayan Sheepdog"
+                },
+                {
+                    "id": "D215",
+                    "tr": "Hokkaido",
+                    "en": "Hokkaido"
+                },
+                {
+                    "id": "D216",
+                    "tr": "Hovawart",
+                    "en": "Hovawart"
+                },
+                {
+                    "id": "D217",
+                    "tr": "Huntaway",
+                    "en": "Huntaway"
+                },
+                {
+                    "id": "D218",
+                    "tr": "Hygenhund",
+                    "en": "Hygenhund"
+                },
+                {
+                    "id": "D219",
+                    "tr": "İbiza Tazısı",
+                    "en": "Ibizan Hound"
+                },
+                {
+                    "id": "D220",
+                    "tr": "İzlanda Köpeği",
+                    "en": "Icelandic Sheepdog"
+                },
+                {
+                    "id": "D221",
+                    "tr": "Hint Parya Köpeği",
+                    "en": "Indian pariah Dog"
+                },
+                {
+                    "id": "D222",
+                    "tr": "Indian Spitz",
+                    "en": "Indian Spitz"
+                },
+                {
+                    "id": "D223",
+                    "tr": "Irish Red and White Setter",
+                    "en": "Irish Red and White Setter"
+                },
+                {
+                    "id": "D224",
+                    "tr": "Irish Setter",
+                    "en": "Irish Setter"
+                },
+                {
+                    "id": "D225",
+                    "tr": "İrlanda Teriyeri",
+                    "en": "Irish Terrier"
+                },
+                {
+                    "id": "D226",
+                    "tr": "Irish Water Spaniel",
+                    "en": "Irish Water Spaniel"
+                },
+                {
+                    "id": "D227",
+                    "tr": "İrlanda Kurt Köpeği",
+                    "en": "Irish Wolfhound"
+                },
+                {
+                    "id": "D228",
+                    "tr": "Istrian Coarse-haired Hound",
+                    "en": "Istrian Coarse-haired Hound"
+                },
+                {
+                    "id": "D229",
+                    "tr": "Istrian Shorthaired Hound",
+                    "en": "Istrian Shorthaired Hound"
+                },
+                {
+                    "id": "D230",
+                    "tr": "İtalyan Tazısı",
+                    "en": "Italian Greyhound"
+                },
+                {
+                    "id": "D231",
+                    "tr": "Jack Russell Teriyer",
+                    "en": "Jack Russell Terrier"
+                },
+                {
+                    "id": "D232",
+                    "tr": "Alman Av Teriyeri",
+                    "en": "Jagdterrier"
+                },
+                {
+                    "id": "D233",
+                    "tr": "İsveç Sığın Tazısı",
+                    "en": "Jämthund"
+                },
+                {
+                    "id": "D234",
+                    "tr": "Kai",
+                    "en": "Kai Ken"
+                },
+                {
+                    "id": "D235",
+                    "tr": "Kaikadi",
+                    "en": "Kaikadi"
+                },
+                {
+                    "id": "D236",
+                    "tr": "Kangal",
+                    "en": "Kangal Turkish Shepherd"
+                },
+                {
+                    "id": "D237",
+                    "tr": "Kanni",
+                    "en": "Kanni"
+                },
+                {
+                    "id": "D238",
+                    "tr": "Karelya Ayı Köpeği",
+                    "en": "Karelian Bear Dog"
+                },
+                {
+                    "id": "D239",
+                    "tr": "Karst Çoban Köpeği",
+                    "en": "Karst Shepherd"
+                },
+                {
+                    "id": "D240",
+                    "tr": "Keeshond",
+                    "en": "Keeshond"
+                },
+                {
+                    "id": "D241",
+                    "tr": "Kerry Beagle",
+                    "en": "Kerry Beagle"
+                },
+                {
+                    "id": "D242",
+                    "tr": "Kerry Blue Teriyer",
+                    "en": "Kerry Blue Terrier"
+                },
+                {
+                    "id": "D243",
+                    "tr": "King Charles Spaniel",
+                    "en": "King Charles Spaniel"
+                },
+                {
+                    "id": "D244",
+                    "tr": "Kral Çoban Köpeği",
+                    "en": "King Shepherd"
+                },
+                {
+                    "id": "D245",
+                    "tr": "Kintamani",
+                    "en": "Kintamani"
+                },
+                {
+                    "id": "D246",
+                    "tr": "Kishu",
+                    "en": "Kishu"
+                },
+                {
+                    "id": "D247",
+                    "tr": "Komondor",
+                    "en": "Komondor"
+                },
+                {
+                    "id": "D248",
+                    "tr": "Kooikerhondje",
+                    "en": "Kooikerhondje"
+                },
+                {
+                    "id": "D249",
+                    "tr": "Koolie",
+                    "en": "Koolie"
+                },
+                {
+                    "id": "D250",
+                    "tr": "Kore Jindosu",
+                    "en": "Korean Jindo Dog"
+                },
+                {
+                    "id": "D251",
+                    "tr": "Kromfohrlander",
+                    "en": "Kromfohrländer"
+                },
+                {
+                    "id": "D252",
+                    "tr": "Kumaon Mastiff",
+                    "en": "Kumaon Mastiff"
+                },
+                {
+                    "id": "D253",
+                    "tr": "Kuri",
+                    "en": "Kurī"
+                },
+                {
+                    "id": "D254",
+                    "tr": "Kuvasz",
+                    "en": "Kuvasz"
+                },
+                {
+                    "id": "D255",
+                    "tr": "Kyi-Leo",
+                    "en": "Kyi-Leo"
+                },
+                {
+                    "id": "D256",
+                    "tr": "Labrador Husky",
+                    "en": "Labrador Husky"
+                },
+                {
+                    "id": "D257",
+                    "tr": "Labrador Retriever",
+                    "en": "Labrador Retriever"
+                },
+                {
+                    "id": "D258",
+                    "tr": "Lagotto Romagnolo",
+                    "en": "Lagotto Romagnolo"
+                },
+                {
+                    "id": "D259",
+                    "tr": "Lakeland Teriyeri",
+                    "en": "Lakeland Terrier"
+                },
+                {
+                    "id": "D260",
+                    "tr": "Lancashire Heeler",
+                    "en": "Lancashire Heeler"
+                },
+                {
+                    "id": "D261",
+                    "tr": "Landseer",
+                    "en": "Landseer"
+                },
+                {
+                    "id": "D262",
+                    "tr": "Lapponian Çoban Köpeği",
+                    "en": "Lapponian Herder"
+                },
+                {
+                    "id": "D263",
+                    "tr": "Large Münsterländer",
+                    "en": "Large Münsterländer"
+                },
+                {
+                    "id": "D264",
+                    "tr": "Leonberger Köpeği",
+                    "en": "Leonberger"
+                },
+                {
+                    "id": "D265",
+                    "tr": "Lhasa Apso",
+                    "en": "Lhasa Apso"
+                },
+                {
+                    "id": "D266",
+                    "tr": "Lithuanian Hound",
+                    "en": "Lithuanian Hound"
+                },
+                {
+                    "id": "D267",
+                    "tr": "Longhaired Whippet",
+                    "en": "Longhaired Whippet"
+                },
+                {
+                    "id": "D268",
+                    "tr": "Löwchen",
+                    "en": "Löwchen"
+                },
+                {
+                    "id": "D269",
+                    "tr": "Mahratta Greyhound",
+                    "en": "Mahratta Greyhound"
+                },
+                {
+                    "id": "D270",
+                    "tr": "Malta Köpeği",
+                    "en": "Maltese"
+                },
+                {
+                    "id": "D271",
+                    "tr": "Manchester Teriyer",
+                    "en": "Manchester Terrier"
+                },
+                {
+                    "id": "D272",
+                    "tr": "Maremma Çoban Köpeği",
+                    "en": "Maremma Sheepdog"
+                },
+                {
+                    "id": "D273",
+                    "tr": "McNab Çoban Köpeği",
+                    "en": "McNab"
+                },
+                {
+                    "id": "D274",
+                    "tr": "Tüysüz Meksika Köpeği",
+                    "en": "Mexican Hairless Dog"
+                },
+                {
+                    "id": "D275",
+                    "tr": "Minyatür Amerikan Çoban Köpeği",
+                    "en": "Miniature American Shepherd"
+                },
+                {
+                    "id": "D276",
+                    "tr": "Minyatür Avustralya Çoban Köpeği",
+                    "en": "Miniature Australian Shepherd"
+                },
+                {
+                    "id": "D277",
+                    "tr": "Minyatür Fox Teriyer",
+                    "en": "Miniature Fox Terrier"
+                },
+                {
+                    "id": "D278",
+                    "tr": "Minyatür Pinscher",
+                    "en": "Miniature Pinscher"
+                },
+                {
+                    "id": "D279",
+                    "tr": "Minyatür Schnauzer",
+                    "en": "Miniature Schnauzer"
+                },
+                {
+                    "id": "D280",
+                    "tr": "Mini Shar Pei",
+                    "en": "Miniature Shar Pei"
+                },
+                {
+                    "id": "D281",
+                    "tr": "Molossus",
+                    "en": "Molossus"
+                },
+                {
+                    "id": "D282",
+                    "tr": "Karadağ Dağ Tazısı",
+                    "en": "Montenegrin Mountain Hound"
+                },
+                {
+                    "id": "D283",
+                    "tr": "Moskova Bekçi Köpeği",
+                    "en": "Moscow Watchdog"
+                },
+                {
+                    "id": "D284",
+                    "tr": "Moscow Water Dog",
+                    "en": "Moscow Water Dog"
+                },
+                {
+                    "id": "D285",
+                    "tr": "Mountain Cur",
+                    "en": "Mountain Cur"
+                },
+                {
+                    "id": "D286",
+                    "tr": "Mucuchies",
+                    "en": "Mucuchies"
+                },
+                {
+                    "id": "D287",
+                    "tr": "Mudhol Hound",
+                    "en": "Mudhol Hound"
+                },
+                {
+                    "id": "D288",
+                    "tr": "Mudi",
+                    "en": "Mudi"
+                },
+                {
+                    "id": "D289",
+                    "tr": "Napoli Mastifi",
+                    "en": "Neapolitan Mastiff"
+                },
+                {
+                    "id": "D290",
+                    "tr": "New Zealand Heading Dog",
+                    "en": "New Zealand Heading Dog"
+                },
+                {
+                    "id": "D291",
+                    "tr": "Newfoundland",
+                    "en": "Newfoundland"
+                },
+                {
+                    "id": "D292",
+                    "tr": "Norfolk Spaniel",
+                    "en": "Norfolk Spaniel"
+                },
+                {
+                    "id": "D293",
+                    "tr": "Norfolk Terrier",
+                    "en": "Norfolk Terrier"
+                },
+                {
+                    "id": "D294",
+                    "tr": "Norrbottenspets",
+                    "en": "Norrbottenspets"
+                },
+                {
+                    "id": "D295",
+                    "tr": "North Country Beagle",
+                    "en": "North Country Beagle"
+                },
+                {
+                    "id": "D296",
+                    "tr": "Kuzey Inuit Köpeği",
+                    "en": "Northern Inuit Dog"
+                },
+                {
+                    "id": "D297",
+                    "tr": "Norveç Çoban Köpeği",
+                    "en": "Norwegian Buhund"
+                },
+                {
+                    "id": "D298",
+                    "tr": "Norwegian Elkhound",
+                    "en": "Norwegian Elkhound"
+                },
+                {
+                    "id": "D299",
+                    "tr": "Norwegian Lundehund",
+                    "en": "Norwegian Lundehund"
+                },
+                {
+                    "id": "D300",
+                    "tr": "Norwich Teriyeri",
+                    "en": "Norwich Terrier"
+                },
+                {
+                    "id": "D301",
+                    "tr": "Eski Bosna Sighthound",
+                    "en": "Old Croatian Sighthound"
+                },
+                {
+                    "id": "D302",
+                    "tr": "Eski Danimarka Pointer",
+                    "en": "Old Danish Pointer"
+                },
+                {
+                    "id": "D303",
+                    "tr": "İngiliz Çoban Köpeği",
+                    "en": "Old English Sheepdog"
+                },
+                {
+                    "id": "D304",
+                    "tr": "Beyaz İngiliz Teriyeri",
+                    "en": "Old English Terrier"
+                },
+                {
+                    "id": "D305",
+                    "tr": "Olde English Bulldogge",
+                    "en": "Olde English Bulldogge"
+                },
+                {
+                    "id": "D306",
+                    "tr": "Su Samuru Tazısı",
+                    "en": "Otterhound"
+                },
+                {
+                    "id": "D307",
+                    "tr": "Eski İspanyol Pointer",
+                    "en": "Pachon Navarro"
+                },
+                {
+                    "id": "D308",
+                    "tr": "Paisley Teriyer",
+                    "en": "Paisley Terrier"
+                },
+                {
+                    "id": "D309",
+                    "tr": "Pandikona",
+                    "en": "Pandikona"
+                },
+                {
+                    "id": "D310",
+                    "tr": "Papillon",
+                    "en": "Papillon"
+                },
+                {
+                    "id": "D311",
+                    "tr": "Parson Russell Teriyer",
+                    "en": "Parson Russell Terrier"
+                },
+                {
+                    "id": "D312",
+                    "tr": "Patterdale Teriyer",
+                    "en": "Patterdale Terrier"
+                },
+                {
+                    "id": "D313",
+                    "tr": "Pekinez",
+                    "en": "Pekingese"
+                },
+                {
+                    "id": "D314",
+                    "tr": "Corgi",
+                    "en": "Corgi"
+                },
+                {
+                    "id": "D315",
+                    "tr": "Presa Canario",
+                    "en": "Presa Canario"
+                },
+                {
+                    "id": "D316",
+                    "tr": "Mallorca Mastiff",
+                    "en": "Mallorca Mastiff"
+                },
+                {
+                    "id": "D317",
+                    "tr": "Peru Tüysüz Köpeği",
+                    "en": "Peruvian Hairless Dog"
+                },
+                {
+                    "id": "D318",
+                    "tr": "Petit Basset Griffon Vendéen",
+                    "en": "Petit Basset Griffon Vendéen"
+                },
+                {
+                    "id": "D319",
+                    "tr": "Petit Bleu de Gascogne",
+                    "en": "Petit Bleu de Gascogne"
+                },
+                {
+                    "id": "D320",
+                    "tr": "Phalène",
+                    "en": "Phalène"
+                },
+                {
+                    "id": "D321",
+                    "tr": "Firavun Tazısı",
+                    "en": "Pharaoh Hound"
+                },
+                {
+                    "id": "D322",
+                    "tr": "Phu Quoc ridgeback dog",
+                    "en": "Phu Quoc Ridgeback Dog"
+                },
+                {
+                    "id": "D323",
+                    "tr": "Picardy Spaniel",
+                    "en": "Picardy Spaniel"
+                },
+                {
+                    "id": "D324",
+                    "tr": "Plott Tazısı",
+                    "en": "Plott Hound"
+                },
+                {
+                    "id": "D325",
+                    "tr": "Podenco Canario",
+                    "en": "Podenco Canario"
+                },
+                {
+                    "id": "D326",
+                    "tr": "Pointer",
+                    "en": "Pointer"
+                },
+                {
+                    "id": "D327",
+                    "tr": "Polonya Tazısı",
+                    "en": "Polish Hound"
+                },
+                {
+                    "id": "D328",
+                    "tr": "Polonya Av Köpeği",
+                    "en": "Polish Hunting Dog"
+                },
+                {
+                    "id": "D329",
+                    "tr": "Polonya Lowland Çoban Köpeği",
+                    "en": "Polish Lowland Sheepdog"
+                },
+                {
+                    "id": "D330",
+                    "tr": "Tatra Çoban Köpeği",
+                    "en": "Tatra Sheepdog"
+                },
+                {
+                    "id": "D331",
+                    "tr": "Pomeranian",
+                    "en": "Pomeranian"
+                },
+                {
+                    "id": "D332",
+                    "tr": "Pont-Audemer Spaniel",
+                    "en": "Pont-Audemer Spaniel"
+                },
+                {
+                    "id": "D333",
+                    "tr": "Poodle",
+                    "en": "Poodle"
+                },
+                {
+                    "id": "D334",
+                    "tr": "Porcelaine",
+                    "en": "Porcelaine"
+                },
+                {
+                    "id": "D335",
+                    "tr": "Portekiz Podengo",
+                    "en": "Portuguese Podengo"
+                },
+                {
+                    "id": "D336",
+                    "tr": "Portekiz Pointer",
+                    "en": "Portuguese Pointer"
+                },
+                {
+                    "id": "D337",
+                    "tr": "Portekiz Water Dog",
+                    "en": "Portuguese Water Dog"
+                },
+                {
+                    "id": "D338",
+                    "tr": "Posavac Tazısı",
+                    "en": "Posavac Hound"
+                },
+                {
+                    "id": "D339",
+                    "tr": "Prague Ratter",
+                    "en": "Prague Ratter"
+                },
+                {
+                    "id": "D340",
+                    "tr": "Pudelpointer",
+                    "en": "Pudelpointer"
+                },
+                {
+                    "id": "D341",
+                    "tr": "Pug",
+                    "en": "Pug"
+                },
+                {
+                    "id": "D342",
+                    "tr": "Puli",
+                    "en": "Puli"
+                },
+                {
+                    "id": "D343",
+                    "tr": "Pumi",
+                    "en": "Pumi"
+                },
+                {
+                    "id": "D344",
+                    "tr": "Pungsan",
+                    "en": "Pungsan Dog"
+                },
+                {
+                    "id": "D345",
+                    "tr": "Pirene Mastif",
+                    "en": "Pyrenean Mastiff"
+                },
+                {
+                    "id": "D346",
+                    "tr": "Pirene Çoban Köpeği",
+                    "en": "Pyrenean Shepherd"
+                },
+                {
+                    "id": "D347",
+                    "tr": "Alentejo Çoban Köpeği",
+                    "en": "Rafeiro do Alentejo"
+                },
+                {
+                    "id": "D348",
+                    "tr": "Rajapalayam",
+                    "en": "Rajapalayam"
+                },
+                {
+                    "id": "D349",
+                    "tr": "Rampur Tazısı",
+                    "en": "Rampur Greyhound"
+                },
+                {
+                    "id": "D350",
+                    "tr": "Brezilya Tazısı",
+                    "en": "Rastreador Brasileiro"
+                },
+                {
+                    "id": "D351",
+                    "tr": "Rat Teriyer",
+                    "en": "Rat Terrier"
+                },
+                {
+                    "id": "D352",
+                    "tr": "Ratonero Bodeguero Andaluz",
+                    "en": "Ratonero Bodeguero Andaluz"
+                },
+                {
+                    "id": "D353",
+                    "tr": "Redbone Rakun Tazısı",
+                    "en": "Redbone Coonhound"
+                },
+                {
+                    "id": "D354",
+                    "tr": "Rhodesian Ridgeback",
+                    "en": "Rhodesian Ridgeback"
+                },
+                {
+                    "id": "D355",
+                    "tr": "Rottweiler",
+                    "en": "Rottweiler"
+                },
+                {
+                    "id": "D356",
+                    "tr": "Rough Collie",
+                    "en": "Rough Collie"
+                },
+                {
+                    "id": "D357",
+                    "tr": "Russell Terrier",
+                    "en": "Russell Terrier"
+                },
+                {
+                    "id": "D358",
+                    "tr": "Rus Spaniel",
+                    "en": "Russian Spaniel"
+                },
+                {
+                    "id": "D359",
+                    "tr": "Rus tracker",
+                    "en": "Russian tracker"
+                },
+                {
+                    "id": "D360",
+                    "tr": "Russo-European Laika",
+                    "en": "Russo-European Laika"
+                },
+                {
+                    "id": "D361",
+                    "tr": "İspanyol Tazısı",
+                    "en": "Sabueso Español"
+                },
+                {
+                    "id": "D362",
+                    "tr": "Saint-Usuge Spaniel",
+                    "en": "Saint-Usuge Spaniel"
+                },
+                {
+                    "id": "D363",
+                    "tr": "Sakhalin Husky",
+                    "en": "Sakhalin Husky"
+                },
+                {
+                    "id": "D364",
+                    "tr": "Gazal Tazısı",
+                    "en": "Saluki"
+                },
+                {
+                    "id": "D365",
+                    "tr": "Samoyed",
+                    "en": "Samoyed"
+                },
+                {
+                    "id": "D366",
+                    "tr": "Sapsali",
+                    "en": "Sapsali"
+                },
+                {
+                    "id": "D367",
+                    "tr": "Schapendoes",
+                    "en": "Schapendoes"
+                },
+                {
+                    "id": "D368",
+                    "tr": "Şiller Tazısı",
+                    "en": "Schillerstövare"
+                },
+                {
+                    "id": "D369",
+                    "tr": "Schipperke",
+                    "en": "Schipperke"
+                },
+                {
+                    "id": "D370",
+                    "tr": "İsviçre Tazısı",
+                    "en": "Schweizer Laufhund"
+                },
+                {
+                    "id": "D371",
+                    "tr": "Scotch Collie",
+                    "en": "Scotch Collie"
+                },
+                {
+                    "id": "D372",
+                    "tr": "İskoç Geyik Tazısı",
+                    "en": "Scottish Deerhound"
+                },
+                {
+                    "id": "D373",
+                    "tr": "İskoç Teriyer",
+                    "en": "Scottish Terrier"
+                },
+                {
+                    "id": "D374",
+                    "tr": "Sealyham Terrier",
+                    "en": "Sealyham Terrier"
+                },
+                {
+                    "id": "D375",
+                    "tr": "İtalyan Tazısı",
+                    "en": "Segugio Italiano"
+                },
+                {
+                    "id": "D376",
+                    "tr": "Seppala Sibirya Kızak Köpeği",
+                    "en": "Seppala Siberian Sleddog"
+                },
+                {
+                    "id": "D377",
+                    "tr": "Balkan Tazısı",
+                    "en": "Serbian Hound"
+                },
+                {
+                    "id": "D378",
+                    "tr": "Üç Renkli Sırp Kopoyu",
+                    "en": "Serbian Tricolour Hound"
+                },
+                {
+                    "id": "D379",
+                    "tr": "Şar Pey",
+                    "en": "Shar Pei"
+                },
+                {
+                    "id": "D380",
+                    "tr": "Shetland Çoban Köpeği",
+                    "en": "Shetland Sheepdog"
+                },
+                {
+                    "id": "D381",
+                    "tr": "Shiba Inu",
+                    "en": "Shiba Inu"
+                },
+                {
+                    "id": "D382",
+                    "tr": "Shih Tzu",
+                    "en": "Shih Tzu"
+                },
+                {
+                    "id": "D383",
+                    "tr": "Şikoku",
+                    "en": "Shikoku"
+                },
+                {
+                    "id": "D384",
+                    "tr": "Shiloh Shepherd",
+                    "en": "Shiloh Shepherd Dog"
+                },
+                {
+                    "id": "D385",
+                    "tr": "Sibirya Kurdu",
+                    "en": "Siberian Husky"
+                },
+                {
+                    "id": "D386",
+                    "tr": "Silken Windhound",
+                    "en": "Silken Windhound"
+                },
+                {
+                    "id": "D387",
+                    "tr": "Sinhala Hound",
+                    "en": "Sinhala Hound"
+                },
+                {
+                    "id": "D388",
+                    "tr": "Skye Teriyer",
+                    "en": "Skye Terrier"
+                },
+                {
+                    "id": "D389",
+                    "tr": "Sloughi",
+                    "en": "Sloughi"
+                },
+                {
+                    "id": "D390",
+                    "tr": "Slovak Çuvaç",
+                    "en": "Slovak Cuvac"
+                },
+                {
+                    "id": "D391",
+                    "tr": "Slovakian Rough-haired Pointer",
+                    "en": "Slovakian Rough-haired Pointer"
+                },
+                {
+                    "id": "D392",
+                    "tr":"Small Greek Domestic Dog",
+                    "en": "Small Greek Domestic Dog"
+                },
+                {
+                    "id": "D393",
+                    "tr": "Small Münsterländer",
+                    "en": "Small Münsterländer"
+                },
+                {
+                    "id": "D394",
+                    "tr": "Smooth Collie",
+                    "en": "Smooth Collie"
+                },
+                {
+                    "id": "D395",
+                    "tr": "Güney Rusya Çoban Köpeği",
+                    "en": "South Russian Ovcharka"
+                },
+                {
+                    "id": "D396",
+                    "tr": "Güney Tazısı",
+                    "en": "Southern Hound"
+                },
+                {
+                    "id": "D397",
+                    "tr": "İspanyol Mastifi",
+                    "en": "Spanish Mastiff"
+                },
+                {
+                    "id": "D398",
+                    "tr": "İspanyol Su Köpeği",
+                    "en": "Spanish Water Dog"
+                },
+                {
+                    "id": "D399",
+                    "tr": "Spinone Italiano",
+                    "en": "Spinone Italiano"
+                },
+                {
+                    "id": "D400",
+                    "tr": "Sporting Lucas Teriyer",
+                    "en": "Sporting Lucas Terrier"
+                },
+                {
+                    "id": "D401",
+                    "tr": "St. Bernard",
+                    "en": "St. Bernard"
+                },
+                {
+                    "id": "D402",
+                    "tr": "St. John Köpeği",
+                    "en": "St. John's Water Dog"
+                },
+                {
+                    "id": "D403",
+                    "tr": "Stabyhoun",
+                    "en": "Stabyhoun"
+                },
+                {
+                    "id": "D404",
+                    "tr": "Staffordshire Bull Terrier",
+                    "en": "Staffordshire Bull Terrier"
+                },
+                {
+                    "id": "D405",
+                    "tr": "Standart Schnauzer",
+                    "en": "Standard Schnauzer"
+                },
+                {
+                    "id": "D406",
+                    "tr": "Stephens Cur",
+                    "en": "Stephens Cur"
+                },
+                {
+                    "id": "D407",
+                    "tr": "Styrian Coarse-haired Hound",
+                    "en": "Styrian Coarse-haired Hound"
+                },
+                {
+                    "id": "D408",
+                    "tr": "Sussex Spaniel",
+                    "en": "Sussex Spaniel"
+                },
+                {
+                    "id": "D409",
+                    "tr": "Lapphund",
+                    "en": "Swedish Lapphund"
+                },
+                {
+                    "id": "D410",
+                    "tr": "Swedish Vallhund",
+                    "en": "Swedish Vallhund"
+                },
+                {
+                    "id": "D411",
+                    "tr": "Tahltan Ayı Köpeği",
+                    "en": "Tahltan Bear Dog"
+                },
+                {
+                    "id": "D412",
+                    "tr": "Kırgız Tayganı",
+                    "en": "Taigan"
+                },
+                {
+                    "id": "D413",
+                    "tr": "Talbot Tazısı",
+                    "en": "Talbot"
+                },
+                {
+                    "id": "D414",
+                    "tr": "Tamaskan Köpeği",
+                    "en": "Tamaskan Dog"
+                },
+                {
+                    "id": "D415",
+                    "tr": "Teddy Roosevelt Teriyer",
+                    "en": "Teddy Roosevelt Terrier"
+                },
+                {
+                    "id": "D416",
+                    "tr": "Telomian",
+                    "en": "Telomian"
+                },
+                {
+                    "id": "D417",
+                    "tr": "Tenterfield Terrier",
+                    "en": "Tenterfield Terrier"
+                },
+                {
+                    "id": "D418",
+                    "tr": "Thai Bangkaew Dog",
+                    "en": "Thai Bangkaew Dog"
+                },
+                {
+                    "id": "D419",
+                    "tr": "Thai Ridgeback",
+                    "en": "Thai Ridgeback"
+                },
+                {
+                    "id": "D420",
+                    "tr": "Tibet Mastifi",
+                    "en": "Tibetan Mastiff"
+                },
+                {
+                    "id": "D421",
+                    "tr": "Tibet Spanyeli",
+                    "en": "Tibetan Spaniel"
+                },
+                {
+                    "id": "D422",
+                    "tr": "Tibet Teriyeri",
+                    "en": "Tibetan Terrier"
+                },
+                {
+                    "id": "D423",
+                    "tr": "Tornjak",
+                    "en": "Tornjak"
+                },
+                {
+                    "id": "D424",
+                    "tr": "Tosa",
+                    "en": "Tosa"
+                },
+                {
+                    "id": "D425",
+                    "tr": "Toy Bulldog",
+                    "en": "Toy Bulldog"
+                },
+                {
+                    "id": "D426",
+                    "tr": "Toy Fox Teriyer",
+                    "en": "Toy Fox Terrier"
+                },
+                {
+                    "id": "D427",
+                    "tr": "Toy Manchester Teriyer",
+                    "en": "Toy Manchester Terrier"
+                },
+                {
+                    "id": "D428",
+                    "tr": "Toy Trawler Spaniel",
+                    "en": "Toy Trawler Spaniel"
+                },
+                {
+                    "id": "D429",
+                    "tr": "Transilvanya Tazısı",
+                    "en": "Transylvanian Hound"
+                },
+                {
+                    "id": "D430",
+                    "tr": "Treeing Cur",
+                    "en": "Treeing Cur"
+                },
+                {
+                    "id": "D431",
+                    "tr": "Treeing Walker Coonhound",
+                    "en": "Treeing Walker Coonhound"
+                },
+                {
+                    "id": "D432",
+                    "tr": "Amerikan Tilki Tazısı",
+                    "en": "Trigg Hound"
+                },
+                {
+                    "id": "D433",
+                    "tr": "Tweed Su Spanieli",
+                    "en": "Tweed Water Spaniel"
+                },
+                {
+                    "id": "D434",
+                    "tr": "Tyrolean Tazısı",
+                    "en": "Tyrolean Hound"
+                },
+                {
+                    "id": "D435",
+                    "tr": "Vizsla",
+                    "en": "Vizsla"
+                },
+                {
+                    "id": "D436",
+                    "tr": "İtalyan Volpino",
+                    "en": "Volpino Italiano"
+                },
+                {
+                    "id": "D437",
+                    "tr": "Weimaraner",
+                    "en": "Weimaraner"
+                },
+                {
+                    "id": "D438",
+                    "tr": "Galli Çoban Köpeği",
+                    "en": "Welsh Sheepdog"
+                },
+                {
+                    "id": "D439",
+                    "tr": "Welsh Springer Spaniel",
+                    "en": "Welsh Springer Spaniel"
+                },
+                {
+                    "id": "D440",
+                    "tr": "Welsh Terrier",
+                    "en": "Welsh Terrier"
+                },
+                {
+                    "id": "D441",
+                    "tr": "Batı Highland Beyaz Teriyeri",
+                    "en": "West Highland White Terrier"
+                },
+                {
+                    "id": "D442",
+                    "tr": "Batı Sibirya Laykası",
+                    "en": "West Siberian Laika"
+                },
+                {
+                    "id": "D443",
+                    "tr": "Westphalian Dachsbracke",
+                    "en": "Westphalian Dachsbracke"
+                },
+                {
+                    "id": "D444",
+                    "tr": "Hollanda Spanyeli",
+                    "en": "Wetterhoun"
+                },
+                {
+                    "id": "D445",
+                    "tr": "Whippet",
+                    "en": "Whippet"
+                },
+                {
+                    "id": "D446",
+                    "tr": "Beyaz Alman Kurdu",
+                    "en": "White Shepherd"
+                },
+                {
+                    "id": "D447",
+                    "tr": "Wire Fox Terrier",
+                    "en": "Wire Fox Terrier"
+                },
+                {
+                    "id": "D448",
+                    "tr": "Wirehaired Pointing Griffon",
+                    "en": "Wirehaired Pointing Griffon"
+                },
+                {
+                    "id": "D449",
+                    "tr": "Wirehaired Vizsla",
+                    "en": "Wirehaired Vizsla"
+                },
+                {
+                    "id": "D450",
+                    "tr": "Yorkshire Teriyer",
+                    "en": "Yorkshire Terrier"
+                },
+                {
+                    "id": "D451",
+                    "tr": "İlirya Çoban Köpeği",
+                    "en": "Šarplaninac"
+                }
+            ]
+        },
+        {
+            "id": "P1",
+            "name": {
+                "tr": "Kedi",
+                "en": "Cat"
+            },
+            "species": [
+                {
+                    "id": "C0",
+                    "tr": "Diğer",
+                    "en": "Other"
+                },
+                {
+                    "id": "C1",
+                    "tr": "Habeş Kedisi",
+                    "en": "Abyssinian"
+                },
+                {
+                    "id": "C2",
+                    "en": "Ege Kedisi",
+                    "tr": "Aegean"
+                },
+                {
+                    "id": "C3",
+                    "tr": "American Curl",
+                    "en": "American Curl"
+                },
+                {
+                    "id": "C4",
+                    "tr": "American Bobtail",
+                    "en": "American Bobtail"
+                },
+                {
+                    "id": "C5",
+                    "tr": "Amerikan Kedisi",
+                    "en": "American Shorthair"
+                },
+                {
+                    "id": "C6",
+                    "tr": "American Wirehair",
+                    "en": "American Wirehair"
+                },
+                {
+                    "id": "C7",
+                    "tr": "Arap Mau",
+                    "en": "Arabian Mau"
+                },
+                {
+                    "id": "C8",
+                    "tr": "Avustralya Sisi",
+                    "en": "Australian Mist"
+                },
+                {
+                    "id": "C9",
+                    "tr": "Asya",
+                    "en": "Asian"
+                },
+                {
+                    "id": "C10",
+                    "tr": "Tiffanie",
+                    "en": "Asian Semi-longhair"
+                },
+                {
+                    "id": "C11",
+                    "tr": "Balinese",
+                    "en": "Balinese"
+                },
+                {
+                    "id": "C12",
+                    "tr": "Bambino",
+                    "en": "Bambino"
+                },
+                {
+                    "id": "C13",
+                    "tr": "Bengal",
+                    "en": "Bengal"
+                },
+                {
+                    "id": "C14",
+                    "tr": "Bengal",
+                    "en": "Birman"
+                },
+                {
+                    "id": "C15",
+                    "tr": "Bombay",
+                    "en": "Bombay"
+                },
+                {
+                    "id": "C16",
+                    "tr": "Brazilya Shorthair",
+                    "en": "Brazilian Shorthair"
+                },
+                {
+                    "id": "C17",
+                    "tr": "British Shorthair",
+                    "en": "British Shorthair"
+                },
+                {
+                    "id": "C18",
+                    "tr": "British Longhair",
+                    "en": "British Longhair"
+                },
+                {
+                    "id": "C19",
+                    "tr": "Birman Kedisi",
+                    "en": "Burmese"
+                },
+                {
+                    "id": "C20",
+                    "tr": "Burmilla",
+                    "en": "Burmilla"
+                },
+                {
+                    "id": "C21",
+                    "tr": "California Spangled",
+                    "en": "California Spangled"
+                },
+                {
+                    "id": "C22",
+                    "tr": "Chantilly-Tiffany",
+                    "en": "Chantilly-Tiffany"
+                },
+                {
+                    "id": "C23",
+                    "tr": "Chartreux",
+                    "en": "Chartreux"
+                },
+                {
+                    "id": "C24",
+                    "tr": "Chausie",
+                    "en": "Chausie"
+                },
+                {
+                    "id": "C25",
+                    "tr": "Cheetoh",
+                    "en": "Cheetoh"
+                },
+                {
+                    "id": "C26",
+                    "tr": "Colorpoint Shorthair",
+                    "en": "Colorpoint Shorthair"
+                },
+                {
+                    "id": "C27",
+                    "tr": "Cornish Rex",
+                    "en": "Cornish Rex"
+                },
+                {
+                    "id": "C28",
+                    "tr": "Cymric",
+                    "en": "Cymric"
+                },
+                {
+                    "id": "C29",
+                    "tr": "Kıbrıs Kedisi",
+                    "en": "Cyprus"
+                },
+                {
+                    "id": "C30",
+                    "tr": "Devon Rex",
+                    "en": "Devon Rex"
+                },
+                {
+                    "id": "C31",
+                    "tr": "Donskoy",
+                    "en": "Donskoy"
+                },
+                {
+                    "id": "C32",
+                    "tr": "Dragon Li",
+                    "en": "Dragon Li"
+                },
+                {
+                    "id": "C33",
+                    "tr": "Cüce Kedi",
+                    "en": "Dwarf Cat"
+                },
+                {
+                    "id": "C34",
+                    "tr": "Mısır Mausu",
+                    "en": "Egyptian Mau"
+                },
+                {
+                    "id": "C34",
+                    "tr": "European Shorthair",
+                    "en": "European Shorthair"
+                },
+                {
+                    "id": "C35",
+                    "tr": "Exotic Shorthair",
+                    "en": "Exotic Shorthair"
+                },
+                {
+                    "id": "C36",
+                    "tr": "Foldex",
+                    "en": "Foldex"
+                },
+                {
+                    "id": "C37",
+                    "tr": "Alman Rex",
+                    "en": "German Rex"
+                },
+                {
+                    "id": "C38",
+                    "tr": "Havana Brown",
+                    "en": "Havana Brown"
+                },
+                {
+                    "id": "C39",
+                    "tr": "Highlander",
+                    "en": "Highlander"
+                },
+                {
+                    "id": "C40",
+                    "tr": "Himalayan",
+                    "en": "Himalayan"
+                },
+                {
+                    "id": "C41",
+                    "tr": "Japon Bobtail",
+                    "en": "Japanese Bobtail"
+                },
+                {
+                    "id": "C42",
+                    "tr": "Javanese",
+                    "en": "Javanese"
+                },
+                {
+                    "id": "C43",
+                    "tr": "Karelian Bobtail",
+                    "en": "Karelian Bobtail"
+                },
+                {
+                    "id": "C44",
+                    "tr": "Khao Manee",
+                    "en": "Khao Manee"
+                },
+                {
+                    "id": "C45",
+                    "tr": "Korat",
+                    "en": "Korat"
+                },
+                {
+                    "id": "C46",
+                    "tr": "Kore Bobtail",
+                    "en": "Korean Bobtail"
+                },
+                {
+                    "id": "C47",
+                    "tr": "Korn Ja",
+                    "en": "Korn Ja"
+                },
+                {
+                    "id": "C48",
+                    "tr": "Kurilian Bobtail",
+                    "en": "Kurilian Bobtail"
+                },
+                {
+                    "id": "C49",
+                    "tr": "LaPerm",
+                    "en": "LaPerm"
+                },
+                {
+                    "id": "C50",
+                    "tr": "Lykoi",
+                    "en": "Lykoi"
+                },
+                {
+                    "id": "C51",
+                    "tr": "Maine Coon",
+                    "en": "Maine Coon"
+                },
+                {
+                    "id": "C52",
+                    "tr": "Manx",
+                    "en": "Manx"
+                },
+                {
+                    "id": "C53",
+                    "tr": "Mekong Bobtail",
+                    "en": "Mekong Bobtail"
+                },
+                {
+                    "id": "C54",
+                    "tr": "Minskin",
+                    "en": "Minskin"
+                },
+                {
+                    "id": "C55",
+                    "tr": "Munchkin",
+                    "en": "Munchkin"
+                },
+                {
+                    "id": "C56",
+                    "tr": "Nebelung",
+                    "en": "Nebelung"
+                },
+                {
+                    "id": "C57",
+                    "tr": "Napoleon",
+                    "en": "Napoleon"
+                },
+                {
+                    "id": "C58",
+                    "tr": "Norveç Orman Kedisi",
+                    "en": "Norwegian Forest Cat"
+                },
+                {
+                    "id": "C59",
+                    "tr": "Ocicat",
+                    "en": "Ocicat"
+                },
+                {
+                    "id": "C60",
+                    "tr": "Ojos Azules",
+                    "en": "Ojos Azules"
+                },
+                {
+                    "id": "C61",
+                    "tr": "Oregon Rex",
+                    "en": "Oregon Rex"
+                },
+                {
+                    "id": "C62",
+                    "tr": "Oriental Bicolor",
+                    "en": "Oriental Bicolor"
+                },
+                {
+                    "id": "C63",
+                    "tr": "Oriental Shorthair",
+                    "en": "Oriental Shorthair"
+                },
+                {
+                    "id": "C64",
+                    "tr": "Oriental Longhair",
+                    "en": "Oriental Longhair"
+                },
+                {
+                    "id": "C65",
+                    "tr": "PerFold",
+                    "en": "PerFold"
+                },
+                {
+                    "id": "C66",
+                    "tr": "İran (Modern İran Kedisi)",
+                    "en": "Persian (Modern Persian Cat)"
+                },
+                {
+                    "id": "C67",
+                    "tr": "İran (Geleneksel İran Kedisi)",
+                    "en": "Persian (Traditional Persian Cat)"
+                },
+                {
+                    "id": "C68",
+                    "tr": "Peterbald",
+                    "en": "Peterbald"
+                },
+                {
+                    "id": "C70",
+                    "tr": "Pixie-bob",
+                    "en": "Pixie-bob"
+                },
+                {
+                    "id": "C71",
+                    "tr": "Raas",
+                    "en": "Raas"
+                },
+                {
+                    "id": "C72",
+                    "tr": "Ragamuffin",
+                    "en": "Ragamuffin"
+                },
+                {
+                    "id": "C73",
+                    "tr": "Ragdoll",
+                    "en": "Ragdoll"
+                },
+                {
+                    "id": "C74",
+                    "tr": "Mavi Rus Kedisi",
+                    "en": "Russian Blue"
+                },
+                {
+                    "id": "C75",
+                    "tr": "Rus Beyazı, Rus Siyahı ve Rus Tekiri",
+                    "en": "Russian White, Black and Tabby"
+                },
+                {
+                    "id": "C76",
+                    "tr": "Sam Sawet",
+                    "en": "Sam Sawet"
+                },
+                {
+                    "id": "C77",
+                    "tr": "Savannah",
+                    "en": "Savannah"
+                },
+                {
+                    "id": "C78",
+                    "tr": "Scottish Fold",
+                    "en": "Scottish Fold"
+                },
+                {
+                    "id": "C78",
+                    "tr": "Selkirk Rex",
+                    "en": "Selkirk Rex"
+                },
+                {
+                    "id": "C79",
+                    "tr": "Serengeti",
+                    "en": "Serengeti"
+                },
+                {
+                    "id": "C80",
+                    "tr": "Serrade Petit",
+                    "en": "Serrade Petit"
+                },
+                {
+                    "id": "C81",
+                    "tr": "Siyam Kedisi",
+                    "en": "Siamese"
+                },
+                {
+                    "id": "C82",
+                    "tr": "Sibirya",
+                    "en": "Siberian"
+                },
+                {
+                    "id": "C83",
+                    "tr": "Singapura",
+                    "en": "Singapura"
+                },
+                {
+                    "id": "C84",
+                    "tr": "Karayak",
+                    "en": "Snowshoe"
+                },
+                {
+                    "id": "C85",
+                    "tr": "Sokoke",
+                    "en": "Sokoke"
+                },
+                {
+                    "id": "C86",
+                    "tr": "Somali",
+                    "en": "Somali"
+                },
+                {
+                    "id": "C87",
+                    "tr": "Sfenks",
+                    "en": "Sphynx"
+                },
+                {
+                    "id": "C88",
+                    "tr": "Suphalak",
+                    "en": "Suphalak"
+                },
+                {
+                    "id": "C89",
+                    "tr": "Geleneksel Siyam",
+                    "en": "Thai"
+                },
+                {
+                    "id": "C90",
+                    "tr": "Thai Lilac",
+                    "en": "Thai Lilac"
+                },
+                {
+                    "id": "C91",
+                    "tr": "Tonkinese",
+                    "en": "Tonkinese"
+                },
+                {
+                    "id": "C92",
+                    "tr": "Toyger",
+                    "en": "Toyger"
+                },
+                {
+                    "id": "C93",
+                    "tr": "Ankara Kedisi",
+                    "en": "Turkish Angora"
+                },
+                {
+                    "id": "C94",
+                    "tr": "Van Kedisi",
+                    "en": "Turkish Van"
+                },
+                {
+                    "id": "C95",
+                    "tr": "Ukraynalı Levkoy",
+                    "en": "Ukrainian Levkoy"
+                }
+            ]
+        },
+        {
+            "id": "P2",
+            "name": {
+                "tr": "Kuş",
+                "en": "Bird"
+            },
+            "species":[
+                    {
+                        "id": "B0",
+                        "tr": "Diğer",
+                        "en": "Other"
+                    },
+                    {
+                        "id": "B1",
+                        "tr": "Afrika Gri Papağanı",
+                        "en": "African Grey Parrot"
+                    },
+                    {
+                        "id": "B2",
+                        "tr": "Amazon Papağanı",
+                        "en": "Amazon Parrot"
+                    },
+                    {
+                        "id": "B3",
+                        "tr": "Mavi Taçlı Muhabbet Kuşu",
+                        "en": "Blue-Crowned Parakeet"
+                    },
+                    {
+                        "id": "B4",
+                        "tr": "Muhabbet Kuşu",
+                        "en": "Budgie"
+                    },
+                    {
+                        "id": "B5",
+                        "tr": "Kanarya",
+                        "en": "Canary"
+                    },
+                    {
+                        "id": "B6",
+                        "tr": "Kakadugiller",
+                        "en": "Cockatoo"
+                    },
+                    {
+                        "id": "B7",
+                        "tr": "Crimson Rosella",
+                        "en": "Crimson Rosella"
+                    },
+                    {
+                        "id": "B8",
+                        "tr": "Sarı Başlı Papağan",
+                        "en": "Double Yellow-Headed Amazon Parrot"
+                    },
+                    {
+                        "id": "B9",
+                        "tr": "Eclectus",
+                        "en": "Eclectus"
+                    },
+                    {
+                        "id": "B10",
+                        "tr": "Fischer Ayrılmazı",
+                        "en": "Fischer’s Lovebird"
+                    },
+                    {
+                        "id": "B11",
+                        "tr": "Doğu Yassıkuyruğu",
+                        "en": "Golden-Mantled Rosella"
+                    },
+                    {
+                        "id": "B12",
+                        "tr": "Yeşil Yanaklı Perkit",
+                        "en": "Green-Cheeked Conure"
+                    },
+                    {
+                        "id": "B13",
+                        "tr": "Kırmızı Omuzlu Makav",
+                        "en": "Hahn’s Macaw"
+                    },
+                    {
+                        "id": "B14",
+                        "tr": "Yeşil Papağan",
+                        "en": "Indian Ring-Necked Parakeet"
+                    },
+                    {
+                        "id": "B15",
+                        "tr": "Leylak Rengi Taçlı Amazon",
+                        "en": "Lilac-Crowned Amazon"
+                    },
+                    {
+                        "id": "B16",
+                        "tr": "Lovebird",
+                        "en": "Lovebird"
+                    },
+                    {
+                        "id": "B17",
+                        "tr": "Meyer Papağanı",
+                        "en": "Meyer’s Parrot"
+                    },
+                    {
+                        "id": "B18",
+                        "tr": "Turuncu Kanatlı Amazon Papağanı",
+                        "en": "Orange-Winged Amazon Parrot"
+                    },
+                    {
+                        "id": "B19",
+                        "tr": "Gök Papağanı",
+                        "en": "Pacific Parrotlet"
+                    },
+                    {
+                        "id": "B20",
+                        "tr": "Parrotlet",
+                        "en": "Parrotlet"
+                    },
+                    {
+                        "id": "B21",
+                        "tr": "Pionus Papağanı",
+                        "en": "Pionus Parrot"
+                    },
+                    {
+                        "id": "B22",
+                        "tr": "Psittacula",
+                        "en": "Psittacula"
+                    },
+                    {
+                        "id": "B23",
+                        "tr": "Swainson Papağanı",
+                        "en": "Rainbow Lory"
+                    },
+                    {
+                        "id": "B24",
+                        "tr": "Kırmızı Faktör Kanarya",
+                        "en": "Red-Factor Canary"
+                    },
+                    {
+                        "id": "B25",
+                        "tr": "Rosella",
+                        "en": "Rosella"
+                    },
+                    {
+                        "id": "B26",
+                        "tr": "Senegal Papağanı",
+                        "en": "Senegal Parrot"
+                    },
+                    {
+                        "id": "B27",
+                        "tr": "Güneş Muhbbet Kuşu",
+                        "en": "Sun Conure"
+                    },
+                    {
+                        "id": "B28",
+                        "tr": "Kara Papağan",
+                        "en": "Vasa Parrot"
+                    },
+                    {
+                        "id": "B29",
+                        "tr": "Sarı Enseli Amazon Papağanı",
+                        "en": "Yellow-Naped Amazon Parrot"
+                    },
+                    {
+                        "id": "B30",
+                        "tr": "İskender Papağanı",
+                        "en": "Alexandrine Parakeet"
+                    },
+                    {
+                        "id": "B31",
+                        "tr": "Blue-and-Gold Macaw",
+                        "en": "Blue-and-Gold Macaw"
+                    },
+                    {
+                        "id": "B32",
+                        "tr": "Mavi Başlı Papağan",
+                        "en": "Blue-Headed Pionus"
+                    },
+                    {
+                        "id": "B33",
+                        "tr": "Kayık",
+                        "en": "Caique"
+                    },
+                    {
+                        "id": "B34",
+                        "tr": "Sultan Papağanı",
+                        "en": "Cockatiel"
+                    },
+                    {
+                        "id": "B35",
+                        "tr": "Konur Papağanı",
+                        "en": "Conure"
+                    },
+                    {
+                        "id": "B36",
+                        "tr": "Elmas Kumru",
+                        "en": "Diamond Dove"
+                    },
+                    {
+                        "id": "B37",
+                        "tr": "Kumru",
+                        "en": "Dove"
+                    },
+                    {
+                        "id": "B38",
+                        "tr": "İspinoz",
+                        "en": "Finch"
+                    },
+                    {
+                        "id": "B39",
+                        "tr": "Goffin Kakadu",
+                        "en": "Goffin’s Cockatoo"
+                    },
+                    {
+                        "id": "B40",
+                        "tr": "Gökkuşağı İspinozu",
+                        "en": "Gouldian Finch"
+                    },
+                    {
+                        "id": "B41",
+                        "tr": "Kırmızı-Yeşil Ara",
+                        "en": "Green-Winged Macaw"
+                    },
+                    {
+                        "id": "B42",
+                        "tr": "Sümbül Makav",
+                        "en": "Hyacinth Macaw"
+                    },
+                    {
+                        "id": "B43",
+                        "tr": "Kırmızılı Perikit",
+                        "en": "Jenday Conure"
+                    },
+                    {
+                        "id": "B44",
+                        "tr": "Lori",
+                        "en": "Lory"
+                    },
+                    {
+                        "id": "B45",
+                        "tr": "Amerikan Papağanı",
+                        "en": "Macaw"
+                    },
+                    {
+                        "id": "B46",
+                        "tr": "Molukan Kakadu",
+                        "en": "Moluccan Cockatoo"
+                    },
+                    {
+                        "id": "B47",
+                        "tr": "Baykuş İspinozu",
+                        "en": "Owl Finch"
+                    },
+                    {
+                        "id": "B48",
+                        "tr": "Papağan",
+                        "en": "Parrot"
+                    },
+                    {
+                        "id": "B49",
+                        "tr": "Cennet Papağanı",
+                        "en": "Peach-Faced Lovebird"
+                    },
+                    {
+                        "id": "B50",
+                        "tr": "Poicephalus",
+                        "en": "Poicephalus"
+                    },
+                    {
+                        "id": "B51",
+                        "tr": "Keşiş Papağanı",
+                        "en": "Quaker Parakeet"
+                    },
+                    {
+                        "id": "B52",
+                        "tr": "Kırmızı Lori",
+                        "en": "Red Lory"
+                    },
+                    {
+                        "id": "B53",
+                        "tr": "Kaplumbağa Güvercini",
+                        "en": "Ring-Necked Dove"
+                    },
+                    {
+                        "id": "B54",
+                        "tr": "Kırmızı Macaw Papağanı",
+                        "en": "Scarlet Macaw"
+                    },
+                    {
+                        "id": "B55",
+                        "tr": "Beyaz Kakadu",
+                        "en": "Umbrella Cockatoo"
+                    },
+                    {
+                        "id": "B56",
+                        "tr": "Ak Tepeli Papağan",
+                        "en": "White-Capped Pionus"
+                    },
+                    {
+                        "id": "B57",
+                        "tr": "Zebra İspinozu",
+                        "en": "Zebra Finch"
+                    },
+                    {
+                        "id": "B58",
+                        "tr": "Ördek",
+                        "en":"Duck"
+                    },
+                    {
+                        "id": "B59",
+                        "tr": "Kaz",
+                        "en": "Goose"
+                    },
+                    {
+                        "id": "B60",
+                        "tr": "Hindi",
+                        "en": "Turkey"
+                    },
+                    {
+                        "id": "B61",
+                        "tr": "Keklik",
+                        "en": "Partridge"
+                    },
+                    {
+                        "id": "B62",
+                        "tr": "Güvercin",
+                        "en": "Pigeon"
+                    }
+            ]
+        },
+        {
+            "id": "P3",
+            "name":{
+                "tr": "Kemirgen",
+                "en": "Rodent"
+            },
+            "species": [
+                {
+                    "id": "R0",
+                    "tr": "Diğer",
+                    "en": "Other"
+                },
+                {
+                    "id": "R1",
+                    "tr": "Hamster",
+                    "en": "Hamster"
+                },
+                {
+                    "id": "R2",
+                    "tr": "Gerbil",
+                    "en": "Gerbil"
+                },
+                {
+                    "id": "R3",
+                    "tr": "Fare",
+                    "en": "Mice"
+                },
+                {
+                    "id": "R4",
+                    "tr": "Sıçan",
+                    "en": "Rat"
+                },
+                {
+                    "id": "R5",
+                    "tr": "Gine Domuzu",
+                    "en": "Guinea Pig"
+                },
+                {
+                    "id": "R6",
+                    "tr": "Tavşan",
+                    "en": "Rabbit"
+                }
+            ]
+        },
+        {
+            "id": "P4",
+            "name": {
+                "tr": "Su Canlısı",
+                "en": "Aquatic Creatures"
+            },
+            "species":[
+                {
+                    "id": "A0",
+                    "tr": "Diğer",
+                    "en": "Other"
+                },
+                {
+                    "id": "A1",
+                    "tr": "Kaplumbağa",
+                    "en": "Turtle"
+                },
+                {
+                    "id": "A2",
+                    "tr": "Yengeç",
+                    "en": "Crab"
+                },
+                {
+                    "id": "A3",
+                    "tr": "Balık",
+                    "en": "Fish"
+                },
+                {
+                    "id": "A4",
+                    "tr": "Fok",
+                    "en": "Seal"
+                },
+                {
+                    "id": "A5",
+                    "tr": "Ahtapot",
+                    "en": "Octopus"
+                },
+                {
+                    "id": "A6",
+                    "tr": "Denizatı",
+                    "en": "Seahorse"
+                },
+                {
+                    "id": "A7",
+                    "tr": "Denizyıldızı",
+                    "en": "Starfish"
+                },
+                {
+                    "id": "A8",
+                    "tr": "Kalamar",
+                    "en": "Squid"
+                },
+                {
+                    "id": "A9",
+                    "tr": "Istakoz",
+                    "en": "Lobster"
+                },
+                {
+                    "id": "A10",
+                    "tr": "Karides",
+                    "en": "Shrimp"
+                },
+                {
+                    "id": "A11",
+                    "tr": "İstiridye",
+                    "en": "Oyster"
+                },
+                {
+                    "id": "A12",
+                    "tr": "Yunus",
+                    "en": "Dolphin"
+                },
+                {
+                    "id": "A13",
+                    "tr": "Su Samuru",
+                    "en": "Otter"
+                }
+            ]
+        },
+        {
+            "id": "P5",
+            "name": {
+                "tr": "Böcek",
+                "en": "Bug"
+            },
+            "species": [
+                {
+                    "id": "BG0",
+                    "tr": "Diğer",
+                    "en": "Other"
+                },
+                {
+                    "id": "BG1",
+                    "tr": "Örümcek",
+                    "en": "Spider"
+                },
+                {
+                    "id": "BG2",
+                    "tr": "Tarantula",
+                    "en": "Tarantula"
+                },
+                {
+                    "id": "BG3",
+                    "tr": "Çekirge",
+                    "en": "Grasshopper"
+                },
+                {
+                    "id": "BG4",
+                    "tr": "Peygamber Devesi",
+                    "en": "Praying Manti"
+                },
+                {
+                    "id": "BG5",
+                    "tr": "Cırcır Böceği",
+                    "en": "Cricket"
+                },
+                {
+                    "id": "BG6",
+                    "tr": "Gergedan Böceği",
+                    "en": "Beetle"
+                },
+                {
+                    "id": "BG7",
+                    "tr": "Kırkayak",
+                    "en": "Centipede"
+                },
+                {
+                    "id": "BG8",
+                    "tr": "Akrep",
+                    "en": "Scorpion"
+                },
+                {
+                    "id": "BG9",
+                    "tr": "Un Kurdu",
+                    "en": "Mealworm"
+                },
+                {
+                    "id": "BG10",
+                    "tr": "Karınca",
+                    "en": "Ant"
+                },
+                {
+                    "id": "BG11",
+                    "tr": "Ateş Böceği",
+                    "en": "Firefly"
+                },
+                {
+                    "id": "BG12",
+                    "tr": "İpekböceği",
+                    "en": "Silkworms"
+                },
+                {
+                    "id": "BG13",
+                    "tr": "Solucan",
+                    "en": "Worm"
+                }
+            ]
+        },
+        {
+            "id": "P6",
+            "name": {
+                "tr": "Çiftlik Hayvanları",
+                "en": "Farm Animals"
+            },
+            "species": [
+                {
+                    "id": "F0",
+                    "tr": "Diğer",
+                    "en": "Other"
+                },
+                {
+                    "id": "F1",
+                    "tr": "Keçi",
+                    "en": "Goat"
+                },
+                {
+                    "id": "F2",
+                    "tr": "Koyun",
+                    "en": "Sheep"
+                },
+                {
+                    "id": "F3",
+                    "tr": "Domuz",
+                    "en": "Pig"
+                },
+                {
+                    "id": "F4",
+                    "tr": "Sığır",
+                    "en": "Cattle"
+                },
+                {
+                    "id": "F5",
+                    "tr": "Eşşek",
+                    "en": "Donkey"
+                },
+                {
+                    "id": "F6",
+                    "tr": "Bufalo",
+                    "en": "Buffaloes"
+                },
+                {
+                    "id": "F7",
+                    "tr": "Deve",
+                    "en": "Camel"
+                },
+                {
+                    "id": "F8",
+                    "tr": "At",
+                    "en": "Horse"
+                },
+                {
+                    "id": "F9",
+                    "tr": "Lama",
+                    "en": "Llama"
+                },
+                {
+                    "id": "F10",
+                    "tr": "Alpaka",
+                    "en": "Alpaca"
+                },
+                {
+                    "id": "F11",
+                    "tr": "Bizon",
+                    "en": "Bison"
+                },
+                {
+                    "id": "F12",
+                    "tr": "Geyik",
+                    "en": "Deer"
+                },
+                {
+                    "id": "F13",
+                    "tr": "Katır",
+                    "en": "Mule"
+                },
+                {
+                    "id": "F14",
+                    "tr": "Ren Geyiği",
+                    "en": "Reindeer"
+                },
+                {
+                    "id": "F15",
+                    "tr": "Devekuşu",
+                    "en": "Ostrich"
+                },
+                {
+                    "id": "F16",
+                    "tr": "Bıldırcın",
+                    "en": "Quail"
+                },
+                {
+                    "id": "F17",
+                    "tr": "Arı",
+                    "en": "Bees"
+                }
+            ]
+        }
+    ]
+}

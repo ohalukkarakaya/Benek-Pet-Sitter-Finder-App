@@ -1,89 +1,99 @@
 import express from "express";
+import fs from "fs";
 import AnimalCategories from "../../models/AnimalCategories.js";
 import { animalCategoryReqValidation } from "../../utils/animalCategoryReqValidationSchema.js";
 import auth from "../../middleware/auth.js";
 
 const router = express.Router();
 
-//Insert Animal Category
-router.post(
-    "/insertAnimalCategory",
+//Send Pet Keywords
+router.get(
+    "/:language",
     auth,
     async (req, res) => {
-      try{
-        const { error } = animalCategoryReqValidation(req.body);
-        if(error)
-          return res.status(400).json(
-            {
-              error: true,
-              message: error.details[0].message
-            }
-          );
-  
-        const animal = await AnimalCategories.findOne(
-            {
-                category: req.body.category
-            }
-        );
-        if(animal){
-            if(
-                animal.animalName.some(
-                    item => item.tr === req.body.animalName.tr
-                        && item.en === req.body.animalName.en
-                )
-            ){
-                return res.status(400).json(
+    
+    let rawPetDataset = fs.readFile(
+        '../../src/petDataset.json',
+        "utf8",
+        (err, data) => {
+            if(err){
+                return res.status(500).json(
                     {
                         error: true,
-                        message: "Animal Allready Exists"
+                        message: err.message
                     }
                 );
-            }else{
-                //push animal name to category
-                animal.animalName.push(req.body.animalName);
-                animal.markModified('animalName');
-                animal.save().then(
-                    (result) => {
-                        return res.status(200).json(
-                            {
-                                error: false,
-                                message: `animal inserted to category ${animal.category.en}`
-                            }
-                        );
-                    }
-                )
-            }
-        }else{
-            console.log(req.body);
-            //create a category and insert animal name
-            await new AnimalCategories(
-                {
-                  category: req.body.category,
-                  animalName: [ req.body.animalName ],
-                }
-            ).save().then(
-              (result) => {
-                return res.status(200).json(
-                    {
-                        error: false,
-                        message: "Animal inserted",
-                        insertedData: result
-                    }
-                );
-              }
-            );
+            };
+            console.log(data);
         }
-  
-      }catch(err){
-          console.log(err);
-          res.status(500).json(
-              {
-                  error: true,
-                  message: "Internal Server Error"
-              }
-          );
-      }
+    );
+    let petDataset = JSON.parse(rawPetDataset);
+
+    const userLanguage = req.params.language;
+
+    if(userLanguage === "tr"){
+        const trResponse = [];
+        for(var pet in petDataset.pets){
+            var petGeneralId = pet.id;
+            var petName = pet.name.tr;
+
+            var petSpecies = [];
+            for(var species in pet.species){
+                var speciesId = species.id;
+                var speciesName = species.tr;
+
+                var speciesObject = {
+                    "id": speciesId,
+                    "name": speciesName, 
+                };
+                petSpecies.push(speciesObject);
+            }
+
+            var trResponseObject = {
+                "id": petGeneralId,
+                "pet": petName,
+                "species": petSpecies
+            };
+            trResponse.push(trResponseObject);
+        }
+
+        return res.status(200).json(
+            {
+                trResponse
+            }
+        );
+    }else{
+        const enResponse = [];
+        for(var pet in petDataset.pets){
+            var petGeneralId = pet.id;
+            var petName = pet.name.en;
+
+            var petSpecies = [];
+            for(var species in pet.species){
+                var speciesId = species.id;
+                var speciesName = species.en;
+
+                var speciesObject = {
+                    "id": speciesId,
+                    "name": speciesName, 
+                };
+                petSpecies.push(speciesObject);
+            }
+
+            var trResponseObject = {
+                "id": petGeneralId,
+                "pet": petName,
+                "species": petSpecies
+            };
+            enResponse.push(trResponseObject);
+        }
+
+        return res.status(200).json(
+            {
+                enResponse
+            }
+        );
     }
-  );
+});
 
   export default router;
