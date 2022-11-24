@@ -117,7 +117,9 @@ router.post(
                                         petId: requestArray[i].petId,
                                         speciesId: requestArray[i].speciesId
                                     };
-                                    updateUser.interestingPetTags.push(petTag);
+                                    if(!updateUser.interestingPetTags.contains(petTag)){
+                                        updateUser.interestingPetTags.push(petTag);
+                                    }
                                 };
                                 updateUser.markModified('interestingPetTags');
                                 updateUser.save(
