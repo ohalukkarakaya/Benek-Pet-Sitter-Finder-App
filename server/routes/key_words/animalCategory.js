@@ -69,14 +69,14 @@ router.get(
         );
     }else{
         const enResponse = [];
-        for(var pet in petDataset.pets){
-            var petGeneralId = pet.id;
-            var petName = pet.name.en;
+        for(var i = 0; i < petDataset.pets.length; i ++){
+            var petGeneralId = petDataset.pets[i].id;
+            var petName = petDataset.pets[i].name.en;
 
             var petSpecies = [];
-            for(var species in pet.species){
-                var speciesId = species.id;
-                var speciesName = species.en;
+            for(var index = 0; index < petDataset.pets[i].species.length; index ++){
+                var speciesId = petDataset.pets[i].species[index].id;
+                var speciesName = petDataset.pets[i].species[index].en;
 
                 var speciesObject = {
                     "id": speciesId,
