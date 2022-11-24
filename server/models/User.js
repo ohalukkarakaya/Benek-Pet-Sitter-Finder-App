@@ -160,10 +160,10 @@ const UserSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
-        interestsTags: [
+        interestingPetTags: [
             {
-                tagId: String,
-                tag: String
+                petId: String,
+                speciesId: String
             }
         ]
     },

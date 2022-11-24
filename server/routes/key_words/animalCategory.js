@@ -2,9 +2,10 @@ import express from "express";
 import { animalCategoryReqValidation } from "../../utils/animalCategoryReqValidationSchema.js";
 import auth from "../../middleware/auth.js";
 import { createRequire } from "module";
+import User from "../../models/User.js";
+
 const require = createRequire(import.meta.url);
 const rawPetDataset = require('../../src/pet_dataset.json');
-
 const petDataset = JSON.parse(JSON.stringify(rawPetDataset));
 
 const router = express.Router();
@@ -83,6 +84,63 @@ router.get(
 });
 
 //Insert Keyword
-//To Do
+router.post(
+    "/insertInterestedPets",
+    auth,
+    async (req, res) => {
+        try{
+            const { error } = animalCategoryReqValidation(req.body);
+            if(error){
+                return res.status(400).json(
+                    {
+                      error: true,
+                      message: error.details[0].message
+                    }
+                  );
+            }else{
+                User.findById(
+                    req.user._id,
+                    (error, updateUser) => {
+                        if(error){
+                            return res.status(404).json(
+                                {
+                                    error: true,
+                                    message: "User can not found"
+                                }
+                            );
+                        }else{
+                            const requestArray = req.body.selectedPetCategories;
+                            const isArrayEmpty = requestArray.length === 0;
+                            if(!isArrayEmpty){
+                                for(var i = 0; i < requestArray.length; i ++){
+                                    const petTag = {
+                                        petId: requestArray[i].petId,
+                                        speciesId: requestArray[i].speciesId
+                                    };
+                                    updateUser.interestingPetTags.push(petTag);
+                                };
+                                updateUser.markModified('interestingPetTags');
+                                updateUser.save(
+                                    function (err) {
+                                        if(err) {
+                                            console.error('ERROR: While Update!');
+                                        }
+                                    }
+                                );
+                            }
+                        }
+                    }
+                );
+            }
+        }catch(err){
+            res.status(500).json(
+                {
+                    error: true,
+                    message: err.message
+                }
+            );
+        }
+    }
+)
 
   export default router;
