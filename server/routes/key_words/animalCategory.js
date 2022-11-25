@@ -117,7 +117,18 @@ router.post(
                                         petId: requestArray[i].petId,
                                         speciesId: requestArray[i].speciesId
                                     };
-                                    if(!updateUser.interestingPetTags.contains(petTag)){
+                                    const isTagAllreadyExist = updateUser.interestingPetTags.find(
+                                        tag => 
+                                            tag.petId === petTag.petId
+                                            && tag.speciesId === petTag.speciesId
+                                    );
+                                    if(isTagAllreadyExist){
+                                        updateUser.interestingPetTags = updateUser.interestingPetTags.filter(
+                                            tag => 
+                                                tag.petId !== petTag.petId
+                                                && tag.speciesId !== petTag.speciesId 
+                                        );
+                                    }else{
                                         updateUser.interestingPetTags.push(petTag);
                                     }
                                 };
