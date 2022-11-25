@@ -111,7 +111,7 @@ router.post(
                         }else{
                             const requestArray = req.body.selectedPetCategories;
                             const isArrayEmpty = requestArray.length === 0;
-                            if(!isArrayEmpty){
+                            if( !isArrayEmpty ){
                                 for(var i = 0; i < requestArray.length; i ++){
                                     const petTag = {
                                         petId: requestArray[i].petId,
@@ -137,9 +137,22 @@ router.post(
                                     function (err) {
                                         if(err) {
                                             console.error('ERROR: While Update!');
+                                            return res.status(500).json(
+                                                {
+                                                    error: true,
+                                                    message: "Internal server error"
+                                                }
+                                            );
                                         }
                                     }
-                                );
+                                ).then(
+                                    (data) => {
+                                        return res.status(200).json({
+                                            error: false,
+                                            message: "Tag process succesful"
+                                        });
+                                    }
+                                )
                             }
                         }
                     }
