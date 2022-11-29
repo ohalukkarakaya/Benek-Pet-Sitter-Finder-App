@@ -1,16 +1,23 @@
 import express from "express";
 import Pet from "../../models/Pet.js";
-import { signUpBodyValidation } from "../../utils/signUpValidationSchema.js";
+import { createPetReqBodyValidation } from "../../utils/createPetValidationSchema.js";
 import auth from "../../middleware/auth.js";
+import { createRequire } from "module";
+import User from "../../models/User.js";
+
+const require = createRequire(import.meta.url);
+const rawPetDataset = require('../../src/pet_dataset.json');
+const petDataset = JSON.parse(JSON.stringify(rawPetDataset));
 
 const router = express.Router();
-//Insert Pet
+
+//Create Pet
 router.post(
     "/createPet", 
     auth,
     async (req, res) => {
       try{
-        const { error } = signUpBodyValidation(req.body);
+        const { error } = createPetReqBodyValidation(req.body);
         if(error)
           return res.status(400).json(
             {
@@ -18,6 +25,24 @@ router.post(
               message: error.details[0].message
             }
           );
+        
+        let petKind;
+        let petSpecies;
+
+        for(var i = 0; i < petDataset.pets.length; i ++){
+          if(petDataset.pets[i].id === req.body.kindCode){
+            petKind = petDataset.pets[i].name;
+            for(var index = 0; index < petDataset.pets[i].species.length; index ++){
+              if(petDataset.pets[i].species[index].id === req.body.speciesCode){
+                petSpecies = {
+                    "tr": petDataset.pets[i].species[index].tr,
+                    "en": petDataset.pets[i].species[index].en
+                  };
+                console.log(petSpecies);
+              }
+            }
+          }
+        }
   
         const pet = await Pet.find(
           {
@@ -37,7 +62,7 @@ router.post(
             ]
           }
         );
-        if(pet){
+        if(pet.length > 0){
           return res.status(400).json(
             {
               error: true,
@@ -56,25 +81,36 @@ router.post(
             birthDay: req.body.birthDay,
             kind: req.body.kindCode,
             species: req.body.speciesCode,
-            password: hashPassword,
             primaryOwner: req.user._id,
             allOwners: [ req.user._id ],
           }
         ).save().then(
           (result) => {
-            user.pets.push(result._id);
-            user.markModified('pets');
-            user.save(
-              function (err) {
-                if(err) {
-                  console.error('ERROR: While Update!');
-                  res.status(500).json(
-                    {
-                      error: true,
-                      message: "Internal server error"
-                    }
-                  );
+            User.findByIdAndUpdate(
+              req.user._id,
+              {
+                $push: {
+                  pets: result._id
                 }
+              }
+            ).then(
+              (_) => {
+                const currentYear = new Date().getFullYear();
+                const petsBirthYear = result.birthDay.getFullYear();
+
+                return res.status(200).json(
+                  {
+                    error: false,
+                    message: "Pet created succesfully",
+                    data: {
+                      petId: result._id,
+                      petName: pet.name,
+                      petAge: `${currentYear - petsBirthYear} years old`,
+                      petKind: petKind,
+                      petSpecies: petSpecies
+                    }
+                  }
+                );
               }
             );
           }
