@@ -127,4 +127,75 @@ router.post(
     }
   );
 
+//Add secondary owner to pet
+router.put(
+  "/addSecondaryOwner/:petId/:secondaryOwnerId",
+  auth,
+  async (req, res) => {
+    try{
+      const pet = await Pet.findOne(
+        {
+          _id: req.params.petId,
+          primaryOwner: req.user._id
+        }
+      );
+      if(pet){
+        if(!pet.allOwners.includes(req.params.secondaryOwnerId)){
+          const secondaryOwner = await User.findById(
+            req.params.secondaryOwnerId
+          );
+    
+          if(secondaryOwner){
+            pet.allOwners.push(secondaryOwner._id)
+            pet.markModified("allOwners");
+            pet.save(
+              function (err) {
+                if(err) {
+                    console.error('ERROR: While Update!');
+                }
+              }
+            );
+            return res.status(200).json(
+              {
+                error: false,
+                message: `@${secondaryOwner.userName} recorded as owner succesfully`,
+  
+              }
+            );
+          }else{
+            return res.status(404).json(
+              {
+                error: true,
+                message: "User which you are trying to record as secondary owner is not found"
+              }
+            );
+          }
+        }else{
+          return res.status(400).json(
+            {
+              error: false,
+              message: "This user is allready recorded asowner"
+            }
+          );
+        }
+      }else{
+        return res.status(404).json(
+          {
+            error: true,
+            message: "Pet not found"
+          }
+        );
+      }
+    }catch(err){
+      console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+)
+
 export default router;
