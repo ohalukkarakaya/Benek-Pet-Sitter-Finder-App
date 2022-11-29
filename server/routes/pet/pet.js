@@ -23,9 +23,10 @@ router.post(
             }
           );
   
-      const user = await User.findOne(
+      const user = await Pet.findOne(
         {
-          email: req.body.email
+          name: req.body.name,
+          primaryOwner: req.user._id,
         }
       );
       if(user)
