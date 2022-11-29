@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth/auth.js';
 import refreshTokenRoutes from './routes/auth/refreshToken.js';
 import editUserRoutes from './routes/edit_user/editUser.js';
-import petRoutes from './routes/key_words/pet.js';
+import petRoutes from './routes/pet/pet.js';
 import animalKeywordRoutes from './routes/key_words/animalCategory.js';
 import bodyParser from 'body-parser';
 

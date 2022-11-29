@@ -1,14 +1,10 @@
 import express from "express";
 import Pet from "../../models/Pet.js";
-import bcrypt from "bcrypt";
-import dotenv from "dotenv";
-import { signUpBodyValidation } from "../../utils/validationSchema.js";
+import { signUpBodyValidation } from "../../utils/signUpValidationSchema.js";
 import auth from "../../middleware/auth.js";
 
-dotenv.config();
-
 const router = express.Router();
-//SignUp
+//Insert Pet
 router.post(
     "/createPet", 
     auth,
@@ -23,46 +19,66 @@ router.post(
             }
           );
   
-      const user = await Pet.findOne(
-        {
-          name: req.body.name,
-          primaryOwner: req.user._id,
-        }
-      );
-      if(user)
-        return res.status(400).json(
+        const pet = await Pet.find(
           {
-            error: true,
-            message: "User Allready Exists"
+            $or: [
+              {
+                name: req.body.name,
+                kind: req.body.kindCode,
+                species: req.body.speciesCode,
+                primaryOwner: req.user._id
+              },
+              {
+                name: req.body.name,
+                kind: req.body.kindCode,
+                species: req.body.speciesCode,
+                allOwners: { $in: [ req.user._id ]}
+              }
+            ]
           }
         );
-  
-      const salt = await bcrypt.genSalt(Number(process.env.SALT));
-      const hashPassword = await bcrypt.hash(req.body.password, salt);
-  
-      await new User(
-        {
-          userName: req.body.userName,
-          email: req.body.email,
-          identity: req.body.identity,
-          location: req.body.location,
-          password: hashPassword,
-          trustedIps: [req.body.ip]
-        }
-      ).save().then(
-        (result) => {
-          // Handle account verification
-          // Send verification code
-          sendOTPVerificationEmail(
+        if(pet){
+          return res.status(400).json(
             {
-              _id: result._id,
-              email: result.email
-            },
-            res
+              error: true,
+              message: "Pet Allready Exists",
+              petId: pet._id,
+              petName: pet.name 
+            }
           );
         }
-      );
   
+        await new Pet(
+          {
+            name: req.body.name,
+            bio: req.body.petBio,
+            sex: req.body.sex,
+            birthDay: req.body.birthDay,
+            kind: req.body.kindCode,
+            species: req.body.speciesCode,
+            password: hashPassword,
+            primaryOwner: req.user._id,
+            allOwners: [ req.user._id ],
+          }
+        ).save().then(
+          (result) => {
+            user.pets.push(result._id);
+            user.markModified('pets');
+            user.save(
+              function (err) {
+                if(err) {
+                  console.error('ERROR: While Update!');
+                  res.status(500).json(
+                    {
+                      error: true,
+                      message: "Internal server error"
+                    }
+                  );
+                }
+              }
+            );
+          }
+        );  
       }catch(err){
           console.log(err);
           res.status(500).json(
