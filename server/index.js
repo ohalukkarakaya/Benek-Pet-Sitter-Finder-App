@@ -57,7 +57,7 @@ app.use("/auth", authRoutes);
 app.use("/api/refreshToken", refreshTokenRoutes);
 app.use("/api/user", editUserRoutes);
 app.use("/api/pet", petRoutes);
-app.use("/api/petOwnerOperations", petOwnerOperationsRoutes);
+app.use("/api/petOwner", petOwnerOperationsRoutes);
 app.use("/api/keywords/animals", animalKeywordRoutes);
 
 app.use((err, req, res, next) => {

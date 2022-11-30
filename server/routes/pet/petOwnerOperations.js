@@ -363,4 +363,23 @@ router.put(
     }
   );
 
+  //Hand over pet
+  router.put(
+    "/handOverPet/:petId/:newUserId",
+    auth,
+    async (req, res) => {
+      try{
+
+      }catch(err){
+        console.log(err);
+          res.status(500).json(
+              {
+                  error: true,
+                  message: "Internal Server Error"
+              }
+          );
+      }
+    }
+  );
+
 export default router;
