@@ -29,6 +29,7 @@ import authRoutes from './routes/auth/auth.js';
 import refreshTokenRoutes from './routes/auth/refreshToken.js';
 import editUserRoutes from './routes/edit_user/editUser.js';
 import petRoutes from './routes/pet/pet.js';
+import petOwnerOperationsRoutes from './routes/pet/petOwnerOperations.js';
 import animalKeywordRoutes from './routes/key_words/animalCategory.js';
 import bodyParser from 'body-parser';
 
@@ -56,6 +57,7 @@ app.use("/auth", authRoutes);
 app.use("/api/refreshToken", refreshTokenRoutes);
 app.use("/api/user", editUserRoutes);
 app.use("/api/pet", petRoutes);
+app.use("/api/petOwnerOperations", petOwnerOperationsRoutes);
 app.use("/api/keywords/animals", animalKeywordRoutes);
 
 app.use((err, req, res, next) => {
