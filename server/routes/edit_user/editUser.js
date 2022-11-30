@@ -1,15 +1,3 @@
-
-//      88     YbodP  88  88                                                            88  88                         88
-//                                                                                                                     88
-//    dP"Yb   dP""b8 88   88 88b 88      dP""b8    db    88     88 .dP"Y8       dP""b8 88   88 Yb    dP 888888 88b 88  88
-//   dP   Yb dP   `" 88   88 88Yb88     dP   `"   dPYb   88     88 `Ybo."      dP   `" 88   88  Yb  dP  88__   88Yb88  88
-//   Yb   dP Yb  "88 Y8   8P 88 Y88     Yb       dP__Yb  88  .o 88 o.`Y8b      Yb  "88 Y8   8P   YbdP   88""   88 Y88   
-//    YbodP   YboodP `YbodP' 88  Y8 dp   YboodP dP""""Yb 88ood8 88 8bodP' dp    YboodP `YbodP'    YP    888888 88  Y8  88
-//                                  d                                     d
-//                                         88                       88
-
-
-
 import express from "express";
 import dotenv from "dotenv";
 import auth from "../../middleware/auth.js";

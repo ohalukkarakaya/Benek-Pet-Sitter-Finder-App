@@ -1,15 +1,3 @@
-
-//      88     YbodP  88  88                                                            88  88                         88
-//                                                                                                                     88
-//    dP"Yb   dP""b8 88   88 88b 88      dP""b8    db    88     88 .dP"Y8       dP""b8 88   88 Yb    dP 888888 88b 88  88
-//   dP   Yb dP   `" 88   88 88Yb88     dP   `"   dPYb   88     88 `Ybo."      dP   `" 88   88  Yb  dP  88__   88Yb88  88
-//   Yb   dP Yb  "88 Y8   8P 88 Y88     Yb       dP__Yb  88  .o 88 o.`Y8b      Yb  "88 Y8   8P   YbdP   88""   88 Y88   
-//    YbodP   YboodP `YbodP' 88  Y8 dp   YboodP dP""""Yb 88ood8 88 8bodP' dp    YboodP `YbodP'    YP    888888 88  Y8  88
-//                                  d                                     d
-//                                         88                       88
-
-
-
 import express from "express";
 import Pet from "../../models/Pet.js";
 import { createPetReqBodyValidation } from "../../utils/createPetValidationSchema.js";
@@ -158,7 +146,7 @@ router.put(
           );
     
           if(secondaryOwner){
-            pet.allOwners.push(secondaryOwner._id)
+            pet.allOwners.push(secondaryOwner._id);
             pet.markModified("allOwners");
             pet.save(
               function (err) {
@@ -167,6 +155,52 @@ router.put(
                 }
               }
             );
+
+            //check dependency status of secondary user
+            const isSecondaryUserAllreadyDepended = false;
+            const isPetAllreadyInsertedToSecondaryOwner = false;
+            for(var i = 0; i < secondaryOwner.dependedUsers.length; i ++){
+              if( secondaryOwner.dependedUsers[i] === req.user._id ){
+                isSecondaryUserAllreadyDepended = true;
+              }
+              for(var index = 0; index < secondaryOwner.dependedUsers[i].linkedPets.length; i ++){
+                if(secondaryOwner.dependedUsers[i].linkedPets[index] === req.params.petId){
+                  isPetAllreadyInsertedToSecondaryOwner = true;
+                }
+              }
+            }
+
+            //add dependency to secondary user
+            if(!isSecondaryUserAllreadyDepended && !isPetAllreadyInsertedToSecondaryOwner){
+              secondaryOwner.dependedUsers.push(
+                {
+                  user: req.user._id,
+                  linkedPets: [ pet._id ]
+                }
+              );
+            }else if(isSecondaryUserAllreadyDepended && !isPetAllreadyInsertedToSecondaryOwner){
+              secondaryOwner.dependedUsers.filter(
+                dependeds => dependeds === req.user._id
+              ).linkedPets.push( pet._id );
+            }else if(isPetAllreadyInsertedToSecondaryOwner){
+              return res.status(500).json(
+                {
+                  error: true,
+                  message: `user with the id: ${secondaryOwner._id}, is allready depended with user with the id: ${req.user._id} by the pet with the id: ${pet._id}`
+                }
+              );
+            };
+
+            secondaryOwner.markModified("dependedUsers");
+            secondaryOwner.save(
+              function (err) {
+                if(err) {
+                    console.error('ERROR: While Update Secondary Owner!');
+                }
+              }
+            );
+
+            //send response
             return res.status(200).json(
               {
                 error: false,
@@ -208,6 +242,125 @@ router.put(
         );
     }
   }
-)
+);
+
+//Remove secondary owner of the pet
+router.put(
+  "/removeSecondaryOwner/:petId/:secondaryOwnerId",
+  auth,
+  async (req, res) => {
+    try{
+      const pet = await Pet.findOne(
+        {
+          _id: req.params.petId,
+          primaryOwner: req.user._id
+        }
+      );
+      if(pet){
+        if(pet.allOwners.includes(req.params.secondaryOwnerId)){
+          const secondaryOwner = await User.findById(
+            req.params.secondaryOwnerId
+          );
+    
+          if(secondaryOwner){
+            pet.allOwners = pet.allOwners.filter( owner => owner !== secondaryOwner._id );
+            pet.markModified("allOwners");
+            pet.save(
+              function (err) {
+                if(err) {
+                    console.error('ERROR: While Update!');
+                }
+              }
+            );
+
+            //check dependency status of secondary user
+            const isSecondaryUserAllreadyDepended = false;
+            const isPetAllreadyInsertedToSecondaryOwner = false;
+            for(var i = 0; i < secondaryOwner.dependedUsers.length; i ++){
+              if( secondaryOwner.dependedUsers[i] === req.user._id ){
+                isSecondaryUserAllreadyDepended = true;
+              }
+              for(var index = 0; index < secondaryOwner.dependedUsers[i].linkedPets.length; i ++){
+                if(secondaryOwner.dependedUsers[i].linkedPets[index] === req.params.petId){
+                  isPetAllreadyInsertedToSecondaryOwner = true;
+                }
+              }
+            }
+
+            //remove dependency of the secondary user
+            if(isSecondaryUserAllreadyDepended && isPetAllreadyInsertedToSecondaryOwner){
+              const secondaryOwnerDepended = secondaryOwner.dependedUsers.filter(depended => depended.user === req.user._id).linkedPets;
+              if(secondaryOwnerDepended.length > 1){
+                secondaryOwner.dependedUsers.linkedPets = secondaryOwner.dependedUsers.filter(
+                  depended => depended.user === req.user._id
+                ).linkedPets.filter(
+                  linkedPet => linkedPet !== pet._id
+                );
+              }else{
+                secondaryOwner.dependedUsers = secondaryOwner.dependedUsers.filter(
+                  depended => depended.user !== req.user._id
+                );
+              }
+            }else if(!isPetAllreadyInsertedToSecondaryOwner){
+              return res.status(500).json(
+                {
+                  error: true,
+                  message: `user with the id: ${secondaryOwner._id}, was not depended with user with the id: ${req.user._id} by the pet with the id: ${pet._id}`
+                }
+              );
+            };
+
+            secondaryOwner.markModified("dependedUsers");
+            secondaryOwner.save(
+              function (err) {
+                if(err) {
+                    console.error('ERROR: While Update Secondary Owner!');
+                }
+              }
+            );
+
+            //send response
+            return res.status(200).json(
+              {
+                error: false,
+                message: `@${secondaryOwner.userName} is not owner of @${pet.name} anymore.`,
+  
+              }
+            );
+          }else{
+            return res.status(404).json(
+              {
+                error: true,
+                message: "User which you are trying to record as secondary owner is not found"
+              }
+            );
+          }
+        }else{
+          return res.status(400).json(
+            {
+              error: false,
+              message: "This user is allready recorded as owner"
+            }
+          );
+        }
+      }else{
+        return res.status(404).json(
+          {
+            error: true,
+            message: "Pet not found"
+          }
+        );
+      }
+    }catch(err){
+      console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+);
 
 export default router;
