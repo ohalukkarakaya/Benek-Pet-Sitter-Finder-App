@@ -174,7 +174,7 @@ router.put(
           return res.status(400).json(
             {
               error: false,
-              message: "This user is allready recorded asowner"
+              message: "This user is allready recorded as owner"
             }
           );
         }
