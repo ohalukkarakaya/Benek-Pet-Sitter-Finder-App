@@ -14,7 +14,7 @@
 //                              ⠛⠛⠛⣤⣤⣤⣤           ⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⠛⠛⠛⠛ 
 //                                      ⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛
 
-//  Övün, Çalış, Güven!
+//  Çalış, Övün, Güven!
 
 import express from 'express';
 import mongoose from 'mongoose';
