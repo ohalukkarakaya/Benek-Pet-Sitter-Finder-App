@@ -597,9 +597,7 @@ router.put(
   auth,
   async (req, res) => {
     try{
-      //To DO: talep edilen fiyat 0 değil ise önce ödeme yapacak!!
-      //talep edilen fiyat 0 ise hayvanın bütün sahiplerine girip dependencyi kaldıracak, primary userdan
-      //pet idyi silecek, hayvanın bütün sahiplerini silecek, en son primary userını değiştirecek.
+      //To DO: yasak olduğu için ücret karşılığı hayvan devri iptal!!!
       const invitationId = req.params.invitationId;
       const usersResponse = req.params.usersResponse;
     
@@ -664,11 +662,6 @@ router.put(
       if(invitation.price !== 0){
         price = `${invitation.price}${invitation.priceUnit}`;
       };
-
-      //To Do payment method will be here
-      //if(invitation.price !== 0){
-
-      //}
 
       //find pet
       const pet = await Pet.findById(invitation.pet);
