@@ -132,7 +132,7 @@ router.put(
       //if user rejected invitation
       const usersResponse = req.params.usersResponse;
       if(!usersResponse){
-        await SecondaryOwnerInvitation.findOneAndDelete(
+        return await SecondaryOwnerInvitation.findOneAndDelete(
           {
             _id: req.params.invitationId,
             to: req.user._id
@@ -507,7 +507,7 @@ router.put(
 
 //Pet Hand Over Invitation
 router.post(
-"/handOverPet/:petId/:invitedUserId",
+"/petHandOverInvitation/:petId/:invitedUserId",
 auth,
 async (req, res) => {
   try{
@@ -584,5 +584,128 @@ async (req, res) => {
     }
   }
 );
+
+//Accept Or Reject Pet Hand Over Invitation
+router.put(
+  "/petHandOverInvitation/:invitationId/:usersResponse",
+  auth,
+  async (req, res) => {
+    try{
+      //To DO: talep edilen fiyat 0 değil ise önce ödeme yapacak!!
+      //talep edilen fiyat 0 ise hayvanın bütün sahiplerine girip dependencyi kaldıracak, primary userdan
+      //pet idyi silecek, hayvanın bütün sahiplerini silecek, en son primary userını değiştirecek.
+      const invitationId = req.params.invitationId;
+      const usersResponse = req.params.usersResponse;
+    
+      //check if there is a sended value for invitation id 
+      if(!invitationId){
+        return res.status(400).json(
+          {
+            error: true,
+            message: "invitation id is required"
+          }
+        );
+      };
+
+      //check if users responses type is boolean
+      if(typeof usersResponse !== "boolean"){
+        return res.status(400).json(
+          {
+            error: true,
+            message: "response must be boolean"
+          }
+        );
+      };
+
+      //if user rejected the invitation
+      if(!usersResponse){
+        return await PetHandOverInvitation.findOneAndDelete(
+          {
+            _id: invitationId,
+            to: req.user._id
+          }
+        ).then(
+          (_) => {
+            return res.status(200).json(
+              {
+                error: false,
+                message: "invitation rejected succesfully"
+              }
+            );
+          }
+        );
+      };
+
+      //find invitation
+      const invitation = await PetHandOverInvitation.findOne(
+        {
+          _id: invitationId,
+          to: req.user._id
+        }
+      );
+
+      //if invitation couldn't found
+      if(!invitation){
+        return res.status(404).json(
+          {
+            error: true,
+            message: "couldn't find the invitation"
+          }
+        );
+      };
+
+      //To Do payment method will be here
+      //if(invitation.price !== 0){
+
+      //}
+
+      //find pet
+      const pet = await Pet.findById(invitation.pet);
+
+      //find owner
+      const owner = await User.findById(invitation.from);
+
+      //find invited user
+      const invitedUser = await User.finfById(invitation.to);
+
+      //validate users and pet
+      if(!pet || !owner || !invitedUser || req.user._id !== invitedUser._id || pet.primaryOwner !== owner._id){
+        return res.status(404).json(
+          {
+            error: true,
+            message: "Pet, user or invited user couldn't found or there is an issue with authorization"
+          }
+        )
+      };
+
+      //delete dependency of all secondary owners of the pet
+      for( var i = 0; i < pet.allOwners.length; i++ ){
+        const dependedUser = await User.findById(pet.allOwners[i]);
+        for( var index = 0; index < dependedUser.dependedUsers.length; index ++ ){
+          if( dependedUser.dependedUsers[index].linkedPets.length > 1 ){
+            dependedUser.dependedUsers[index].linkedPets.filter(
+              linkedPet => linkedPet !== pet._id
+            );
+          }else{
+            dependedUser.dependedUsers[index].filter(
+              linkedUser => linkedUser.user !== owner._id
+            );
+          }
+        }
+        dependedUser.markModified('dependedUsers');
+        dependedUser.save();
+      }
+
+    }catch(err){
+      console.log(err);
+      res.status(500).json(
+        {
+          error: true,
+          message: "Internal Server Error"
+        }
+      );
+    }
+  }
+)
 
 export default router;
