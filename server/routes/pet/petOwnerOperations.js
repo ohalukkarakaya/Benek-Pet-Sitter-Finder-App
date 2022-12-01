@@ -696,6 +696,19 @@ router.put(
         dependedUser.save();
       }
 
+      //delete owners dependency
+      owner.pets.filter(pets => pets !== pet._id);
+      owner.markModified('pets');
+
+      //clean pets all secondary owners
+      pet.allOwners = [];
+      pet.markModified('allOwners');
+
+      //hand over pet
+      pet.primaryOwner = invitedUser._id;
+      pet.markModified('primaryOwner');
+
+
     }catch(err){
       console.log(err);
       res.status(500).json(
