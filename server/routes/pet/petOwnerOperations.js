@@ -693,12 +693,18 @@ router.put(
           }
         }
         dependedUser.markModified('dependedUsers');
-        dependedUser.save();
+        if(dependedUser._id !== owner._id || dependedUser !== invitedUser._id){
+          dependedUser.save();
+        }
       }
 
       //delete owners dependency
       owner.pets.filter(pets => pets !== pet._id);
       owner.markModified('pets');
+
+      //insert pet to new user as owned pet
+      invitedUser.pets.push(pet.$assertPopulated._id);
+      invitedUser.markModified('pets');
 
       //clean pets all secondary owners
       pet.allOwners = [];
@@ -708,6 +714,18 @@ router.put(
       pet.primaryOwner = invitedUser._id;
       pet.markModified('primaryOwner');
 
+      //save all
+      await owner.save();
+      await invitedUser.save();
+      await pet.save();
+
+      //send success response
+      return res.status(200).json(
+        {
+          error: false,
+          message: `Pet ${pet.name} hand over succesfully to @${invitedUser.userName}`
+        }
+      );
 
     }catch(err){
       console.log(err);
