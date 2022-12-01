@@ -46,6 +46,23 @@ const PetSchema = new mongoose.Schema(
           type: Array,
           default: []
       },
+      handOverRecord: [
+        {
+            from: {
+                type: String,
+                required: true
+            },
+            to: {
+                type: String,
+                required: true
+            },
+            price: String,
+            date: {
+                type: Date,
+                default: Date.now()
+            }
+        }
+      ],
       savers: {
           type: Array,
           default: []

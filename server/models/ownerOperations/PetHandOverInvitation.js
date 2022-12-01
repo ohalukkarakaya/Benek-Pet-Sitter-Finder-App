@@ -21,6 +21,10 @@ const PetHandOverInvitationSchema = new mongoose.Schema(
       price: {
         type: Number,
         default: 0
+      },
+      situation: {
+        isAccepted: Boolean,
+        time: Date
       }
   },
   {

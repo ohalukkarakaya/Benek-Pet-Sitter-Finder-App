@@ -267,6 +267,12 @@ router.put(
                   }
                 );
 
+                //set invitation to notification
+                invitation.situation.isAccepted = true;
+                invitation.situation.time = Date.now();
+                invitation.markModified('situation');
+                invitation.save();
+
                 //send response
                 return res.status(200).json(
                   {
@@ -654,6 +660,11 @@ router.put(
         );
       };
 
+      let price;
+      if(invitation.price !== 0){
+        price = `${invitation.price}${invitation.priceUnit}`;
+      };
+
       //To Do payment method will be here
       //if(invitation.price !== 0){
 
@@ -708,7 +719,15 @@ router.put(
 
       //clean pets all secondary owners
       pet.allOwners = [];
+      pet.handOverRecord.push(
+        {
+          from: owner._id,
+          to: invitedUser._id,
+          price: price
+        }
+      );
       pet.markModified('allOwners');
+      pet.markModified('handOverRecord');
 
       //hand over pet
       pet.primaryOwner = invitedUser._id;
@@ -718,6 +737,12 @@ router.put(
       await owner.save();
       await invitedUser.save();
       await pet.save();
+
+      //set invitation to notification
+      invitation.situation.isAccepted = true;
+      invitation.situation.time = Date.now();
+      invitation.markModified('situation');
+      invitation.save();
 
       //send success response
       return res.status(200).json(
@@ -737,6 +762,63 @@ router.put(
       );
     }
   }
-)
+);
+
+router.delete(
+  "/deleteInvitation/:invitationId:/:invitationType",
+  auth,
+  async (req, res) => {
+    try{
+       if(req.params.invitationType == "SecondaryOwner"){
+         await SecondaryOwnerInvitation.findOneAndDelete(
+          {
+            _id: req.params.invitationId,
+            from: req.user._id
+          }
+         ).then(
+          (_) => {
+            return res.status(200).json(
+              {
+                error: false,
+                message: "Invitation deleted succesfully"
+              }
+            );
+          }
+         );
+       }else if(req.params.invitationType == "HandOver"){
+        await PetHandOverInvitation.findOneAndDelete(
+          {
+            _id: req.params.invitationId,
+            from: req.user._id
+          }
+         ).then(
+          (_) => {
+            return res.status(200).json(
+              {
+                error: false,
+                message: "Invitation deleted succesfully"
+              }
+            );
+          }
+         );
+       }else{
+        return res.status(400).json(
+          {
+            error: true,
+            message: 'invitation type just can be "SecondaryOwner" or "HandOver"'
+          }
+        );
+       }
+    }catch(err){
+      console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+);
 
 export default router;
