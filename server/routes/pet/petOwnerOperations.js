@@ -2,6 +2,8 @@ import express from "express";
 import Pet from "../../models/Pet.js";
 import auth from "../../middleware/auth.js";
 import User from "../../models/User.js";
+import { handOverInvitationReqBodyValidation, handOverInvitationReqParamsValidation } from "../../utils/handOverInvitationValidationSchema.js";
+import PetHandOverInvitation from "../../models/ownerOperations/PetHandOverInvitation.js";
 
 const router = express.Router();
 
@@ -363,13 +365,58 @@ router.put(
     }
   );
 
-  //Hand over pet
-  router.put(
-    "/handOverPet/:petId/:newUserId",
+  //Pet Hand Over Invitation
+  router.post(
+    "/handOverPet/:petId/:invitedUserId",
     auth,
     async (req, res) => {
       try{
-        
+        //check sended data
+        handOverInvitationReqParamsValidation(req.params);
+        handOverInvitationReqBodyValidation(req.body);
+
+        const invitedUserId = req.params.invitedUserId;
+        const invitedUser = await User.findById(invitedUserId)
+        const petId = req.params.petId;
+        const userId = req.user._id;
+
+        if(invitedUser && userId !== invitedUserId){
+          const pet = await Pet.findById(petId);
+          if(pet && pet.primaryOwner === userId){
+            await new PetHandOverInvitation(
+              {
+                from: userId,
+                to: invitedUserId,
+                petId: petId,
+                priceUnit: req.body.priceUnit,
+                price: req.body.price
+              }
+            ).save().then(
+              (invitation) => {
+                return res.status(200).json(
+                  {
+                    error: false,
+                    invitation: invitation
+                  }
+                );
+              }
+            );
+          }else{
+            return res.status(400).json(
+              {
+                error: true,
+                message: "Pet couldn't found or it doesn't belong to you"
+              }
+            );
+          }
+        }else{
+          return res.status(400).json(
+            {
+              error: true,
+              message: "ivited user couldn't found or it is you"
+            }
+          );
+        }
       }catch(err){
         console.log(err);
           res.status(500).json(
