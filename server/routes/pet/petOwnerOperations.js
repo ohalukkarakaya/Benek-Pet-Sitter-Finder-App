@@ -2,7 +2,7 @@ import express from "express";
 import Pet from "../../models/Pet.js";
 import auth from "../../middleware/auth.js";
 import User from "../../models/User.js";
-import { handOverInvitationReqBodyValidation, handOverInvitationReqParamsValidation } from "../../utils/handOverInvitationValidationSchema.js";
+import { handOverInvitationReqParamsValidation } from "../../utils/handOverInvitationValidationSchema.js";
 import PetHandOverInvitation from "../../models/ownerOperations/PetHandOverInvitation.js";
 import { secondaryOwnerInvitationReqParamsValidation } from "../../utils/secondaryOwnerInvitationValidationSchema.js";
 import SecondaryOwnerInvitation from "../../models/ownerOperations/SecondaryOwnerInvitation.js";
@@ -552,15 +552,6 @@ async (req, res) => {
           }
         );
       }
-      const { bodyValidationError } = handOverInvitationReqBodyValidation(req.body);
-      if(bodyValidationError){
-        return res.status(400).json(
-          {
-            error: true,
-            message: bodyValidationError.details[0].message
-          }
-        );
-      }
 
       const invitedUserId = req.params.invitedUserId;
       const invitedUser = await User.findById(invitedUserId)
@@ -574,9 +565,7 @@ async (req, res) => {
             {
               from: userId,
               to: invitedUserId,
-              petId: petId,
-              priceUnit: req.body.priceUnit,
-              price: req.body.price
+              petId: petId
             }
           ).save().then(
             (invitation) => {

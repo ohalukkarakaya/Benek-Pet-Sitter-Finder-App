@@ -13,19 +13,6 @@ const PetHandOverInvitationSchema = new mongoose.Schema(
       petId: {
           type: String,
       },
-      priceUnit: {
-        type: String,
-        enum: [ "tl", "usd" ],
-        default: "tl"
-      },
-      price: {
-        type: Number,
-        default: 0
-      },
-      situation: {
-        isAccepted: Boolean,
-        time: Date
-      }
   },
   {
       timestamps: true
