@@ -109,8 +109,10 @@ router.put(
   auth,
   async (req, res) => {
     try{
-      //check type od users response
-      if(typeof req.params.usersResponse !== 'boolean'){
+      //check type of users response
+      const isResponseBoolean = req.params.usersResponse === 'false' || req.params.usersResponse === 'true';
+      if(!isResponseBoolean){
+        console.log(req.params.usersResponse);
         return res.status(400).json(
           {
             error: true,
@@ -157,6 +159,14 @@ router.put(
         }
       );
       if(invitation){
+        if(invitation.situation.isAccepted){
+          return res.status(401).json(
+            {
+              error: true,
+              message: `This invitation has already been accepted at ${invitation.situation.time}`
+            }
+          );
+        };
         const owner = await User.findById(invitation.from);
         const secondaryOwner = await User.findById(invitation.to);
         const pet = await Pet.findById(invitation.petId);
@@ -164,20 +174,27 @@ router.put(
         //check if pet exists
         if(pet){
           if(!pet.allOwners.includes(secondaryOwner._id)){
-            if(pet.primaryOwner === owner._id &&  pet.primaryOwner !== secondaryOwner._id){
+            if(pet.primaryOwner.toString() === owner._id.toString() &&  pet.primaryOwner.toString() !== secondaryOwner._id.toString()){
     
               //check if the user which is gonna be secondary user does exists
               if(secondaryOwner){
                 //insert secondary owner to pet
-                pet.allOwners.push(secondaryOwner._id);
-                pet.markModified("allOwners");
-                pet.save(
-                  function (err) {
-                    if(err) {
-                      console.error('ERROR: While Update!');
+                if(
+                  pet.allOwners.includes.filter(
+                    owner => 
+                      owner !== secondaryOwner._id.toString()
+                  )
+                ){
+                  pet.allOwners.push(secondaryOwner._id.toString());
+                  pet.markModified("allOwners");
+                  pet.save(
+                    function (err) {
+                      if(err) {
+                        console.error('ERROR: While Update!');
+                      }
                     }
-                  }
-                );
+                  );
+                }
 
                 //check dependency status of primary owner
                 const isPrimaryUserAllreadyDepended = false;
@@ -335,12 +352,12 @@ router.put(
       const pet = await Pet.findOne(
         {
           _id: req.params.petId,
-          primaryOwner: req.user._id
         }
       );
       if(pet){
+        const isAuthorized = req.user._id === pet.primaryOwner || pet.allOwners.includes(req.user._id) && req.user._id === req.params.secondaryOwnerId;
         //check if user who sended request is authorized
-        if(req.user._id !== pet.primaryOwner || req.user._id !== secondaryOwner){
+        if(!isAuthorized){
           return res.status(403).json(
             {
               error: false,
@@ -367,21 +384,21 @@ router.put(
               }
             );
   
-            if(req.user._id === pet.primaryOwner){
+            if(req.user._id.toString() === pet.primaryOwner.toString() || req.user._id.toString() === secondaryOwner._id.toString() ){
               //find primary owner
               const primaryOwner = await User.findById(
-                req.user._id
+                pet.primaryOwner
               );
   
               //check dependency status of primary owner
-              const isPrimaryUserAllreadyDepended = false;
-              const isPetAllreadyInsertedToPrimaryOwner = false;
-              for(var i = 0; i < primary.dependedUsers.length; i ++){
-                if( primary.dependedUsers[i] === secondaryOwner._id ){
+              var isPrimaryUserAllreadyDepended = false;
+              var isPetAllreadyInsertedToPrimaryOwner = false;
+              for(var i = 0; i < primaryOwner.dependedUsers.length; i ++){
+                if( primaryOwner.dependedUsers[i].user.toString() === secondaryOwner._id.toString() ){
                   isPrimaryUserAllreadyDepended = true;
                 }
-                for(var index = 0; index < primaryOwner.dependedUsers[i].linkedPets.length; i ++){
-                  if(primaryOwner.dependedUsers[i].linkedPets[index] === req.params.petId){
+                for(var index = 0; index < primaryOwner.dependedUsers[i].linkedPets.length; index ++){
+                  if(primaryOwner.dependedUsers[i].linkedPets[index].toString() === req.params.petId.toString()){
                     isPetAllreadyInsertedToPrimaryOwner = true;
                   }
                 }
@@ -389,8 +406,9 @@ router.put(
   
               //remove dependency of the primary owner
               if(isPrimaryUserAllreadyDepended && isPetAllreadyInsertedToPrimaryOwner){
-                const primaryOwnerDepended = primaryOwner.dependedUsers.filter(depended => depended.user === secondaryOwner._id).linkedPets;
-                if(primaryOwnerDepended.length > 1){
+                const primaryOwnerDepended = primaryOwner.dependedUsers.filter(depended => depended.user.toString() === secondaryOwner._id.toString());
+                console.log(primaryOwnerDepended[0].linkedPets);
+                if(primaryOwnerDepended[0].linkedPets.length > 1){
                   primaryOwner.dependedUsers.linkedPets = primaryOwner.dependedUsers.filter(
                     depended => depended.user === secondaryOwner._id
                   ).linkedPets.filter(
@@ -398,10 +416,10 @@ router.put(
                   );
                 }else{
                   primaryOwner.dependedUsers = primaryOwner.dependedUsers.filter(
-                    depended => depended.user !== secondaryOwner._id
+                    depended => depended.user.toString() !== secondaryOwner._id.toString()
                   );
                 }
-              }else if(!isPetAllreadyInsertedToSecondaryOwner){
+              }else if(!isPetAllreadyInsertedToPrimaryOwner){
                 return res.status(500).json(
                   {
                     error: true,
@@ -421,14 +439,14 @@ router.put(
             }
     
             //check dependency status of secondary user
-            const isSecondaryUserAllreadyDepended = false;
-            const isPetAllreadyInsertedToSecondaryOwner = false;
+            var isSecondaryUserAllreadyDepended = false;
+            var isPetAllreadyInsertedToSecondaryOwner = false;
             for(var i = 0; i < secondaryOwner.dependedUsers.length; i ++){
               if( secondaryOwner.dependedUsers[i] === req.user._id || secondaryOwner._id === req.user._id ){
                 isSecondaryUserAllreadyDepended = true;
               }
-              for(var index = 0; index < secondaryOwner.dependedUsers[i].linkedPets.length; i ++){
-                if(secondaryOwner.dependedUsers[i].linkedPets[index] === req.params.petId || secondaryOwner._id === req.user._id){
+              for(var index = 0; index < secondaryOwner.dependedUsers[i].linkedPets.length; index ++){
+                if(secondaryOwner.dependedUsers[i].linkedPets[index] === req.params.petId || secondaryOwner._id.toString() === req.user._id.toString()){
                   isPetAllreadyInsertedToSecondaryOwner = true;
                 }
               }
@@ -448,7 +466,7 @@ router.put(
                   depended => depended.user !== req.user._id
                 );
               }
-            }else if(!isPetAllreadyInsertedToSecondaryOwner && secondaryOwner._id !== req.user._id){
+            }else if(!isPetAllreadyInsertedToSecondaryOwner && secondaryOwner._id.toString() !== req.user._id){
               return res.status(500).json(
                 {
                   error: true,
@@ -457,7 +475,7 @@ router.put(
               );
             };
     
-            if(secondaryOwner._id !== req.user._id){
+            if(secondaryOwner._id.toString() !== req.user._id){
               secondaryOwner.markModified("dependedUsers");
               secondaryOwner.save(
                 function (err) {
