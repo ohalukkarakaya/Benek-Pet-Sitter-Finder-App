@@ -180,7 +180,7 @@ router.put(
               if(secondaryOwner){
                 //insert secondary owner to pet
                 if(
-                  pet.allOwners.includes.filter(
+                  pet.allOwners.filter(
                     owner => 
                       owner !== secondaryOwner._id.toString()
                   )
@@ -214,14 +214,14 @@ router.put(
                 if(!isPrimaryUserAllreadyDepended && !isPetAllreadyInsertedToPrimaryOwner){
                   owner.dependedUsers.push(
                     {
-                      user: secondaryOwner._id,
-                      linkedPets: [ pet._id ]
+                      user: secondaryOwner._id.toString(),
+                      linkedPets: [ pet._id.toString() ]
                     }
                   );
                 }else if(isPrimaryUserAllreadyDepended && !isPetAllreadyInsertedToPrimaryOwner){
                   owner.dependedUsers.filter(
                     dependeds => dependeds === secondaryOwner._id
-                  ).linkedPets.push( pet._id );
+                  ).linkedPets.push( pet._id.toString );
                 }else if(isPetAllreadyInsertedToPrimaryOwner){
                   return res.status(500).json(
                     {
@@ -258,14 +258,14 @@ router.put(
                 if(!isSecondaryUserAllreadyDepended && !isPetAllreadyInsertedToSecondaryOwner){
                   secondaryOwner.dependedUsers.push(
                     {
-                      user: req.user._id,
-                      linkedPets: [ pet._id ]
+                      user: owner._id.toString(),
+                      linkedPets: [ pet._id.toString() ]
                     }
                   );
                 }else if(isSecondaryUserAllreadyDepended && !isPetAllreadyInsertedToSecondaryOwner){
                   secondaryOwner.dependedUsers.filter(
-                    dependeds => dependeds === req.user._id
-                  ).linkedPets.push( pet._id );
+                    dependeds => dependeds.toString() === owner._id.toString()
+                  ).linkedPets.push( pet._id.toString() );
                 }else if(isPetAllreadyInsertedToSecondaryOwner){
                   return res.status(500).json(
                     {
@@ -354,6 +354,7 @@ router.put(
           _id: req.params.petId,
         }
       );
+      let primaryOwnerId;
       if(pet){
         const isAuthorized = req.user._id === pet.primaryOwner || pet.allOwners.includes(req.user._id) && req.user._id === req.params.secondaryOwnerId;
         //check if user who sended request is authorized
@@ -389,6 +390,7 @@ router.put(
               const primaryOwner = await User.findById(
                 pet.primaryOwner
               );
+              primaryOwnerId = primaryOwner._id.toString();
   
               //check dependency status of primary owner
               var isPrimaryUserAllreadyDepended = false;
@@ -407,7 +409,6 @@ router.put(
               //remove dependency of the primary owner
               if(isPrimaryUserAllreadyDepended && isPetAllreadyInsertedToPrimaryOwner){
                 const primaryOwnerDepended = primaryOwner.dependedUsers.filter(depended => depended.user.toString() === secondaryOwner._id.toString());
-                console.log(primaryOwnerDepended[0].linkedPets);
                 if(primaryOwnerDepended[0].linkedPets.length > 1){
                   primaryOwner.dependedUsers.linkedPets = primaryOwner.dependedUsers.filter(
                     depended => depended.user === secondaryOwner._id
@@ -446,24 +447,24 @@ router.put(
                 isSecondaryUserAllreadyDepended = true;
               }
               for(var index = 0; index < secondaryOwner.dependedUsers[i].linkedPets.length; index ++){
-                if(secondaryOwner.dependedUsers[i].linkedPets[index] === req.params.petId || secondaryOwner._id.toString() === req.user._id.toString()){
+                if(secondaryOwner.dependedUsers[i].linkedPets[index].toString() === req.params.petId.toString() || secondaryOwner._id.toString() === req.user._id.toString()){
                   isPetAllreadyInsertedToSecondaryOwner = true;
                 }
               }
             }
     
             //remove dependency of the secondary user
-            if(isSecondaryUserAllreadyDepended && isPetAllreadyInsertedToSecondaryOwner && secondaryOwner._id !== req.user._id){
-              const secondaryOwnerDepended = secondaryOwner.dependedUsers.filter(depended => depended.user === req.user._id);
+            if(isSecondaryUserAllreadyDepended && isPetAllreadyInsertedToSecondaryOwner){
+              const secondaryOwnerDepended = secondaryOwner.dependedUsers.filter(depended => depended.user.toString() === primaryOwnerId);
               if(secondaryOwnerDepended[0].linkedPets.length > 1){
                 secondaryOwner.dependedUsers[0].linkedPets = secondaryOwner.dependedUsers.filter(
-                  depended => depended.user === req.user._id
+                  depended => depended.user === primaryOwnerId
                 ).linkedPets.filter(
                   linkedPet => linkedPet !== pet._id
                 );
               }else{
                 secondaryOwner.dependedUsers = secondaryOwner.dependedUsers.filter(
-                  depended => depended.user !== req.user._id
+                  depended => depended.user.toString() !== primaryOwnerId
                 );
               }
             }else if(!isPetAllreadyInsertedToSecondaryOwner && secondaryOwner._id.toString() !== req.user._id){
@@ -475,7 +476,7 @@ router.put(
               );
             };
     
-            if(secondaryOwner._id.toString() === req.user._id.toString() || primaryOwner._id.toString() == req.user._id.toString()){
+            if(secondaryOwner._id.toString() === req.user._id.toString() || primaryOwnerId === req.user._id.toString()){
               secondaryOwner.markModified("dependedUsers");
               secondaryOwner.save(
                 function (err) {
