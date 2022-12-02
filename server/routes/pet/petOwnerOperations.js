@@ -133,7 +133,7 @@ router.put(
 
       //if user rejected invitation
       const usersResponse = req.params.usersResponse;
-      if(!usersResponse){
+      if(usersResponse == 'false'){
         return await SecondaryOwnerInvitation.findOneAndDelete(
           {
             _id: req.params.invitationId,
