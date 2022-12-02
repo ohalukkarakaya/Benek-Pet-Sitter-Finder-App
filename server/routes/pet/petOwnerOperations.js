@@ -159,14 +159,6 @@ router.put(
         }
       );
       if(invitation){
-        if(invitation.situation.isAccepted){
-          return res.status(401).json(
-            {
-              error: true,
-              message: `This invitation has already been accepted at ${invitation.situation.time}`
-            }
-          );
-        };
         const owner = await User.findById(invitation.from);
         const secondaryOwner = await User.findById(invitation.to);
         const pet = await Pet.findById(invitation.petId);
@@ -284,11 +276,18 @@ router.put(
                   }
                 );
 
-                //set invitation to notification
-                invitation.situation.isAccepted = true;
-                invitation.situation.time = Date.now();
-                invitation.markModified('situation');
-                invitation.save();
+                //delete invititation
+                SecondaryOwnerInvitation.deleteOne(
+                  {
+                    _id: invitation._id,
+                    to: req.user._id
+                  },
+                  (err) => {
+                    if(err){
+                      console.log(err);
+                    }
+                  }
+                );
 
                 //send response
                 return res.status(200).json(
@@ -780,64 +779,6 @@ router.put(
         }
       );
     }
-  }
-);
-
-//Remove secondary owner of the pet
-router.delete(
-  "/deleteInvitation/:invitationId/:invitationType",
-  auth,
-  async (req, res) => {
-    try{
-      if(req.params.invitationType == "SecondaryOwner"){
-        await SecondaryOwnerInvitation.findOneAndDelete(
-         {
-           _id: req.params.invitationId,
-           from: req.user._id
-         }
-        ).then(
-         (_) => {
-           return res.status(200).json(
-             {
-               error: false,
-               message: "Invitation deleted succesfully"
-             }
-           );
-         }
-        );
-      }else if(req.params.invitationType == "HandOver"){
-       await PetHandOverInvitation.findOneAndDelete(
-         {
-           _id: req.params.invitationId,
-           from: req.user._id
-         }
-        ).then(
-         (_) => {
-           return res.status(200).json(
-             {
-               error: false,
-               message: "Invitation deleted succesfully"
-             }
-           );
-         }
-        );
-      }else{
-       return res.status(400).json(
-         {
-           error: true,
-           message: 'invitation type just can be "SecondaryOwner" or "HandOver"'
-         }
-       );
-      }
-   }catch(err){
-     console.log(err);
-       res.status(500).json(
-           {
-               error: true,
-               message: "Internal Server Error"
-           }
-       );
-   }
   }
 );
 

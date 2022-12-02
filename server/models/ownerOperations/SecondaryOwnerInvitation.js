@@ -12,10 +12,6 @@ const SecondaryOwnerInvitationSchema = new mongoose.Schema(
       },
       petId: {
           type: String,
-      },
-      situation: {
-        isAccepted: Boolean,
-        time: Date
       }
   },
   {
