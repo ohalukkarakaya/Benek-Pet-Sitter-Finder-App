@@ -374,7 +374,7 @@ router.put(
         
           //if secondary owner is exist
           if(secondaryOwner){
-            pet.allOwners = pet.allOwners.filter( owner => owner !== secondaryOwner._id );
+            pet.allOwners = pet.allOwners.filter( owner => owner.toString() !== secondaryOwner._id.toString() );
             pet.markModified("allOwners");
             pet.save(
               function (err) {
@@ -442,7 +442,7 @@ router.put(
             var isSecondaryUserAllreadyDepended = false;
             var isPetAllreadyInsertedToSecondaryOwner = false;
             for(var i = 0; i < secondaryOwner.dependedUsers.length; i ++){
-              if( secondaryOwner.dependedUsers[i] === req.user._id || secondaryOwner._id === req.user._id ){
+              if( secondaryOwner.dependedUsers[i].user.toString() === req.user._id.toString() || secondaryOwner._id.toString() === req.user._id.toString() ){
                 isSecondaryUserAllreadyDepended = true;
               }
               for(var index = 0; index < secondaryOwner.dependedUsers[i].linkedPets.length; index ++){
@@ -454,9 +454,9 @@ router.put(
     
             //remove dependency of the secondary user
             if(isSecondaryUserAllreadyDepended && isPetAllreadyInsertedToSecondaryOwner && secondaryOwner._id !== req.user._id){
-              const secondaryOwnerDepended = secondaryOwner.dependedUsers.filter(depended => depended.user === req.user._id).linkedPets;
-              if(secondaryOwnerDepended.length > 1){
-                secondaryOwner.dependedUsers.linkedPets = secondaryOwner.dependedUsers.filter(
+              const secondaryOwnerDepended = secondaryOwner.dependedUsers.filter(depended => depended.user === req.user._id);
+              if(secondaryOwnerDepended[0].linkedPets.length > 1){
+                secondaryOwner.dependedUsers[0].linkedPets = secondaryOwner.dependedUsers.filter(
                   depended => depended.user === req.user._id
                 ).linkedPets.filter(
                   linkedPet => linkedPet !== pet._id
@@ -475,7 +475,7 @@ router.put(
               );
             };
     
-            if(secondaryOwner._id.toString() !== req.user._id){
+            if(secondaryOwner._id.toString() === req.user._id.toString() || primaryOwner._id.toString() == req.user._id.toString()){
               secondaryOwner.markModified("dependedUsers");
               secondaryOwner.save(
                 function (err) {
