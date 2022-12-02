@@ -330,6 +330,13 @@ router.put(
           );
         }
           
+      }else{
+        return res.status(404).json(
+          {
+            error: true,
+            message: "Invitation couldn't found"
+          }
+        );
       }
     }catch(err){
       console.log(err);
