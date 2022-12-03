@@ -611,9 +611,8 @@ router.put(
   auth,
   async (req, res) => {
     try{
-      //To DO: yasak olduğu için ücret karşılığı hayvan devri iptal!!!
       const invitationId = req.params.invitationId;
-      const usersResponse = req.params.usersResponse;
+      const userResponse = req.params.usersResponse;
     
       //check if there is a sended value for invitation id 
       if(!invitationId){
@@ -626,7 +625,8 @@ router.put(
       };
 
       //check if users responses type is boolean
-      if(typeof usersResponse !== "boolean"){
+      const isUsersResponseBoolean = userResponse === 'true' || userResponse === 'false';
+      if(!isUsersResponseBoolean){
         return res.status(400).json(
           {
             error: true,
@@ -634,6 +634,8 @@ router.put(
           }
         );
       };
+
+      const usersResponse = userResponse === 'true' || userResponse !== 'false';
 
       //if user rejected the invitation
       if(!usersResponse){
@@ -672,22 +674,20 @@ router.put(
         );
       };
 
-      let price;
-      if(invitation.price !== 0){
-        price = `${invitation.price}${invitation.priceUnit}`;
-      };
-
       //find pet
-      const pet = await Pet.findById(invitation.pet);
+      const petId = invitation.petId.toString();
+      const pet = await Pet.findOne({_id: petId});
 
       //find owner
-      const owner = await User.findById(invitation.from);
+      const ownerId = invitation.from.toString();
+      const owner = await User.findOne({_id: ownerId});
 
       //find invited user
-      const invitedUser = await User.finfById(invitation.to);
+      const invitedUserId = invitation.to.toString();
+      const invitedUser = await User.findOne({_id: invitedUserId});
 
       //validate users and pet
-      if(!pet || !owner || !invitedUser || req.user._id !== invitedUser._id || pet.primaryOwner !== owner._id){
+      if(!pet || !owner || !invitedUser || req.user._id.toString() !== invitedUser._id.toString() || pet.primaryOwner.toString() !== owner._id.toString()){
         return res.status(404).json(
           {
             error: true,
@@ -698,58 +698,79 @@ router.put(
 
       //delete dependency of all secondary owners of the pet
       for( var i = 0; i < pet.allOwners.length; i++ ){
+        
+        const currentdependency = pet.allOwners[i].toString();
+        console.log(owner.dependedUsers.filter(d => d.user.toString() === currentdependency));
+        if(currentdependency !== owner._id.toString() && owner.dependedUsers.filter(d => d.user.toString() === currentdependency)[0].linkedPets.length > 1){
+          owner.dependedUsers = owner.dependedUsers.filter(dep => dep.toString() === currentdependency).linkedPets.filter(
+            lPet => lPet.toString() !== pet._id.toString() 
+          );
+        }else if(currentdependency !== owner._id.toString()){
+          owner.dependedUsers = owner.dependedUsers.filter( dep => dep.toString() !== currentdependency );
+        };
+
         const dependedUser = await User.findById(pet.allOwners[i]);
         for( var index = 0; index < dependedUser.dependedUsers.length; index ++ ){
           if( dependedUser.dependedUsers[index].linkedPets.length > 1 ){
-            dependedUser.dependedUsers[index].linkedPets.filter(
-              linkedPet => linkedPet !== pet._id
+            dependedUser.dependedUsers[index] = dependedUser.dependedUsers[index].linkedPets.filter(
+              linkedPet => linkedPet.toString() !== pet._id.toString()
             );
           }else{
-            dependedUser.dependedUsers[index].filter(
-              linkedUser => linkedUser.user !== owner._id
+            dependedUser.dependedUsers = dependedUser.dependedUsers.filter(
+              linkedUser => linkedUser.user.toString() !== owner._id.toString()
             );
           }
         }
-        dependedUser.markModified('dependedUsers');
-        if(dependedUser._id !== owner._id || dependedUser !== invitedUser._id){
+
+        if(dependedUser._id.toString() !== owner._id.toString()){
+          dependedUser.markModified('dependedUsers');
           dependedUser.save();
         }
       }
 
-      //delete owners dependency
-      owner.pets.filter(pets => pets !== pet._id);
-      owner.markModified('pets');
-
       //insert pet to new user as owned pet
-      invitedUser.pets.push(pet.$assertPopulated._id);
+      invitedUser.pets.push(pet._id.toString());
       invitedUser.markModified('pets');
 
       //clean pets all secondary owners
-      pet.allOwners = [];
+      pet.allOwners = [ invitedUser._id.toString() ];
       pet.handOverRecord.push(
         {
-          from: owner._id,
-          to: invitedUser._id,
-          price: price
+          from: owner._id.toString(),
+          to: invitedUser._id.toString(),
         }
       );
       pet.markModified('allOwners');
       pet.markModified('handOverRecord');
 
       //hand over pet
-      pet.primaryOwner = invitedUser._id;
+      pet.primaryOwner = invitedUser._id.toString();
       pet.markModified('primaryOwner');
 
+      //delete owners dependency
+      console.log(`pet: ${owner.pets[0].toString()}`);
+      owner.pets = owner.pets.filter(p => p.toString() !== pet._id.toString());
+      owner.markModified('dependedUsers');
+      owner.markModified('pets');
+      delete owner.__v;
+
       //save all
-      await owner.save();
-      await invitedUser.save();
-      await pet.save();
+      owner.save();
+      invitedUser.save();
+      pet.save();
 
       //set invitation to notification
-      invitation.situation.isAccepted = true;
-      invitation.situation.time = Date.now();
-      invitation.markModified('situation');
-      invitation.save();
+      PetHandOverInvitation.deleteOne(
+        {
+          _id: invitation._id,
+          to: invitedUser._id
+        },
+        (err) => {
+          if(err){
+            console.log(err);
+          }
+        }
+      );
 
       //send success response
       return res.status(200).json(

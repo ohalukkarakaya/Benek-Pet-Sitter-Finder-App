@@ -12,6 +12,7 @@ const PetHandOverInvitationSchema = new mongoose.Schema(
       },
       petId: {
           type: String,
+          required: true,
       },
   },
   {
