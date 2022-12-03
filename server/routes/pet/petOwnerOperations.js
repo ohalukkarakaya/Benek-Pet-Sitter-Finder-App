@@ -698,16 +698,6 @@ router.put(
 
       //delete dependency of all secondary owners of the pet
       for( var i = 0; i < pet.allOwners.length; i++ ){
-        
-        const currentdependency = pet.allOwners[i].toString();
-        console.log(owner.dependedUsers.filter(d => d.user.toString() === currentdependency));
-        if(currentdependency !== owner._id.toString() && owner.dependedUsers.filter(d => d.user.toString() === currentdependency)[0].linkedPets.length > 1){
-          owner.dependedUsers = owner.dependedUsers.filter(dep => dep.toString() === currentdependency).linkedPets.filter(
-            lPet => lPet.toString() !== pet._id.toString() 
-          );
-        }else if(currentdependency !== owner._id.toString()){
-          owner.dependedUsers = owner.dependedUsers.filter( dep => dep.toString() !== currentdependency );
-        };
 
         const dependedUser = await User.findById(pet.allOwners[i]);
         for( var index = 0; index < dependedUser.dependedUsers.length; index ++ ){
@@ -726,6 +716,27 @@ router.put(
           dependedUser.markModified('dependedUsers');
           dependedUser.save();
         }
+      }
+
+      //delete dependency of owner
+      for( var i = 0; i < owner.dependedUsers.length; i ++ ){
+        const petCount = owner.dependedUsers[i].linkedPets.length;
+        for( var index = 0; index < petCount; index ++){
+          if(owner.dependedUsers[i].linkedPets.length > 1){ 
+            if(owner.dependedUsers[i].linkedPets[index] === pet._id.toString()){
+              owner.dependedUsers[i] = owner.dependedUsers[i].linkedPets.filter(
+                lnkdpt => lnkdpt.toString() !== pet._id.toString()
+              );
+            }
+          }else{
+            if(owner.dependedUsers[i].linkedPets[index] === pet._id.toString()){
+              owner.dependedUsers = owner.dependedUsers.filter(
+                dpndUsr => dpndUsr.user.toString() !== owner.dependedUsers[i].user.toString()
+              );
+            }
+          }
+        }
+        owner.markModified('dependedUsers');
       }
 
       //insert pet to new user as owned pet
@@ -748,9 +759,7 @@ router.put(
       pet.markModified('primaryOwner');
 
       //delete owners dependency
-      console.log(`pet: ${owner.pets[0].toString()}`);
       owner.pets = owner.pets.filter(p => p.toString() !== pet._id.toString());
-      owner.markModified('dependedUsers');
       owner.markModified('pets');
       delete owner.__v;
 
