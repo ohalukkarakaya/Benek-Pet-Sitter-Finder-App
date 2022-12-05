@@ -6,8 +6,33 @@ const PetSchema = new mongoose.Schema(
           type: String,
           required: true,
       },
-      imgUrl: {
-          type: String,
+      petProfileImg: {
+        isDefaultImg: {
+            type: Boolean,
+            default: true,
+        },
+        recordedImgName: {
+            type: String,
+            default: "",
+        },
+        imgUrl: {
+            type: String,
+            default: ""
+        },
+      },
+      petCoverImg: {
+        isDefaultImg: {
+            type: Boolean,
+            default: true,
+        },
+        recordedImgName: {
+            type: String,
+            default: "",
+        },
+        imgUrl: {
+            type: String,
+            default: ""
+        },
       },
       bio: {
           type: String,

@@ -4,6 +4,7 @@ import { createPetReqBodyValidation } from "../../utils/createPetValidationSchem
 import auth from "../../middleware/auth.js";
 import { createRequire } from "module";
 import User from "../../models/User.js";
+import { updatePetProfileImg } from "../../middleware/serverHandlePetProfileImage.js";
 
 const require = createRequire(import.meta.url);
 const rawPetDataset = require('../../src/pet_dataset.json');
@@ -126,5 +127,95 @@ router.post(
       }
     }
   );
+
+//Edit Profile Image and Cover Image of the Pet
+router.put(
+  "/petProfileImage/:petId", 
+  auth,
+  updatePetProfileImg,
+  async (req, res, next) => {
+    try{
+      let petProfileImageSucces;
+      let petCoverImageSucces;
+      let successResponse;
+
+      //if there is existing images and they uploaded to media server
+      if (req.files) {
+
+        if(req.files.petProfileImg){
+          var uploadedProfileImgImage = req.files.petProfileImg[0].location;
+          console.log(`Profile Image: ${uploadedProfileImgImage}`);
+        }
+        if(req.files.petCoverImg){
+          var uploadedCoverImgImage = req.files.petCoverImg[0].location;
+          console.log(`Cover Image: ${uploadedCoverImgImage}`);
+        }
+
+        if(
+          req.files.petProfileImg
+          && req.files.petCoverImg
+        ) {
+          //if there is profile image and cover image both
+          petProfileImageSucces = uploadedProfileImgImage;
+          petCoverImageSucces = uploadedCoverImgImage;
+        }else if(
+          req.files.petProfileImg
+          && !req.files.petCoverImg
+        ) {
+          //if there is only profile image
+          petProfileImageSucces = uploadedProfileImgImage;
+        }else if(
+          !req.files.petProfileImg
+          && req.files.petCoverImg
+        ) {
+          //if there is only cover image
+          petCoverImageSucces = uploadedCoverImgImage;
+        }
+        next();
+      }
+
+      //check what did updated
+      if(
+        petProfileImageSucces !== null
+        || petCoverImageSucces !== null
+      ){
+        successResponse = {
+          error: false,
+          profileImageUrl: petProfileImageSucces,
+          coverImageUrl: petCoverImageSucces
+        };
+        next();
+      }
+
+      if(successResponse !== null){
+        await req.pet.save(
+          function (err) {
+            if(err) {
+                console.error('ERROR: While Update!');
+            }
+          }
+        );
+        return res.status(200).json(
+          successResponse
+        );
+      }else{
+        return res.status(400).json(
+          {
+            error: true,
+            message: "Empty Request Body"
+          }
+        );
+      }
+    }catch(err){
+        console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+);
 
 export default router;

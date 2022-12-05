@@ -51,8 +51,9 @@ const connect = () => {
 app.use(express.static('src'));
 
 app.use(express.json());
-app.use(bodyParser.urlencoded({extended : true}));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({ type: 'application/*+json' }));
+
 app.use("/auth", authRoutes);
 app.use("/api/refreshToken", refreshTokenRoutes);
 app.use("/api/user", editUserRoutes);

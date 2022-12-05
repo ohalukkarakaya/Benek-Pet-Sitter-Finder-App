@@ -78,7 +78,7 @@ router.post(
         }
       }
 
-      //check what id updated
+      //check what did updated
       if(
         profileImageSucces !== null
         || coverImageSucces !== null
