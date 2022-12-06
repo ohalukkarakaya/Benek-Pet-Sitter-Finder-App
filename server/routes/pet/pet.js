@@ -316,16 +316,28 @@ router.delete(
                     (imgUrl) => imgUrl !== url
                   );
                 }
-              ).then(
-                (_) => {
-                  pet.markModified("images");
-                  pet.save();
-                  return res.status(200).json(
-                    {
-                      error: false,
-                      message: "images deleted succesfully"
-                    }
-                  );
+              );
+            }
+          ).then(
+            (_) => {
+              pet.markModified("images");
+              pet.save(
+                (err) => {
+                  if(err){
+                    console.log(err);
+                    return res.status(500).json(
+                      {
+                        error: true,
+                        message: "An error occured while saving to database"
+                      }
+                    );
+                  }
+                }
+              );
+              return res.status(200).json(
+                {
+                  error: false,
+                  message: "images deleted succesfully"
                 }
               );
             }
