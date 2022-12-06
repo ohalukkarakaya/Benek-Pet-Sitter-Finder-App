@@ -45,6 +45,7 @@ const PetSchema = new mongoose.Schema(
           type: String,
           enum: [ "Male", "Female" ]
       },
+      images: [ String ],
       birthDay: {
           type: Date,
       },

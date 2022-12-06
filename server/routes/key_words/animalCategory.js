@@ -1,5 +1,5 @@
 import express from "express";
-import { animalCategoryReqValidation } from "../../utils/animalCategoryReqValidationSchema.js";
+import { animalCategoryReqValidation } from "../../utils/bodyValidation/animalCategoryReqValidationSchema.js";
 import auth from "../../middleware/auth.js";
 import { createRequire } from "module";
 import User from "../../models/User.js";

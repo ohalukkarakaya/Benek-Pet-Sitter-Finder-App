@@ -2,9 +2,9 @@ import express from "express";
 import Pet from "../../models/Pet.js";
 import auth from "../../middleware/auth.js";
 import User from "../../models/User.js";
-import { handOverInvitationReqParamsValidation } from "../../utils/handOverInvitationValidationSchema.js";
+import { handOverInvitationReqParamsValidation } from "../../utils/bodyValidation/handOverInvitationValidationSchema.js";
 import PetHandOverInvitation from "../../models/ownerOperations/PetHandOverInvitation.js";
-import { secondaryOwnerInvitationReqParamsValidation } from "../../utils/secondaryOwnerInvitationValidationSchema.js";
+import { secondaryOwnerInvitationReqParamsValidation } from "../../utils/bodyValidation/secondaryOwnerInvitationValidationSchema.js";
 import SecondaryOwnerInvitation from "../../models/ownerOperations/SecondaryOwnerInvitation.js";
 
 const router = express.Router();

@@ -1,8 +1,8 @@
 import multer from "multer";
 import multerS3 from "multer-s3";
 import dotenv from "dotenv";
-import Pet from "../models/Pet.js";
-import s3 from "../utils/s3Service.js";
+import Pet from "../../models/Pet.js";
+import s3 from "../../utils/s3Service.js";
 dotenv.config();
 
 //Storage

@@ -1,10 +1,10 @@
 import express from "express";
 import Pet from "../../models/Pet.js";
-import { createPetReqBodyValidation } from "../../utils/createPetValidationSchema.js";
+import { createPetReqBodyValidation } from "../../utils/bodyValidation/createPetValidationSchema.js";
 import auth from "../../middleware/auth.js";
 import { createRequire } from "module";
 import User from "../../models/User.js";
-import { updatePetProfileImg } from "../../middleware/serverHandlePetProfileImage.js";
+import { updatePetProfileImg } from "../../middleware/imageHandle/serverHandlePetProfileImage.js";
 
 const require = createRequire(import.meta.url);
 const rawPetDataset = require('../../src/pet_dataset.json');
@@ -206,6 +206,26 @@ router.put(
           }
         );
       }
+    }catch(err){
+        console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+);
+
+//Insert Images of the pet
+router.put(
+  "/petsImages/:petId", 
+  auth,
+  updatePetProfileImg,
+  async (req, res, next) => {
+    try{
+      
     }catch(err){
         console.log(err);
         res.status(500).json(

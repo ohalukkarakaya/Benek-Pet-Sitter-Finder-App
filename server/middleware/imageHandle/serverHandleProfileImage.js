@@ -1,8 +1,8 @@
 import multer from "multer";
 import multerS3 from "multer-s3";
 import dotenv from "dotenv";
-import User from "../models/User.js";
-import s3 from "../utils/s3Service.js";
+import User from "../../models/User.js";
+import s3 from "../../utils/s3Service.js";
 dotenv.config();
 
 //Storage

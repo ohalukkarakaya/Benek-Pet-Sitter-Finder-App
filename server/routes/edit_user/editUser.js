@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import auth from "../../middleware/auth.js";
-import { updateProfileImg } from "../../middleware/serverHandleProfileImage.js";
+import { updateProfileImg } from "../../middleware/imageHandle/serverHandleProfileImage.js";
 
 
 dotenv.config();

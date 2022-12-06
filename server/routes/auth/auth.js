@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import generateTokens from "../../utils/generateTokens.js";
 import UserOTPVerification from "../../models/UserOtpVerification.js";
 import sendOTPVerificationEmail from "../../utils/sendValidationEmail.js";
-import { signUpBodyValidation } from "../../utils/signUpValidationSchema.js";
+import { signUpBodyValidation } from "../../utils/bodyValidation/signUpValidationSchema.js";
 import UserToken from "../../models/UserToken.js";
 
 dotenv.config();
