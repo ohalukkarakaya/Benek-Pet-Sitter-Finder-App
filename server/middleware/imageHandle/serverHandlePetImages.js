@@ -21,7 +21,7 @@ const storage = multerS3(
                 const newFileName = `${petId}_petsImage${imageId}.${originalname.split(".")[1]}`;
                 req.petProfileImgNewFileName = newFileName;
                 
-                cb(null, "pets/"+petId+"/petsImages/"+newFileName);
+                cb(null, "pets/"+petId.toString()+"/petsImages/"+newFileName);
 
             }catch(err){
                 console.log(err);

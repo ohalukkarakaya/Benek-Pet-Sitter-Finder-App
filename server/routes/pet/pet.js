@@ -6,6 +6,7 @@ import { createRequire } from "module";
 import User from "../../models/User.js";
 import { updatePetProfileImg } from "../../middleware/imageHandle/serverHandlePetProfileImage.js";
 import { uploadPetImages } from "../../middleware/imageHandle/serverHandlePetImages.js";
+import s3 from "../../utils/s3Service.js";
 
 const require = createRequire(import.meta.url);
 const rawPetDataset = require('../../src/pet_dataset.json');
@@ -224,7 +225,7 @@ router.put(
   "/petsImages/:petId", 
   auth,
   uploadPetImages,
-  async (req, res, next) => {
+  async (req, res) => {
     try{
       var urlList = [];
       for(var i = 0; i < req.files.length; i ++){
@@ -247,6 +248,90 @@ router.put(
           }
         );
       }
+    }catch(err){
+        console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+);
+
+//Delete Images of the pet
+router.delete(
+  "/petsImages/:petId", 
+  auth,
+  async (req, res) => {
+    try{
+      const urlList = req.body.urlList;
+      if(!urlList || !(urlList.length > 0)){
+        return res.status(400).json(
+          {
+            error: true,
+            message: "Image url to delet is required"
+          }
+        );
+      }
+
+      const deleteImg = async (deleteParams, res) => {
+        try{
+          s3.deleteObject(deleteParams).promise();
+          console.log("Success", data);
+        }catch(err){
+          return res.status(500).json(
+            {
+              error: true,
+              message: "An error occured while deleting image"
+            }
+          );
+        }
+      };
+
+      await Pet.findById(req.params.petId).then(
+        (pet) => {
+          if(!pet){
+            return res.status(404).json(
+              {
+                error: true,
+                message: "Pet couldn't found"
+              }
+            );
+          }
+
+          await urlList.map(
+            (url) => {
+              const splitUrl = url.split('/');
+              const imgName = splitUrl[splitUrl.length - 1];
+
+              const deleteImageParams = {
+                Bucket: process.env.BUCKET_NAME,
+                Key: `pets/${pet._id.toString()}/petsImages/"${imgName}`
+              };
+              await deleteImg(deleteImageParams).then(
+                (_) => {
+                  pet.images.filter(
+                    (imgUrl) => imgUrl !== url
+                  );
+                }
+              ).then(
+                (_) => {
+                  pet.markModified("images");
+                  pet.save();
+                  return res.status(200).json(
+                    {
+                      error: false,
+                      message: "images deleted succesfully"
+                    }
+                  );
+                }
+              );
+            }
+          );
+        }
+      )
     }catch(err){
         console.log(err);
         res.status(500).json(
