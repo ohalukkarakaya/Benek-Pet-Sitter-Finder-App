@@ -276,17 +276,13 @@ router.delete(
         );
       }
 
-      const deleteImg = async (deleteParams, res) => {
-        try{
-          s3.deleteObject(deleteParams).promise();
-          console.log("Success", data);
-        }catch(err){
-          return res.status(500).json(
-            {
-              error: true,
-              message: "An error occured while deleting image"
-            }
-          );
+      const deleteImg = async (deleteParams) => {
+        try {
+            s3.deleteObject(deleteParams).promise();
+            console.log("Success", data);
+            return data;
+        } catch (err) {
+            console.log("Error", err);
         }
       };
 
@@ -301,16 +297,17 @@ router.delete(
             );
           }
 
-          await urlList.map(
+          urlList.map(
             (url) => {
               const splitUrl = url.split('/');
               const imgName = splitUrl[splitUrl.length - 1];
+              console.log(imgName);
 
               const deleteImageParams = {
                 Bucket: process.env.BUCKET_NAME,
                 Key: `pets/${pet._id.toString()}/petsImages/"${imgName}`
               };
-              await deleteImg(deleteImageParams).then(
+              deleteImg(deleteImageParams).then(
                 (_) => {
                   pet.images.filter(
                     (imgUrl) => imgUrl !== url
@@ -318,28 +315,27 @@ router.delete(
                 }
               );
             }
-          ).then(
-            (_) => {
-              pet.markModified("images");
-              pet.save(
-                (err) => {
-                  if(err){
-                    console.log(err);
-                    return res.status(500).json(
-                      {
-                        error: true,
-                        message: "An error occured while saving to database"
-                      }
-                    );
+          );
+
+          pet.markModified("images");
+          pet.save(
+            (err) => {
+              if(err){
+                console.log(err);
+                return res.status(500).json(
+                  {
+                    error: true,
+                    message: "An error occured while saving to database"
                   }
-                }
-              );
-              return res.status(200).json(
-                {
-                  error: false,
-                  message: "images deleted succesfully"
-                }
-              );
+                );
+              }
+            }
+          );
+
+          return res.status(200).json(
+            {
+              error: false,
+              message: "images deleted succesfully"
             }
           );
         }
