@@ -5,6 +5,7 @@ import auth from "../../middleware/auth.js";
 import { createRequire } from "module";
 import User from "../../models/User.js";
 import { updatePetProfileImg } from "../../middleware/imageHandle/serverHandlePetProfileImage.js";
+import { uploadPetImages } from "../../middleware/imageHandle/serverHandlePetImages.js";
 
 const require = createRequire(import.meta.url);
 const rawPetDataset = require('../../src/pet_dataset.json');
@@ -222,10 +223,30 @@ router.put(
 router.put(
   "/petsImages/:petId", 
   auth,
-  updatePetProfileImg,
+  uploadPetImages,
   async (req, res, next) => {
     try{
-      
+      var urlList = [];
+      for(var i = 0; i < req.files.length; i ++){
+        urlList.push(req.files[i].location);
+        req.pet.images.push(req.files[i].location);
+      }
+      if(urlList.length !== 0){
+        req.pet.markModified('images');
+        req.pet.save(
+          function (err) {
+            if(err) {
+                console.error('ERROR: While Update!');
+            }
+          }
+        );
+        return req.res.status(200).json(
+          {
+            error: false,
+            data: urlList
+          }
+        );
+      }
     }catch(err){
         console.log(err);
         res.status(500).json(
