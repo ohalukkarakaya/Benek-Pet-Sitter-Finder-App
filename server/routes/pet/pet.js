@@ -391,7 +391,8 @@ router.put(
         return req.res.status(200).json(
           {
             error: false,
-            data: urlList
+            url: req.file.location,
+            desc: req.body.desc
           }
         );
       }

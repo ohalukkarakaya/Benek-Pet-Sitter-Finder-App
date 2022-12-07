@@ -32,12 +32,14 @@ const storage = multerS3(
 
 //File Filter
 const fileFilter = (req, file, cb) => {
-    if(file){
-        if(file.mimetype === 'image/jpeg' && file.mimetype === 'application/pdf'){
+    if(file && req.body.desc){
+        if(file.mimetype === 'image/jpeg' || file.mimetype === 'application/pdf'){
             cb( null, true );
         }else{
             cb( new Error('You can just upload ".jpg" or ".pdf"'), false );
         }
+    }else{
+        cb( new Error('Certificate and description is required'), false );
     }
 };
 
@@ -58,16 +60,20 @@ const uploadPetVaccinationCertificate = async (req, res, next) => {
             await Pet.findOne(
                 { _id: petId},
                 (err, pet) => {
+                    if(err){
+                        console.log("err", err);
+                    }
                     req.pet = pet;
                     upload.single( 'file' )(
                         req,
                         {},
-                        (err) => {
-                            if(err){
+                        (error) => {
+                            if(error){
+                                console.log("error", error);
                                 return res.status(500).json(
                                     {
                                         error: true,
-                                        errorData: err,
+                                        errorData: error,
                                         message: "A problem occured wile uploading certificate"
                                     }
                                 );
