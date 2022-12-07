@@ -289,55 +289,65 @@ router.delete(
             );
           }
 
-          urlList.map(
+          const promiseUrlDelete = urlList.map(
             (url) => {
-              const splitUrl = url.split('/');
-              const imgName = splitUrl[splitUrl.length - 1];
-
-              const deleteImageParams = {
-                Bucket: process.env.BUCKET_NAME,
-                Key: `pets/${pet._id.toString()}/petsImages/${imgName}`
-              };
-              s3.deleteObject(
-                deleteImageParams,
-                (error, data) => {
-                  if(error){
-                    console.log("error", error);
-                    return res.status(500).json(
-                      {
-                        error: true,
-                        message: "An error occured while deleting images"
+              return new Promise(
+                (resolve, reject) => {
+                  const splitUrl = url.split('/');
+                  const imgName = splitUrl[splitUrl.length - 1];
+  
+                  const deleteImageParams = {
+                    Bucket: process.env.BUCKET_NAME,
+                    Key: `pets/${pet._id.toString()}/petsImages/${imgName}`
+                  };
+                  s3.deleteObject(
+                    deleteImageParams,
+                    (error, data) => {
+                      if(error){
+                        console.log("error", error);
+                        return res.status(500).json(
+                          {
+                            error: true,
+                            message: "An error occured while deleting images"
+                          }
+                        );
                       }
-                    );
-                  }
-                  pet.images = pet.images.filter(
-                    (imgUrl) => imgUrl !== url
+                      console.log(url);
+                      pet.images = pet.images.filter(
+                        imgUrl => 
+                          imgUrl !== url
+                      );
+                      return resolve(true);
+                    }
                   );
-                  pet.markModified("images");
                 }
               );
             }
-          );
+          )
 
-          console.log(pet.images);
-          pet.save(
-            (err) => {
-              if(err){
-                console.log(err);
-                return res.status(500).json(
-                  {
-                    error: true,
-                    message: "An error occured while saving to database"
+          Promise.all(promiseUrlDelete).then(
+            (_) => {
+              pet.markModified("images");
+              console.log("a");
+              pet.save(
+                (err) => {
+                  if(err){
+                    console.log("error", err);
+                    return res.status(500).json(
+                      {
+                        error: true,
+                        message: "An error occured while saving to database"
+                      }
+                    );
                   }
-                );
-              }
-            }
-          );
-
-          return res.status(200).json(
-            {
-              error: false,
-              message: "images deleted succesfully"
+                }
+              );
+              return res.status(200).json(
+                {
+                  error: false,
+                  message: "images deleted succesfully"
+                }
+              );
             }
           );
         }
