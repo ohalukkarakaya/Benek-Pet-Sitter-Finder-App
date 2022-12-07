@@ -312,7 +312,7 @@ router.delete(
                           }
                         );
                       }
-                      
+
                       pet.images = pet.images.filter(
                         imgUrl => 
                           imgUrl !== url
@@ -323,10 +323,11 @@ router.delete(
                 }
               );
             }
-          )
+          );
 
           Promise.all(promiseUrlDelete).then(
             (_) => {
+              const petImages = pet.images;
               pet.markModified("images");
               pet.save(
                 (err) => {
@@ -344,7 +345,8 @@ router.delete(
               return res.status(200).json(
                 {
                   error: false,
-                  message: "images deleted succesfully"
+                  message: "images deleted succesfully",
+                  petImages: petImages
                 }
               );
             }
