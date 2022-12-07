@@ -1,6 +1,7 @@
 import express from "express";
 import Pet from "../../models/Pet.js";
 import { createPetReqBodyValidation } from "../../utils/bodyValidation/createPetValidationSchema.js";
+import { editVaccinationCertificateValidation } from "../../utils/bodyValidation/editVaccinationCertificateReqValidationSchema.js";
 import auth from "../../middleware/auth.js";
 import { createRequire } from "module";
 import User from "../../models/User.js";
@@ -274,7 +275,7 @@ router.delete(
         return res.status(400).json(
           {
             error: true,
-            message: "Image url to delet is required"
+            message: "Image url to delete is required"
           }
         );
       }
@@ -396,6 +397,177 @@ router.put(
           }
         );
       }
+    }catch(err){
+        console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+);
+
+//Edit Certificate desc
+router.put(
+  "/editVaccinationCertificate/:petId",
+  auth,
+  async (req, res) => {
+    try{
+
+      const { error } = editVaccinationCertificateValidation(req.body);
+      if(error){
+        return res.status(400).json(
+          {
+            error: true,
+            message: error.details[0].message
+          }
+        );
+      }
+          
+
+      const certificateUrl = req.body.certificateUrl;
+      const newDesc = req.body.newDesc;
+
+      await Pet.findById(req.params.petId).then(
+        (pet) => {
+          if(!pet){
+            return res.status(404).json(
+              {
+                error: true,
+                message: "Pet couldn't found"
+              }
+            );
+          }
+
+          for(var i = 0; i < pet.vaccinations.length; i ++){
+            if(pet.vaccinations[i].fileUrl === certificateUrl){
+              pet.vaccinations[i].desc = newDesc;
+            }
+          }
+
+          pet.markModified('vaccinations');
+          const petsVaccinations = pet.vaccinations;
+          pet.save(
+            function (err) {
+              if(err) {
+                  console.error('ERROR: While Update!');
+              }
+            }
+          );
+
+          return req.res.status(200).json(
+            {
+              error: false,
+              petsVaccinations: petsVaccinations
+            }
+          );
+        }
+      )
+    }catch(err){
+        console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+);
+
+//Delete Vaccination Certificate of the Pet
+router.delete(
+  "/petsVaccinationCertificate/:petId",
+  auth,
+  async (req, res) => {
+    try{
+      const urlList = req.body.urlList;
+      if(!urlList || !(urlList.length > 0)){
+        return res.status(400).json(
+          {
+            error: true,
+            message: "File url to delete is required"
+          }
+        );
+      }
+
+      await Pet.findById(req.params.petId).then(
+        (pet) => {
+          if(!pet){
+            return res.status(404).json(
+              {
+                error: true,
+                message: "Pet couldn't found"
+              }
+            );
+          }
+
+          const promiseUrlDelete = urlList.map(
+            (url) => {
+              return new Promise(
+                (resolve, reject) => {
+                  const splitUrl = url.split('/');
+                  const imgName = splitUrl[splitUrl.length - 1];
+  
+                  const deleteImageParams = {
+                    Bucket: process.env.BUCKET_NAME,
+                    Key: `pets/${pet._id.toString()}/petsVaccinationCertificates/${imgName}`
+                  };
+                  s3.deleteObject(
+                    deleteImageParams,
+                    (error, data) => {
+                      if(error){
+                        console.log("error", error);
+                        return res.status(500).json(
+                          {
+                            error: true,
+                            message: "An error occured while deleting certificate"
+                          }
+                        );
+                      }
+
+                      pet.vaccinations = pet.vaccinations.filter(
+                        vaccination => 
+                          vaccination.fileUrl !== url
+                      );
+                      return resolve(true);
+                    }
+                  );
+                }
+              );
+            }
+          );
+
+          Promise.all(promiseUrlDelete).then(
+            (_) => {
+              const petVaccinations = pet.vaccinations;
+              pet.markModified("vaccinations");
+              pet.save(
+                (err) => {
+                  if(err){
+                    console.log("error", err);
+                    return res.status(500).json(
+                      {
+                        error: true,
+                        message: "An error occured while saving to database"
+                      }
+                    );
+                  }
+                }
+              );
+              return res.status(200).json(
+                {
+                  error: false,
+                  message: "vaccination deleted succesfully",
+                  remainedVaccinations: petVaccinations
+                }
+              );
+            }
+          );
+        }
+      )
     }catch(err){
         console.log(err);
         res.status(500).json(
