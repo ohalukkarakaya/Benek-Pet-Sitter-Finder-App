@@ -312,7 +312,7 @@ router.delete(
                           }
                         );
                       }
-                      console.log(url);
+                      
                       pet.images = pet.images.filter(
                         imgUrl => 
                           imgUrl !== url
@@ -328,7 +328,6 @@ router.delete(
           Promise.all(promiseUrlDelete).then(
             (_) => {
               pet.markModified("images");
-              console.log("a");
               pet.save(
                 (err) => {
                   if(err){
