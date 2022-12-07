@@ -6,6 +6,7 @@ import { createRequire } from "module";
 import User from "../../models/User.js";
 import { updatePetProfileImg } from "../../middleware/imageHandle/serverHandlePetProfileImage.js";
 import { uploadPetImages } from "../../middleware/imageHandle/serverHandlePetImages.js";
+import { uploadPetVaccinationCertificate } from "../../middleware/imageHandle/serverHandlePetVaccinationCertificates.js";
 import s3 from "../../utils/s3Service.js";
 import dotenv from "dotenv";
 
@@ -353,6 +354,47 @@ router.delete(
           );
         }
       )
+    }catch(err){
+        console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+);
+
+//Insert Vaccination Certificate of the Pet
+router.put(
+  "/petsVaccinationCertificate/:petId", 
+  auth,
+  uploadPetVaccinationCertificate,
+  async (req, res) => {
+    try{
+      if(req.file.location){
+        req.pet.vaccinations.push(
+          {
+            desc: req.body.desc,
+            fileUrl: req.file.location
+          }
+        );
+        req.pet.markModified('vaccinations');
+        req.pet.save(
+          function (err) {
+            if(err) {
+                console.error('ERROR: While Update!');
+            }
+          }
+        );
+        return req.res.status(200).json(
+          {
+            error: false,
+            data: urlList
+          }
+        );
+      }
     }catch(err){
         console.log(err);
         res.status(500).json(

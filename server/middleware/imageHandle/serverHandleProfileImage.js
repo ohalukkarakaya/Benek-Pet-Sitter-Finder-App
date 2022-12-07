@@ -17,14 +17,16 @@ const storage = multerS3(
             const { originalname } = file;
             const userId = req.user._id;
 
+            const splitedOriginalName = originalname.split(".");
+
             if(file.fieldname == "profileImg"){
-                const newFileName = `${userId}_profileImg.${originalname.split(".")[1]}`;
+                const newFileName = `${userId}_profileImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.profileImgNewFileName = newFileName;
                 
                 cb(null, "profileAssets/"+userId+"/"+newFileName);
 
             }else if(file.fieldname == "coverImg"){
-                const newFileName = `${userId}_coverImg.${originalname.split(".")[1]}`;
+                const newFileName = `${userId}_coverImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.coverImgNewFileName = newFileName;
                 
                 cb(null, "profileAssets/"+userId+"/"+newFileName);

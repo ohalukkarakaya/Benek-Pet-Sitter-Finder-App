@@ -51,43 +51,6 @@ const upload = multer(
     }
 );
 
-const deleteImg = async (req, file, deleteParams) => {
-    try {
-        fileFilter.then(
-            (_) => {
-                s3.deleteObject(deleteParams).promise();
-                console.log("Success", data);
-                return data;
-            }
-        );
-    } catch (err) {
-        console.log("Error", err);
-    }
-  };
-
-const ValidateAndCleanBucket = async (
-    req,
-    pet,
-    isDefaultProfileImg,
-    isDefaultCoverImg,
-    recordedImgName
-) => {
-    if(!isDefaultProfileImg && pet.petProfileImg !== undefined && pet.petProfileImg.recordedImgName !== undefined){
-        const deleteProfileImageParams = {
-            Bucket: process.env.BUCKET_NAME,
-            Key: `petProfileAssets/${pet._id}/${recordedImgName}`
-        };
-        await deleteImg(deleteProfileImageParams);
-    }
-    if(!isDefaultCoverImg && pet.petCoverImg !== undefined && pet.petCoverImg.recordedImgName !== undefined){
-        const deleteCoverImageParams = {
-            Bucket: process.env.BUCKET_NAME,
-            Key: `Pets/${pet._id}/${recordedImgName}`
-        };
-        await deleteImg(deleteCoverImageParams);
-    }
-}
-
 const uploadPetImages = async (req, res, next) => {
     try{
         const petId = req.params.petId;

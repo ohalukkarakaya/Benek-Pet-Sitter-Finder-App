@@ -16,14 +16,16 @@ const storage = multerS3(
                 const { originalname } = file;
                 const petId = req.pet._id;
 
+                const splitedOriginalName = originalname.split(".");
+
                 if(file.fieldname == "petProfileImg"){
-                    const newFileName = `${petId}_petProfileImg.${originalname.split(".")[1]}`;
+                    const newFileName = `${petId}_petProfileImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                     req.petProfileImgNewFileName = newFileName;
                 
                     cb(null, "pets/"+petId+"/petProfileAssets/"+newFileName);
 
                 }else if(file.fieldname == "petCoverImg"){
-                    const newFileName = `${petId}_petCoverImg.${originalname.split(".")[1]}`;
+                    const newFileName = `${petId}_petCoverImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                     req.petCoverImgNewFileName = newFileName;
                 
                     cb(null, "pets/"+petId+"/petProfileAssets/"+newFileName);
