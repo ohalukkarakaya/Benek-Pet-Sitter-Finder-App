@@ -346,7 +346,7 @@ router.delete(
                 {
                   error: false,
                   message: "images deleted succesfully",
-                  petImages: petImages
+                  remainedPetImages: petImages
                 }
               );
             }
