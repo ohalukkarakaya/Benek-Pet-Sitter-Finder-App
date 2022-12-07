@@ -7,11 +7,13 @@ import User from "../../models/User.js";
 import { updatePetProfileImg } from "../../middleware/imageHandle/serverHandlePetProfileImage.js";
 import { uploadPetImages } from "../../middleware/imageHandle/serverHandlePetImages.js";
 import s3 from "../../utils/s3Service.js";
+import dotenv from "dotenv";
 
 const require = createRequire(import.meta.url);
 const rawPetDataset = require('../../src/pet_dataset.json');
 const petDataset = JSON.parse(JSON.stringify(rawPetDataset));
 
+dotenv.config();
 const router = express.Router();
 
 //Create Pet
@@ -276,16 +278,6 @@ router.delete(
         );
       }
 
-      const deleteImg = async (deleteParams) => {
-        try {
-            s3.deleteObject(deleteParams).promise();
-            console.log("Success", data);
-            return data;
-        } catch (err) {
-            console.log("Error", err);
-        }
-      };
-
       await Pet.findById(req.params.petId).then(
         (pet) => {
           if(!pet){
@@ -301,23 +293,33 @@ router.delete(
             (url) => {
               const splitUrl = url.split('/');
               const imgName = splitUrl[splitUrl.length - 1];
-              console.log(imgName);
 
               const deleteImageParams = {
                 Bucket: process.env.BUCKET_NAME,
-                Key: `pets/${pet._id.toString()}/petsImages/"${imgName}`
+                Key: `pets/${pet._id.toString()}/petsImages/${imgName}`
               };
-              deleteImg(deleteImageParams).then(
-                (_) => {
-                  pet.images.filter(
+              s3.deleteObject(
+                deleteImageParams,
+                (error, data) => {
+                  if(error){
+                    console.log("error", error);
+                    return res.status(500).json(
+                      {
+                        error: true,
+                        message: "An error occured while deleting images"
+                      }
+                    );
+                  }
+                  pet.images = pet.images.filter(
                     (imgUrl) => imgUrl !== url
                   );
+                  pet.markModified("images");
                 }
               );
             }
           );
 
-          pet.markModified("images");
+          console.log(pet.images);
           pet.save(
             (err) => {
               if(err){

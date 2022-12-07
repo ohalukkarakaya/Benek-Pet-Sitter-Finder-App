@@ -18,7 +18,8 @@ const storage = multerS3(
                 const petId = req.pet._id;
 
                 const imageId = `${Math.floor(10000000000000 + Math.random() * 90000000000000)}`
-                const newFileName = `${petId}_petsImage${imageId}.${originalname.split(".")[1]}`;
+                const splitedOriginalName = originalname.split(".");
+                const newFileName = `${petId}_petsImage${imageId}.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.petProfileImgNewFileName = newFileName;
                 
                 cb(null, "pets/"+petId.toString()+"/petsImages/"+newFileName);
