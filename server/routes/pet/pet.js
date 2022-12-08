@@ -641,6 +641,7 @@ router.delete(
     //clean depandancies
       const primaryOwner = await User.findById(req.pet.primaryOwner.toString());
       const allOwners = req.pet.allOwners.filter(owner => owner.toString() !== req.pet.primaryOwner.toString());
+      const petId = req.pet._id.toString();
 
       //clean dependecy of primary owner
       primaryOwner.pets = primaryOwner.pets.filter(pet => pet.toString() !== req.pet._id.toString());
@@ -698,60 +699,44 @@ router.delete(
       }
 
       //delete images of pet
-      const promiseUrlDelete = new Promise(
-            (resolve, reject) => {
-              const splitUrl = url.split('/');
-              const imgName = splitUrl[splitUrl.length - 1];
-
-              const deleteImageParams = {
+      const deleteImageParams = {
                 Bucket: process.env.BUCKET_NAME,
-                Key: `pets/${req.pet._id.toString()}`
+                Key: `pets/${petId}`
               };
-              s3.deleteObject(
-                deleteImageParams,
-                (error, data) => {
-                  if(error){
-                    console.log("error", error);
-                    return res.status(500).json(
-                      {
-                        error: true,
-                        message: "An error occured while deleting certificate"
-                      }
-                    );
-                  }
+      s3.deleteObject(
+        deleteImageParams,
+        (error, data) => {
+          if(error){
+            console.log("error", error);
+            return res.status(500).json(
+              {
+                error: true,
+                message: "An error occured while deleting certificate"
+              }
+            );
+          }
+          console.log(data);
+        }
+      );
 
-                  pet.vaccinations = pet.vaccinations.filter(
-                    vaccination => 
-                      vaccination.fileUrl !== url
-                  );
-                  return resolve(true);
-                }
-              );
+      //delete pet
+      req.pet.deleteOne().then(
+        (_) => {
+          return res.status(200).json(
+            {
+              error: false,
+              message: "Pet deleted succesfully"
             }
           );
-
-      Promise.all(promiseUrlDelete).then(
-        (_) => {
-          //delete pet
-          req.pet.deleteOne().then(
-            (_) => {
-              return res.status(200).json(
-                {
-                  error: false,
-                  message: "Pet deleted succesfully"
-                }
-              );
-            }
-          ).catch(
-            (error) => {
-              console.log(error);
-              return res.status(500).json(
-                {
-                  error: true,
-                  message: "An error occured while deleting",
-                  error: error
-                }
-              );
+        }
+      ).catch(
+        (error) => {
+          console.log(error);
+          return res.status(500).json(
+            {
+              error: true,
+              message: "An error occured while deleting",
+              error: error
             }
           );
         }
