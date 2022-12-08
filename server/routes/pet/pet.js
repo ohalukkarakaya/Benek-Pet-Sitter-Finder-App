@@ -224,6 +224,68 @@ router.put(
   }
 );
 
+//Edit Certificate desc
+router.put(
+  "/editPetBioCertificate/:petId",
+  auth,
+  async (req, res) => {
+    try{
+        
+      if(!req.body.newBio && typeof req.body.newBio !== "string"){
+        return res.status(400).json(
+          {
+            error: true,
+            message: 'Property "newBio" with "String" value is required'
+          }
+        );
+      }
+
+      const petId = req.params.petId;
+      const newBio = req.body.newBio;
+
+      await Pet.findById(petId).then(
+        (pet) => {
+          if(!pet){
+            return res.status(404).json(
+              {
+                error: true,
+                message: "Pet couldn't found"
+              }
+            );
+          }
+
+          pet.bio = newBio;
+
+          pet.markModified('bio');
+          const petBio = pet.bio;
+          pet.save(
+            function (err) {
+              if(err) {
+                  console.error('ERROR: While Update!');
+              }
+            }
+          );
+
+          return req.res.status(200).json(
+            {
+              error: false,
+              newPetBio: petBio
+            }
+          );
+        }
+      )
+    }catch(err){
+        console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+);
+
 //Insert Images of the pet
 router.put(
   "/petsImages/:petId", 
