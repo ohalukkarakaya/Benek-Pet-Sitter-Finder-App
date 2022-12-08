@@ -698,16 +698,14 @@ router.delete(
       }
 
       //delete images of pet
-      const promiseUrlDelete = req.pet.images.map(
-        (url) => {
-          return new Promise(
+      const promiseUrlDelete = new Promise(
             (resolve, reject) => {
               const splitUrl = url.split('/');
               const imgName = splitUrl[splitUrl.length - 1];
 
               const deleteImageParams = {
                 Bucket: process.env.BUCKET_NAME,
-                Key: `pets/${pet._id.toString()}/petsVaccinationCertificates/${imgName}`
+                Key: `pets/${req.pet._id.toString()}`
               };
               s3.deleteObject(
                 deleteImageParams,
@@ -731,8 +729,6 @@ router.delete(
               );
             }
           );
-        }
-      );
 
       Promise.all(promiseUrlDelete).then(
         (_) => {
