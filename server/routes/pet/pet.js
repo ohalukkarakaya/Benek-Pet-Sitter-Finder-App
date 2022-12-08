@@ -3,6 +3,7 @@ import Pet from "../../models/Pet.js";
 import { createPetReqBodyValidation } from "../../utils/bodyValidation/createPetValidationSchema.js";
 import { editVaccinationCertificateValidation } from "../../utils/bodyValidation/editVaccinationCertificateReqValidationSchema.js";
 import auth from "../../middleware/auth.js";
+import editPetAuth from "../../middleware/editPetAuth.js";
 import { createRequire } from "module";
 import User from "../../models/User.js";
 import { updatePetProfileImg } from "../../middleware/imageHandle/serverHandlePetProfileImage.js";
@@ -543,6 +544,7 @@ router.put(
 router.delete(
   "/petsVaccinationCertificate/:petId",
   auth,
+  editPetAuth,
   async (req, res) => {
     try{
       const urlList = req.body.urlList;
@@ -630,6 +632,106 @@ router.delete(
           );
         }
       )
+    }catch(err){
+        console.log(err);
+        res.status(500).json(
+            {
+                error: true,
+                message: "Internal Server Error"
+            }
+        );
+    }
+  }
+);
+
+//Delete Pet and Clean Dependency
+router.delete(
+  "/deletePet/:petId",
+  auth,
+  editPetAuth,
+  async (req, res) => {
+    try{
+    //clean depandancies
+      const primaryOwner = await User.findById(req.pet.primaryOwner.toString());
+      const allOwners = req.pet.allOwners.filter(owner => owner.toString() !== req.pet.primaryOwner.toString());
+
+      //clean dependecy of primary owner
+      primaryOwner.pets = primaryOwner.pets.filter(pet => pet.toString !== req.pet._id.toString());
+      
+      for(var i = 0; i < allOwners.length; i ++){
+        for(var indx = 0; indx < primaryOwner.dependedUsers.length; indx ++){
+          const dep = primaryOwner.dependedUsers[indx];
+          const secondaryOwner = allOwners[i];
+
+          if(dep.user.toString() === secondaryOwner.toString()){
+            if(dep.linkedPets.length > 1){
+              primaryOwner.dependedUsers[indx].linkedPets = primaryOwner.dependedUsers[indx].linkedPets.filter(pets => pets.toString() !== req.pet._id);
+            }else{
+              primaryOwner.dependedUsers = primaryOwner.dependedUsers.filter(depUser => depUser.user.toStrin() !== secondaryOwner.toString());
+            }
+          }
+        }
+      }
+
+      primaryOwner.markModified("pets");
+      primaryOwner.markModified("dependedUsers");
+      primaryOwner.save(
+        function (err) {
+          if(err) {
+            console.error(`ERROR: While Updating Owner "${primaryOwner._id.toString()}"!`);
+          }
+        }
+      );
+
+      //clean dependency of secondary owners
+      for(var i = 0; i < allOwners.length; i ++){
+        const ownerId = allOwners[i].toString();
+        const owner = await User.findById(ownerId);
+        const deps = owner.dependedUsers;
+
+        for(var indx = 0; indx < deps.length; indx ++){
+          if(deps[indx].user.toString() === req.pet.primaryOwner.toString()){
+            const linkedPets = deps[indx].linkedPets;
+            if(linkedPets.length > 1){
+              owner.dependedUsers[indx].linkedPets = owner.dependedUsers[indx].linkedPets.filter(pets => pets.toString() !== req.pet._id);
+            }else{
+              owner.dependedUsers = owner.dependedUsers.filter(dependeds => dependeds !== deps[indx]);
+            }
+          }
+        }
+
+        owner.markModified("dependedUser");
+        owner.save(
+          function (err) {
+            if(err) {
+              console.error(`ERROR: While Updating Secondary Owner "${owner._id.toString()}"!`);
+            }
+          }
+        );
+      }
+
+      //delete pet
+      req.pet.deleteOne().then(
+        (_) => {
+          return res.status(200).json(
+            {
+              error: false,
+              message: "Pet deleted succesfully"
+            }
+          );
+        }
+      ).catch(
+        (error) => {
+          console.log(error);
+          return res.status(500).json(
+            {
+              error: true,
+              message: "An error occured while deleting",
+              error: error
+            }
+          );
+        }
+      );
     }catch(err){
         console.log(err);
         res.status(500).json(
