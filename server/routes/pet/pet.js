@@ -229,6 +229,7 @@ router.put(
 router.put(
   "/editPetBioCertificate/:petId",
   auth,
+  editPetAuth,
   async (req, res) => {
     try{
         
@@ -241,40 +242,26 @@ router.put(
         );
       }
 
-      const petId = req.params.petId;
       const newBio = req.body.newBio;
 
-      await Pet.findById(petId).then(
-        (pet) => {
-          if(!pet){
-            return res.status(404).json(
-              {
-                error: true,
-                message: "Pet couldn't found"
-              }
-            );
+      req.pet.bio = newBio;
+
+      req.pet.markModified('bio');
+      const petBio = req.pet.bio;
+      req.pet.save(
+        function (err) {
+          if(err) {
+            console.error('ERROR: While Update!');
           }
-
-          pet.bio = newBio;
-
-          pet.markModified('bio');
-          const petBio = pet.bio;
-          pet.save(
-            function (err) {
-              if(err) {
-                  console.error('ERROR: While Update!');
-              }
-            }
-          );
-
-          return req.res.status(200).json(
-            {
-              error: false,
-              newPetBio: petBio
-            }
-          );
         }
-      )
+      );
+
+      return res.status(200).json(
+        {
+          error: false,
+          newPetBio: petBio
+        }
+      );
     }catch(err){
         console.log(err);
         res.status(500).json(
