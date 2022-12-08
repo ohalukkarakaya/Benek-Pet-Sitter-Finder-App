@@ -32,7 +32,7 @@ const storage = multerS3(
 
 //File Filter
 const fileFilter = (req, file, cb) => {
-    if(file && req.body.desc){
+    if(file){
         if(file.mimetype === 'image/jpeg' || file.mimetype === 'application/pdf'){
             cb( null, true );
         }else{
