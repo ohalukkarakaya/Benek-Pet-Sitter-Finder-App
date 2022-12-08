@@ -643,7 +643,7 @@ router.delete(
       const allOwners = req.pet.allOwners.filter(owner => owner.toString() !== req.pet.primaryOwner.toString());
 
       //clean dependecy of primary owner
-      primaryOwner.pets = primaryOwner.pets.filter(pet => pet.toString !== req.pet._id.toString());
+      primaryOwner.pets = primaryOwner.pets.filter(pet => pet.toString() !== req.pet._id.toString());
       
       for(var i = 0; i < allOwners.length; i ++){
         for(var indx = 0; indx < primaryOwner.dependedUsers.length; indx ++){
@@ -654,7 +654,7 @@ router.delete(
             if(dep.linkedPets.length > 1){
               primaryOwner.dependedUsers[indx].linkedPets = primaryOwner.dependedUsers[indx].linkedPets.filter(pets => pets.toString() !== req.pet._id);
             }else{
-              primaryOwner.dependedUsers = primaryOwner.dependedUsers.filter(depUser => depUser.user.toStrin() !== secondaryOwner.toString());
+              primaryOwner.dependedUsers = primaryOwner.dependedUsers.filter(depUser => depUser.user.toString() !== secondaryOwner.toString());
             }
           }
         }
