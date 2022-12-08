@@ -224,7 +224,7 @@ router.put(
   }
 );
 
-//Edit Certificate desc
+//Edit Pet Bio
 router.put(
   "/editPetBioCertificate/:petId",
   auth,
