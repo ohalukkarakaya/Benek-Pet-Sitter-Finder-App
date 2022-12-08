@@ -698,8 +698,6 @@ router.delete(
         );
       }
 
-      console.log(`pets/${petId}`);
-
       //delete images of pet
       async function emptyS3Directory(bucket, dir){
         const listParams = {
@@ -712,8 +710,7 @@ router.delete(
           Bucket: bucket,
           Delete: { Objects: [] }
         };
-        console.log(listParams);
-        console.log(listedObjects);
+        
         listedObjects.Contents.forEach(({ Key }) => {
           deleteParams.Delete.Objects.push({ Key });
         });
