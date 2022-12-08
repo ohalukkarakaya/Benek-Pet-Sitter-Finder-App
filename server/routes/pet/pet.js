@@ -98,7 +98,7 @@ router.post(
               req.user._id,
               {
                 $push: {
-                  pets: result._id
+                  pets: result._id.toString()
                 }
               }
             ).then(
@@ -698,45 +698,51 @@ router.delete(
         );
       }
 
-      //delete images of pet
-      const deleteImageParams = {
-                Bucket: process.env.BUCKET_NAME,
-                Key: `pets/${petId}`
-              };
-      s3.deleteObject(
-        deleteImageParams,
-        (error, data) => {
-          if(error){
-            console.log("error", error);
-            return res.status(500).json(
-              {
-                error: true,
-                message: "An error occured while deleting certificate"
-              }
-            );
-          }
-          console.log(data);
-        }
-      );
+      console.log(`pets/${petId}`);
 
-      //delete pet
-      req.pet.deleteOne().then(
-        (_) => {
-          return res.status(200).json(
-            {
-              error: false,
-              message: "Pet deleted succesfully"
-            }
-          );
+      //delete images of pet
+      async function emptyS3Directory(bucket, dir){
+        const listParams = {
+          Bucket: bucket,
+          Prefix: dir
+        };
+        const listedObjects = await s3.listObjectsV2(listParams);
+        if (listedObjects.Contents.length === 0) return;
+        const deleteParams = {
+          Bucket: bucket,
+          Delete: { Objects: [] }
+        };
+        console.log(listParams);
+        console.log(listedObjects);
+        listedObjects.Contents.forEach(({ Key }) => {
+          deleteParams.Delete.Objects.push({ Key });
+        });
+        await s3.deleteObjects(deleteParams);
+          if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
         }
-      ).catch(
-        (error) => {
-          console.log(error);
-          return res.status(500).json(
-            {
-              error: true,
-              message: "An error occured while deleting",
-              error: error
+      
+        emptyS3Directory(process.env.BUCKET_NAME, `pets/${petId}/`).then(
+        (_) => {
+          //delete pet
+          req.pet.deleteOne().then(
+            (_) => {
+              return res.status(200).json(
+                {
+                  error: false,
+                  message: "Pet deleted succesfully"
+                }
+              );
+            }
+          ).catch(
+            (error) => {
+              console.log(error);
+                return res.status(500).json(
+                  {
+                    error: true,
+                    message: "An error occured while deleting",
+                    error: error
+                  }
+                );
             }
           );
         }
