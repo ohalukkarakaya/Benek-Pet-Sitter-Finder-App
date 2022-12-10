@@ -56,33 +56,23 @@ const upload = multer(
 //Upload File
 const uploadPetVaccinationCertificate = async (req, res, next) => {
     try{
-        const petId = req.params.petId;
-            await Pet.findOne(
-                { _id: petId},
-                (err, pet) => {
-                    if(err){
-                        console.log("err", err);
-                    }
-                    req.pet = pet;
-                    upload.single( 'file' )(
-                        req,
-                        {},
-                        (error) => {
-                            if(error){
-                                console.log("error", error);
-                                return res.status(500).json(
-                                    {
-                                        error: true,
-                                        errorData: error,
-                                        message: "A problem occured wile uploading certificate"
-                                    }
-                                );
-                            }
-                            next();
+        upload.single( 'file' )(
+            req,
+            {},
+            (error) => {
+                if(error){
+                    console.log("error", error);
+                    return res.status(500).json(
+                        {
+                            error: true,
+                            errorData: error,
+                            message: "A problem occured wile uploading certificate"
                         }
                     );
                 }
-            ).clone();
+                next();
+            }
+        );
     }catch(err){
         return res.status(500).json(
             {

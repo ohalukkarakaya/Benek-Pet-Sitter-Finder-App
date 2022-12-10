@@ -45,7 +45,44 @@ const PetSchema = new mongoose.Schema(
           type: String,
           enum: [ "Male", "Female" ]
       },
-      images: [ String ],
+      images: [
+        {
+            imgUrl: {
+                type: String,
+                required: true,
+            },
+            comments: [
+                {
+                    userId: {
+                        type: String,
+                        required: true,
+                    },
+                    comment: {
+                        type: String,
+                        maxLength: [
+                            150,
+                            '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
+                        ],
+                    },
+                    replies: [
+                        {
+                            userId: {
+                                type: String,
+                                required: true
+                            },
+                            reply: {
+                                type: String,
+                                maxLength: [
+                                    150,
+                                    '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
+                                ],
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+      ],
       birthDay: {
           type: Date,
       },

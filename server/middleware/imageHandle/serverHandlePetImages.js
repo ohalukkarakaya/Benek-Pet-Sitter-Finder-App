@@ -53,43 +53,36 @@ const upload = multer(
 
 const uploadPetImages = async (req, res, next) => {
     try{
-        const petId = req.params.petId;
-            await Pet.findOne(
-                { _id: petId},
-                (err, pet) => {
-                    req.pet = pet;
-                    const howmanyImageCanRecorded = 6 - pet.images.length;
-                    if(howmanyImageCanRecorded > 0){
-                        upload.array(
-                            'files',
-                            howmanyImageCanRecorded
-                        )(
-                            req,
-                            {},
-                            (err) => {
-                                if(err){
-                                    return res.status(500).json(
-                                        {
-                                            error: true,
-                                            errorData: err,
-                                            message: "A problem occured wile uploading images"
-                                        }
-                                    );
-                                }
-
-                                next();
-                            }
-                        );
-                    }else{
-                        return res.status(406).json(
+        const howmanyImageCanRecorded = 6 - req.pet.images.length;
+        if(howmanyImageCanRecorded > 0){
+            upload.array(
+                'files',
+                howmanyImageCanRecorded
+            )(
+                req,
+                {},
+                (err) => {
+                    if(err){
+                        return res.status(500).json(
                             {
                                 error: true,
-                                message: "there is 6 or more image uploaded allready"
+                                errorData: err,
+                                message: "A problem occured wile uploading images"
                             }
                         );
                     }
+
+                    next();
                 }
-            ).clone();
+            );
+        }else{
+            return res.status(406).json(
+                {
+                    error: true,
+                    message: "there is 6 or more image uploaded allready"
+                }
+            );
+        }
     }catch(err){
         return res.status(500).json(
             {
@@ -100,4 +93,4 @@ const uploadPetImages = async (req, res, next) => {
     }
 } 
 
-    export { uploadPetImages };
+export { uploadPetImages };

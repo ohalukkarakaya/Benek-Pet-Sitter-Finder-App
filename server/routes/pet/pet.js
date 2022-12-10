@@ -21,119 +21,119 @@ const router = express.Router();
 
 //Create Pet
 router.post(
-    "/createPet", 
-    auth,
-    async (req, res) => {
-      try{
-        const { error } = createPetReqBodyValidation(req.body);
-        if(error)
-          return res.status(400).json(
-            {
-              error: true,
-              message: error.details[0].message
-            }
-          );
-        
-        let petKind;
-        let petSpecies;
-
-        for(var i = 0; i < petDataset.pets.length; i ++){
-          if(petDataset.pets[i].id === req.body.kindCode){
-            petKind = petDataset.pets[i].name;
-            for(var index = 0; index < petDataset.pets[i].species.length; index ++){
-              if(petDataset.pets[i].species[index].id === req.body.speciesCode){
-                petSpecies = {
-                    "tr": petDataset.pets[i].species[index].tr,
-                    "en": petDataset.pets[i].species[index].en
-                  };
-                console.log(petSpecies);
-              }
-            }
-          }
-        }
-  
-        const pet = await Pet.find(
+  "/createPet", 
+  auth,
+  async (req, res) => {
+    try{
+      const { error } = createPetReqBodyValidation(req.body);
+      if(error)
+        return res.status(400).json(
           {
-            $or: [
-              {
-                name: req.body.name,
-                kind: req.body.kindCode,
-                species: req.body.speciesCode,
-                primaryOwner: req.user._id
-              },
-              {
-                name: req.body.name,
-                kind: req.body.kindCode,
-                species: req.body.speciesCode,
-                allOwners: { $in: [ req.user._id ]}
-              }
-            ]
+            error: true,
+            message: error.details[0].message
           }
         );
-        if(pet.length > 0){
-          return res.status(400).json(
+        
+      let petKind;
+      let petSpecies;
+
+      for(var i = 0; i < petDataset.pets.length; i ++){
+        if(petDataset.pets[i].id === req.body.kindCode){
+          petKind = petDataset.pets[i].name;
+          for(var index = 0; index < petDataset.pets[i].species.length; index ++){
+            if(petDataset.pets[i].species[index].id === req.body.speciesCode){
+              petSpecies = {
+                "tr": petDataset.pets[i].species[index].tr,
+                "en": petDataset.pets[i].species[index].en
+              };
+              console.log(petSpecies);
+            }
+          }
+        }
+      }
+  
+      const pet = await Pet.find(
+        {
+          $or: [
             {
-              error: true,
-              message: "Pet Allready Exists",
-              petId: pet._id,
-              petName: pet.name 
+              name: req.body.name,
+              kind: req.body.kindCode,
+              species: req.body.speciesCode,
+              primaryOwner: req.user._id
+            },
+            {
+              name: req.body.name,
+              kind: req.body.kindCode,
+              species: req.body.speciesCode,
+              allOwners: { $in: [ req.user._id ]}
+            }
+          ]
+        }
+      );
+      if(pet.length > 0){
+        return res.status(400).json(
+          {
+            error: true,
+            message: "Pet Allready Exists",
+            petId: pet._id,
+            petName: pet.name 
+          }
+        );
+      }
+  
+      await new Pet(
+        {
+          name: req.body.name,
+          bio: req.body.petBio,
+          sex: req.body.sex,
+          birthDay: req.body.birthDay,
+          kind: req.body.kindCode,
+          species: req.body.speciesCode,
+          primaryOwner: req.user._id,
+          allOwners: [ req.user._id ],
+        }
+      ).save().then(
+        (result) => {
+          User.findByIdAndUpdate(
+            req.user._id,
+            {
+              $push: {
+                pets: result._id.toString()
+              }
+            }
+          ).then(
+            (_) => {
+              const currentYear = new Date().getFullYear();
+              const petsBirthYear = result.birthDay.getFullYear();
+
+              return res.status(200).json(
+                {
+                  error: false,
+                  message: "Pet created succesfully",
+                  data: {
+                    petId: result._id,
+                    petName: pet.name,
+                    petAge: `${currentYear - petsBirthYear} years old`,
+                    petKind: petKind,
+                    petSpecies: petSpecies
+                  }
+                }
+              );
             }
           );
         }
-  
-        await new Pet(
-          {
-            name: req.body.name,
-            bio: req.body.petBio,
-            sex: req.body.sex,
-            birthDay: req.body.birthDay,
-            kind: req.body.kindCode,
-            species: req.body.speciesCode,
-            primaryOwner: req.user._id,
-            allOwners: [ req.user._id ],
-          }
-        ).save().then(
-          (result) => {
-            User.findByIdAndUpdate(
-              req.user._id,
-              {
-                $push: {
-                  pets: result._id.toString()
-                }
-              }
-            ).then(
-              (_) => {
-                const currentYear = new Date().getFullYear();
-                const petsBirthYear = result.birthDay.getFullYear();
-
-                return res.status(200).json(
-                  {
-                    error: false,
-                    message: "Pet created succesfully",
-                    data: {
-                      petId: result._id,
-                      petName: pet.name,
-                      petAge: `${currentYear - petsBirthYear} years old`,
-                      petKind: petKind,
-                      petSpecies: petSpecies
-                    }
-                  }
-                );
-              }
-            );
-          }
-        );  
-      }catch(err){
-          console.log(err);
-          res.status(500).json(
-              {
-                  error: true,
-                  message: "Internal Server Error"
-              }
-          );
-      }
+      );  
+    }catch(err){
+      console.log(err);
+      res.status(500).json(
+        {
+          error: true,
+          message: "Internal Server Error"
+        }
+      );
     }
-  );
+  }
+);
 
 //Edit Profile Image and Cover Image of the Pet
 router.put(
@@ -278,20 +278,25 @@ router.put(
 router.put(
   "/petsImages/:petId", 
   auth,
+  editPetAuth,
   uploadPetImages,
   async (req, res) => {
     try{
       var urlList = [];
       for(var i = 0; i < req.files.length; i ++){
         urlList.push(req.files[i].location);
-        req.pet.images.push(req.files[i].location);
+        req.pet.images.push(
+          {
+            imgUrl: req.files[i].location
+          }
+        );
       }
       if(urlList.length !== 0){
         req.pet.markModified('images');
         req.pet.save(
           function (err) {
             if(err) {
-                console.error('ERROR: While Update!');
+                console.error(err);
             }
           }
         );
@@ -318,6 +323,7 @@ router.put(
 router.delete(
   "/petsImages/:petId", 
   auth,
+  editPetAuth,
   async (req, res) => {
     try{
       const urlList = req.body.urlList;
@@ -330,81 +336,68 @@ router.delete(
         );
       }
 
-      await Pet.findById(req.params.petId).then(
-        (pet) => {
-          if(!pet){
-            return res.status(404).json(
-              {
-                error: true,
-                message: "Pet couldn't found"
-              }
-            );
-          }
-
-          const promiseUrlDelete = urlList.map(
-            (url) => {
-              return new Promise(
-                (resolve, reject) => {
-                  const splitUrl = url.split('/');
-                  const imgName = splitUrl[splitUrl.length - 1];
+      const promiseUrlDelete = urlList.map(
+        (url) => {
+          return new Promise(
+            (resolve, reject) => {
+              const splitUrl = url.split('/');
+              const imgName = splitUrl[splitUrl.length - 1];
   
-                  const deleteImageParams = {
-                    Bucket: process.env.BUCKET_NAME,
-                    Key: `pets/${pet._id.toString()}/petsImages/${imgName}`
-                  };
-                  s3.deleteObject(
-                    deleteImageParams,
-                    (error, data) => {
-                      if(error){
-                        console.log("error", error);
-                        return res.status(500).json(
-                          {
-                            error: true,
-                            message: "An error occured while deleting images"
-                          }
-                        );
-                      }
-
-                      pet.images = pet.images.filter(
-                        imgUrl => 
-                          imgUrl !== url
-                      );
-                      return resolve(true);
-                    }
-                  );
-                }
-              );
-            }
-          );
-
-          Promise.all(promiseUrlDelete).then(
-            (_) => {
-              const petImages = pet.images;
-              pet.markModified("images");
-              pet.save(
-                (err) => {
-                  if(err){
-                    console.log("error", err);
+              const deleteImageParams = {
+                Bucket: process.env.BUCKET_NAME,
+                Key: `pets/${req.pet._id.toString()}/petsImages/${imgName}`
+              };
+              s3.deleteObject(
+                deleteImageParams,
+                (error, data) => {
+                  if(error){
+                    console.log("error", error);
                     return res.status(500).json(
                       {
                         error: true,
-                        message: "An error occured while saving to database"
+                        message: "An error occured while deleting images"
                       }
                     );
                   }
-                }
-              );
-              return res.status(200).json(
-                {
-                  error: false,
-                  message: "images deleted succesfully",
-                  remainedPetImages: petImages
+
+                  req.pet.images = req.pet.images.filter(
+                    img => 
+                      img.imgUrl !== url
+                  );
+                  return resolve(true);
                 }
               );
             }
           );
         }
-      )
+      );
+
+      Promise.all(promiseUrlDelete).then(
+        (_) => {
+          const petImages = req.pet.images;
+          req.pet.markModified("images");
+          req.pet.save(
+            (err) => {
+              if(err){
+                console.log("error", err);
+                return res.status(500).json(
+                  {
+                    error: true,
+                    message: "An error occured while saving to database"
+                  }
+                );
+              }
+            }
+          );
+          return res.status(200).json(
+            {
+              error: false,
+              message: "images deleted succesfully",
+              remainedPetImages: petImages
+            }
+          );
+        }
+      );
     }catch(err){
         console.log(err);
         res.status(500).json(
@@ -421,6 +414,7 @@ router.delete(
 router.put(
   "/petsVaccinationCertificate/:petId", 
   auth,
+  editPetAuth,
   uploadPetVaccinationCertificate,
   async (req, res) => {
     try{
@@ -463,6 +457,7 @@ router.put(
 router.put(
   "/editVaccinationCertificate/:petId",
   auth,
+  editPetAuth,
   async (req, res) => {
     try{
 
@@ -480,41 +475,28 @@ router.put(
       const certificateUrl = req.body.certificateUrl;
       const newDesc = req.body.newDesc;
 
-      await Pet.findById(req.params.petId).then(
-        (pet) => {
-          if(!pet){
-            return res.status(404).json(
-              {
-                error: true,
-                message: "Pet couldn't found"
-              }
-            );
-          }
-
-          for(var i = 0; i < pet.vaccinations.length; i ++){
-            if(pet.vaccinations[i].fileUrl === certificateUrl){
-              pet.vaccinations[i].desc = newDesc;
-            }
-          }
-
-          pet.markModified('vaccinations');
-          const petsVaccinations = pet.vaccinations;
-          pet.save(
-            function (err) {
-              if(err) {
-                  console.error('ERROR: While Update!');
-              }
-            }
-          );
-
-          return req.res.status(200).json(
-            {
-              error: false,
-              petsVaccinations: petsVaccinations
-            }
-          );
+      for(var i = 0; i < req.pet.vaccinations.length; i ++){
+        if(req.pet.vaccinations[i].fileUrl === certificateUrl){
+          req.pet.vaccinations[i].desc = newDesc;
         }
-      )
+      }
+
+      req.pet.markModified('vaccinations');
+      const petsVaccinations = req.pet.vaccinations;
+      req.pet.save(
+        function (err) {
+          if(err) {
+            console.error('ERROR: While Update!');
+          }
+        }
+      );
+
+      return req.res.status(200).json(
+        {
+          error: false,
+          petsVaccinations: petsVaccinations
+        }
+      );
     }catch(err){
         console.log(err);
         res.status(500).json(
@@ -568,7 +550,7 @@ router.delete(
                     );
                   }
 
-                  req.pet.vaccinations = pet.vaccinations.filter(
+                  req.pet.vaccinations = req.pet.vaccinations.filter(
                     vaccination => 
                       vaccination.fileUrl !== url
                   );
