@@ -5,6 +5,7 @@ import { petImageCommentValidation } from "../../utils/bodyValidation/pets/petIm
 
 const router = express.Router();
 
+//pet image leave comments and reply comment
 router.put(
     "/petImageComment",
     auth,
