@@ -1,7 +1,7 @@
 import express from "express";
 import Pet from "../../models/Pet.js";
-import { createPetReqBodyValidation } from "../../utils/bodyValidation/createPetValidationSchema.js";
-import { editVaccinationCertificateValidation } from "../../utils/bodyValidation/editVaccinationCertificateReqValidationSchema.js";
+import { createPetReqBodyValidation } from "../../utils/bodyValidation/pets/createPetValidationSchema.js";
+import { editVaccinationCertificateValidation } from "../../utils/bodyValidation/pets/editVaccinationCertificateReqValidationSchema.js";
 import auth from "../../middleware/auth.js";
 import editPetAuth from "../../middleware/editPetAuth.js";
 import { createRequire } from "module";
@@ -11,6 +11,7 @@ import { uploadPetImages } from "../../middleware/imageHandle/serverHandlePetIma
 import { uploadPetVaccinationCertificate } from "../../middleware/imageHandle/serverHandlePetVaccinationCertificates.js";
 import s3 from "../../utils/s3Service.js";
 import dotenv from "dotenv";
+import petInteractions from "./petInteractions.js"; 
 
 const require = createRequire(import.meta.url);
 const rawPetDataset = require('../../src/pet_dataset.json');
@@ -25,7 +26,7 @@ router.post(
   auth,
   async (req, res) => {
     try{
-      const { error } = createPetReqBodyValidation(req.body);
+      const { error } = createPetReqBodyValidation( req.body );
       if(error)
         return res.status(400).json(
           {
@@ -724,5 +725,7 @@ router.delete(
     }
   }
 );
+
+router.use("/interractions", petInteractions);
 
 export default router;
