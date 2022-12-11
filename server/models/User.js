@@ -144,7 +144,7 @@ const UserSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
-        savedUsersOrPets: {
+        followingUsersOrPets: {
             type: Array,
             default: []
         },

@@ -3,8 +3,169 @@ import Pet from "../../models/Pet.js";
 import auth from "../../middleware/auth.js";
 import { petImageCommentValidation, petEditImageCommentValidation, petDeleteImageCommentValidation } from "../../utils/bodyValidation/pets/petImageCommentsValidationSchemas.js";
 import { petImageLikeValidation, petImageCommentLikeValidation } from "../../utils/bodyValidation/pets/petImageLikeValidationSchemas.js";
+import User from "../../models/User.js";
 
 const router = express.Router();
+
+router.put(
+    "/followPet/:petId",
+    auth,
+    async (req, res) => {
+        try{
+            const petId = req.params.petId.toString;
+            if(!petId){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "pet id parameter is required"
+                    }
+                );
+            }
+
+            const user = await User.findById( req.user._id );
+            if(!user){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "user couldn't found"
+                    }
+                );
+            }
+
+            const pet = await Pet.findById( petId );
+            if(!pet){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "pet couldn't found"
+                    }
+                );
+            }
+
+            const isAlreadyFollowedUserSide = user.followingUsersOrPets.find(
+                followingIdObject =>
+                    followingIdObject.type === "pet"
+                    && followingIdObject.followingId.toString() === petId
+            );
+
+            const isAlreadyFollowedPetSide = pet.followers.find(
+                followerId =>
+                    followerId.toString() === req.user._id.toString()
+            );
+
+            if(
+                !isAlreadyFollowedUserSide && isAlreadyFollowedPetSide
+                || isAlreadyFollowedUserSide && !isAlreadyFollowedPetSide
+            ){
+                user.followingUsersOrPets = user.followingUsersOrPets.filter(
+                    followingIdObject =>
+                        followingIdObject.followingId.toString() !== petId
+                );
+                user.markModified("followingUsersOrPets");
+                user.save(
+                    (err) => {
+                        if(err) {
+                            console.error('ERROR: While fixing follow issue!');
+                            return res. status(500).json(
+                                {
+                                    error: true,
+                                    message: 'ERROR: While fixing follow issue - user side!'
+                                }
+                            );
+                        }
+                    }
+                );
+
+                pet.followers = pet.followers.filter(
+                    followerId =>
+                        followerId.toString() !== req.user._id.toString()
+                );
+                pet.markModified("followers");
+                pet.save(
+                    (err) => {
+                        if(err) {
+                            console.error('ERROR: While fixing follow issue!');
+                            return res. status(500).json(
+                                {
+                                    error: true,
+                                    message: 'ERROR: While fixing follow issue - pet side!'
+                                }
+                            );
+                        }
+                    }
+                );
+
+                return res.status(500).json(
+                    {
+                        error: true,
+                        message: "pet unfollowed becasu there was an issue with records. Please re try to follow"
+                    }
+                );
+            }
+
+            const isAlreadyFollowed = isAlreadyFollowedUserSide && isAlreadyFollowedPetSide;
+
+            if(isAlreadyFollowed){
+                user.followingUsersOrPets.push( 
+                    {
+                        type: "pet",
+                        followingId: petId
+                    }
+                );
+                
+                pet.followers.push( req.user._id.toString() );
+            }else{
+                user.followingUsersOrPets = user.followingUsersOrPets.filter(
+                    followingIdObject =>
+                    followingIdObject.followingId.toString() !== petId
+                );
+
+                pet.followers = pet.followers.filter(
+                    followerId =>
+                        followerId.toString() !== req.user._id.toString()
+                );
+            }
+
+            user.markModified("followingUsersOrPets");
+            user.save(
+                (err) => {
+                    if(err){
+                        console.error('ERROR: While following pet - user side!');
+                        return res.status(500).json(
+                            {
+                                error: true,
+                                message: 'ERROR: While following pet - user side!'
+                            }
+                        );
+                    }
+                }
+            );
+
+            pet.markModified("followers");
+            pet.save(
+                (err) => {
+                    if(err){
+                        console.error('ERROR: While following pet - pet side!');
+                        return res.status(500).json(
+                            {
+                                error: true,
+                                message: 'ERROR: While following pet - pet side!'
+                            }
+                        );
+                    }
+                }
+            );
+        }catch(err){
+            console.log("error - follow pet", err);
+            return res.status(500).json(
+                {
+                    error: true,
+                    message: "Internal server error"
+                }
+            );
+        }
+    }
+)
 
 //like image or remove like
 router.put(

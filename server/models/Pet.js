@@ -129,7 +129,7 @@ const PetSchema = new mongoose.Schema(
             }
         }
       ],
-      savers: {
+      followers: {
           type: Array,
           default: []
       },
