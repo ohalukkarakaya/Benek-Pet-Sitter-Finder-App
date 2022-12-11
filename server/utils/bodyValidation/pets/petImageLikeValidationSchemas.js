@@ -16,6 +16,7 @@ const petImageCommentLikeValidation = (body) => {
         petId: Joi.string().required().label("petId"),
         imgId: Joi.string().required().label("imgId"),
         commentId: Joi.string().required().label("commentId"),
+        replyId: Joi.string().label("replyId"),
       }
   );
   return bodySchema.validate(body);

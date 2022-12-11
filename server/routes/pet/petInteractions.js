@@ -6,7 +6,7 @@ import { petImageLikeValidation, petImageCommentLikeValidation } from "../../uti
 
 const router = express.Router();
 
-//like image
+//like image or remove like
 router.put(
     "/likeImage",
     auth,
