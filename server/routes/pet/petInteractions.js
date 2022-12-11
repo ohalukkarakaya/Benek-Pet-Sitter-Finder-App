@@ -21,18 +21,7 @@ router.put(
         
         const isReply = req.body.commentId !== undefined && req.body.commentId !== null;
 
-        await Pet.findById(
-            req.body.petId,
-            (err, pet) => {
-                if(err){
-                    console.log("error", err);
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: "An error occured while searching pet"
-                        }
-                    );
-                }
+        const pet = await Pet.findById( req.body.petId );
 
                 if(!pet){
                     console.log("pet couldn't found");
@@ -44,50 +33,60 @@ router.put(
                     );
                 }
                 
-                const image = pet.images.filter(
+                const image = pet.images.find(
                     image =>
                         image.imgUrl === req.body.imgUrl
-                )[0];
-
-                if(isReply){
-                    image.comment.replies.push(
+                );
+                
+                if(image){
+                    if(isReply){
+                        image.comments.find(
+                            comment =>
+                                comment._id.toString() === req.body.commentId.toString()
+                        ).replies.push(
+                            {
+                                userId: req.user._id,
+                                reply: req.body.comment
+                            }
+                        );
+                    }else{
+                        image.comments.push(
+                            {
+                                userId: req.user._id,
+                                comment: req.body.comment
+                            }
+                        );
+                    }
+    
+                    pet.markModified("images");
+                    pet.save(
+                        (err) => {
+                            if(err) {
+                                console.error('ERROR: While Inserting Comment!');
+                                return res. status(500).json(
+                                    {
+                                        error: true,
+                                        message: "ERROR: While Inserting Comment!"
+                                    }
+                                );
+                            }
+                        }
+                    );
+    
+                    return res.status(200).json(
                         {
-                            userId: req.user._id,
-                            reply: req.body.comment
+                            error: false,
+                            message: "Comment saved succesfully"
                         }
                     );
                 }else{
-                    image.comment.push(
+                    return res.status(404).json(
                         {
-                            userId: req.user._id,
-                            comment: req.body.comment
+                            error: true,
+                            message: "image couldn't found"
                         }
                     );
                 }
-
-                pet.markDown("images");
-                pet.save(
-                    (err) => {
-                        if(err) {
-                            console.error('ERROR: While Inserting Comment!');
-                            return res. status(500).json(
-                                {
-                                    error: true,
-                                    message: "ERROR: While Inserting Comment!"
-                                }
-                            );
-                        }
-                    }
-                );
-
-                return res.status(200).json(
-                    {
-                        error: false,
-                        message: "Comment saved succesfully"
-                    }
-                );
-            }
-        );
     }
 );
 

@@ -6,6 +6,7 @@ const petImageCommentValidation = (params) => {
           petId: Joi.string().required().label("petId"),
           imgUrl: Joi.string().required().label("imgUrl"),
           comment: Joi.string().required().label("comment"),
+          commentId: Joi.string().label("commentId"),
         }
     );
     return paramsSchema.validate(params);
