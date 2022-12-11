@@ -93,7 +93,7 @@ router.put(
 
 //edit comment and reply
 router.put(
-    "/petImageComment",
+    "/petEditImageComment",
     auth,
     async (req, res) => {
         const { error } = petEditImageCommentValidation( req.body );
