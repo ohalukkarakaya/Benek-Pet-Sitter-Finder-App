@@ -612,6 +612,30 @@ router.delete(
       const primaryOwner = await User.findById(req.pet.primaryOwner.toString());
       const allOwners = req.pet.allOwners.filter(owner => owner.toString() !== req.pet.primaryOwner.toString());
       const petId = req.pet._id.toString();
+      const petFollowers = req.pet.followers;
+
+      //clean followers follow event
+      for(var i = 0; i < petFollowers.length; i ++){
+        follower = await User.findById(petFollowers[i]);
+        follower.followingUsersOrPets = follower.followingUsersOrPets.filter(
+          followingObject =>
+            followingObject.followingId.toString() !== petId
+        );
+        follower.markModified("followingUsersOrPets");
+        follower.save(
+          (err) => {
+            if(err){
+                console.error('ERROR: While deleting follow event of follower');
+                return res.status(500).json(
+                    {
+                        error: true,
+                        message: 'ERROR: While deleting follow event of follower'
+                    }
+                );
+            }
+          }
+        );
+      }
 
       //clean dependecy of primary owner
       primaryOwner.pets = primaryOwner.pets.filter(pet => pet.toString() !== req.pet._id.toString());
