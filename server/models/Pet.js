@@ -51,6 +51,7 @@ const PetSchema = new mongoose.Schema(
                 type: String,
                 required: true,
             },
+            likes: [ String ],
             comments: [
                 {
                     userId: {
@@ -64,6 +65,7 @@ const PetSchema = new mongoose.Schema(
                             '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                         ],
                     },
+                    likes: [ String ],
                     replies: [
                         {
                             userId: {
@@ -76,7 +78,8 @@ const PetSchema = new mongoose.Schema(
                                     150,
                                     '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                                 ],
-                            }
+                            },
+                            likes: [ String ],
                         }
                     ]
                 }
