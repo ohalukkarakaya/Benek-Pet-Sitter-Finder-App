@@ -2,6 +2,7 @@ import express from "express";
 import Pet from "../../models/Pet.js";
 import auth from "../../middleware/auth.js";
 import { petImageCommentValidation, petEditImageCommentValidation, petDeleteImageCommentValidation } from "../../utils/bodyValidation/pets/petImageCommentsValidationSchemas.js";
+import { petImageLikeValidation, petImageCommentLikeValidation } from "../../utils/bodyValidation/pets/petImageLikeValidationSchemas.js";
 
 const router = express.Router();
 
@@ -33,7 +34,7 @@ router.put(
 
             const image = pet.images.find(
                 imageObject => 
-                    imageObject._id.toString === req.body.imgId.toString()
+                    imageObject._id.toString() === req.body.imgId.toString()
             );
             if(!image){
                 return res.status(404).json(
@@ -76,12 +77,129 @@ router.put(
             return res.status(200).json(
                 {
                     error: false,
-                    message: "image has been liked"
+                    message: "image has been liked or like has been removed"
                 }
             );
-            
+
         }catch(err){
             console.log("error - like image", err);
+            return res.status(500).json(
+                {
+                    error: true,
+                    message: "Internal server error"
+                }
+            );
+        }
+    }
+);
+
+//like comment or reply
+router.put(
+    "/likeComment",
+    auth,
+    async (req, res) => {
+        try{
+            const { error } = petImageCommentLikeValidation( req.body );
+            if(error){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: error.details[0].message
+                    }
+                );
+            }
+
+            const pet = await Pet.findById( req.body.petId );
+            if(!pet){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "Pet couldn't found"
+                    }
+                );
+            }
+
+            const image = pet.images.find(
+                imageObject => 
+                    imageObject._id.toString() === req.body.imgId.toString()
+            );
+            if(!image){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "image couldn't found"
+                    }
+                );
+            }
+
+            const comment = image.comments.find(
+                commentObject =>
+                    commentObject._id.toString() === req.body.commentId.toString()
+            );
+
+            const isReply = req.body.replyId !== undefined && req.body.replyId !== null;
+
+            if(isReply){
+                const reply = comment.replies.find(
+                    replyObject =>
+                        replyObject._id.toString() === req.body.replyId.toString()
+                );
+                
+                const isAlreadyLiked = reply.likes.find(
+                    likedUserId =>
+                        likedUserId.toString() === req.user._id.toString()
+                );
+
+                if(isAlreadyLiked){
+                    reply.likes = reply.likes.filter(
+                        likedUserId =>
+                            likedUserId.toString() !== req.user._id.toString()
+                    );
+                }else{
+                    reply.likes.push(
+                        req.user._id.toString()
+                    );
+                }
+            }else{
+                const isAlreadyLiked = comment.likes.find(
+                    likedUserId =>
+                        likedUserId.toString() === req.user._id.toString()
+                );
+    
+                if(isAlreadyLiked){
+                    comment.likes = image.likes.filter(
+                        likedUserId =>
+                            likedUserId.toString() !== req.user._id.toString()
+                    );
+                }else{
+                    comment.likes.push( req.user._id.toString() );
+                }
+            }
+
+            pet.markModified("images");
+            pet.save(
+                (err) => {
+                    if(err) {
+                        console.error('ERROR: While Inserting Comment!');
+                        return res. status(500).json(
+                            {
+                                error: true,
+                                message: "ERROR: While Inserting Comment!"
+                            }
+                        );
+                    }
+                }
+            );
+
+            return res.status(200).json(
+                {
+                    error: false,
+                    message: "comment or reply has been liked or like has been removed"
+                }
+            );
+
+        }catch(err){
+            console.log("error - like comment", err);
             return res.status(500).json(
                 {
                     error: true,
@@ -176,7 +294,7 @@ router.put(
                 );
             }
         }catch(err){
-            console.log("error", err);
+            console.log("error - leave comment", err);
             return res.status(500).json(
                 {
                     error: true,
