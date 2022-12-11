@@ -7,6 +7,7 @@ import User from "../../models/User.js";
 
 const router = express.Router();
 
+//follow pet
 router.put(
     "/followPet/:petId",
     auth,
