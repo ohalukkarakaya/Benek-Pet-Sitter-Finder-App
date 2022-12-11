@@ -1,15 +1,15 @@
 import Joi from "joi";
 
-const petImageCommentValidation = (params) => {
+const petEditImageCommentValidation = (params) => {
     const paramsSchema = Joi.object(
         {
           petId: Joi.string().required().label("petId"),
           imgId: Joi.string().required().label("imgId"),
-          comment: Joi.string().required().label("comment"),
+          newComment: Joi.string().required().label("newComment"),
           commentId: Joi.string().label("commentId"),
         }
     );
     return paramsSchema.validate(params);
 };
 
-export { petImageCommentValidation };
+export { petEditImageCommentValidation };
