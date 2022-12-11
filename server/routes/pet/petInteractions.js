@@ -3,6 +3,7 @@ import Pet from "../../models/Pet.js";
 import auth from "../../middleware/auth.js";
 import { petImageCommentValidation } from "../../utils/bodyValidation/pets/petImageCommentValidationSchema.js";
 import { petEditImageCommentValidation } from "../../utils/bodyValidation/pets/petEditImageCommentValidationSchema.js";
+import { petDeleteImageCommentValidation } from "../../utils/bodyValidation/pets/petDeleteImageCommentValidationSchema.js";
 
 const router = express.Router();
 
@@ -114,7 +115,7 @@ router.put(
                     return res.status(404).json(
                         {
                             error: true,
-                            message: "Pet couldn't founs"
+                            message: "Pet couldn't found"
                         }
                     );
                 }
@@ -148,11 +149,11 @@ router.put(
                     pet.save(
                         (err) => {
                             if(err) {
-                                console.error('ERROR: While Inserting Comment!');
+                                console.error('ERROR: While Editing Comment!');
                                 return res. status(500).json(
                                     {
                                         error: true,
-                                        message: "ERROR: While Inserting Comment!"
+                                        message: "ERROR: While Editing Comment!"
                                     }
                                 );
                             }
@@ -162,7 +163,89 @@ router.put(
                     return res.status(200).json(
                         {
                             error: false,
-                            message: "Comment saved succesfully"
+                            message: "Comment edited succesfully"
+                        }
+                    );
+                }else{
+                    return res.status(404).json(
+                        {
+                            error: true,
+                            message: "image couldn't found"
+                        }
+                    );
+                }
+    }
+);
+
+//delete pet image comment and replies
+router.delete(
+    "/petImageComment",
+    auth,
+    async (req, res) => {
+        const { error } = petDeleteImageCommentValidation( req.body );
+        if(error)
+            return res.status(400).json(
+                {
+                    error: true,
+                    message: error.details[0].message
+                }
+            );
+        
+        const isReply = req.body.replyId !== undefined && req.body.replyId !== null;
+
+        const pet = await Pet.findById( req.body.petId );
+
+                if(!pet){
+                    console.log("pet couldn't found");
+                    return res.status(404).json(
+                        {
+                            error: true,
+                            message: "Pet couldn't founs"
+                        }
+                    );
+                }
+                
+                const image = pet.images.find(
+                    image =>
+                        image._id.toString() === req.body.imgId.toString()
+                );
+                
+                if(image){
+                    if(isReply){
+                        const comments = image.comments.find(
+                            comment =>
+                                comment._id.toString() === req.body.commentId.toString()
+                        );
+                        comments.replies = comments.replies.filter(
+                            replyObject => 
+                                replyObject._id.toString() !== req.body.replyId.toString()
+                        );
+                    }else{
+                        image.comments = image.comments.filter(
+                            commentObject =>
+                                commentObject._id.toString() !== req.body.commentId.toString()
+                        );
+                    }
+    
+                    pet.markModified("images");
+                    pet.save(
+                        (err) => {
+                            if(err) {
+                                console.error('ERROR: While Deleting Comment!');
+                                return res. status(500).json(
+                                    {
+                                        error: true,
+                                        message: "ERROR: While Deleting Comment!"
+                                    }
+                                );
+                            }
+                        }
+                    );
+    
+                    return res.status(200).json(
+                        {
+                            error: false,
+                            message: "Comment deleted succesfully"
                         }
                     );
                 }else{
