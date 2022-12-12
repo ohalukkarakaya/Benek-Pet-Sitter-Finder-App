@@ -13,7 +13,7 @@ router.put(
     auth,
     async (req, res) => {
         try{
-            const petId = req.params.petId.toString;
+            const petId = req.params.petId.toString();
             if(!petId){
                 return res.status(400).json(
                     {
@@ -42,7 +42,7 @@ router.put(
                     }
                 );
             }
-
+            
             const isAlreadyFollowedUserSide = user.followingUsersOrPets.find(
                 followingIdObject =>
                     followingIdObject.type === "pet"
@@ -99,7 +99,7 @@ router.put(
                 return res.status(500).json(
                     {
                         error: true,
-                        message: "pet unfollowed becasu there was an issue with records. Please re try to follow"
+                        message: "pet unfollowed because there was an issue with records. Please re try to follow"
                     }
                 );
             }
@@ -107,15 +107,6 @@ router.put(
             const isAlreadyFollowed = isAlreadyFollowedUserSide && isAlreadyFollowedPetSide;
 
             if(isAlreadyFollowed){
-                user.followingUsersOrPets.push( 
-                    {
-                        type: "pet",
-                        followingId: petId
-                    }
-                );
-                
-                pet.followers.push( req.user._id.toString() );
-            }else{
                 user.followingUsersOrPets = user.followingUsersOrPets.filter(
                     followingIdObject =>
                     followingIdObject.followingId.toString() !== petId
@@ -125,6 +116,15 @@ router.put(
                     followerId =>
                         followerId.toString() !== req.user._id.toString()
                 );
+            }else{
+                user.followingUsersOrPets.push( 
+                    {
+                        type: "pet",
+                        followingId: petId
+                    }
+                );
+                
+                pet.followers.push( req.user._id.toString() );
             }
 
             user.markModified("followingUsersOrPets");
@@ -154,6 +154,13 @@ router.put(
                             }
                         );
                     }
+                }
+            );
+
+            return res.status(200).json(
+                {
+                    error: false,
+                    message: "pet followed or follow event removed succesfully"
                 }
             );
         }catch(err){
@@ -517,7 +524,7 @@ router.put(
                     if(
                         replyObject.userId.toString() !== req.user._id.toString()
                         && commentObject.userId.toString() !== req.user._id.toString()
-                        && pet.primaryOwner.toString !== req.ıser._id.toString()
+                        && pet.primaryOwner.toString() !== req.ıser._id.toString()
                     ){
                         return res.status(401).json(
                             {
@@ -532,7 +539,7 @@ router.put(
 
                     if(
                         commentObject.userId.toString() !== req.user._id.toString()
-                        && pet.primaryOwner.toString !== req.ıser._id.toString()
+                        && pet.primaryOwner.toString() !== req.ıser._id.toString()
                     ){
                         return res.status(401).json(
                             {
@@ -635,7 +642,7 @@ router.delete(
                     if(
                         replyObject.userId.toString() !== req.user._id.toString()
                         && comments.userId.toString() !== req.user._id.toString()
-                        && pet.primaryOwner.toString !== req.ıser._id.toString()
+                        && pet.primaryOwner.toString() !== req.ıser._id.toString()
                     ){
                         return res.status(401).json(
                             {
@@ -657,7 +664,7 @@ router.delete(
 
                     if(
                         commentObject.userId.toString() !== req.user._id.toString()
-                        && pet.primaryOwner.toString !== req.ıser._id.toString()
+                        && pet.primaryOwner.toString() !== req.ıser._id.toString()
                     ){
                         return res.status(401).json(
                             {
