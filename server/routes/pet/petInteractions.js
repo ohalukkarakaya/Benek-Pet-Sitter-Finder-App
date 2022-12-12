@@ -502,21 +502,45 @@ router.put(
             );
                 
             if(image){
+
+                const commentObject = image.comments.find(
+                    comment =>
+                        comment._id.toString() === req.body.commentId.toString()
+                );
+                
                 if(isReply){
-                    const replyObject = image.comments.find(
-                        comment =>
-                            comment._id.toString() === req.body.commentId.toString()
-                    ).replies.find(
+                    const replyObject = commentObject.replies.find(
                         reply =>
                             reply._id.toString() === req.body.replyId.toString()
                     );
 
+                    if(
+                        replyObject.userId.toString() !== req.user._id.toString()
+                        && commentObject.userId.toString() !== req.user._id.toString()
+                        && pet.primaryOwner.toString !== req.ıser._id.toString()
+                    ){
+                        return res.status(401).json(
+                            {
+                                error: true,
+                                message: "You can't edit this comment"
+                            }
+                        );
+                    }
+
                     replyObject.reply = req.body.newComment;
                 }else{
-                    const commentObject = image.comments.find(
-                        comment =>
-                            comment._id.toString() === req.body.commentId.toString()
-                    );
+
+                    if(
+                        commentObject.userId.toString() !== req.user._id.toString()
+                        && pet.primaryOwner.toString !== req.ıser._id.toString()
+                    ){
+                        return res.status(401).json(
+                            {
+                                error: true,
+                                message: "You can't edit this comment"
+                            }
+                        );
+                    }
 
                     commentObject.comment = req.body.newComment;
                 }
@@ -602,11 +626,47 @@ router.delete(
                         comment =>
                             comment._id.toString() === req.body.commentId.toString()
                     );
+
+                    const replyObject = comments.replies.find(
+                        replyObject =>
+                            replyObject._id.toString() === req.body.replyId.toString()
+                    );
+
+                    if(
+                        replyObject.userId.toString() !== req.user._id.toString()
+                        && comments.userId.toString() !== req.user._id.toString()
+                        && pet.primaryOwner.toString !== req.ıser._id.toString()
+                    ){
+                        return res.status(401).json(
+                            {
+                                error: true,
+                                message: "You can't edit this comment"
+                            }
+                        );
+                    }
+
                     comments.replies = comments.replies.filter(
                         replyObject => 
                             replyObject._id.toString() !== req.body.replyId.toString()
                     );
                 }else{
+                    const commentObject = image.comments.find(
+                        comment =>
+                            comment._id.toString() === req.body.commentId.toString()
+                    );
+
+                    if(
+                        commentObject.userId.toString() !== req.user._id.toString()
+                        && pet.primaryOwner.toString !== req.ıser._id.toString()
+                    ){
+                        return res.status(401).json(
+                            {
+                                error: true,
+                                message: "You can't edit this comment"
+                            }
+                        );
+                    }
+
                     image.comments = image.comments.filter(
                         commentObject =>
                             commentObject._id.toString() !== req.body.commentId.toString()
