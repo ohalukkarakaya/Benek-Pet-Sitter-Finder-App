@@ -420,4 +420,8 @@ router.put(
     }
 );
 
+//TO DO: became care giver
+//TO DO: cancel care giver subscription
+//TO DO: delete user
+
 export default router;
