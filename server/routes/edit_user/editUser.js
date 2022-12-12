@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import auth from "../../middleware/auth.js";
 import { updateProfileImg } from "../../middleware/imageHandle/serverHandleProfileImage.js";
+import userRoutes from './routes/edit_user/user.js';
 
 
 dotenv.config();
@@ -114,5 +115,7 @@ router.post(
     }
   }
 );
+
+router.use( "/userOperations", userRoutes );
 
 export default router;

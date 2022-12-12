@@ -2,7 +2,7 @@ import { Router } from "express";
 import UserToken from "../../models/UserToken.js";
 import jwt from "jsonwebtoken";
 import verifyRefreshToken from "../../utils/verifyRefreshToken.js";
-import { refreshTokenBodyValidation } from "../../utils/bodyValidation/signUpValidationSchema.js";
+import { refreshTokenBodyValidation } from "../../utils/bodyValidation/user/signUpValidationSchema.js";
 
 const router = Router();
 
