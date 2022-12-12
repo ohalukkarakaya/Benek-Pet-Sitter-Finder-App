@@ -116,6 +116,6 @@ router.post(
   }
 );
 
-router.use( "/userOperations", userRoutes );
+router.use( "/profileSettings", userRoutes );
 
 export default router;
