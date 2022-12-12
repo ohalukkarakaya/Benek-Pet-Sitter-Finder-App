@@ -109,7 +109,7 @@ router.put(
             if(isAlreadyFollowed){
                 user.followingUsersOrPets = user.followingUsersOrPets.filter(
                     followingIdObject =>
-                    followingIdObject.followingId.toString() !== petId
+                        followingIdObject.followingId.toString() !== petId
                 );
 
                 pet.followers = pet.followers.filter(

@@ -12,9 +12,6 @@ dotenv.config();
 
 const router = express.Router();
 
-//follow-unfollow user
-//TO DO
-
 //reset user name
 router.put(
     "/resetUsername",

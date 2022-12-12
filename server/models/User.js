@@ -148,6 +148,10 @@ const UserSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
+        followers: {
+            type: Array,
+            default: []
+        },
         saved: {
             type: Array,
             default: []

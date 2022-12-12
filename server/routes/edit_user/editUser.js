@@ -2,7 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import auth from "../../middleware/auth.js";
 import { updateProfileImg } from "../../middleware/imageHandle/serverHandleProfileImage.js";
-import userRoutes from './routes/edit_user/user.js';
+import userSetingsRoutes from './user.js';
+import userInterractionsRoutes from "./userInterractions.js"
 
 
 dotenv.config();
@@ -116,6 +117,7 @@ router.post(
   }
 );
 
-router.use( "/profileSettings", userRoutes );
+router.use( "/profileSettings", userSetingsRoutes );
+router.use( "/interractions", userInterractionsRoutes );
 
 export default router;
