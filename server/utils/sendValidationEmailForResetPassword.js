@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import fs from "fs";
-import ChangeEmailOTP from "../../models/UserSettings/ChangeEmail.js";
+import ChangeEmailOTP from "../models/UserSettings/ChangeEmail.js";
 
 dotenv.config();
 
