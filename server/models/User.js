@@ -61,6 +61,7 @@ const UserSchema = new mongoose.Schema(
         },
         phone: {
             type: String,
+            default: null
         },
         iban: {
             type: String,

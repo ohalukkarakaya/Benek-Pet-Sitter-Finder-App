@@ -4,9 +4,12 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import auth from "../../middleware/auth.js";
 import ChangeEmailOTP from "../../models/UserSettings/ChangeEmail.js";
+import PhoneOtpVerification from "../../models/UserSettings/PhoneOTPVerification.js";
 import sendOTPVerificationEmailForResetPassword from "../../utils/sendValidationEmailForResetPassword.js";
 import sendOneTimePassword from "../../utils/sendOneTimePasswordEmail.js";
+import { sendOTPVerificationSMS, verifyOTPVerificationSMS } from "../../utils/sendValidationSMS.js";
 import { resetPasswordBodyValidation, resetEmailBodyValidation } from "../../utils/bodyValidation/user/userSettingsRequestsValidationSchema.js";
+import { addPhoneBodyValidation, verifyPhoneBodyValidation } from "../../utils/bodyValidation/user/addPhoneNumberValidationSchema.js";
 
 dotenv.config();
 
@@ -420,8 +423,137 @@ router.put(
     }
 );
 
+//insert phone number
+router.post(
+  "/addPhoneNumber",
+  auth,
+  async (req, res) => {
+    try{
+      const { error } = addPhoneBodyValidation( req.body );
+      if(error){
+        console.log("validation error - ", error);
+        return res.status(400).json(
+          {
+            error: true,
+            messaage: error
+          }
+        );
+      }
+
+      const phoneNumber = req.body.phoneNumber;
+      const isPhoneAlreadyUsed = await User.findOne(
+        {
+          phone: phoneNumber
+        }
+      );
+      if(isPhoneAlreadyUsed){
+        return res.status(400).json(
+          {
+            error: true,
+            message: "This number already used"
+          }
+        );
+      }
+
+      const user = await User.findById( req.user._id );
+      if(!user){
+        return res.status(404).json(
+          {
+            error: true,
+            message: "User couldn't found"
+          }
+        );
+      }
+
+      await PhoneOtpVerification.deleteMany({ userId: req.user._id.toString() });
+      await PhoneOtpVerification.deleteMany({ phoneNumber: phoneNumber });
+
+      sendOTPVerificationSMS(
+        {
+          _id: req.user._id.toString(),
+          phone: phoneNumber
+        },
+        res
+      );
+      
+    }catch(err){
+      console.log("Error: add phone number", err);
+      return res.status(500).json(
+        {
+          error: true,
+          message: "Internal server error"
+        }
+      );
+    }
+  }
+);
+
+//verify phone number
+router.post(
+  "/verifyPhoneNumber",
+  auth,
+  async (req, res) => {
+    try{
+      const { error } = verifyPhoneBodyValidation( req.body );
+      if(error){
+        console.log("validation error - ", error);
+        return res.status(400).json(
+          {
+            error: true,
+            messaage: error
+          }
+        );
+      }
+
+      let { phoneNumber, otp } = req.body;
+
+      const user = await User.findById( req.user._id );
+      if(!user){
+        return res.status(404).json(
+          {
+            error: true,
+            message: "User couldn't found"
+          }
+        );
+      }
+
+      const verificationObject = await PhoneOtpVerification.findOne(
+        {
+          userId: req.user._id.toString(),
+          phoneNumber: `+${phoneNumber}`
+        }
+      );
+      if(!verificationObject){
+        return res.status(404).json(
+          {
+            error: true,
+            message: "Verification didn't request for this phone number"
+          }
+        );
+      }
+
+      verifyOTPVerificationSMS(
+        {
+          _id: req.user._id.toString(),
+          phone: phoneNumber,
+          otp: otp
+        },
+        res
+      );
+      
+    }catch(err){
+      console.log("Error: add phone number", err);
+      return res.status(500).json(
+        {
+          error: true,
+          message: "Internal server error"
+        }
+      );
+    }
+  }
+);
 //TO DO: became care giver
-//TO DO: cancel care giver subscription
+
 //TO DO: delete user
 
 export default router;
