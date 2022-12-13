@@ -552,7 +552,121 @@ router.post(
     }
   }
 );
-//TO DO: became care giver
+
+//add Iban
+router.put(
+  "/iban",
+  auth,
+  async (req, res) => {
+    try{
+      const iban = req.body.iban;
+      if( !iban ){
+        return res.status(400).json(
+          {
+            error: true,
+            message: "Iban is required"
+          }
+        );
+      }
+
+      await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          iban: iban
+        }
+      ).then(
+        (user) => {
+          if(!user){
+            return res.status(404).json(
+              {
+                error: true,
+                message: "User couldn't find"
+              }
+            );
+          }
+
+          return res.status(200).json(
+            {
+              error: false,
+              message: "iban inserted succesfully"
+            }
+          );
+        }
+      ).catch(
+        (error) => {
+          console.log(error);
+          return res.status(500).json(
+              {
+                error: true,
+                message: "An error occured while saving",
+                errorData: error
+              }
+            );
+        }
+      );
+    }catch(err){
+      console.log("Error: add phone number", err);
+      return res.status(500).json(
+        {
+          error: true,
+          message: "Internal server error"
+        }
+      );
+    }
+  }
+);
+
+//become care giver
+router.put(
+  "/becomeCareGiver",
+  auth,
+  async (req, res) => {
+    try{
+
+      const user = await User.findById( req.user._id );
+      if(!user){
+        return res.status(404).json(
+          {
+            error: true,
+            message: "User couldn't found"
+          }
+        );
+      }
+
+      const isCareGiver = user.isCareGiver;
+
+      user.isCareGiver = !isCareGiver;
+      user.markModified("isCareGiver");
+      user.save(
+        (err) => {
+          if(err){
+              return res.status(500).json(
+                  {
+                      error: true,
+                      message: "ERROR: while saving user"
+                  }
+              );
+          }
+        }
+      );
+
+      return res.status(200).json(
+        {
+          error: false,
+          message: "became caregiver succesfully"
+        }
+      );
+    }catch(err){
+      console.log("Error: add phone number", err);
+      return res.status(500).json(
+        {
+          error: true,
+          message: "Internal server error"
+        }
+      );
+    }
+  }
+);
 
 //TO DO: delete user
 

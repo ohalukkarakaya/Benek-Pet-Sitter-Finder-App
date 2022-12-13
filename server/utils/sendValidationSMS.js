@@ -98,7 +98,7 @@ const twilioClient = twilio(
                                             {
                                               error: true,
                                               message: "An error occured while saving",
-                                              error: error
+                                              error: e
                                             }
                                           );
                                     }
