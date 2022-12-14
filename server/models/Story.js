@@ -19,6 +19,13 @@ const StorySchema = new schema(
                 required: true
             }
         },
+        desc: {
+            type: String,
+            maxLength: [
+                50,
+                '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
+            ],
+        },
         contentUrl: {
             type: String,
             required: true
@@ -31,6 +38,39 @@ const StorySchema = new schema(
             type: Date,
             default: Date.now() + 86400000
         },
+        likes: [ String ],
+        comments: [
+            {
+                userId: {
+                    type: String,
+                    required: true,
+                },
+                comment: {
+                    type: String,
+                    maxLength: [
+                        50,
+                        '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
+                    ],
+                },
+                likes: [ String ],
+                replies: [
+                    {
+                        userId: {
+                            type: String,
+                            required: true
+                        },
+                        reply: {
+                            type: String,
+                            maxLength: [
+                                50,
+                                '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
+                            ],
+                        },
+                        likes: [ String ],
+                    }
+                ]
+            }
+        ],
     }
 );
 

@@ -221,6 +221,7 @@ router.post(
                         id: req.body.aboutId,
                         aboutType: req.body.aboutType
                     },
+                    desc: req.body.desc,
                     contentUrl: contentUrl
                 }
             ).save().then(
@@ -339,6 +340,10 @@ router.delete(
         }
     }
 );
+
+//like story
+
+//leave comment to the story or reply comment
 
 //TO DO: plan meeting event
 //TO DO: plan joining to meeting event

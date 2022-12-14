@@ -32,9 +32,12 @@ import petRoutes from './routes/pet/pet.js';
 import petOwnerOperationsRoutes from './routes/pet/petOwnerOperations.js';
 import animalKeywordRoutes from './routes/key_words/animalCategory.js';
 import bodyParser from 'body-parser';
+import expireStories from './cron_jobs/deleteExpiredStories.js';
 
 const app = express();
 dotenv.config();
+
+expireStories;
 
 const connect = () => {
     mongoose.connect(process.env.DB).then(

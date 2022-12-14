@@ -61,7 +61,7 @@ const PetSchema = new mongoose.Schema(
                     comment: {
                         type: String,
                         maxLength: [
-                            150,
+                            50,
                             '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                         ],
                     },
@@ -75,7 +75,7 @@ const PetSchema = new mongoose.Schema(
                             reply: {
                                 type: String,
                                 maxLength: [
-                                    150,
+                                    50,
                                     '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                                 ],
                             },
