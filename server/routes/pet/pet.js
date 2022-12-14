@@ -417,11 +417,11 @@ router.put(
   uploadPetVaccinationCertificate,
   async (req, res) => {
     try{
-      if(req.file.location){
+      if(req.cdnUrl){
         req.pet.vaccinations.push(
           {
             desc: req.body.desc,
-            fileUrl: req.file.location
+            fileUrl: req.cdnUrl
           }
         );
         req.pet.markModified('vaccinations');
@@ -435,7 +435,7 @@ router.put(
         return req.res.status(200).json(
           {
             error: false,
-            url: req.file.location,
+            url: req.cdnUrl,
             desc: req.body.desc
           }
         );

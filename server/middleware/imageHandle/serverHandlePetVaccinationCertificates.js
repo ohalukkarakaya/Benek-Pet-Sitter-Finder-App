@@ -28,6 +28,7 @@ const storage = multerS3(
                 const splitedOriginalName = originalname.split(".");
                 const newFileName = `${petId}_vaccinationCertificate${imageId}.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.petProfileImgNewFileName = newFileName;
+                req.cdnUrl = `${process.env.CDN_SUBDOMAIN}pets/${petId.toString()}/petsVaccinationCertificates/${newFileName}`;
                 
                 cb(null, "pets/"+petId.toString()+"/petsVaccinationCertificates/"+newFileName);
 
