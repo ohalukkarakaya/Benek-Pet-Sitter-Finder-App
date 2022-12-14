@@ -11,6 +11,14 @@ const storage = multerS3(
         s3,
         bucket: process.env.BUCKET_NAME,
         acl: 'public-read',
+        contentType: ( req, file, cb ) => {
+            try{
+                const fileType = file.mimetype;
+                cb(null, fileType);
+            }catch(err){
+                console.log(err);
+            }
+        },
         key: (req, file, cb) => {
             try{
 
