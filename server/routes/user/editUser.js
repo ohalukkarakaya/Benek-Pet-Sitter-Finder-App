@@ -24,12 +24,10 @@ router.post(
     //if there is existing images and they uploaded to media server
     if (req.files) {
       if(req.files.profileImg){
-        var uploadedProfileImgImage = req.files.profileImg[0].location;
-        console.log(`Profile Image: ${uploadedProfileImgImage}`);
+        var uploadedProfileImgImage = req.profileCdnPath;
       }
       if(req.files.coverImg){
-        var uploadedCoverImgImage = req.files.coverImg[0].location;
-        console.log(`Cover Image: ${uploadedCoverImgImage}`);
+        var uploadedCoverImgImage = req.coverCdnPath;
       }
 
       if(

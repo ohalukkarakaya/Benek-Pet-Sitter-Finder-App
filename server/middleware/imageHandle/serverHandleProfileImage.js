@@ -30,12 +30,14 @@ const storage = multerS3(
             if(file.fieldname == "profileImg"){
                 const newFileName = `${userId}_profileImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.profileImgNewFileName = newFileName;
+                req.profileCdnPath = `${process.env.CDN_SUBDOMAIN}profileAssets/${userId}/${newFileName}`;
                 
                 cb(null, "profileAssets/"+userId+"/"+newFileName);
 
             }else if(file.fieldname == "coverImg"){
                 const newFileName = `${userId}_coverImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.coverImgNewFileName = newFileName;
+                req.coverCdnPath = `${process.env.CDN_SUBDOMAIN}profileAssets/${userId}/${newFileName}`;
                 
                 cb(null, "profileAssets/"+userId+"/"+newFileName);
             }
@@ -136,22 +138,22 @@ const updateProfileImg = async (req, res, next) => {
                                         let updateParams;
                                         if(req.files.profileImg && req.files.coverImg){
                                                 //if there is profile image and cover image both
-                                                req.user.profileImg.imgUrl = req.files.profileImg[0].location;
+                                                req.user.profileImg.imgUrl = req.profileCdnPath;
                                                 req.user.profileImg.recordedImgName = req.profileImgNewFileName;
                                                 req.user.profileImg.isDefaultImg = false;
-                                                req.user.coverImg.imgUrl = req.files.coverImg[0].location;
+                                                req.user.coverImg.imgUrl = req.coverCdnPath;
                                                 req.user.coverImg.recordedImgName = req.coverImgNewFileName;
                                                 req.user.coverImg.isDefaultImg = false;
 
                                         }else if(req.files.profileImg && !req.files.coverImg){
                                                 //if there is only profile image
-                                                req.user.profileImg.imgUrl = req.files.profileImg[0].location;
+                                                req.user.profileImg.imgUrl = req.profileCdnPath;
                                                 req.user.profileImg.recordedImgName = req.profileImgNewFileName;
                                                 req.user.profileImg.isDefaultImg = false;
 
                                         }else if(!req.files.profileImg && req.files.coverImg){
                                                 //if there is only cover image
-                                                req.user.coverImg.imgUrl= req.files.coverImg[0].location;
+                                                req.user.coverImg.imgUrl= req.coverCdnPath;
                                                 req.user.coverImg.recordedImgName = req.coverImgNewFileName;
                                                 req.user.coverImg.isDefaultImg = false;
                                         }
