@@ -151,12 +151,10 @@ router.put(
       if (req.files) {
 
         if(req.files.petProfileImg){
-          var uploadedProfileImgImage = req.files.petProfileImg[0].location;
-          console.log(`Profile Image: ${uploadedProfileImgImage}`);
+          var uploadedProfileImgImage = req.petProfilePath;
         }
         if(req.files.petCoverImg){
-          var uploadedCoverImgImage = req.files.petCoverImg[0].location;
-          console.log(`Cover Image: ${uploadedCoverImgImage}`);
+          var uploadedCoverImgImage = req.petCoverPath;
         }
 
         if(

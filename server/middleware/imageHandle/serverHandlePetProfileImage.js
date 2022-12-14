@@ -3,6 +3,7 @@ import multerS3 from "multer-s3";
 import dotenv from "dotenv";
 import Pet from "../../models/Pet.js";
 import s3 from "../../utils/s3Service.js";
+
 dotenv.config();
 
 //Storage
@@ -136,24 +137,26 @@ const updatePetProfileImg = async (req, res, next) => {
                                 (err) => {
                                     if(req.files !== undefined && req.files.petProfileImg || req.files !== undefined && req.files.petCoverImg){
                                         let updateParams;
+                                        req.petProfilePath = `${process.env.CDN_SUBDOMAIN}pets/${petId}/petProfileAssets/${req.petProfileImgNewFileName}`;
+                                        req.petCoverPath = `${process.env.CDN_SUBDOMAIN}pets/${petId}/petProfileAssets/${req.petCoverImgNewFileName}`;
                                         if(req.files.petProfileImg && req.files.petCoverImg){
                                                 //if there is profile image and cover image both
-                                                req.pet.petProfileImg.imgUrl = req.files.petProfileImg[0].location;
+                                                req.pet.petProfileImg.imgUrl = req.petProfilePath;
                                                 req.pet.petProfileImg.recordedImgName = req.petProfileImgNewFileName;
                                                 req.pet.petProfileImg.isDefaultImg = false;
-                                                req.pet.petCoverImg.imgUrl = req.files.petCoverImg[0].location;
+                                                req.pet.petCoverImg.imgUrl = req.petCoverPath;
                                                 req.pet.petCoverImg.recordedImgName = req.petCoverImgNewFileName;
                                                 req.pet.petCoverImg.isDefaultImg = false;
 
                                         }else if(req.files.petProfileImg && !req.files.petCoverImg){
                                                 //if there is only profile image
-                                                req.pet.petProfileImg.imgUrl = req.files.petProfileImg[0].location;
+                                                req.pet.petProfileImg.imgUrl = req.petProfilePath;
                                                 req.pet.petProfileImg.recordedImgName = req.petProfileImgNewFileName;
                                                 req.pet.petProfileImg.isDefaultImg = false;
 
                                         }else if(!req.files.petProfileImg && req.files.petCcoverImg){
                                                 //if there is only cover image
-                                                req.pet.petCoverImg.imgUrl= req.files.petCoverImg[0].location;
+                                                req.pet.petCoverImg.imgUrl= req.petCoverPath;
                                                 req.pet.petCoverImg.recordedImgName = req.petCoverImgNewFileName;
                                                 req.pet.petCoverImg.isDefaultImg = false;
                                         }
