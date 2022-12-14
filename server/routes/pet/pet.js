@@ -284,11 +284,11 @@ router.put(
   async (req, res) => {
     try{
       var urlList = [];
-      for(var i = 0; i < req.files.length; i ++){
-        urlList.push(req.files[i].location);
+      for(var i = 0; i < req.imageNames.length; i ++){
+        urlList.push(`${process.env.CDN_SUBDOMAIN}${req.imageNames[i]}`);
         req.pet.images.push(
           {
-            imgUrl: req.files[i].location
+            imgUrl: `${process.env.CDN_SUBDOMAIN}${req.imageNames[i]}`
           }
         );
       }

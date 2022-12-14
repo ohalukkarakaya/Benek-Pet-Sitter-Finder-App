@@ -29,6 +29,7 @@ const storage = multerS3(
                 const splitedOriginalName = originalname.split(".");
                 const newFileName = `${petId}_petsImage${imageId}.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.petProfileImgNewFileName = newFileName;
+                req.imageNames.push("pets/"+petId.toString()+"/petsImages/"+newFileName);
                 
                 cb(null, "pets/"+petId.toString()+"/petsImages/"+newFileName);
 
@@ -61,6 +62,7 @@ const upload = multer(
 
 const uploadPetImages = async (req, res, next) => {
     try{
+        req.imageNames = [];
         const howmanyImageCanRecorded = 6 - req.pet.images.length;
         if(howmanyImageCanRecorded > 0){
             upload.array(
