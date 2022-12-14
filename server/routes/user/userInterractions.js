@@ -9,6 +9,7 @@ dotenv.config();
 
 const router = express.Router();
 
+//follow user
 router.put(
     "/followUser/:followingUserId",
     auth,
@@ -35,7 +36,7 @@ router.put(
             }
             const userFollowings = user.followingUsersOrPets;
 
-            const followingUser = await new User.findById( followingUserId );
+            const followingUser = await User.findById( followingUserId );
             if(!followingUser){
                 return res.status(404).json(
                     {
@@ -201,9 +202,8 @@ router.post(
             }
 
             if(
-                !req.body.about
-                || !req.body.about.id
-                || !req.body.about.aboutType
+                !req.body.aboutId
+                || !req.body.aboutType
             ){
                 return res.status(400).json(
                     {
@@ -217,7 +217,7 @@ router.post(
                 {
                     userId: user._id.toString(),
                     about: {
-                        id: req.body.about.id,
+                        id: req.body.aboutId,
                         aboutType: req.body.aboutType
                     },
                     contentUrl: contentUrl
@@ -229,6 +229,7 @@ router.post(
                             error: false,
                             message: `Story with id ${story._id}, created succesfully`,
                             storyId: story._id.toString(),
+                            contentUrl: story.contentUrl,
                             storyExpireDate: story.expiresAt
                         }
                     );
