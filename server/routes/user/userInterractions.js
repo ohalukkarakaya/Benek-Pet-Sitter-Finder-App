@@ -1,7 +1,9 @@
 import express from "express";
 import User from "../../models/User.js";
+import Story from "../../models/Story.js";
 import dotenv from "dotenv";
 import auth from "../../middleware/auth.js";
+import { uploadStory } from "../../middleware/contentHandle/serverHandleStoryContent.js";
 
 dotenv.config();
 
@@ -171,7 +173,88 @@ router.put(
     }
 );
 
-//TO DO: create story
+//create story
+router.post(
+    "/story",
+    auth,
+    uploadStory,
+    async (req, res) => {
+        try{
+            const contentUrl = req.cdnUrl;
+            if(!contentUrl){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "Content required"
+                    }
+                );
+            }
+
+            const user = await User.findById(req.user._id);
+            if(!user){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "User couldn't found"
+                    }
+                );
+            }
+
+            if(
+                !req.body.about
+                || !req.body.about.id
+                || !req.body.about.aboutType
+            ){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "Story must be about an event, pet or user"
+                    }
+                );
+            }
+
+            await new Story(
+                {
+                    userId: user._id.toString(),
+                    about: {
+                        id: req.body.about.id,
+                        aboutType: req.body.aboutType
+                    },
+                    contentUrl: contentUrl
+                }
+            ).save().then(
+                (story) => {
+                    return res.status(200).json(
+                        {
+                            error: false,
+                            message: `Story with id ${story._id}, created succesfully`,
+                            storyId: story._id.toString(),
+                            storyExpireDate: story.expiresAt
+                        }
+                    );
+                }
+            ).catch(
+                (error) => {
+                    return res.status(500).json(
+                        {
+                            error: true,
+                            message: "An error occured while saving story data"
+                        }
+                    );
+                }
+            );
+        }catch(err){
+            console.log("ERROR: create story - ", err);
+            return res.status(500).json(
+                {
+                    error: true,
+                    message: "Internal server error"
+                }
+            );
+        }
+    }
+);
+
 //TO DO: plan meeting event
 //TO DO: plan joining to meeting event
 //TO DO: give star to care giver
