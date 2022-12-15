@@ -52,6 +52,10 @@ const StorySchema = new schema(
                         '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                     ],
                 },
+                date: {
+                    type: Date,
+                    default: Date.now(),
+                },
                 likes: [ String ],
                 replies: [
                     {
@@ -65,6 +69,10 @@ const StorySchema = new schema(
                                 50,
                                 '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                             ],
+                        },
+                        date: {
+                            type: Date,
+                            default: Date.now(),
                         },
                         likes: [ String ],
                     }
