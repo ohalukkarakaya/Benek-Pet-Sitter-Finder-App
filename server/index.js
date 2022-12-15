@@ -27,7 +27,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth/auth.js';
 import refreshTokenRoutes from './routes/auth/refreshToken.js';
-import editUserRoutes from './routes/user/editUser.js';
+import editUserRoutes from './routes/user/user.js';
 import petRoutes from './routes/pet/pet.js';
 import petOwnerOperationsRoutes from './routes/pet/petOwnerOperations.js';
 import animalKeywordRoutes from './routes/key_words/animalCategory.js';
