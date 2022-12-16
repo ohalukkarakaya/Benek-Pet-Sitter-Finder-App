@@ -172,6 +172,7 @@ router.put(
     }
 );
 
+//story endpoints
 router.use("/story", storyEndpoints);
 
 //TO DO: plan meeting event
