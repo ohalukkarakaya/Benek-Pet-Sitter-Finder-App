@@ -47,12 +47,13 @@ const StorySchema = new schema(
                 },
                 comment: {
                     type: String,
+                    required: true,
                     maxLength: [
                         50,
                         '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                     ],
                 },
-                date: {
+                createdAt: {
                     type: Date,
                     default: Date.now(),
                 },
@@ -65,12 +66,13 @@ const StorySchema = new schema(
                         },
                         reply: {
                             type: String,
+                            required: true,
                             maxLength: [
                                 50,
                                 '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                             ],
                         },
-                        date: {
+                        createdAt: {
                             type: Date,
                             default: Date.now(),
                         },
@@ -79,6 +81,9 @@ const StorySchema = new schema(
                 ]
             }
         ],
+    },
+    {
+        timestamps: true
     }
 );
 

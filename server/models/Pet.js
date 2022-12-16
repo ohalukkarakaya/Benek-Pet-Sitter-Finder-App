@@ -66,6 +66,10 @@ const PetSchema = new mongoose.Schema(
                         ],
                     },
                     likes: [ String ],
+                    createdAt: {
+                        type: Date,
+                        default: Date.now(),
+                    },
                     replies: [
                         {
                             userId: {
@@ -80,6 +84,10 @@ const PetSchema = new mongoose.Schema(
                                 ],
                             },
                             likes: [ String ],
+                            createdAt: {
+                                type: Date,
+                                default: Date.now(),
+                            },
                         }
                     ]
                 }
