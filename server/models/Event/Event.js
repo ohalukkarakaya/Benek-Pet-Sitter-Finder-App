@@ -17,7 +17,7 @@ const EventSchema = new mongoose.Schema(
       imgUrl: {
         type: String,
         required: true
-    },
+      },
       ticketPrice: {
         priceType: {
             type: String,

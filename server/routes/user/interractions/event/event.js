@@ -61,6 +61,7 @@ router.post(
             await new Event(
                 {
                     eventAdmin: user._id.toString(),
+                    eventOrganizers: [ req.user._id.toString() ],
                     desc: req.body.desc,
                     imgUrl: contentUrl,
                     ticketPrice: {
