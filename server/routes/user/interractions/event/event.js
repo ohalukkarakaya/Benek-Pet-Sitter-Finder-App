@@ -494,7 +494,7 @@ router.put(
     }
 );
 
-//will join events
+//join events
 router.use("/eventJoin", eventJoinEndpoints);
 
 export default router;
