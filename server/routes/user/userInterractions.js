@@ -3,6 +3,7 @@ import User from "../../models/User.js";
 import dotenv from "dotenv";
 import auth from "../../middleware/auth.js";
 import storyEndpoints from "./interractions/story/story.js";
+import eventEndpoints from "./interractions/event/event.js";
 dotenv.config();
 
 const router = express.Router();
@@ -174,6 +175,9 @@ router.put(
 
 //story endpoints
 router.use("/story", storyEndpoints);
+
+//event endpoints
+router.use("/event", eventEndpoints);
 
 //TO DO: plan meeting event
 //TO DO: plan joining to meeting event

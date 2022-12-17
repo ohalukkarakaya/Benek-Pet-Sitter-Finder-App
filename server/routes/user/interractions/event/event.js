@@ -1,32 +1,23 @@
 import express from "express";
 import User from "../../../../models/User.js";
-import Story from "../../../../models/Event/Event.js";
+import Event from "../../../../models/Event/Event.js";
 import dotenv from "dotenv";
 import auth from "../../../../middleware/auth.js";
-import { uploadStory } from "../../../../middleware/contentHandle/serverHandleStoryContent.js";
+import { uploadEventImage } from "../../../../middleware/contentHandle/serverHandleEventImage.js";
 import s3 from "../../../../utils/s3Service.js";
-import storyCommentEndpoints from "./storyComments.js";
 
 dotenv.config();
 
 const router = express.Router();
 
-//create story
+//create event
 router.post(
     "/",
     auth,
-    uploadStory,
+    uploadEventImage,
     async (req, res) => {
         try{
             const contentUrl = req.cdnUrl;
-            if(!contentUrl){
-                return res.status(400).json(
-                    {
-                        error: true,
-                        message: "Content required"
-                    }
-                );
-            }
 
             const user = await User.findById(req.user._id);
             if(!user){
@@ -39,36 +30,65 @@ router.post(
             }
 
             if(
-                !req.body.aboutId
-                || !req.body.aboutType
+                !req.body.desc
+                || !req.body.adressDesc
+                || !req.body.lat
+                || !req.body.long
             ){
                 return res.status(400).json(
                     {
                         error: true,
-                        message: "Story must be about an event, pet or user"
+                        message: "Missing property"
                     }
                 );
             }
 
-            await new Story(
+            if(
+                req.body.ticketPrice && !req.body.ticketPriceType
+                || !req.body.ticketPrice && req.body.ticketPriceType
+            ){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "Missing property for ticketprice"
+                    }
+                );
+            }
+
+            const eventDate = Date.parse(req.body.date);
+
+            await new Event(
                 {
-                    userId: user._id.toString(),
-                    about: {
-                        id: req.body.aboutId,
-                        aboutType: req.body.aboutType
-                    },
+                    eventAdmin: user._id.toString(),
                     desc: req.body.desc,
-                    contentUrl: contentUrl
+                    imgUrl: contentUrl,
+                    ticketPrice: {
+                        priceType: req.body.ticketPriceType,
+                        price: req.body.ticketPrice
+                    },
+                    adress: {
+                        adressDesc: req.body.adressDesc,
+                        lat: req.body.lat,
+                        long: req.body.long
+                    },
+                    maxGuest: req.body.maxGuest,
+                    date: eventDate,
+                    expiryDate: new Date( eventDate + 7*24*60*60*1000 ),
+                    isPrivate: req.body.isPrivate
                 }
             ).save().then(
-                (story) => {
+                (event) => {
                     return res.status(200).json(
                         {
                             error: false,
-                            message: `Story with id ${story._id}, created succesfully`,
-                            storyId: story._id.toString(),
-                            contentUrl: story.contentUrl,
-                            storyExpireDate: story.expiresAt
+                            message: `Story with id ${event._id}, planed succesfully at ${event.date}`,
+                            eventId: event._id.toString(),
+                            desc: event.desc,
+                            eventImgUrl: event.imgUrl,
+                            ticketPrice: event.ticketPrice,
+                            adress: event.adress,
+                            maxGuest: req.body.maxGuest,
+                            date: eventDate
                         }
                     );
                 }
@@ -77,13 +97,14 @@ router.post(
                     return res.status(500).json(
                         {
                             error: true,
-                            message: "An error occured while saving story data"
+                            data: error,
+                            message: "An error occured while saving event data"
                         }
                     );
                 }
             );
         }catch(err){
-            console.log("ERROR: create story - ", err);
+            console.log("ERROR: create event - ", err);
             return res.status(500).json(
                 {
                     error: true,
@@ -93,163 +114,5 @@ router.post(
         }
     }
 );
-
-//delete story
-router.delete(
-    "/",
-    auth,
-    async (req, res) => {
-        try{
-            const storyId = req.body.storyId;
-            if(!storyId){
-                return res.status(400).json(
-                    {
-                        error: true,
-                        message: "storyId is required"
-                    }
-                );
-            }
-
-            const story = await Story.findById( storyId );
-            if(!story){
-                return res.status(404).json(
-                    {
-                        error: true,
-                        message: "Story couldn't found"
-                    }
-                );
-            }
-
-            if(story.userId !== req.user._id.toString()){
-                return res.status(401).json(
-                    {
-                        error: true,
-                        message: "you can't delete this story"
-                    }
-                );
-            }
-
-            const contentUrl = story.contentUrl;
-            const splitUrl = contentUrl.split('/');
-            const contentName = splitUrl[splitUrl.length - 1];
-
-            const deleteContentParams = {
-                Bucket: process.env.BUCKET_NAME,
-                Key: `profileAssets/${req.user._id.toString()}/story/${contentName}`
-            };
-
-            s3.deleteObject(
-                deleteContentParams,
-                (error, data) => {
-                  if(error){
-                    console.log("error", error);
-                    return res.status(500).json(
-                      {
-                        error: true,
-                        message: "An error occured while deleting content"
-                      }
-                    );
-                  }
-
-                  story.deleteOne().then(
-                    (_) => {
-                        return res.status(200).json(
-                            {
-                                error: false,
-                                message: "Story deleted succesfully"
-                            }
-                        );
-                    }
-                  );
-                }
-              );
-
-            
-        }catch(err){
-            console.log("ERROR: delete story - ", err);
-            return res.status(500).json(
-                {
-                    error: true,
-                    message: "Internal server error"
-                }
-            );
-        }
-    }
-);
-
-//like story
-router.put(
-    "/:storyId",
-    auth,
-    async (req, res) => {
-        try{
-            const storyId = req.params.storyId;
-            if(!storyId){
-                return res.status(400).json(
-                    {
-                        error: true,
-                        message: "storyId is required"
-                    }
-                );
-            }
-
-            const story = Story.findById(storyId);
-            if(!story){
-                return res.status(404).json(
-                    {
-                        error: true,
-                        message: "Story couldn't found"
-                    }
-                );
-            }
-
-            const likes = story.likes;
-
-            const isAlreadyLiked = likes.find(
-                userId => userId === req.user._id.toString()
-            );
-
-            if(isAlreadyLiked){
-                story.likes = likes.filter(
-                    userId => userId !== req.user._id.toString()
-                );
-            }else{
-                story.likes.push(req.user._id.toString());
-            }
-
-            story.markModified("likes");
-            story.save(
-                (err) => {
-                    if(err){
-                      console.log("error", err);
-                      return res.status(500).json(
-                        {
-                          error: true,
-                          message: "An error occured while saving to database"
-                        }
-                      );
-                    }
-                  }
-            );
-
-            return res.status(200).json(
-                {
-                    error: false,
-                    message: "Story liked or like removed succesfully"
-                }
-            );
-        }catch(err){
-            console.log("ERROR: like story - ", err);
-            return res.status(500).json(
-                {
-                    error: true,
-                    message: "Internal server error"
-                }
-            );
-        }
-    }
-);
-
-router.use("comments", storyCommentEndpoints);
 
 export default router;

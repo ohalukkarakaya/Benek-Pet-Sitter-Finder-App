@@ -13,17 +13,19 @@ const EventSchema = new mongoose.Schema(
             '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
         ],
       },
+      imgUrl: {
+        type: String,
+        required: true
+    },
       ticketPrice: {
         priceType: {
             type: String,
-            required: true,
             enum: [ "Free", "TL", "USD", "EUR" ],
             default: "Free"
         },
         price: {
             type: Number,
             default: 0,
-            required: true
         }
       },
       adress: {
@@ -45,6 +47,7 @@ const EventSchema = new mongoose.Schema(
       },
       maxGuests: {
         type: Number,
+        //-1 means no limit
         default: -1
       },
       date: {
@@ -53,9 +56,13 @@ const EventSchema = new mongoose.Schema(
       },
       expiryDate: {
         type: Date,
+        required: true,
         validate: [
             function (value) {
-                return Date( this.date + 7*24*60*60*1000 ) === value;
+                console.log(`date: ${this.date}`);
+                const eventDate = Date.parse(this.date)
+                console.log(`${new Date( eventDate + 7*24*60*60*1000 )}, ${value}`);
+                return new Date( eventDate + 7*24*60*60*1000 ).toString() === value.toString();
             }
         ]
       },
