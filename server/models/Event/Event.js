@@ -6,6 +6,7 @@ const EventSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
+      eventOrganizers: [ String ],
       desc: {
         type: String,
         maxLength: [
@@ -59,9 +60,7 @@ const EventSchema = new mongoose.Schema(
         required: true,
         validate: [
             function (value) {
-                console.log(`date: ${this.date}`);
                 const eventDate = Date.parse(this.date)
-                console.log(`${new Date( eventDate + 7*24*60*60*1000 )}, ${value}`);
                 return new Date( eventDate + 7*24*60*60*1000 ).toString() === value.toString();
             }
         ]
