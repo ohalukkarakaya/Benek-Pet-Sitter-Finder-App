@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import auth from "../../../../middleware/auth.js";
 import { uploadEventImage } from "../../../../middleware/contentHandle/serverHandleEventImage.js";
 import eventJoinEndpoints from "./eventJoin.js";
+import afterEventEndpoints from "./eventGuestInterractions.js";
 import s3 from "../../../../utils/s3Service.js";
 
 dotenv.config();
@@ -496,5 +497,8 @@ router.put(
 
 //join events
 router.use("/eventJoin", eventJoinEndpoints);
+
+//after event interractions
+router.use("/afterEvent", afterEventEndpoints);
 
 export default router;
