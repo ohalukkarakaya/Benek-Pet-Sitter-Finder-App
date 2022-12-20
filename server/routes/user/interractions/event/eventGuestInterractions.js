@@ -363,8 +363,4 @@ router.put(
 
 router.use("/comment", afterEventCommentEndpoints);
 
-//edit contents
-
-//delete contents
-
 export default router;

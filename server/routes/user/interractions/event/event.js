@@ -168,6 +168,12 @@ router.put(
     }
 );
 
+//To Do: edit event
+
+//To Do: delete event
+
+//To Do: follow - unfollow event
+
 //organizer operations
 router.use("/organizer", organizerEndpoints);
 
