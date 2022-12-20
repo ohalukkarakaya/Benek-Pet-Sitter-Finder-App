@@ -72,8 +72,14 @@ const EventSchema = new mongoose.Schema(
                 required: true
             },
             content: {
-                type: String,
-                required: true,
+                isUrl: {
+                    type: Boolean,
+                    default: false
+                },
+                value: {
+                    type: String,
+                    required: true,
+                }
             },
             createdAt: {
                 type: Date,

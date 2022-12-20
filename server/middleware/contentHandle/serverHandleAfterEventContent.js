@@ -62,9 +62,36 @@ const upload = multer(
     }
 );
 
+const deleteImg = async (req, file, deleteParams) => {
+    try {
+        fileFilter.then(
+            (_) => {
+                s3.deleteObject(deleteParams).promise();
+                console.log("Success", data);
+                return data;
+            }
+        );
+    } catch (err) {
+        console.log("Error", err);
+    }
+  };
+
+const ValidateAndCleanBucket = async ( req ) => {
+    if(req.imgName){
+        const deleteProfileImageParams = {
+            Bucket: process.env.BUCKET_NAME,
+            Key: `events/${req.eventId.toString()}/${req.imgName}`
+        };
+        await deleteImg(deleteProfileImageParams);
+    }
+}
+
 //Upload File
 const uploadEventContent = async (req, res, next) => {
     try{
+        const contentId = req.params.contentId;
+        const isEditing = contentId;
+
         req.meetingEvent = await Event.findById(req.params.eventId);
         if(!req.meetingEvent){
             return res.status(404).json(
@@ -75,21 +102,51 @@ const uploadEventContent = async (req, res, next) => {
             );
         }
 
-        upload.single( 'file' )(
-            req,
-            {},
-            (error) => {
-                if(error){
-                    console.log("error", error);
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            errorData: error,
-                            message: "A problem occured wile uploading story"
+        if(isEditing){
+            req.content = req.meetingEvent.afterEvent.find(
+                contentObject =>
+                    contentObject._id.toString() === contentId
+            );
+
+            if(req.content.isUrl){
+                const splitedImgUrl = req.content.value.split("/");
+                req.imgName = splitedImgUrl[splitedImgUrl.length -1];
+            }
+        }
+
+        ValidateAndCleanBucket(req).then(
+            (_) => {
+                upload.single( 'file' )(
+                    req,
+                    {},
+                    (error) => {
+                        if(error){
+                            console.log("error", error);
+                            return res.status(500).json(
+                                {
+                                    error: true,
+                                    errorData: error,
+                                    message: "A problem occured wile uploading story"
+                                }
+                            );
                         }
-                    );
-                }
-                next();
+                        if(isEditing){
+                            req.content.isUrl = false;
+                            req.content.value = null;
+                        };
+                        next();
+                    }
+                );
+            }
+        ).catch(
+            (err) => {
+                console.log(err);
+                return res.status(500).json(
+                    {
+                        error: true,
+                        message: "Internal server error"
+                    }
+                );
             }
         );
     }catch(err){
