@@ -400,7 +400,9 @@ router.post(
                 );
             }
 
-            if(event.maxGuests !== -1 && event.maxGuests <= event.willJoin.length){
+            const isAllreadyJoined = event.willJoin.find(userId => userId === req.user._id.toString());
+
+            if(!isAllreadyJoined && event.maxGuests !== -1 && event.maxGuests <= event.willJoin.length){
                 return res.json(
                     {
                         error: true,
@@ -408,8 +410,6 @@ router.post(
                     }
                 );
             }
-
-            const isAllreadyJoined = event.willJoin.find(userId => userId === req.user._id.toString());
 
             if(isAllreadyJoined){
                 await EventTicket.findOneAndDelete(

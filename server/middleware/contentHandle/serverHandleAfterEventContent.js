@@ -1,5 +1,6 @@
 import multer from "multer";
 import multerS3 from "multer-s3";
+import Event from "../../models/Event/Event.js";
 import dotenv from "dotenv";
 import s3 from "../../utils/s3Service.js";
 
@@ -64,6 +65,16 @@ const upload = multer(
 //Upload File
 const uploadEventContent = async (req, res, next) => {
     try{
+        req.meetingEvent = await Event.findById(req.params.eventId);
+        if(!req.meetingEvent){
+            return res.status(404).json(
+                {
+                    error: true,
+                    message: "Event not found"
+                }
+            );
+        }
+
         upload.single( 'file' )(
             req,
             {},
