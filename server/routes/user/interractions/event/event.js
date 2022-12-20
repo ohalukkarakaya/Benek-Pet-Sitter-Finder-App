@@ -20,8 +20,6 @@ router.post(
     uploadEventImage,
     async (req, res) => {
         try{
-            const contentUrl = req.cdnUrl;
-
             const user = await User.findById(req.user._id);
             if(!user){
                 return res.status(404).json(
@@ -65,7 +63,6 @@ router.post(
                     eventAdmin: user._id.toString(),
                     eventOrganizers: [ req.user._id.toString() ],
                     desc: req.body.desc,
-                    imgUrl: contentUrl,
                     ticketPrice: {
                         priceType: req.body.ticketPriceType,
                         price: req.body.ticketPrice
@@ -88,7 +85,6 @@ router.post(
                             message: `Story with id ${event._id}, planed succesfully at ${event.date}`,
                             eventId: event._id.toString(),
                             desc: event.desc,
-                            eventImgUrl: event.imgUrl,
                             ticketPrice: event.ticketPrice,
                             adress: event.adress,
                             maxGuest: req.body.maxGuest,
@@ -109,6 +105,58 @@ router.post(
             );
         }catch(err){
             console.log("ERROR: create event - ", err);
+            return res.status(500).json(
+                {
+                    error: true,
+                    message: "Internal server error"
+                }
+            );
+        }
+    }
+);
+
+//upload event image
+router.put(
+    "/:eventId",
+    auth,
+    uploadEventImage,
+    async (req, res) => {
+        try{
+            const contentUrl = req.cdnUrl;
+            if(!contentUrl){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "image is required"
+                    }
+                );
+            }
+            
+            req.meetingEvent.ımgUrl = contentUrl;
+            req.meetingEvent.markModified("imgUrl");
+            req.save(
+                (err) => {
+                    if(err){
+                        console.log(err);
+                        return res.status.json(
+                            {
+                                error: true,
+                                message: "Internal server error"
+                            }
+                        );
+                    }
+                }
+            );
+
+            return res.status(200).json(
+                {
+                    error: false,
+                    message: "image uploaded succesfully",
+                    imgUrl: contentUrl
+                }
+            );
+        }catch(err){
+            console.log("ERROR: upload event image - ", err);
             return res.status(500).json(
                 {
                     error: true,

@@ -28,7 +28,7 @@ const storage = multerS3(
                 const splitedOriginalName = originalname.split(".");
                 const newFileName = `eventContent_${eventId}_${userId}_${imageId}.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.eventContent = newFileName;
-                req.cdnUrl = `${process.env.CDN_SUBDOMAIN}events/${userId.toString()}/afterEventContents/${newFileName}`;
+                req.cdnUrl = `${process.env.CDN_SUBDOMAIN}events/${eventId.toString()}/afterEventContents/${newFileName}`;
                 
                 cb(null, "events/"+eventId.toString()+"/afterEventContents/"+newFileName);
 
