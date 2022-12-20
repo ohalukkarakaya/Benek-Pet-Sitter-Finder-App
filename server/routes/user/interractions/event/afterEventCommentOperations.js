@@ -240,8 +240,8 @@ router.put(
 );
 
 //delete comment or reply
-router.put(
-    "/delete/:eventId/:contentId",
+router.delete(
+    "/:eventId/:contentId",
     auth,
     async (req, res) => {
         try{

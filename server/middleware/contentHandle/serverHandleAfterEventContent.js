@@ -80,7 +80,7 @@ const ValidateAndCleanBucket = async ( req ) => {
     if(req.imgName){
         const deleteProfileImageParams = {
             Bucket: process.env.BUCKET_NAME,
-            Key: `events/${req.eventId.toString()}/${req.imgName}`
+            Key: `events/${req.eventId.toString()}/afterEventContents/${req.imgName}`
         };
         await deleteImg(deleteProfileImageParams);
     }
