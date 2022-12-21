@@ -10,10 +10,10 @@ const expireEvents = cron.schedule(
     '0 0 0 * * *',
     async () => {
         try{
-            const expiredStories = await Event.find().where('expiryDate').lte(Date.now());
-            expiredStories.map(
-                (meetingEvent) => {
-                    const soldTickets = await EventTicket.find({ eventId: eventId });
+            const expiredEvents = await Event.find().where('expiryDate').lte(Date.now());
+            expiredEvents.map(
+                async (meetingEvent) => {
+                    const soldTickets = await EventTicket.find({ eventId: meetingEvent._id.toString() });
                     const cancelPayments = soldTickets.map(
                         (ticket) => {
                             return new Promise(
