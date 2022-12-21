@@ -415,34 +415,34 @@ router.delete(
                     await s3.deleteObjects(deleteParams);
                         if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
                     }
-                }
-            );
-            emptyS3Directory(process.env.BUCKET_NAME, `events/${eventId.toString()}/`).then(
-                (_) => {
-                  //delete pet
-                  meetingEvent.deleteOne().then(
-                    (_) => {
-                      return res.status(200).json(
-                        {
-                          error: false,
-                          message: "Event deleted succesfully"
+                    emptyS3Directory(process.env.BUCKET_NAME, `events/${eventId.toString()}/`).then(
+                        (_) => {
+                          //delete pet
+                          meetingEvent.deleteOne().then(
+                            (_) => {
+                              return res.status(200).json(
+                                {
+                                  error: false,
+                                  message: "Event deleted succesfully"
+                                }
+                              );
+                            }
+                          ).catch(
+                            (error) => {
+                              console.log(error);
+                                return res.status(500).json(
+                                  {
+                                    error: true,
+                                    message: "An error occured while deleting",
+                                    error: error
+                                  }
+                                );
+                            }
+                          );
                         }
                       );
-                    }
-                  ).catch(
-                    (error) => {
-                      console.log(error);
-                        return res.status(500).json(
-                          {
-                            error: true,
-                            message: "An error occured while deleting",
-                            error: error
-                          }
-                        );
-                    }
-                  );
                 }
-              );
+            );
         }catch(err){
             console.log("ERROR: delete event - ", err);
             return res.status(500).json(
