@@ -252,6 +252,7 @@ router.put(
                     eventId: event._id.toString(),
                     userId: req.user._id.toString(),
                     ticketPassword: hashTicketPassword,
+                    paidPrice: event.ticketPrice,
                     eventDate: event.date,
                     expiryDate: event.expiryDate,
                     isPrivate: event.isPrivate
@@ -461,6 +462,7 @@ router.post(
                         eventId: event._id.toString(),
                         userId: req.user._id.toString(),
                         ticketPassword: hashTicketPassword,
+                        paidPrice: event.ticketPrice,
                         eventDate: event.date,
                         expiryDate: event.expiryDate,
                         isPrivate: event.isPrivate

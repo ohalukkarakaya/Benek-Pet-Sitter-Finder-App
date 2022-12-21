@@ -15,6 +15,17 @@ const EventTicketSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
+      paidPrice: {
+        priceType: {
+            type: String,
+            enum: [ "Free", "TL", "USD", "EUR" ],
+            default: "Free"
+        },
+        price: {
+            type: Number,
+            default: 0,
+        }
+      },
       boughtAt: {
         type: Date,
         dafeult: Date.now()
