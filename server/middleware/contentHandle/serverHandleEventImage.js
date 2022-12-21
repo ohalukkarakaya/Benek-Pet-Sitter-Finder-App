@@ -114,6 +114,16 @@ const uploadEventImage = async (req, res, next) => {
             );
         }
 
+        const meetingDate = Date.parse(req.meetingEvent.date);
+        if(meetingDate <= Date.now()){
+            return res.status(400).json(
+                {
+                    error: true,
+                    message: "too late to edit this event"
+                }
+            );
+        }
+
         const areThereImgAlready = req.meetingEvent.imgUrl;
         
         const splitedImgUrl = req.meetingEvent.imgUrl.split("/");
