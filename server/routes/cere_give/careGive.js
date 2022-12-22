@@ -648,7 +648,7 @@ router.put(
     auth,
     async (req, res) => {
         try{
-
+            
         }catch(err){
             console.log("Error: schedule care give mission - ", err);
             return res.status(500).json(
