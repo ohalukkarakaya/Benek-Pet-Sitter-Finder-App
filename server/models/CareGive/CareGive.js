@@ -1,3 +1,4 @@
+import { required } from "joi";
 import mongoose from "mongoose";
 
 const CareGiveSchema = new mongoose.Schema(
@@ -18,7 +19,26 @@ const CareGiveSchema = new mongoose.Schema(
         isAccepted: {
             type: Boolean,
             default: false
+        },
+        actionCode: {
+            codeType: {
+                type: String,
+                enum: [ "Start", "Finish" ],
+                required: true
+            },
+            codePassWord: {
+                type: String,
+                required: true
+            },
+            code: {
+                type: String,
+                required: true
+            }
         }
+      },
+      isStarted: {
+        type: Boolean,
+        default: false
       },
       petId: {
         type: String,
