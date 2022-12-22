@@ -31,7 +31,7 @@ const CareGiveSchema = new mongoose.Schema(
         },
         careGiverContact: {
             careGiverPhone: {
-                typr: String,
+                type: String,
                 required: true
             },
             careGiverEmail: {
@@ -100,7 +100,7 @@ const CareGiveSchema = new mongoose.Schema(
       },
       endDate: {
         type: Date,
-        default: new Date.parse(Date.now() + 7*24*60*60*1000),
+        default: Date.now() + 7*24*60*60*1000,
         validate: [
             function (value) {
                 const startDate = Date.parse(this.startDate);
