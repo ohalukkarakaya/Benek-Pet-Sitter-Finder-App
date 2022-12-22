@@ -2,17 +2,57 @@ import mongoose from "mongoose";
 
 const CareGiveSchema = new mongoose.Schema(
   {
+      invitation: {
+        from: {
+            type: String,
+            required: true
+        },
+        to: {
+            type: String,
+            required: true,
+        },
+        at: {
+            type: Date,
+            default: Date.now()
+        },
+        isAccepted: {
+            type: Boolean,
+            default: false
+        }
+      },
       petId: {
         type: String,
         required: true
       },
       careGiver: {
-        type: String,
-        required: true,
+        careGiverId: {
+            type: String,
+            required: true
+        },
+        careGiverContact: {
+            careGiverPhone: {
+                typr: String,
+                required: true
+            },
+            careGiverEmail: {
+                type: String,
+                required: true
+            }
+        }
       },
       petOwner: {
-        type: String,
-        required: true,
+        petOwnerId: {
+            type: String,
+            required: true
+        },
+        petOwnerContact: {
+            petOwnerEmail: {
+                type: String
+            },
+            petOwnerPhone: {
+                type: String,
+            }
+        }
       },
       prices: {
         servicePrice: {
@@ -26,7 +66,7 @@ const CareGiveSchema = new mongoose.Schema(
                 default: 0,
             }
         },
-        extraServicePrice: {
+        extraServicesPrice: {
             priceType: {
                 type: String,
                 enum: [ "Free", "TL", "USD", "EUR" ],
@@ -67,10 +107,6 @@ const CareGiveSchema = new mongoose.Schema(
                 return startDate < Date.parse(value);
             }
         ]
-      },
-      meetingDate: {
-        type: Date,
-        required: true
       },
       adress: {
         adressDesc: {
