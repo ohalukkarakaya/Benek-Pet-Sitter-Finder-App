@@ -3,7 +3,9 @@ import User from "../../models/User.js";
 import Pet from "../../models/Pet.js";
 import CareGive from "../../models/CareGive/CareGive.js";
 import dotenv from "dotenv";
+import bcrypt from "bcrypt";
 import auth from "../../middleware/auth.js";
+import QRCode from "qrcode";
 
 dotenv.config();
 
@@ -19,14 +21,13 @@ router.post(
             const startDate = req.body.startDate;
             const endDate = req.body.endDate;
             const meetingAdress = req.body.meetingAdress;
-            const userId = req.params.userId.toString;
 
             if(
                 !petId
                 || !startDate
                 || !endDate
                 || !meetingAdress
-                || !userId
+                || !ownerId
             ){
                 return res.status(400).json(
                     {
@@ -59,6 +60,15 @@ router.post(
                 );
             }
 
+            if(pet.primaryOwner.toString() === req.user._id.toString()){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "Pet belongs to you"
+                    }
+                );
+            }
+
             const isPetAlreadyInCareGive = CareGive.find(
                 careGiveObject =>
                     careGiveObject.petId.toString() === pet._id.toString()
@@ -73,23 +83,6 @@ router.post(
                 );
             }
 
-            let ownerId;
-            let careGiverId;
-            if(pet.primaryOwner.toString() === req.user._id.toString()){
-                ownerId = req.user._id.toString();
-                careGiverId = req.body.userId.toString();
-            }else if(pet.primaryOwner.toString() === req.body.userId.toString()){
-                ownerId = req.body.userId.toString();
-                careGiverId = req.user._id.toString();
-            }else{
-                return res.status(400).json(
-                    {
-                        error: true,
-                        message: "You can open service only for pets owner"
-                    }
-                );
-            }
-
             if(Date.parse(startDate) < Date.now() || Date.parse(endDate) < Date.parse(startDate)){
                 return res.status(400).json(
                     {
@@ -99,8 +92,8 @@ router.post(
                 );
             }
 
-            const careGiver = await User.findById(careGiverId);
-            const owner = await User.findById(ownerId);
+            const careGiver = await User.findById(req.user._id.toString());
+            const owner = await User.findById(pet.primaryOwner.toString());
             if(!owner || !careGiver){
                 return res.status(404).json(
                     {
@@ -109,27 +102,16 @@ router.post(
                     }
                 );
             }
-
-            const isOwner = owner._id.toString() === req.user._id.toString();
             const isOwnerVerified = owner.email;
-
-            const isCareGiver = careGiver._id.toString === req.user._id.toString();
             const isCareGiverVerified = careGiver.isCareGiver && careGiver.email && careGiver.phone && careGiver.iban;
-            if(isCareGiver && !isCareGiverVerified){
+            if(!isCareGiverVerified){
                 return res.status(403).json(
                     {
                         error: true,
                         message: "you need to verify your phone number, email and bank accounts iban number"
                     }
                 );
-            }else if(isOwner && !isOwnerVerified){
-                return res.status(403).json(
-                    {
-                        error: true,
-                        message: "You need to verify your email"
-                    }
-                );
-            }else if(isCareGiver && isCareGiverVerified || isOwner && isOwnerVerified){
+            }else{
                 await new CareGive(
                     {
                         invitation: {
@@ -138,10 +120,10 @@ router.post(
                         },
                         petId: pet._id.toString(),
                         careGiver: {
-                            careGiverId: careGiver._id.toString(),
+                            careGiverId: req.user._id.toString(),
                             careGiverContact: {
-                                careGiverPhone: careGiver.phone,
-                                careGiverEmail: careGiver.email
+                                careGiverPhone: req.user.phone,
+                                careGiverEmail: req.user.email
                             }
                         },
                         petOwner: {
@@ -161,7 +143,7 @@ router.post(
                         return res.status(200).json(
                             {
                                 error: false,
-                                message: `user with th id "${req.body.userId}" invented to careGive`
+                                message: `user with th id "${req.body.ownerId}" invented to careGive`
                             }
                         );
                     }
@@ -218,7 +200,10 @@ router.put(
                 );
             }
 
-            if(invitedCareGive.invitation.to !== req.user._id.toString()){
+            if(
+                invitedCareGive.invitation.to !== req.user._id.toString()
+                || req.user._id.toString() !== invitedCareGive.petOwner.toString()
+            ){
                 return res.status(401).json(
                     {
                         error: true,
@@ -270,55 +255,19 @@ router.put(
                 }
 
                 const isPetOwner = req.user._id.toString() === invitedCareGive.petOwner.petOwnerId.toString();
-                const isCareGiver = req.user._id.toString() === invitedCareGive.careGiver.careGiverId.toString();
-                if(isPetOwner  && !isCareGiver){
-                    const isEmailValid = petOwner.email;
-                    if(!isEmailValid){
-                        return res.status(400).json(
-                            {
-                                error: true,
-                                message: "please verify your email firstly"
-                            }
-                        );
-                    }
-                }else if(!isPetOwner && isCareGiver){
-                    const isEmailValid = careGiver.email;
-                    if(!isEmailValid){
-                        return res.status(400).json(
-                            {
-                                error: true,
-                                message: "please verify your email firstly"
-                            }
-                        );
-                    }
-
-                    const isPhoneValid = careGiver.phone;
-                    if(!isPhoneValid){
-                        return res.status(400).json(
-                            {
-                                error: true,
-                                message: "Please verify your phone number firstly"
-                            }
-                        );
-                    }
-
-                    const isIbanValid = careGiver.iban;
-                    if(!isIbanValid){
-                        return res.status(400).json(
-                            {
-                                error: true,
-                                message: "We need your iban to accept you as careGiver"
-                            }
-                        );
-                    }
-                }else{
-                    return res.status(401).json(
+                const isEmailValid = petOwner.email;
+                if(!isEmailValid){
+                    return res.status(400).json(
                         {
                             error: true,
-                            message: "You are not authorized for this action"
+                            message: "please verify your email firstly"
                         }
                     );
                 }
+
+                invitedCareGive.petOwner.petOwnerContact.petOwnerEmail = petOwner.email;
+                invitedCareGive.petOwner.petOwnerContact.petOwnerPhone = petOwner.phone;
+                invitedCareGive.markModified("petOwner");
 
                 const careGiveHistoryRecordforPet = {
                     careGiver: careGiver._id.toString(),
@@ -352,38 +301,76 @@ router.put(
                 petOwner.markModified("pastCaregivers");
 
                 invitedCareGive.invitation.isAccepted = true;
-                invitedCareGive.markModified("invitation");
 
                 pet.save().then(
                     (_) => {
                         careGiver.save().then(
                             (__) => {
                                 petOwner.save().then(
-                                    (___) => {
-                                        invitedCareGive.save().then(
-                                            (____) => {
-                                                const price = invitedCareGive.prices.servicePrice;
-                                                if(price.priceType !== "Free" && price.price !== 0){
-                                                    //take payment in here
+                                    async (___) => {
+                                        if(isPetOwner){
+                                            const price = invitedCareGive.prices.servicePrice;
+                                            if(price.priceType !== "Free" && price.price !== 0){
+                                                //take payment in here
+                                            }
+
+                                            //generate password
+                                            const randPassword = Buffer.from(Math.random().toString()).toString("base64").substring(0,20);
+                                            const salt = await bcrypt.genSalt(Number(process.env.SALT));
+                                            const hashCodePassword = await bcrypt.hash(randPassword, salt);
+
+                                            //qr code data
+                                            const data = {
+                                                careGiveId: invitedCareGive._id.toString(),
+                                                petOwner: req.user._id.toString(),
+                                                careGiver: invitedCareGive.careGiver.careGiverId.toString(),
+                                                pet: invitedCareGive.petId.toString(),
+                                                ticketPassword: randPassword,
+                                            }
+                        
+                                            let qrCodeData = JSON.stringify(data);
+
+                                            // Get the base64 url
+                                            QRCode.toDataURL(
+                                                qrCodeData,
+                                                function (err, url) {
+                                                    if(err){
+                                                        return res.status(500).json(
+                                                            {
+                                                                error: true,
+                                                                message: "error wile generating QR code"
+                                                            }
+                                                        );
+                                                    }
+
+                                                    invitedCareGive.invitation.actionCode.codeType = "Start";
+                                                    invitedCareGive.invitation.actionCode.codePassword = hashCodePassword;
+                                                    invitedCareGive.invitation.actionCode.code = url;
+                                                    invitedCareGive.markModified(invitation);
+                                                    invitedCareGive.save().then(
+                                                        (____) => {
+                                                            res.status(200).json(
+                                                                {
+                                                                    error: false,
+                                                                    message: "careGive accepted",
+                                                                    code: url
+                                                                }
+                                                            );
+                                                        }
+                                                    ).catch(
+                                                        (er) => {
+                                                            console.log(er);
+                                                            return res.status(500).json(
+                                                                {
+                                                                    error: true,
+                                                                    message: "Internal server error"
+                                                                }
+                                                            );
+                                                        }
+                                                    );
                                                 }
-                                                res.status(200).json(
-                                                    {
-                                                        error: false,
-                                                        message: "careGive accepted"
-                                                    }
-                                                );
-                                            }
-                                        ).catch(
-                                            (err) => {
-                                                console.log(err);
-                                                return res.status(500).json(
-                                                    {
-                                                        error: true,
-                                                        message: "Internal server error"
-                                                    }
-                                                );
-                                            }
-                                        );
+                                            );
+                                        }
                                     }
                                 ).catch(
                                     (err) => {
