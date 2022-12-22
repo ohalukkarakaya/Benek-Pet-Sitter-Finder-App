@@ -179,12 +179,4 @@ router.use("/story", storyEndpoints);
 //event endpoints
 router.use("/event", eventEndpoints);
 
-//TO DO: plan meeting event
-//TO DO: plan joining to meeting event
-//TO DO: give star to care giver
-//TO DO: plan care give for a pet
-//TO DO: plan care give missions
-//TO DO: upload care give mission
-//TO DO: approve care give mission
-
 export default router;

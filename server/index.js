@@ -30,6 +30,7 @@ import refreshTokenRoutes from './routes/auth/refreshToken.js';
 import editUserRoutes from './routes/user/user.js';
 import petRoutes from './routes/pet/pet.js';
 import petOwnerOperationsRoutes from './routes/pet/petOwnerOperations.js';
+import careGiveRoutes from './routes/cere_give/careGive.js';
 import animalKeywordRoutes from './routes/key_words/animalCategory.js';
 import bodyParser from 'body-parser';
 import expireStories from './cron_jobs/deleteExpiredStories.js';
@@ -65,6 +66,7 @@ app.use("/api/user", editUserRoutes);
 app.use("/api/pet", petRoutes);
 app.use("/api/petOwner", petOwnerOperationsRoutes);
 app.use("/api/keywords/animals", animalKeywordRoutes);
+app.use("/api/careGive", careGiveRoutes);
 
 app.use((err, req, res, next) => {
   const status = err.status || 500;

@@ -455,8 +455,6 @@ router.delete(
     }
 );
 
-//To Do: follow - unfollow event
-
 //organizer operations
 router.use("/organizer", organizerEndpoints);
 
