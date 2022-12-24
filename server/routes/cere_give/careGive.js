@@ -648,6 +648,18 @@ router.put(
     auth,
     async (req, res) => {
         try{
+            const careGiveId = req.params.careGiveId;
+            const missionDesc = req.body.missionDesc;
+            const missionDate = req.body.missionDate;
+
+            if(!careGiveId || !missionDesc || !missionDate){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "Missing param"
+                    }    
+                );
+            }
             
         }catch(err){
             console.log("Error: schedule care give mission - ", err);
