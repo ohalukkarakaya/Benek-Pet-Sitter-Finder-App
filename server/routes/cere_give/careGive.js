@@ -644,7 +644,7 @@ router.put(
 
 //schedule care give
 router.put(
-    "/schedule/:careGiveId",
+    "/mission/schedule/:careGiveId",
     auth,
     async (req, res) => {
         try{
@@ -735,6 +735,24 @@ router.put(
                 {
                     error: true,
                     message: "Internal server error"
+                }
+            );
+        }
+    }
+);
+
+router.put(
+    "/mission/getTimeCode/:careGiveId",
+    auth,
+    async (req, res) => {
+        try{
+
+        }catch(err){
+            console.log(err);
+            return res.status(500).json(
+                {
+                    error: true,
+                    message: "Internal Server Error"
                 }
             );
         }
