@@ -648,9 +648,9 @@ router.put(
     auth,
     async (req, res) => {
         try{
-            const careGiveId = req.params.careGiveId;
-            const missionDesc = req.body.missionDesc;
-            const missionDate = req.body.missionDate;
+            const careGiveId = req.params.careGiveId.toString();
+            const missionDesc = req.body.missionDesc.toString();
+            const missionDate = Date.parse(req.body.missionDate.toString());
 
             if(!careGiveId || !missionDesc || !missionDate){
                 return res.status(400).json(
@@ -661,6 +661,74 @@ router.put(
                 );
             }
             
+            const careGive = await CareGive.findById(careGiveId);
+            if(!careGive){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "Care give not found"
+                    }
+                );
+            }
+
+            const areThereMissionAtSameTime = careGive.missionCallender.find(
+                missionObject => 
+                    missionObject.missionDate === missionDate
+            );
+            if(areThereMissionAtSameTime){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "there is allready mission scheduled at this time"
+                    }
+                );
+            }
+
+            let isExtraService
+            if(Date.now() > Date.parse(careGive.startDate)){
+                isExtraService = true;
+            }else{
+                isExtraService = false;
+            }
+
+            if(isExtraService){
+                //take payment
+            }
+
+            careGive.missionCallender.push(
+                {
+                    missionDesc: missionDesc,
+                    missionDate: missionDate,
+                    missionDeadline: new Date.parse(missionDate + 1*60*60*1000),
+
+                }
+            );
+            careGive.markModified("missionCallender");
+            careGive.save().then(
+                (savedMission) => {
+                    if(savedMission){
+                        return res.status(200).json(
+                            {
+                                error: false,
+                                message: "mission inserted succesfully",
+                                missionId :savedMission._id.toString()
+                            }
+                        );
+                    }
+                }
+            ).catch(
+                (error) => {
+                    if(error){
+                        console.log(error);
+                        return res.status(500).json(
+                            {
+                                error: true,
+                                message: "Internal server error"
+                            }
+                        );
+                    }
+                }
+            );
         }catch(err){
             console.log("Error: schedule care give mission - ", err);
             return res.status(500).json(
