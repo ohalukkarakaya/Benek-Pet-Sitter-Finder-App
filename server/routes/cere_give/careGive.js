@@ -955,7 +955,135 @@ router.put(
     auth,
     async (req, res) => {
         try{
-            
+            const userId = req.user._id.toString();
+            const careGiveId = req.params.careGiveId;
+            const missionId = req.params.missionId;
+            const responseAsString = req.params.response;
+            if( !userId || !careGiveId || !missionId || !responseAsString ){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "missing params"
+                    }
+                );
+            }
+
+            if(responseAsString !== "true" && responseAsString!== "false"){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "response type can be boolean"
+                    }
+                );
+            }
+
+            const response = responseAsString === "true";
+
+            const careGive = await CareGive.findById(careGiveId.toString());
+            if(!careGive){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "careGive not found"
+                    }
+                );
+            }
+            if(careGive.petOwner.petOwnerId.toString !== userId.toString()){
+                return res.status(401).json(
+                    {
+                        error: true,
+                        message: "you are not authorized to accept this request"
+                    }
+                );
+            }
+
+            const mission = careGive.missionCallender.find(
+                missionObject =>
+                    missionObject._id.toString() === missionId.toString()
+            );
+            if(!mission){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "mission not found"
+                    }
+                );
+            }
+            if(
+                !mission.missionAcception.isMissionAccepted
+                || !mission.extra.isExtra
+                || mission.extra.isExtraAccepted
+                || mission.extra.extraServicePrice.priceType === "NotExtra"
+                    && mission.extra.extraServicePrice.price === 0
+            ){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "something wrong with your request"
+                    }
+                );
+            }
+
+            if(!response){
+                careGive.missionCallender = careGive.missionCallender.filter(
+                    missionObject => 
+                        missionObject._id.toString() !== missionId.toString()
+                );
+                careGive.markModified("missionCallender");
+                careGive.save().then(
+                    (_) => {
+                        return res.status(200).json(
+                            {
+                                error: false,
+                                message: "mission refused succesfully"
+                            }
+                        );
+                    }
+                ).catch(
+                    (error) => {
+                        if(error){
+                            console.log(error);
+                            return res.status(500).json(
+                                {
+                                    error: true,
+                                    message: "Internal Server Error"
+                                }
+                            );
+                        }
+                    }
+                );
+            }else{
+                const price = mission.extra.extraServicePrice.price;
+                const priceType = mission.extra.extraServicePrice.priceType;
+                // take payment here
+
+                mission.isExtraAccepted = true;
+                careGive.markModified("missionCallender");
+                careGive.save().then(
+                    (_) => {
+                        return res.status(200).json(
+                            {
+                                error: false,
+                                message: "extra service accepted succesfully"
+                            }
+                        );
+                    }
+                ).catch(
+                    (error) => {
+                        if(error){
+                            console.log(error);
+                            return res.status(500).json(
+                                {
+                                    error: true,
+                                    message: "Internal Server Error"
+                                }
+                            );
+                        }
+                    }
+                );
+            }
+
+
         }catch(err){
             console.log("Error: accept extra service mission - ", err);
             return res.status(500).json(
@@ -968,6 +1096,7 @@ router.put(
     }    
 );
 
+//get time code for upload mission
 router.put(
     "/mission/getTimeCode/:careGiveId",
     auth,
