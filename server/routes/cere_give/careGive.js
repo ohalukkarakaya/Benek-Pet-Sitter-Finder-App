@@ -684,17 +684,6 @@ router.put(
                 );
             }
 
-            let isExtraService
-            if(Date.now() > Date.parse(careGive.startDate)){
-                isExtraService = true;
-            }else{
-                isExtraService = false;
-            }
-
-            if(isExtraService){
-                //take payment
-            }
-
             careGive.missionCallender.push(
                 {
                     missionDesc: missionDesc,

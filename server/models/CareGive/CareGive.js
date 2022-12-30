@@ -84,33 +84,6 @@ const CareGiveSchema = new mongoose.Schema(
                 type: Number,
                 default: 0,
             }
-        },
-        extraServicesPrice: {
-            priceType: {
-                type: String,
-                enum: [ "Free", "TL", "USD", "EUR" ],
-                default: "Free",
-                validate: [
-                    function (value) {
-                        const servicePrice = this.servicePrice;
-                        if(servicePrice.priceType === "Free"){
-                           return value === "Free";
-                        }
-                    }
-                ]
-            },
-            price: {
-                type: Number,
-                default: 0,
-                validate: [
-                    function (value) {
-                        const servicePrice = this.servicePrice;
-                        if(servicePrice.priceType === "Free"){
-                           return value === 0;
-                        }
-                    }
-                ]
-            }
         }
       },
       startDate: {
@@ -179,6 +152,36 @@ const CareGiveSchema = new mongoose.Schema(
                 isApproved: {
                     type: Boolean,
                     default: false
+                }
+            },
+            missionAcception: {
+                isMissionAccepted: {
+                    type: Boolean,
+                    default: false,
+                },
+                refuseOrMakeExtraReason: {
+                    type: String
+                }
+            },
+            extra: {
+                isExtra: {
+                    type: Boolean,
+                    default: false
+                },
+                isExtraAccepted: {
+                    type: Boolean,
+                    default: false
+                },
+                extraServicePrice: {
+                    priceType: {
+                        type: String,
+                        enum: [ "Free", "TL", "USD", "EUR" ],
+                        default: "Free"
+                    },
+                    price: {
+                        type: Number,
+                        default: 0,
+                    }
                 }
             }
         }
