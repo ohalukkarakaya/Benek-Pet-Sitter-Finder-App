@@ -140,20 +140,6 @@ const CareGiveSchema = new mongoose.Schema(
                     }
                 ]
             },
-            missionContent:{
-                timePassword: {
-                    type: String,
-                    required:true
-                },
-                videoUrl: {
-                    type: String,
-                    required: true,
-                },
-                isApproved: {
-                    type: Boolean,
-                    default: false
-                }
-            },
             missionAcception: {
                 isMissionAccepted: {
                     type: Boolean,
@@ -183,7 +169,27 @@ const CareGiveSchema = new mongoose.Schema(
                         default: 0,
                     }
                 }
-            }
+            },
+            missionContent:{
+                timeSignature: {
+                    timePassword: {
+                        type: String,
+                        required:true
+                    },
+                    expiresAt: {
+                        type: Date,
+                        default: Date.now() + 10 * 60 * 1000
+                    }
+                },
+                videoUrl: {
+                    type: String,
+                    required: true,
+                },
+                isApproved: {
+                    type: Boolean,
+                    default: false
+                }
+            },
         }
       ]
   },
