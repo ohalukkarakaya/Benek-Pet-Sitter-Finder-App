@@ -159,7 +159,7 @@ const CareGiveSchema = new mongoose.Schema(
                     type: Boolean,
                     default: false,
                 },
-                refuseOrMakeExtraReason: {
+                ReasonToMakeExtra: {
                     type: String
                 }
             },
@@ -175,8 +175,8 @@ const CareGiveSchema = new mongoose.Schema(
                 extraServicePrice: {
                     priceType: {
                         type: String,
-                        enum: [ "Free", "TL", "USD", "EUR" ],
-                        default: "Free"
+                        enum: [ "NotExtra", "TL", "USD", "EUR" ],
+                        default: "NotExtra"
                     },
                     price: {
                         type: Number,
