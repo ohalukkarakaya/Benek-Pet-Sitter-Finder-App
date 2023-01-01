@@ -22,7 +22,7 @@ const CareGiveSchema = new mongoose.Schema(
         actionCode: {
             codeType: {
                 type: String,
-                enum: [ "Start", "Finish" ],
+                enum: [ "Start", "Finish", "Done" ],
                 required: true
             },
             codePassword: {
@@ -38,6 +38,13 @@ const CareGiveSchema = new mongoose.Schema(
       isStarted: {
         type: Boolean,
         default: false
+      },
+      finishProcess: {
+        isFinished: {
+            type: Boolean,
+            default: false,
+        },
+        finishDate: Date
       },
       petId: {
         type: String,
