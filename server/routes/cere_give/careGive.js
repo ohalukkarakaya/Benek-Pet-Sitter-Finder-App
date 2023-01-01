@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import auth from "../../middleware/auth.js";
 import QRCode from "qrcode";
+import validateMission from "../../middleware/validateMission.js";
+import uploadMissionContent from "../../middleware/contentHandle/serverHandleMissionContent.js";
 
 dotenv.config();
 
@@ -1207,68 +1209,49 @@ router.put(
 router.post(
     "/uploadMission/:careGiveId/:missionId",
     auth,
+    validateMission,
+    uploadMissionContent,
     async (req, res) => {
         try{
-            const careGiveId = req.params.careGiveId;
-            const missionId = req.params.missionId;
-            const timeSignaturePassword = req.body.timeSignaturePassword;
-            const userId = req.user._id.toString();
-
-            if( !careGiveId || !missionId || !timeSignaturePassword || !userId ){
-                return res.status(400).json(
+            const careGive = req.careGive;
+            const mission = req. mission;
+            const cdnUrl = req.cdnUrl;
+            const fileName = req.missionContent;
+            
+            if(!careGive || !mission || !cdnUrl || !fileName){
+                return res.status(500).json(
                     {
                         error: true,
-                        message: "missing params"
+                        message: "Internal server error"
                     }
                 );
             }
 
-            const careGive = await CareGive.findById(careGiveId.toString());
-            if(!careGive){
-                return res.status(404).json(
-                    {
-                        error: true,
-                        message: "careGive not found"
+            mission.missionContent.videoUrl = cdnUrl;
+            careGive.markModified("missionCallender");
+            careGive.save().then(
+                (_) => {
+                    return res.status(200).json(
+                        {
+                            error: false,
+                            message: "Mission Content Uploaded",
+                            videoUrl: cdnUrl
+                        }
+                    );
+                }
+            ).catch(
+                (err) => {
+                    if(err){
+                        console.log(err);
+                        return res.status(500).json(
+                            {
+                                error: true,
+                                message: "Internal server error"
+                            }
+                        );
                     }
-                );
-            }
-            if(careGive.careGiver.careGiverId.toString !== userId){
-                return res.status(401).json(
-                    {
-                        error: true,
-                        message: "You are not authorized to upload content in this mission"
-                    }
-                );
-            }
-
-            const mission = careGive.missionCallender.find(
-                missionObject =>
-                    missionObject._id.toString() === missionId.toString()
+                }
             );
-            if(!mission){
-                return res.status(404).json(
-                    {
-                        error: true,
-                        message: "mission not found"
-                    }
-                );
-            }
-            if(mission.missionContent.timeSignature.timePassword !== timeSignaturePassword){
-                return res.status(400).json(
-                    {
-                        error: true,
-                        message: "invalid time signature password"
-                    }
-                );
-            }
-            if(Date.parse(mission.missionContent.timeSignature.expiresAt) < Date.now()){
-                return res.status(400).json(
-                    {
-                        error: true,
-                        message: "invalid time signature password"
-                    }
-                );
-            }
         }catch(err){
             console.log(err);
             return res.status(500).json(

@@ -3,7 +3,6 @@ import User from "../../../../models/User.js";
 import Event from "../../../../models/Event/Event.js";
 import dotenv from "dotenv";
 import auth from "../../../../middleware/auth.js";
-import { uploadEventContent } from "../../../../middleware/contentHandle/serverHandleAfterEventContent.js";
 
 dotenv.config();
 
