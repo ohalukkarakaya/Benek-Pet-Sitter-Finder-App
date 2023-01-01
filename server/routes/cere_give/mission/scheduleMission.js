@@ -1,8 +1,8 @@
 import express from "express";
-import CareGive from "../../models/CareGive/CareGive.js";
+import CareGive from "../../../models/CareGive/CareGive.js";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
-import auth from "../../middleware/auth.js";
+import auth from "../../../middleware/auth.js";
 
 dotenv.config();
 
