@@ -836,7 +836,7 @@ router.post(
                 );
             }
 
-            if(Date.parse(careGive.endDate) >= Date.now()){
+            if(!careGive.finishProcess.isFinished){
                 return res.status(400).json(
                     {
                         error: true,
