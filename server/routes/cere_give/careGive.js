@@ -642,12 +642,99 @@ router.put(
     }
 );
 
+//TO DO: give star to care giver
+router.post(
+    "/giveStar/:careGiveId/:star",
+    auth,
+    async (req, res) => {
+        try{
+            const careGiveId = req.params.careGiveId;
+            const star = req.params.star;
+            if(!careGiveId || !star || typeof star !== "number"){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "Some thing wrong with params"
+                    }
+                );
+            }
+
+            const careGive = await CareGive.findById(careGiveId.toString());
+            if(!careGive){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "CareGive not found"
+                    }
+                );
+            }
+
+            if(careGive.petOwner.petOwnerId !== req.user._id.toString()){
+                return res.status(401).json(
+                    {
+                        error: true,
+                        message: "You are not authorized to give star for this pet owner"
+                    }
+                );
+            }
+
+            if(Date.parse(careGive.endDate) >= Date.now()){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "too early to give star"
+                    }
+                );
+            }
+
+            const careGiverId = careGive.careGiver.careGiverId.toString();
+            const careGiver = await User.findById(careGiverId);
+            if(!careGiver){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "care giver not found"
+                    }
+                );
+            }
+
+            careGiver.stars.push(
+                {
+                    ownerId: req.user._id.toString,
+                    petId: careGive.petId,
+                    star: star,
+                    date: Date.now()
+                }
+            );
+            careGiver.markModified("stars");
+            careGiver.save().then(
+                (_) => {
+                    return res.status(200).json(
+                        {
+                            error: false,
+                            message: `${star} star given to care giver`
+                        }
+                    );
+                }
+            ).catch(
+                (error) => {
+                    if(error){
+                        console.log(error);
+                        return res.status(500).json(
+                            {
+                                error: true,
+                                message: "Internal server error"
+                            }
+                        );
+                    }
+                }
+            );
+        }catch(err){
+
+        }
+    }
+);
+
 router.use("/mission", missionEndPoints);
 
 export default router;
-
-//TO DO: give star to care giver
-//TO DO: plan care give for a pet
-//TO DO: plan care give missions
-//TO DO: upload care give mission
-//TO DO: approve care give mission

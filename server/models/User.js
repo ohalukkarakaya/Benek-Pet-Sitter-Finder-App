@@ -157,10 +157,26 @@ const UserSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
-        stars: {
-            type: Array,
-            default: []
-        },
+        stars: [
+            {
+                ownerId: {
+                    type: String,
+                    required: true
+                },
+                petId: {
+                    type: String,
+                    required: true
+                },
+                star: {
+                    type: Number,
+                    required: true
+                },
+                date: {
+                    type: Date,
+                    default: Date.now()
+                }
+            }
+        ],
         dependedUsers: {
             type: Array,
             default: []
