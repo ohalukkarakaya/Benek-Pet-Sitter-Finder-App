@@ -1,6 +1,5 @@
 import multer from "multer";
 import multerS3 from "multer-s3";
-import CareGive from "../../models/CareGive/CareGive.js";
 import dotenv from "dotenv";
 import s3 from "../../utils/s3Service.js";
 
@@ -62,23 +61,64 @@ const upload = multer(
     }
 );
 
+const deleteContent = async (req, file, deleteParams) => {
+    try {
+        fileFilter.then(
+            (_) => {
+                s3.deleteObject(deleteParams).promise();
+                console.log("Success", data);
+                return data;
+            }
+        );
+    } catch (err) {
+        console.log("Error", err);
+    }
+  };
+
+const ValidateAndCleanBucket = async (
+    req,
+    areThereContentAlready,
+    contentName
+) => {
+    if(areThereContentAlready){
+        const deleteMissionContentParams = {
+            Bucket: process.env.BUCKET_NAME,
+            Key: `careGive/${req.careGiveId.toString()}/${contentName}`
+        };
+        await deleteContent(deleteMissionContentParams);
+    }
+}
+
 //Upload File
 const uploadMissionContent = async (req, res, next) => {
     try{
-        upload.single( 'file' )(
+        const areThereContentAlready = req.mission.missionContent.videoUrl;
+
+        const splitedVideoUrl = req.mission.missionContent.videoUrl.split("/");
+        const contentName = splitedVideoUrl[splitedVideoUrl.length - 1];
+
+        ValidateAndCleanBucket(
             req,
-            {},
-            (error) => {
-                if(error){
-                    console.log("error", error);
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: "A problem occured wile uploading content"
+            areThereContentAlready,
+            contentName
+        ).then(
+            (_) => {
+                upload.single( 'file' )(
+                    req,
+                    {},
+                    (error) => {
+                        if(error){
+                            console.log("error", error);
+                            return res.status(500).json(
+                                {
+                                    error: true,
+                                    message: "A problem occured wile uploading content"
+                                }
+                            );
                         }
-                    );
-                }
-                next();
+                        next();
+                    }
+                );
             }
         );
     }catch(err){
