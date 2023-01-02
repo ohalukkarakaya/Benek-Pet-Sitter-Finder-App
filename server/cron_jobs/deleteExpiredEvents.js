@@ -62,7 +62,7 @@ const expireEvents = cron.schedule(
                             await s3.deleteObjects(deleteParams);
                                 if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
                             }
-                            emptyS3Directory(process.env.BUCKET_NAME, `events/${eventId.toString()}/`).then(
+                            emptyS3Directory(process.env.BUCKET_NAME, `events/${meetingEvent._id.toString()}/`).then(
                                 (_) => {
                                   //delete pet
                                   meetingEvent.deleteOne().then(
