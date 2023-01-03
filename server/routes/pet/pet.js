@@ -2,6 +2,7 @@ import express from "express";
 import Pet from "../../models/Pet.js";
 import User from "../../models/User.js";
 import CareGive from "../../models/CareGive/CareGive.js";
+import ReportMission from "../../models/report/ReportMission.js";
 import { createPetReqBodyValidation } from "../../utils/bodyValidation/pets/createPetValidationSchema.js";
 import { editVaccinationCertificateValidation } from "../../utils/bodyValidation/pets/editVaccinationCertificateReqValidationSchema.js";
 import auth from "../../middleware/auth.js";
@@ -622,6 +623,20 @@ router.delete(
               {
                 error: true,
                 message: "Pet is on care give"
+              }
+            );
+          }
+        }
+      );
+
+      await ReportMission.findOne(
+        { petId: petId },
+        (err, report) => {
+          if( report ){
+            return res.status(400).json(
+              {
+                error: true,
+                message: "There is reported mission about this pet"
               }
             );
           }
