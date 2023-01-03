@@ -1,17 +1,18 @@
 import express from "express";
 import Pet from "../../models/Pet.js";
+import User from "../../models/User.js";
+import CareGive from "../../models/CareGive/CareGive.js";
 import { createPetReqBodyValidation } from "../../utils/bodyValidation/pets/createPetValidationSchema.js";
 import { editVaccinationCertificateValidation } from "../../utils/bodyValidation/pets/editVaccinationCertificateReqValidationSchema.js";
 import auth from "../../middleware/auth.js";
 import editPetAuth from "../../middleware/editPetAuth.js";
 import { createRequire } from "module";
-import User from "../../models/User.js";
 import { updatePetProfileImg } from "../../middleware/imageHandle/serverHandlePetProfileImage.js";
 import { uploadPetImages } from "../../middleware/imageHandle/serverHandlePetImages.js";
 import { uploadPetVaccinationCertificate } from "../../middleware/imageHandle/serverHandlePetVaccinationCertificates.js";
 import s3 from "../../utils/s3Service.js";
 import dotenv from "dotenv";
-import petInteractions from "./petInteractions.js"; 
+import petInteractions from "./petInteractions.js";
 
 const require = createRequire(import.meta.url);
 const rawPetDataset = require('../../src/pet_dataset.json');
@@ -611,6 +612,21 @@ router.delete(
       const allOwners = req.pet.allOwners.filter(owner => owner.toString() !== req.pet.primaryOwner.toString());
       const petId = req.pet._id.toString();
       const petFollowers = req.pet.followers;
+
+      //check if pet is on care give
+      await CareGive.findOne(
+        { petId: petId },
+        (err, careGive) => {
+          if( careGive && !careGive.finishProcess.isFinished ){
+            return res.status(400).json(
+              {
+                error: true,
+                message: "Pet is on care give"
+              }
+            );
+          }
+        }
+      );
 
       //clean followers follow event
       for(var i = 0; i < petFollowers.length; i ++){
