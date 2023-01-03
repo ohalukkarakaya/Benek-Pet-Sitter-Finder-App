@@ -91,6 +91,17 @@ const CareGiveSchema = new mongoose.Schema(
                 type: Number,
                 default: 0,
             }
+        },
+        extraServicePrice: {
+            priceType: {
+                type: String,
+                enum: [ "Free", "TL", "USD", "EUR" ],
+                default: "Free"
+            },
+            price: {
+                type: Number,
+                default: 0,
+            }
         }
       },
       startDate: {

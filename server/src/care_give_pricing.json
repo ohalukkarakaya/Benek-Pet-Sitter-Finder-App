@@ -1,0 +1,183 @@
+{
+    "description": "care give service prices",
+    "prices": [
+        {
+            "id": "CGV-S",
+            "category": "small pets",
+            "tag": "small-pet",
+            "extraMission": {
+                "TL": 50,
+                "EUR": 10,
+                "USD": 10,
+                "RUB": 80
+            },
+            "servicePackages": [
+                {
+                    "id": "S0",
+                    "one-hour": {
+                        "numberOfTasks": 1,
+                        "servicePrice": {
+                            "TL": 100,
+                            "EUR": 10,
+                            "USD": 10,
+                            "RUB": 666
+                        }
+                    }
+                },
+                {
+                    "id": "S1",
+                    "one-day": {
+                        "numberOfTasks": 5,
+                        "servicePrice": {
+                            "TL": 300,
+                            "EUR": 30,
+                            "USD": 30,
+                            "RUB": 2000
+                        }
+                    }
+                },
+                {
+                    "id": "S2",
+                    "one-week": {
+                        "numberOfTasks": 35,
+                        "servicePrice": {
+                            "TL": 1000,
+                            "EUR": 100,
+                            "USD": 100,
+                            "RUB": 4000
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "CGV-M",
+            "category": "medium pets",
+            "tag": "medium-pet",
+            "servicePackages": [
+                {
+                    "id": "M0",
+                    "one-hour": {
+                        "numberOfTasks": 1,
+                        "servicePrice": {
+                            "TL": 150,
+                            "EUR": 20,
+                            "USD": 20,
+                            "RUB": 800
+                        }
+                    }
+                },
+                {
+                    "id": "M1",
+                    "one-day": {
+                        "numberOfTasks": 5,
+                        "servicePrice": {
+                            "TL": 450,
+                            "EUR": 40,
+                            "USD": 40,
+                            "RUB": 3000
+                        }
+                    }
+                },
+                {
+                    "id": "M2",
+                    "one-week": {
+                        "numberOfTasks": 35,
+                        "servicePrice": {
+                            "TL": 1500,
+                            "EUR": 150,
+                            "USD": 150,
+                            "RUB": 5000
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "CGV-L",
+            "category": "large pets",
+            "tag": "large-pet",
+            "servicePackages": [
+                {
+                    "id": "L0",
+                    "one-hour": {
+                        "numberOfTasks": 1,
+                        "servicePrice": {
+                            "TL": 200,
+                            "EUR": 30,
+                            "USD": 30,
+                            "RUB": 900
+                        }
+                    }
+                },
+                {
+                    "id": "L1",
+                    "one-day": {
+                        "numberOfTasks": 5,
+                        "servicePrice": {
+                            "TL": 500,
+                            "EUR": 50,
+                            "USD": 50,
+                            "RUB": 4000
+                        }
+                    }
+                },
+                {
+                    "id": "L2",
+                    "one-week": {
+                        "numberOfTasks": 35,
+                        "servicePrice": {
+                            "TL": 2000,
+                            "EUR": 200,
+                            "USD": 200,
+                            "RUB": 6000
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "CGV-XL",
+            "category": "x-large pets",
+            "tag": "x-large-pet",
+            "servicePackages": [
+                {
+                    "id": "XL0",
+                    "one-hour": {
+                        "numberOfTasks": 1,
+                        "servicePrice": {
+                            "TL": 400,
+                            "EUR": 50,
+                            "USD": 50,
+                            "RUB": 2000
+                        }
+                    }
+                },
+                {
+                    "id": "L1",
+                    "one-day": {
+                        "numberOfTasks": 5,
+                        "servicePrice": {
+                            "TL": 1000,
+                            "EUR": 200,
+                            "USD": 200,
+                            "RUB": 6000
+                        }
+                    }
+                },
+                {
+                    "id": "L2",
+                    "one-week": {
+                        "numberOfTasks": 35,
+                        "servicePrice": {
+                            "TL": 7000,
+                            "EUR": 1000,
+                            "USD": 1000,
+                            "RUB": 14000
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
