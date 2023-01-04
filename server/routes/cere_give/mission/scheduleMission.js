@@ -45,6 +45,15 @@ router.put(
                 );
             }
 
+            if( Date.parse(careGive.endDate) < missionDate ){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "You can't insert mission on this date"
+                    }
+                );
+            }
+
             const areThereMissionAtSameTime = careGive.missionCallender.find(
                 missionObject => 
                     missionObject.missionDate === missionDate
