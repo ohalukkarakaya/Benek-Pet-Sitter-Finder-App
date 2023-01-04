@@ -4,9 +4,14 @@ import Pet from "../../models/Pet.js";
 import CareGive from "../../models/CareGive/CareGive.js";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
+import { createRequire } from "module";
 import auth from "../../middleware/auth.js";
 import QRCode from "qrcode";
 import missionEndPoints from "./mission/mission.js";
+
+const require = createRequire(import.meta.url);
+const rawPricingDataset = require('../../src/care_give_pricing.json');
+const pricingDataset = JSON.parse(JSON.stringify(rawPricingDataset));
 
 dotenv.config();
 
@@ -26,7 +31,6 @@ router.post(
             if(
                 !petId
                 || !startDate
-                || !endDate
                 || !meetingAdress
             ){
                 return res.status(400).json(
@@ -37,10 +41,11 @@ router.post(
                 );
             }
 
-
+            let pricingToSave;
+            let miliSecToCountEndDate;
             const price = req.body.price;
             if(price){
-                if(!price.servicePrice || !price.extraServicesPrice){
+                if(!price.petTypeCode || !price.serviceTypeCode || !price.type){
                     return res.status(400).json(
                         {
                             error: true,
@@ -48,10 +53,49 @@ router.post(
                         }
                     );
                 }
+                const petTypePricingModel = pricingDataset.find(
+                    pricingObject =>
+                        pricingObject.id === price.petTypeCode
+                );
+                if(!petTypePricingModel){
+                    return res.status(404).json(
+                        {
+                            error: true,
+                            message: "pricing pet type model not found"
+                        }
+                    );
+                }
+
+                const pricing = petTypePricingModel.servicePackages.find(
+                    petTypeObject =>
+                        petTypeObject.id === price.serviceTypeCode
+                );
+                if(!pricing){
+                    return res.status(404).json(
+                        {
+                            error: true,
+                            message: "pricing not found"
+                        }
+                    );
+                }
+
+                const pricingType = price.type;
+                const servicePrice = pricing.servicePrice[ price.type ];
+                const extraMissionPrice = petTypePricingModel.extraMission[ priceType ];
+                const maxMissionCount = pricing.numberOfTasks;
+
+                miliSecToCountEndDate = Number(pricing.milisecondsToAdd);
+
+                pricingToSave = {
+                    "priceType": pricingType,
+                    "servicePrice": servicePrice,
+                    "extraMissionPrice": extraMissionPrice,
+                    "maxMissionCount": maxMissionCount
+                };
             }
 
-            const pet = await Pet.findById(petId);
-            if(!pet){
+            const pet = await Pet.findById( petId );
+            if( !pet ){
                 return res.status(404).json(
                     {
                         error: true,
@@ -133,9 +177,9 @@ router.post(
                                 petOwnerPhone: owner.phone
                             }
                         },
-                        price: price,
+                        price: pricingToSave,
                         startDate: startDate,
-                        endDate: endDate,
+                        endDate: new Date(Date.parse(startDate) + miliSecToCountEndDate),
                         adress: meetingAdress
                     }
                 ).then(
@@ -309,8 +353,8 @@ router.put(
                                 petOwner.save().then(
                                     async (___) => {
                                         if(isPetOwner){
-                                            const price = invitedCareGive.prices.servicePrice;
-                                            if(price.priceType !== "Free" && price.price !== 0){
+                                            const price = invitedCareGive.prices;
+                                            if(price.priceType !== "Free" && price.servicePrice !== 0){
                                                 //take payment in here
                                             }
 

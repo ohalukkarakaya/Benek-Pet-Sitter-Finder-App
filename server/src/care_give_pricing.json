@@ -2,6 +2,45 @@
     "description": "care give service prices",
     "prices": [
         {
+            "id": "CGV-XS",
+            "category": "x-small pets",
+            "tag": "x-small-pet",
+            "extraMission": {
+                "TL": 50,
+                "EUR": 10,
+                "USD": 10,
+                "RUB": 80
+            },
+            "servicePackages": [
+                {
+                    "id": "XS0",
+                    "one-day": {
+                        "numberOfTasks": 5,
+                        "milisecondsToAdd": "24 * 60 * 60 * 1000",
+                        "servicePrice": {
+                            "TL": 150,
+                            "EUR": 20,
+                            "USD": 20,
+                            "RUB": 2000
+                        }
+                    }
+                },
+                {
+                    "id": "XS1",
+                    "one-week": {
+                        "numberOfTasks": 35,
+                        "milisecondsToAdd": "7 * 24 * 60 * 60 * 1000",
+                        "servicePrice": {
+                            "TL": 700,
+                            "EUR": 100,
+                            "USD": 100,
+                            "RUB": 4000
+                        }
+                    }
+                }
+            ]
+        },
+        {
             "id": "CGV-S",
             "category": "small pets",
             "tag": "small-pet",
@@ -16,6 +55,7 @@
                     "id": "S0",
                     "one-hour": {
                         "numberOfTasks": 1,
+                        "milisecondsToAdd": "60 * 60 * 1000",
                         "servicePrice": {
                             "TL": 100,
                             "EUR": 10,
@@ -28,6 +68,7 @@
                     "id": "S1",
                     "one-day": {
                         "numberOfTasks": 5,
+                        "milisecondsToAdd": "24 * 60 * 60 * 1000",
                         "servicePrice": {
                             "TL": 300,
                             "EUR": 30,
@@ -40,10 +81,11 @@
                     "id": "S2",
                     "one-week": {
                         "numberOfTasks": 35,
+                        "milisecondsToAdd": "7 * 24 * 60 * 60 * 1000",
                         "servicePrice": {
-                            "TL": 1000,
-                            "EUR": 100,
-                            "USD": 100,
+                            "TL": 1500,
+                            "EUR": 150,
+                            "USD": 150,
                             "RUB": 4000
                         }
                     }
@@ -59,8 +101,9 @@
                     "id": "M0",
                     "one-hour": {
                         "numberOfTasks": 1,
+                        "milisecondsToAdd": "60 * 60 * 1000",
                         "servicePrice": {
-                            "TL": 150,
+                            "TL": 200,
                             "EUR": 20,
                             "USD": 20,
                             "RUB": 800
@@ -71,8 +114,9 @@
                     "id": "M1",
                     "one-day": {
                         "numberOfTasks": 5,
+                        "milisecondsToAdd": "24 * 60 * 60 * 1000",
                         "servicePrice": {
-                            "TL": 450,
+                            "TL": 500,
                             "EUR": 40,
                             "USD": 40,
                             "RUB": 3000
@@ -83,10 +127,11 @@
                     "id": "M2",
                     "one-week": {
                         "numberOfTasks": 35,
+                        "milisecondsToAdd": "7 * 24 * 60 * 60 * 1000",
                         "servicePrice": {
-                            "TL": 1500,
-                            "EUR": 150,
-                            "USD": 150,
+                            "TL": 2000,
+                            "EUR": 200,
+                            "USD": 200,
                             "RUB": 5000
                         }
                     }
@@ -102,8 +147,9 @@
                     "id": "L0",
                     "one-hour": {
                         "numberOfTasks": 1,
+                        "milisecondsToAdd": "60 * 60 * 1000",
                         "servicePrice": {
-                            "TL": 200,
+                            "TL": 300,
                             "EUR": 30,
                             "USD": 30,
                             "RUB": 900
@@ -114,8 +160,9 @@
                     "id": "L1",
                     "one-day": {
                         "numberOfTasks": 5,
+                        "milisecondsToAdd": "24 * 60 * 60 * 1000",
                         "servicePrice": {
-                            "TL": 500,
+                            "TL": 600,
                             "EUR": 50,
                             "USD": 50,
                             "RUB": 4000
@@ -126,10 +173,11 @@
                     "id": "L2",
                     "one-week": {
                         "numberOfTasks": 35,
+                        "milisecondsToAdd": "7 * 24 * 60 * 60 * 1000",
                         "servicePrice": {
-                            "TL": 2000,
-                            "EUR": 200,
-                            "USD": 200,
+                            "TL": 2500,
+                            "EUR": 250,
+                            "USD": 250,
                             "RUB": 6000
                         }
                     }
@@ -145,8 +193,9 @@
                     "id": "XL0",
                     "one-hour": {
                         "numberOfTasks": 1,
+                        "milisecondsToAdd": "60 * 60 * 1000",
                         "servicePrice": {
-                            "TL": 400,
+                            "TL": 500,
                             "EUR": 50,
                             "USD": 50,
                             "RUB": 2000
@@ -154,9 +203,10 @@
                     }
                 },
                 {
-                    "id": "L1",
+                    "id": "XL1",
                     "one-day": {
                         "numberOfTasks": 5,
+                        "milisecondsToAdd": "24 * 60 * 60 * 1000",
                         "servicePrice": {
                             "TL": 1000,
                             "EUR": 200,
@@ -166,11 +216,12 @@
                     }
                 },
                 {
-                    "id": "L2",
+                    "id": "XL2",
                     "one-week": {
                         "numberOfTasks": 35,
+                        "milisecondsToAdd": "7 * 24 * 60 * 60 * 1000",
                         "servicePrice": {
-                            "TL": 7000,
+                            "TL": 6000,
                             "EUR": 1000,
                             "USD": 1000,
                             "RUB": 14000

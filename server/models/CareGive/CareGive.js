@@ -81,27 +81,26 @@ const CareGiveSchema = new mongoose.Schema(
         }
       },
       prices: {
-        servicePrice: {
-            priceType: {
-                type: String,
-                enum: [ "Free", "TL", "USD", "EUR" ],
-                default: "Free"
-            },
-            price: {
-                type: Number,
-                default: 0,
-            }
+        priceType: {
+            type: String,
+            enum: [ "Free", "TL", "USD", "EUR" ],
+            default: "Free"
         },
-        extraServicePrice: {
-            priceType: {
-                type: String,
-                enum: [ "Free", "TL", "USD", "EUR" ],
-                default: "Free"
-            },
-            price: {
-                type: Number,
-                default: 0,
-            }
+        servicePrice: {
+            type: Number,
+            default: 0,
+        },
+        extraMissionPrice: {
+            type: Number,
+            default: 0,
+        },
+        maxMissionCount: {
+            type: Number,
+            default: 0,
+        },
+        boughtExtra: {
+            type: Number,
+            default: 0,
         }
       },
       startDate: {
@@ -158,35 +157,9 @@ const CareGiveSchema = new mongoose.Schema(
                     }
                 ]
             },
-            missionAcception: {
-                isMissionAccepted: {
-                    type: Boolean,
-                    default: false,
-                },
-                ReasonToMakeExtra: {
-                    type: String
-                }
-            },
-            extra: {
-                isExtra: {
-                    type: Boolean,
-                    default: false
-                },
-                isExtraAccepted: {
-                    type: Boolean,
-                    default: false
-                },
-                extraServicePrice: {
-                    priceType: {
-                        type: String,
-                        enum: [ "NotExtra", "TL", "USD", "EUR" ],
-                        default: "NotExtra"
-                    },
-                    price: {
-                        type: Number,
-                        default: 0,
-                    }
-                }
+            isExtra: {
+                type: Boolean,
+                default: false
             },
             missionContent:{
                 timeSignature: {
