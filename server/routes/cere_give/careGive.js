@@ -951,6 +951,25 @@ router.put(
     }
 );
 
+//cancel careGive
+router.post(
+    "/extend/:careGiveId",
+    auth,
+    async (req, res) => {
+        try{
+            //TO DO
+        }catch(err){
+            console.log("ERROR: cancel care give", err);
+            return res.status(500).json(
+                {
+                    error: true,
+                    message: "Internal server error"
+                }
+            );
+        }
+    }
+);
+
 
 //give star to care giver
 router.post(
