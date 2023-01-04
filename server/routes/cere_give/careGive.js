@@ -953,7 +953,7 @@ router.put(
 
 //cancel careGive
 router.post(
-    "/extend/:careGiveId",
+    "/cancel/:careGiveId",
     auth,
     async (req, res) => {
         try{
