@@ -1234,7 +1234,13 @@ router.post(
                 }
             );
         }catch(err){
-
+            console.log("ERROR: give star", err);
+            return res.status(500).json(
+                {
+                    error: true,
+                    message: "Internal server error"
+                }
+            );
         }
     }
 );
