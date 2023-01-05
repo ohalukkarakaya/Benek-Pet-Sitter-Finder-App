@@ -225,6 +225,8 @@ router.put(
         try{
             const careGiveId = req.params.careGiveId;
             const usersResponse = req.params.response;
+            let isCreditPayment = req.body.isCreditPayment;
+
             if(!careGiveId || !usersResponse){
                 return res.status(400).json(
                     {
@@ -232,6 +234,9 @@ router.put(
                         message: "missing params"
                     }
                 );
+            }
+            if(!isCreditPayment){
+                isCreditPayment = false;
             }
 
             const invitedCareGive = await CareGive.findById(careGiveId);
@@ -350,14 +355,31 @@ router.put(
                     (_) => {
                         careGiver.save().then(
                             (__) => {
+                                if(isPetOwner){
+                                    const price = invitedCareGive.prices;
+                                    if(price.priceType !== "Free" && price.servicePrice !== 0){
+                                        if(isCreditPayment){
+                                            const creditType = petOwner.refundCredit.priceType;
+                                            const credit = petOwner.refundCredit.credit;
+
+                                            if(creditType === price.priceType || credit < price.servicePrice){
+                                                return res.status(400).json(
+                                                    {
+                                                        error: true,
+                                                        message: "Can't pay with credit"
+                                                    }
+                                                );
+                                            }
+                                            petOwner.refundCredit.credit = credit - price.servicePrice;
+                                            petOwner.markModified("refundCredit");
+                                        }else{
+                                            //take payment in here
+                                        }
+                                    }
+                                }
                                 petOwner.save().then(
                                     async (___) => {
                                         if(isPetOwner){
-                                            const price = invitedCareGive.prices;
-                                            if(price.priceType !== "Free" && price.servicePrice !== 0){
-                                                //take payment in here
-                                            }
-
                                             //generate password
                                             const randPassword = Buffer.from(Math.random().toString()).toString("base64").substring(0,20);
                                             const salt = await bcrypt.genSalt(Number(process.env.SALT));
@@ -957,7 +979,160 @@ router.post(
     auth,
     async (req, res) => {
         try{
-            //TO DO
+            const careGiveId = req.params.careGiveId.toString();
+            if(!careGiveId){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "missing params"
+                    }
+                );
+            }
+
+            const careGive = await CareGive.findById( careGiveId );
+            if(!careGive){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "Care give not found"
+                    }
+                );
+            }
+
+            if(
+                careGive.petOwner.petOwnerId.toString() !== req.user._id.toString()
+                && careGive.careGiver.careGiverId.toString() !== req.user._id.toString()
+            ){
+                return res.status(401).json(
+                    {
+                        error: true,
+                        message: "You'r unauthorized to cancel this care give"
+                    }
+                );
+            }
+
+            if(Date.parse(careGive.startDate) <= Date.now()){
+                return res.status(400).json(
+                    {
+                        error: true,
+                        message: "It is too late to cancel"
+                    }
+                );
+            }
+
+            const petOwner = await User.findById( careGive.petOwner.petOwnerId.toString() );
+            if(!petOwner){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "Pet owner not found"
+                    }
+                );
+            }
+
+            const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );
+            if(!careGiver){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "Care Giver not found"
+                    }
+                );
+            }
+
+            const pet = await Pet.findById( careGive.petId.toString() );
+            if(!pet){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "Pet not found"
+                    }
+                );
+            }
+
+            if(careGive.prices.priceType !== "Free" && careGive.prices.servicePrice > 0){
+                if( 
+                    petOwner.refundCredit.priceType !== careGive.prices.priceType
+                    && petOwner.refundCredit.priceType !== "None"
+                ){
+                    return res.status(400).json(
+                        {
+                            error: true,
+                            message: "money type doesn't fit"
+                        }
+                    );
+                }
+    
+                if( petOwner.refundCredit.priceType === "None" ){
+                    petOwner.refundCredit.priceType = careGive.prices.priceType
+                }
+
+                petOwner.refundCredit.credit = petOwner.refundCredit.credit + careGive.prices.servicePrice;
+                petOwner.markModified("refundCredit");
+            }
+
+            petOwner.pastCaregivers = petOwner.pastCaregivers.filter(
+                careGiverId =>
+                    careGiverId.toString() !== careGive.careGiver.careGiverId.toString()
+            );
+            petOwner.markModified("refundCredit");
+            petOwner.save(
+                function (err) {
+                    if(err) {
+                        console.error('ERROR: While Update!');
+                    }
+                  }
+            );
+
+            careGiver.caregiverCareer.filter(
+                careerObject =>
+                    careerObject.pet.toString() !== careGive.petId.toString()
+            );
+            careGiver.markModified("caregiverCareer");
+            careGiver.save(
+                function (err) {
+                    if(err) {
+                        console.error('ERROR: While Update!');
+                    }
+                  }
+            );
+
+
+            pet.careGiverHistory.filter(
+                historyObject =>
+                    historyObject.careGiver.toString() !== careGive.careGiver.careGiverId.toString()
+            );
+            pet.markModified("careGiverHistory");
+            pet.save(
+                function (err) {
+                    if(err) {
+                        console.error('ERROR: While Update!');
+                    }
+                  }
+            );
+
+            careGive.deleteOne().then(
+                (_) => {
+                    return res.status(200).json(
+                        {
+                            error: false,
+                            message: "careGive canceled succesfully"
+                        }
+                    );
+                }
+            ).catch(
+                (error) => {
+                    if(error){
+                        console.log(error);
+                        return res.status(500).json(
+                            {
+                                error: true,
+                                message: "Internal server error"
+                            }
+                        );
+                    }
+                }
+            );
         }catch(err){
             console.log("ERROR: cancel care give", err);
             return res.status(500).json(
