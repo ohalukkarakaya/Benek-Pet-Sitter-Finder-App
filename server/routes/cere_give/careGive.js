@@ -7,7 +7,9 @@ import bcrypt from "bcrypt";
 import { createRequire } from "module";
 import auth from "../../middleware/auth.js";
 import QRCode from "qrcode";
+
 import missionEndPoints from "./mission/mission.js";
+import emergencyEndPoints from "./emergency.js";
 
 const require = createRequire(import.meta.url);
 const rawPricingDataset = require('../../src/care_give_pricing.json');
@@ -1246,5 +1248,6 @@ router.post(
 );
 
 router.use("/mission", missionEndPoints);
+router.use("/emergency", emergencyEndPoints);
 
 export default router;

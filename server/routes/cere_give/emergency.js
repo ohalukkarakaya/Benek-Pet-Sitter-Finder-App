@@ -12,7 +12,7 @@ dotenv.config();
 const router = express.Router();
 
 router.post(
-    "/careGiveId",
+    "/:careGiveId",
     auth,
     async() => {
         try{
