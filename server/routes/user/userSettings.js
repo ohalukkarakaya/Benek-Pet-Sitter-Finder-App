@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../../models/User.js";
+import CareGive from "../../models/CareGive/CareGive.js";
 import UserToken from "../../models/UserToken.js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
@@ -691,6 +692,28 @@ router.delete(
           {
             error: true,
             message: "user not found"
+          }
+        );
+      }
+
+      const areThereAnyLinkedCareGive = await CareGive.findOne(
+        {
+          $or: [
+            {
+              "careGiver.careGiverId": user._id.toString()
+            },
+            {
+              "petOwner.petOwnerId": user._id.toString()
+            }
+          ]
+        }
+      );
+
+      if(areThereAnyLinkedCareGive){
+        return res.status(400).json(
+          {
+            error: true,
+            messaage: "You have a care give linked to you"
           }
         );
       }
