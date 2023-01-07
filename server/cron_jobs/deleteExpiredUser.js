@@ -18,7 +18,7 @@ const expireUser = cron.schedule(
             User.find(
                 {
                     "deactivation.isDeactive": true,
-                    "deactivation.deactivationDate": { $lt: Date.now() },
+                    "deactivation.deactivationDate": { $lt: Date.now() - 2592000000 },
                     "deactivation.isAboutToDelete": true
                 }
             ).exec(
@@ -122,6 +122,7 @@ const expireUser = cron.schedule(
                                     )
                                 );
 
+                                //delete events or event interractions
                                 await Event.find(
                                     {
                                         $and: [
