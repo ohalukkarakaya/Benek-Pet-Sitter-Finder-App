@@ -53,7 +53,7 @@ router.post(
             }
 
             const organizer = await User.findById(organizerId);
-            if(!organizer){
+            if(!organizer || organizer.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,

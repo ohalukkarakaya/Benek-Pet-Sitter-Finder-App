@@ -109,6 +109,14 @@ router.post(
                                 }
                             );
                         }else{
+                            if(updateUser.deactivation.isDeactive){
+                                return res.status(404).json(
+                                    {
+                                        error: true,
+                                        message: "User not found"
+                                    }
+                                );
+                            }
                             const requestArray = req.body.selectedPetCategories;
                             const isArrayEmpty = requestArray.length === 0;
                             if( !isArrayEmpty ){

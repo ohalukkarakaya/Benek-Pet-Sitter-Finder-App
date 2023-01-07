@@ -106,7 +106,10 @@ const updateProfileImg = async (req, res, next) => {
     try{
         const userId = req.user._id;
             await User.findOne(
-                { _id: userId},
+                { 
+                    _id: userId,
+                    "deactivation.isDeactive": false
+                },
                 (err, user) => {
                     req.user = user;
                     const isDefaultProfileImg = user.profileImg.isDefaultImg;

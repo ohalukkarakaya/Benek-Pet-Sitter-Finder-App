@@ -140,7 +140,7 @@ router.post(
 
             const careGiver = await User.findById(req.user._id.toString());
             const owner = await User.findById(pet.primaryOwner.toString());
-            if(!owner || !careGiver){
+            if(!owner || !careGiver || owner.deactivation.isDeactive || careGiver.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -286,7 +286,7 @@ router.put(
                 }
 
                 const careGiver = await User.findById( invitedCareGive.careGiver.careGiverId.toString() );
-                if(!careGiver){
+                if(!careGiver || careGiver.deactivation.isDeactive){
                     return res.status(404).json(
                         {
                             error: false,
@@ -296,7 +296,7 @@ router.put(
                 }
 
                 const petOwner = await User.findById( invitedCareGive.petOwner.petOwnerId.toString() );
-                if(!petOwner){
+                if(!petOwner || petOwner.deactivation.isDeactive){
                     return res.status(404).json(
                         {
                             error: true,
@@ -580,7 +580,7 @@ router.put(
             }
 
             const careGiver = await User.findById(userId);
-            if(!careGiver){
+            if(!careGiver || careGiver.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -590,7 +590,7 @@ router.put(
             }
 
             const petOwner = await User.findById(careGive.petOwner.petOwnerId.toString());
-            if(!petOwner){
+            if(!petOwner || petOwner.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -886,7 +886,7 @@ router.put(
             }
 
             const careGiver = await User.findById(userId);
-            if(!careGiver){
+            if(!careGiver || careGiver.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -896,7 +896,7 @@ router.put(
             }
 
             const petOwner = await User.findById(careGive.petOwner.petOwnerId.toString());
-            if(!petOwner){
+            if(!petOwner || petOwner.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -1023,7 +1023,7 @@ router.post(
             }
 
             const petOwner = await User.findById( careGive.petOwner.petOwnerId.toString() );
-            if(!petOwner){
+            if(!petOwner || petOwner.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -1033,7 +1033,7 @@ router.post(
             }
 
             const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );
-            if(!careGiver){
+            if(!careGiver || careGiver.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -1195,7 +1195,7 @@ router.post(
 
             const careGiverId = careGive.careGiver.careGiverId.toString();
             const careGiver = await User.findById(careGiverId);
-            if(!careGiver){
+            if(!careGiver || careGiver.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,

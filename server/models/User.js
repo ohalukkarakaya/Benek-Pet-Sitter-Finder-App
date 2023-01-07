@@ -197,6 +197,19 @@ const UserSchema = new mongoose.Schema(
                 type: Number,
                 default: 0
             }
+        },
+        deactivation: {
+            isDeactive: {
+                type: Boolean,
+                default: false
+            },
+            deactivationDate: {
+                type: Date,
+            },
+            isAboutToDelete: {
+                type: Boolean,
+                default: false
+            }
         }
     },
     {

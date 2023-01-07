@@ -68,6 +68,14 @@ const twilioClient = twilio(
                                     }
                                 ).then(
                                     (user) => {
+                                      if(user.deactivation.isDeactive){
+                                        return res.status(404).json(
+                                          {
+                                            error: true,
+                                            message: "User not found"
+                                          }
+                                        );
+                                      }
                                         PhoneOtpVerification.deleteOne().then(
                                             (_) => {
                                               return res.status(200).json(

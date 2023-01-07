@@ -27,7 +27,8 @@ router.post(
   
       const user = await User.findOne(
         {
-          email: req.body.email
+          email: req.body.email,
+          "deactivation.isDeactive": false
         }
       );
       if(user)
@@ -149,6 +150,19 @@ router.post(
                 }
               );
             }else{
+              if(user.deactivation.isDeactive){
+                user.deactivation.isDeactive = false;
+                user.deactivation.deactivationDate = null;
+                user.isAboutToDelete = false;
+                user.deactivation.markModified("deactivation");
+                user.save(
+                  function (err) {
+                    if(err) {
+                        console.error('ERROR: While Update!');
+                    }
+                  }
+                );
+              }
               const { accessToken, refreshToken } = await generateTokens(user);
               return res.status(200).json(
                 {

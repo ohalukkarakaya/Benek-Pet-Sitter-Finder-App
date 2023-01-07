@@ -97,14 +97,18 @@ router.post(
         }
       ).save().then(
         (result) => {
-          User.findByIdAndUpdate(
-            req.user._id,
-            {
-              $push: {
-                pets: result._id.toString()
+          const user = await User.findById(req.user._id.toString(),);
+          if(!user || user.deactivation.isDeactive){
+            return res.status(404).json(
+              {
+                error: true,
+                message: "user not found"
               }
-            }
-          ).then(
+            );
+          }
+          user.pets.push(result._id.toString());
+          user.markModified("pets");
+          user.save().then(
             (_) => {
               const currentYear = new Date().getFullYear();
               const petsBirthYear = result.birthDay.getFullYear();

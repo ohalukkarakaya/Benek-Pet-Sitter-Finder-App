@@ -46,8 +46,8 @@ router.post(
                 );
             }
 
-            const careGiver = await CareGiver.findById(careGive.careGiver.careGiverId.toString());
-            if(!careGiver){
+            const careGiver = await User.findById(careGive.careGiver.careGiverId.toString());
+            if(!careGiver || careGiver.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -57,7 +57,7 @@ router.post(
             }
 
             const petOwner = await User.findById( careGive.careGiver.careGiverId.toString() );
-            if(!petOwner){
+            if(!petOwner || petOwner.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,

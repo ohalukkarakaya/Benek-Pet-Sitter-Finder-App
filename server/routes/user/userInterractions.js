@@ -25,7 +25,7 @@ router.put(
             }
 
             const user = await User.findById( req.user._id );
-            if(!user){
+            if(!user || user.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -36,7 +36,7 @@ router.put(
             const userFollowings = user.followingUsersOrPets;
 
             const followingUser = await User.findById( followingUserId );
-            if(!followingUser){
+            if(!followingUser || followingUser.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,

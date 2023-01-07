@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../../models/User.js";
+import UserToken from "../../models/UserToken.js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import auth from "../../middleware/auth.js";
@@ -46,7 +47,7 @@ router.put(
             }
 
             const user = User.findById( req.user._id.toString() );
-            if(!user){
+            if(!user || user.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -114,7 +115,7 @@ router.post(
           }
   
           const user = await User.findById( req.user._id );
-          if(!user){
+          if(!user || user.deactivation.isDeactive){
               return res.status(404).json(
                   {
                       error: true,
@@ -222,7 +223,7 @@ router.post(
                   }
                 );
               }else{
-                const user = User.findOne(
+                User.findOne(
                   { _id: req.user._id.toString() },
                   async (err, user) => {
                     if(err){
@@ -233,8 +234,16 @@ router.post(
                         }
                       );
                     }else{
+                      if(user.deactivation.isDeactive){
+                        return res.status(404).json(
+                          {
+                            error: true,
+                            message: "User not found"
+                          }
+                        );
+                      }
                       //success
-                      await User.updateOne(
+                      await user.updateOne(
                         {
                             _id: req.user._id.toString()
                         },
@@ -296,7 +305,7 @@ router.put(
         }
 
         const user = await User.findById( req.user._id );
-        if(!user){
+        if(!user || user.deactivation.isDeactive){
             return res.status(404).json(
                 {
                     error: true,
@@ -374,7 +383,7 @@ router.put(
                     email: req.body.email
                 }
             );
-            if(!user){
+            if(!user || user.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -456,7 +465,7 @@ router.post(
       }
 
       const user = await User.findById( req.user._id );
-      if(!user){
+      if(!user || user.deactivation.isDeactive){
         return res.status(404).json(
           {
             error: true,
@@ -508,7 +517,7 @@ router.post(
       let { phoneNumber, otp } = req.body;
 
       const user = await User.findById( req.user._id );
-      if(!user){
+      if(!user || user.deactivation.isDeactive){
         return res.status(404).json(
           {
             error: true,
@@ -576,7 +585,7 @@ router.put(
         }
       ).then(
         (user) => {
-          if(!user){
+          if(!user || user.deactivation.isDeactive){
             return res.status(404).json(
               {
                 error: true,
@@ -624,7 +633,7 @@ router.put(
     try{
 
       const user = await User.findById( req.user._id );
-      if(!user){
+      if(!user || user.deactivation.isDeactive){
         return res.status(404).json(
           {
             error: true,
@@ -677,7 +686,7 @@ router.delete(
       const userId = req.user._id.toString();
 
       const user = await User.findById(userId);
-      if(!user){
+      if(!user || user.deactivation.isDeactive){
         return res.status(404).json(
           {
             error: true,
@@ -686,7 +695,39 @@ router.delete(
         );
       }
 
-      
+      const userToken = await UserToken.findOne(
+        {
+            token: req.body.refreshToken,
+        }
+      );
+
+      if(userToken){
+        await userToken.remove();
+      }
+
+      if(user.deactive.isDeactive){
+        return res.status(400).json(
+          {
+            error: true,
+            message: "user is already deactive"
+          }
+        );
+      }
+
+      user.deactivation.isDeactive = true;
+      user.deactivation.deactivationDate = Date.now();
+      user.deactivation.isAboutToDelete = true;
+      user.markModified("deactivation");
+      user.save().then(
+        (_) => {
+          return res.status(200).json(
+            {
+              error: false,
+              message: "User deactivated and will be deleted after 30 days"
+            }
+          );
+        }
+      ).catch();
 
     }catch(err){
       console.log("Error: delete user", err);

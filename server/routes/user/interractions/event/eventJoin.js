@@ -38,7 +38,7 @@ router.post(
             }
 
             const invitedUser = await User.findById(req.params.invitedUserId);
-            if(!invitedUser){
+            if(!invitedUser || invitedUser.deactivation.isDeactive){
                 return res.status(404).json(
                     {
                         error: true,
@@ -626,7 +626,7 @@ router.put(
             }
 
             const ticketOwner = await User.findById(ticket.userId);
-            if(!ticketOwner){
+            if(!ticketOwner || ticketOwner.deactivation.isDeactive){
                 ticket.deleteOne().then(
                     (_) => {
                         return res.status(500).json(
