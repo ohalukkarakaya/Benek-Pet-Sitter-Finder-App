@@ -4,10 +4,15 @@ import Pet from "../models/Pet.js"
 import PetSecondaryOwnerInvitation from "../models/ownerOperations/SecondaryOwnerInvitation.js";
 import PetHandOverInvitation from "../models/ownerOperations/PetHandOverInvitation.js";
 import Event from "../models/Event/Event.js";
+import EventTicket from "../models/Event/EventTicket.js";
+import EventInvitation from "../models/Event/Invitations/InviteEvent.js";
+import OrganizerInvitation from "../models/Event/Invitations/InviteOrganizer.js";
+import DeletedUserRefund from "../models/DeletedUserRefund/DeletedUserRefund.js";
 import Story from "../models/Story.js";
 
 import s3 from "../utils/s3Service.js";
 import dotenv from "dotenv";
+import EventTicket from "../models/Event/EventTicket.js";
 
 dotenv.config();
 
@@ -208,7 +213,7 @@ const expireUser = cron.schedule(
                                                                     }
                                                                     emptyS3Directory(process.env.BUCKET_NAME, `events/${meetingEvent._id.toString()}/`).then(
                                                                         (_) => {
-                                                                            //delete pet
+                                                                            //delete event
                                                                             meetingEvent.deleteOne().then(
                                                                                 (_) => {
                                                                                     console.log("an event deleted because of user")
@@ -222,7 +227,7 @@ const expireUser = cron.schedule(
                                                                     );
                                                                 }
                                                             );
-                                                        }else if(meetingEvent.eventOrganizers.includes(user._id.toString())){
+                                                        }else{
                                                             //if user is organizer
                                                             meetingEvent.eventOrganizers = meetingEvent.eventOrganizers.filter(
                                                                 organizerId =>
@@ -314,13 +319,124 @@ const expireUser = cron.schedule(
                                                             );
                                                             meetingEvent.markModified("afterEvent");
 
-                                                            //check if user is allso guest
-                                                            
+                                                            //check if user was also joined guest
+                                                            const didUserJoin = meetingEvent.joined.find(
+                                                                userId =>
+                                                                    userId.toString() === user._id.toString()
+                                                            );
+                                                            if(didUserJoin){
+                                                                meetingEvent.joined = meetingEvent.joined.filter(
+                                                                    userId =>
+                                                                        userId.toString() !== user._id.toString()
+                                                                );
+                                                                meetingEvent.markModified("joined");
+                                                            }
+
+                                                            //check if user was also bought ticket
+                                                            const didUserBoughtTicket = meetingEvent.willJoin = meetingEvent.willJoin.finf(
+                                                                userId =>
+                                                                    userId.toString() === user._id.toString()
+                                                            );
+                                                            if(didUserBoughtTicket){
+                                                                meetingEvent.willJoin = meetingEvent.willJoin.filter(
+                                                                    userId =>
+                                                                        userId.toString() !== user._id.toString()
+                                                                );
+                                                                meetingEvent.markModified("willJoin");
+                                                            }
+
+                                                            meetingEvent.save(
+                                                                (err) => {
+                                                                    if(err){
+                                                                        console.log(err);
+                                                                    }
+                                                                }
+                                                            );
                                                         }
                                                     }
                                                 )
                                             );
                                         }
+                                    }
+                                ).then(
+                                    (_) => {
+                                        //delete bought event tickets
+                                        await EventTicket.find(
+                                            {
+                                                userId: user._id.toString()
+                                            }
+                                        ).exec(
+                                            (err, ticket) => {
+                                                if(err){
+                                                    console.log(err);
+                                                }
+
+                                                if(ticket){
+                                                    if(ticket.paidPrice.priceType === "Free" && ticket.paidPrice.price === 0){
+                                                        //delete event
+                                                        ticket.deleteOne().then(
+                                                            (_) => {
+                                                                console.log("an event ticket deleted because of user")
+                                                            }
+                                                        ).catch(
+                                                            (error) => {
+                                                                console.log(error);
+                                                            }
+                                                        );
+                                                    }else{
+                                                        //keep money for one year
+                                                        const emailsPastRefund = await DeletedUserRefund.findOne(
+                                                            {
+                                                                email: user.email
+                                                            }
+                                                        );
+                                                        if(emailsPastRefund){
+                                                            emailsPastRefund.refundPrice.price = emailsPastRefund.refundPrice.price + ticket.paidPrice.price;
+                                                            emailsPastRefund.markModified("refundPrice");
+                                                            emailsPastRefund.save(
+                                                                (err) => {
+                                                                    if(err){
+                                                                        console.log(err);
+                                                                    }
+                                                                }
+                                                            );
+                                                        }else{
+                                                            await new DeletedUserRefund(
+                                                                {
+                                                                    email: user.email,
+                                                                    refundPrice: {
+                                                                        price: ticket.paidPrice.price
+                                                                    }
+                                                                }
+                                                            ).save(
+                                                                (err) => {
+                                                                    if(err){
+                                                                        console.log(err);
+                                                                    }
+                                                                }
+                                                            ).then(
+                                                                (newRefund) => {
+                                                                    console.log(`new refund with id: ${newRefund._id.toString()} inserted`);
+                                                                }
+                                                            );
+                                                        }
+                                                    }
+                                                    ticket.deleteOne().then(
+                                                        (_) => {
+                                                            console.log("an event ticket deleted because of user")
+                                                        }
+                                                    ).catch(
+                                                        (error) => {
+                                                            console.log(error);
+                                                        }
+                                                    );
+                                                }
+                                            }
+                                        ).then(
+                                            (_) => {
+
+                                            }
+                                        );
                                     }
                                 );
                             }
