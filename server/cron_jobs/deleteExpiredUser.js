@@ -1,4 +1,6 @@
 import cron from "node-cron";
+import dotenv from "dotenv";
+
 import User from "../models/User.js"
 import Pet from "../models/Pet.js"
 import PetSecondaryOwnerInvitation from "../models/ownerOperations/SecondaryOwnerInvitation.js";
@@ -8,11 +10,12 @@ import EventTicket from "../models/Event/EventTicket.js";
 import EventInvitation from "../models/Event/Invitations/InviteEvent.js";
 import OrganizerInvitation from "../models/Event/Invitations/InviteOrganizer.js";
 import DeletedUserRefund from "../models/DeletedUserRefund/DeletedUserRefund.js";
+import EventTicket from "../models/Event/EventTicket.js";
+import CareGive from "../models/CareGive/CareGive.js";
+import ReportedMission from "../models/report/ReportMission.js";
 import Story from "../models/Story.js";
 
 import s3 from "../utils/s3Service.js";
-import dotenv from "dotenv";
-import EventTicket from "../models/Event/EventTicket.js";
 
 dotenv.config();
 
@@ -468,6 +471,96 @@ const expireUser = cron.schedule(
                                 )
                             );
                         }
+
+                        //check if there is finished care give and delete if there is
+                        const careGives = await CareGive.find(
+                            {
+                                $and: [
+                                    {"finishProcess.isFinished": true},
+                                    {
+                                        $or: [
+                                            {"careGiver.careGiverId": user._id.toString()},
+                                            {"petOwner.petOwnerId": user._id.toString()}
+                                        ]
+                                    }
+                                ]
+                            }
+                        );
+
+                        if(careGives){
+                            await Promise.all(
+                                careGives.map(
+                                    async (careGive) => {
+                                        const isCareGiveReported = await ReportedMission.find(
+                                            reportedMissionObject =>
+                                                reportedMissionObject.careGiveId.toString() === careGive._id.toString()
+                                        );
+                                        if(!isCareGiveReported){
+                                            //delete images of event
+                                            async function emptyS3Directory(bucket, dir){
+                                                const listParams = {
+                                                    Bucket: bucket,
+                                                    Prefix: dir
+                                                };
+                                                const listedObjects = await s3.listObjectsV2(listParams);
+                                                if (listedObjects.Contents.length === 0) return;
+                                                const deleteParams = {
+                                                    Bucket: bucket,
+                                                    Delete: { Objects: [] }
+                                                };
+                            
+                                                listedObjects.Contents.forEach(({ Key }) => {
+                                                    deleteParams.Delete.Objects.push({ Key });
+                                                });
+                                                await s3.deleteObjects(deleteParams);
+                                                if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
+                                            }
+                                            emptyS3Directory(process.env.BUCKET_NAME, `careGive/${careGive._id.toString()}/`).then(
+                                                (_) => {
+                                                    //delete CareGive
+                                                    careGive.deleteOne().then(
+                                                        (_) => {
+                                                            console.log("deleted an expired Care Give");
+                                                        }
+                                                    ).catch(
+                                                        (error) => {
+                                                            console.log(error);
+                                                        }
+                                                    );
+                                                }
+                                            );
+                                        }
+                                    }
+                                )
+                            );
+                        }
+
+                        //delete stories
+                        const stories = await Story.find(
+                            {
+                                userId: user._id.toString()
+                            }
+                        );
+                        if(stories){
+                            await Promise.all(
+                                stories.map(
+                                    (story) => {
+                                        story.deleteOne().then(
+                                            (_) => {
+                                                console.log("deleted an expired Care Give");
+                                            }
+                                        ).catch(
+                                            (error) => {
+                                                console.log(error);
+                                            }
+                                        );
+                                    }
+                                )
+                            );
+                        }
+
+                        //delete user
+
                     }
                 );
             }
@@ -477,4 +570,4 @@ const expireUser = cron.schedule(
     }
 );
 
-export default expireStories;
+export default expireUser;
