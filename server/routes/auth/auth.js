@@ -1,12 +1,16 @@
 import express from "express";
+
 import User from "../../models/User.js";
-import bcrypt from "bcrypt";
-import dotenv from "dotenv";
-import generateTokens from "../../utils/bodyValidation/user/generateTokens.js";
 import UserOTPVerification from "../../models/UserOtpVerification.js";
+import UserToken from "../../models/UserToken.js";
+import DeletedUserRefund from "../../models/DeletedUserRefund/DeletedUserRefund.js";
+
 import sendOTPVerificationEmail from "../../utils/sendValidationEmail.js";
 import { signUpBodyValidation } from "../../utils/bodyValidation/user/signUpValidationSchema.js";
-import UserToken from "../../models/UserToken.js";
+import generateTokens from "../../utils/bodyValidation/user/generateTokens.js";
+
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -25,12 +29,7 @@ router.post(
           }
         );
   
-      const user = await User.findOne(
-        {
-          email: req.body.email,
-          "deactivation.isDeactive": false
-        }
-      );
+      const user = await User.findOne({ email: req.body.email });
       if(user)
         return res.status(400).json(
           {
@@ -38,6 +37,27 @@ router.post(
             message: "User Allready Exists"
           }
         );
+
+      var refundCredit = 0;
+      let refundCreditPriceType;
+      const pastRefund = await DeletedUserRefund.find({ email: req.body.email });
+      if(pastRefund){
+        await Promise.all(
+          pastRefund.map(
+            (refund) => {
+              refundCredit = refundCredit + refund.refundPrice.price;
+              refundCreditPriceType = refund.refundPrice.priceType;
+              refund.deleteOne().save(
+                function (err) {
+                  if(err) {
+                      console.error('ERROR: While Update!');
+                  }
+                }
+              );
+            }
+          )
+        );
+      }
   
       const salt = await bcrypt.genSalt(Number(process.env.SALT));
       const hashPassword = await bcrypt.hash(req.body.password, salt);
@@ -49,7 +69,11 @@ router.post(
           identity: req.body.identity,
           location: req.body.location,
           password: hashPassword,
-          trustedIps: [req.body.ip]
+          trustedIps: [req.body.ip],
+          refundCredit: {
+            priceType: refundCreditPriceType,
+            credit: refundCredit
+          }
         }
       ).save().then(
         (result) => {
