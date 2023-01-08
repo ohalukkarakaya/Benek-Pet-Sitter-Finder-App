@@ -10,10 +10,11 @@ import EventTicket from "../models/Event/EventTicket.js";
 import EventInvitation from "../models/Event/Invitations/InviteEvent.js";
 import OrganizerInvitation from "../models/Event/Invitations/InviteOrganizer.js";
 import DeletedUserRefund from "../models/DeletedUserRefund/DeletedUserRefund.js";
-import EventTicket from "../models/Event/EventTicket.js";
 import CareGive from "../models/CareGive/CareGive.js";
 import ReportedMission from "../models/report/ReportMission.js";
 import Story from "../models/Story.js";
+import ChangeEmailModel from "../models/UserSettings/ChangeEmail.js";
+import PhoneOtpVerificationModel from "../models/UserSettings/PhoneOTPVerification.js";
 
 import s3 from "../utils/s3Service.js";
 
@@ -235,7 +236,7 @@ const expireUser = cron.schedule(
                                             //check still if user has any post, comment or reply in event
                                             await Promise.all(
                                                 meetingEvent.afterEvent.map(
-                                                    (afterEventObject) => {
+                                                    async (afterEventObject) => {
                                                         if(afterEventObject.userId.toString() === user._id.toString()){
 
                                                           //delete content
@@ -278,7 +279,7 @@ const expireUser = cron.schedule(
                                                         //deleteComments
                                                         await Promise.all(
                                                             afterEventObject.comments.map(
-                                                                (commentObject) => {
+                                                                async (commentObject) => {
                                                                     if(commentObject.userId.toString() === user._id.toString()){
                                                                         afterEventObject.comments.filter(
                                                                             commentObj =>
@@ -496,7 +497,7 @@ const expireUser = cron.schedule(
                                                 reportedMissionObject.careGiveId.toString() === careGive._id.toString()
                                         );
                                         if(!isCareGiveReported){
-                                            //delete images of event
+                                            //delete images of careGive
                                             async function emptyS3Directory(bucket, dir){
                                                 const listParams = {
                                                     Bucket: bucket,
@@ -559,8 +560,44 @@ const expireUser = cron.schedule(
                             );
                         }
 
-                        //delete user
+                        //delete user settings models
+                        await ChangeEmailModel.deleteMany({ userId: user._id.toString() });
+                        await PhoneOtpVerificationModel.deleteMany({ userId: user._id.toString() });
 
+                        //delete user
+                        //delete images of user
+                        async function emptyS3Directory(bucket, dir){
+                            const listParams = {
+                                Bucket: bucket,
+                                Prefix: dir
+                            };
+                            const listedObjects = await s3.listObjectsV2(listParams);
+                            if (listedObjects.Contents.length === 0) return;
+                            const deleteParams = {
+                                Bucket: bucket,
+                                Delete: { Objects: [] }
+                            };
+        
+                            listedObjects.Contents.forEach(({ Key }) => {
+                                deleteParams.Delete.Objects.push({ Key });
+                            });
+                            await s3.deleteObjects(deleteParams);
+                            if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
+                        }
+                        emptyS3Directory(process.env.BUCKET_NAME, `profileAssets/${user._id.toString()}/`).then(
+                            (_) => {
+                                //delete user
+                                user.deleteOne().then(
+                                    (_) => {
+                                        console.log("deleted an expired User");
+                                    }
+                                ).catch(
+                                    (error) => {
+                                        console.log(error);
+                                    }
+                                );
+                            }
+                        );
                     }
                 );
             }

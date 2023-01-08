@@ -36,6 +36,7 @@ import bodyParser from 'body-parser';
 import expireStories from './cron_jobs/deleteExpiredStories.js';
 import expireEvents from './cron_jobs/deleteExpiredEvents.js';
 import expireCareGive from './cron_jobs/deleteExpiredCareGive.js';
+import expireUser from './cron_jobs/deleteExpiredUser.js';
 
 const app = express();
 dotenv.config();
@@ -43,6 +44,7 @@ dotenv.config();
 expireStories;
 expireEvents;
 expireCareGive;
+expireUser;
 
 const connect = () => {
     mongoose.connect(process.env.DB).then(

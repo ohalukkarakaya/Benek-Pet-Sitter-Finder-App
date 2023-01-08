@@ -96,8 +96,8 @@ router.post(
           allOwners: [ req.user._id ],
         }
       ).save().then(
-        (result) => {
-          const user = await User.findById(req.user._id.toString(),);
+        async (result) => {
+          const user = await User.findById(req.user._id.toString());
           if(!user || user.deactivation.isDeactive){
             return res.status(404).json(
               {
