@@ -1,17 +1,21 @@
 import express from "express";
+
 import User from "../../models/User.js";
 import CareGive from "../../models/CareGive/CareGive.js";
 import UserToken from "../../models/UserToken.js";
-import bcrypt from "bcrypt";
-import dotenv from "dotenv";
-import auth from "../../middleware/auth.js";
 import ChangeEmailOTP from "../../models/UserSettings/ChangeEmail.js";
 import PhoneOtpVerification from "../../models/UserSettings/PhoneOTPVerification.js";
+
 import sendOTPVerificationEmailForResetPassword from "../../utils/sendValidationEmailForResetPassword.js";
 import sendOneTimePassword from "../../utils/sendOneTimePasswordEmail.js";
 import { sendOTPVerificationSMS, verifyOTPVerificationSMS } from "../../utils/sendValidationSMS.js";
 import { resetPasswordBodyValidation, resetEmailBodyValidation } from "../../utils/bodyValidation/user/userSettingsRequestsValidationSchema.js";
 import { addPhoneBodyValidation, verifyPhoneBodyValidation } from "../../utils/bodyValidation/user/addPhoneNumberValidationSchema.js";
+
+import auth from "../../middleware/auth.js";
+
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
 
 dotenv.config();
 
