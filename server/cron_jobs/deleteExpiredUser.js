@@ -152,6 +152,174 @@ const expireUser = cron.schedule(
                                         }
                                         if(events){
                                             //To Do: delete events with all conditions
+                                            await Promise.all(
+                                                events.map(
+                                                    async (meetingEvent) => {
+                                                        //if user is event admin
+                                                        if(meetingEvent.eventAdmin.toString() === user._id.toString()){
+                                                            const eventId = meetingEvent._id.toString();
+                                                            const soldTickets = await EventTicket.find({ eventId: eventId });
+                                                            const cancelPayments = soldTickets.map(
+                                                                (ticket) => {
+                                                                    return new Promise(
+                                                                        (resolve, reject) => {
+                                                                            if(
+                                                                                ticket.paidPrice.priceType !== "Free"
+                                                                                && ticket.paidPrice.price > 0
+                                                                            ){
+                                                                                //To Do: cancel payment
+                                                                            }
+
+                                                                            ticket.deleteOne().then(
+                                                                                (_) => {
+                                                                                    return resolve(true);
+                                                                                }
+                                                                            ).catch(
+                                                                                (error) => {
+                                                                                    if(error){
+                                                                                        console.log(error);
+                                                                                    }
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                    );
+                                                                }
+                                                            );
+                                                            Promise.all(cancelPayments).then(
+                                                                (_) => {
+                                                                        //delete images of event
+                                                                        async function emptyS3Directory(bucket, dir){
+                                                                        const listParams = {
+                                                                            Bucket: bucket,
+                                                                            Prefix: dir
+                                                                        };
+                                                                        const listedObjects = await s3.listObjectsV2(listParams);
+                                                                        if (listedObjects.Contents.length === 0) return;
+                                                                        const deleteParams = {
+                                                                            Bucket: bucket,
+                                                                            Delete: { Objects: [] }
+                                                                        };
+
+                                                                        listedObjects.Contents.forEach(({ Key }) => {
+                                                                            deleteParams.Delete.Objects.push({ Key });
+                                                                        });
+                                                                        await s3.deleteObjects(deleteParams);
+                                                                        if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
+                                                                    }
+                                                                    emptyS3Directory(process.env.BUCKET_NAME, `events/${meetingEvent._id.toString()}/`).then(
+                                                                        (_) => {
+                                                                            //delete pet
+                                                                            meetingEvent.deleteOne().then(
+                                                                                (_) => {
+                                                                                    console.log("an event deleted because of user")
+                                                                                }
+                                                                            ).catch(
+                                                                                (error) => {
+                                                                                    console.log(error);
+                                                                                }
+                                                                            );
+                                                                        }
+                                                                    );
+                                                                }
+                                                            );
+                                                        }else if(meetingEvent.eventOrganizers.includes(user._id.toString())){
+                                                            //if user is organizer
+                                                            meetingEvent.eventOrganizers = meetingEvent.eventOrganizers.filter(
+                                                                organizerId =>
+                                                                    organizerId.toString() !== user._id.toString()
+                                                            );
+                                                            meetingEvent.markModified("eventOrganizers");
+
+                                                            //check still if user has any post, comment or reply in event
+                                                            await Promise.all(
+                                                                meetingEvent.afterEvent.map(
+                                                                    (afterEventObject) => {
+                                                                        if(afterEventObject.userId.toString() === user._id.toString()){
+
+                                                                          //delete content
+                                                                          const areThereImgOnServer = afterEventObject.content.content.isUrl;
+                                                                          if(areThereImgOnServer){
+                                                                            const splitedUrl = content.content.value.split("/");
+                                                                            imgName = splitedUrl[splitedUrl.length - 1];
+                                                            
+                                                                            const deleteImg = async (deleteParams) => {
+                                                                                try {
+                                                                                    s3.deleteObject(deleteParams).promise();
+                                                                                    console.log("Success", data);
+                                                                                    return data;
+                                                                                } catch (err) {
+                                                                                    console.log("Error", err);
+                                                                                }
+                                                                              };
+                                                            
+                                                                              const deleteContentImageParams = {
+                                                                                Bucket: process.env.BUCKET_NAME,
+                                                                                Key: `events/${req.eventId.toString()}/afterEventContents/${imgName}`
+                                                                            };
+                                                            
+                                                                            await deleteImg(deleteContentImageParams);
+                                                                          }
+
+                                                                          //delete afterEvent
+                                                                          meetingEvent.afterEvent = meetingEvent.afterEvent.filter(
+                                                                            afterEvObj =>
+                                                                                afterEvObj.userId.toString() !== afterEventObject.userId.toString()
+                                                                          );
+                                                                        }
+
+                                                                        //delete afterEventLikes
+                                                                        afterEventObject.likes.filter(
+                                                                            like =>
+                                                                                like.toString() !== user._id.toString()
+                                                                        );
+
+                                                                        //deleteComments
+                                                                        await Promise.all(
+                                                                            afterEventObject.comments.map(
+                                                                                (commentObject) => {
+                                                                                    if(commentObject.userId.toString() === user._id.toString()){
+                                                                                        afterEventObject.comments.filter(
+                                                                                            commentObj =>
+                                                                                                commentObj.userId.toString() !== commentObject.userId.toString()
+                                                                                        );
+                                                                                    }
+
+                                                                                    commentObject.likes = commentObject.likes.filter(
+                                                                                        likedUser =>
+                                                                                            likedUser.toString() !== user._id.toString()
+                                                                                    );
+
+                                                                                    await Promise.all(
+                                                                                        commentObject.replies.map(
+                                                                                            (replyObject) => {
+                                                                                                if(replyObject.userId.toString() === user._id.toString()){
+                                                                                                   commentObject.replies.filter(
+                                                                                                    repObj =>
+                                                                                                        repObj.userId.toString() !== replyObject.userId.toString()
+                                                                                                   ); 
+                                                                                                }
+
+                                                                                                replyObject.likes = replyObject.likes.filter(
+                                                                                                    likedUserId =>
+                                                                                                        likedUserId.toString() !== user._id.toString()
+                                                                                                );
+                                                                                            }
+                                                                                        )
+                                                                                    );
+                                                                                }
+                                                                            )
+                                                                        );
+                                                                    }
+                                                                )
+                                                            );
+                                                            meetingEvent.markModified("afterEvent");
+
+                                                            //check if user is allso guest
+                                                            
+                                                        }
+                                                    }
+                                                )
+                                            );
                                         }
                                     }
                                 );

@@ -398,22 +398,22 @@ router.delete(
                 (_) => {
                     //delete images of event
                     async function emptyS3Directory(bucket, dir){
-                    const listParams = {
-                        Bucket: bucket,
-                        Prefix: dir
-                    };
-                    const listedObjects = await s3.listObjectsV2(listParams);
-                    if (listedObjects.Contents.length === 0) return;
-                    const deleteParams = {
-                        Bucket: bucket,
-                        Delete: { Objects: [] }
-                    };
+                        const listParams = {
+                            Bucket: bucket,
+                            Prefix: dir
+                        };
+                        const listedObjects = await s3.listObjectsV2(listParams);
+                        if (listedObjects.Contents.length === 0) return;
+                        const deleteParams = {
+                            Bucket: bucket,
+                            Delete: { Objects: [] }
+                        };
 
-                    listedObjects.Contents.forEach(({ Key }) => {
-                        deleteParams.Delete.Objects.push({ Key });
-                    });
-                    await s3.deleteObjects(deleteParams);
-                        if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
+                        listedObjects.Contents.forEach(({ Key }) => {
+                            deleteParams.Delete.Objects.push({ Key });
+                        });
+                        await s3.deleteObjects(deleteParams);
+                            if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
                     }
                     emptyS3Directory(process.env.BUCKET_NAME, `events/${eventId.toString()}/`).then(
                         (_) => {
@@ -440,7 +440,7 @@ router.delete(
                             }
                           );
                         }
-                      );
+                    );
                 }
             );
         }catch(err){
