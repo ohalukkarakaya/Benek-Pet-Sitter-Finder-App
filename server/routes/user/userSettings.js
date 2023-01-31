@@ -17,6 +17,8 @@ import auth from "../../middleware/auth.js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 
+import axios from "axios";
+
 dotenv.config();
 
 const router = express.Router();
@@ -579,6 +581,17 @@ router.put(
           {
             error: true,
             message: "Iban is required"
+          }
+        );
+      }
+
+      const ibanWithoutSpaces = iban.toString().replaceAll(" ", "").toUpperCase();
+      const ibanValidate = await axios.get(`https://openiban.com/validate/${ibanWithoutSpaces}`);
+      if(ibanValidate.data.valid !== true){
+        return res.status(400).json(
+          {
+            error: true,
+            message: "IBAN is not valid"
           }
         );
       }
