@@ -588,7 +588,7 @@ router.put(
       //validate iban
       const ibanWithoutSpaces = iban.toString().replaceAll(" ", "").toUpperCase();
       const ibanValidate = await axios.get(`https://openiban.com/validate/${ibanWithoutSpaces}`);
-      if(ibanValidate.data.valid !== true){
+      if( ibanValidate.data.valid !== true ){
         return res.status(400).json(
           {
             error: true,
