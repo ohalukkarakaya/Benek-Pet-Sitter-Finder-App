@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-var SchemaTypes = mongoose.Schema.Types;
 const PaymentDataSchema = new mongoose.Schema(
   {
       from: {
@@ -36,6 +35,10 @@ const PaymentDataSchema = new mongoose.Schema(
       date: {
           type: Date,
           required: true
+      },
+      isCanceled: {
+        type: Boolean,
+        default: false
       },
       isPaid: {
         type: Boolean,

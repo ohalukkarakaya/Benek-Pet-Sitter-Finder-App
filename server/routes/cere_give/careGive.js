@@ -2,6 +2,7 @@ import express from "express";
 import User from "../../models/User.js";
 import Pet from "../../models/Pet.js";
 import CareGive from "../../models/CareGive/CareGive.js";
+import PaymentData from "../../models/PaymentData/PaymentData.js";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import { createRequire } from "module";
@@ -375,7 +376,15 @@ router.put(
                                             petOwner.refundCredit.credit = credit - price.servicePrice;
                                             petOwner.markModified("refundCredit");
                                         }else{
-                                            //take payment in here
+                                                const areThereCredit = await PaymentData.findOne(
+                                                    {
+                                                        from: invitedCareGive.invitation.to,
+                                                        isCanceled: true
+                                                    }
+                                                );
+                                                if(areThereCredit){
+                                                    
+                                                }
                                         }
                                     }
                                 }
