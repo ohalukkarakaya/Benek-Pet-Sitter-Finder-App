@@ -14,10 +14,12 @@ import { addPhoneBodyValidation, verifyPhoneBodyValidation } from "../../utils/b
 
 import auth from "../../middleware/auth.js";
 
+import validateTcNo from "../../utils/tcNoValidate.js";
+import validatePassportNo from "../../utils/passportNoValidate.js";
+
+import IBANValidator from "iban-validator-js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-
-import axios from "axios";
 
 dotenv.config();
 
@@ -587,8 +589,8 @@ router.put(
 
       //validate iban
       const ibanWithoutSpaces = iban.toString().replaceAll(" ", "").toUpperCase();
-      const ibanValidate = await axios.get(`https://openiban.com/validate/${ibanWithoutSpaces}`);
-      if( ibanValidate.data.valid !== true ){
+      const ibanValidate = IBANValidator.isValid(ibanWithoutSpaces);
+      if( !ibanValidate ){
         return res.status(400).json(
           {
             error: true,
