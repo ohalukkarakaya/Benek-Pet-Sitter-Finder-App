@@ -376,15 +376,15 @@ router.put(
                                             petOwner.refundCredit.credit = credit - price.servicePrice;
                                             petOwner.markModified("refundCredit");
                                         }else{
-                                                const areThereCredit = await PaymentData.findOne(
-                                                    {
-                                                        from: invitedCareGive.invitation.to,
-                                                        isCanceled: true
-                                                    }
-                                                );
-                                                if(areThereCredit){
-                                                    //To Do: ! take payment
-                                                }
+                                                // const areThereCredit = await PaymentData.findOne(
+                                                //     {
+                                                //         from: invitedCareGive.invitation.to,
+                                                //         isCanceled: true
+                                                //     }
+                                                // );
+                                                // if(areThereCredit){
+                                                //     //To Do: ! take payment
+                                                // }
                                         }
                                     }
                                 }
