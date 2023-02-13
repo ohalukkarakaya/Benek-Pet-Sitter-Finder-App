@@ -33,6 +33,15 @@ const UserSchema = new mongoose.Schema(
                     '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                 ],
             },
+            "nationalId": {
+                "isTcCitizen": {
+                    type: Boolean,
+                    default: true
+                },
+                "idNumber": {
+                    type: String,
+                }
+            },
             "job": {
                 type: String,
                 default: null,
