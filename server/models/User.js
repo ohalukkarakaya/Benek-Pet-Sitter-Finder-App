@@ -42,6 +42,9 @@ const UserSchema = new mongoose.Schema(
                     type: String,
                 }
             },
+            "openAdress": {
+                type: String
+            },
             "job": {
                 type: String,
                 default: null,

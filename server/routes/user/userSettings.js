@@ -689,6 +689,69 @@ router.put(
   }
 );
 
+//add adress
+router.put(
+  "/addAdress",
+  auth,
+  async (req, res) => {
+    try{
+
+      const userId = req.user._id.toString();
+
+      const adress = req.body.adress.toString();
+      if(!adress){
+        return res.status(400).json(
+          {
+            error: true,
+            message: "missing params"
+          }
+        );
+      }
+
+      const user = await User.findById( userId );
+      if( !user ){
+        return res.status(404).json(
+          {
+            error: true,
+            message: "User not found"
+          }
+        );
+      }
+
+      user.identity.openAdress = adress;
+      user.markModified("identity");
+      user.save(
+        (err) => {
+          if(err){
+              return res.status(500).json(
+                  {
+                      error: true,
+                      message: "ERROR: while saving user data"
+                  }
+              );
+          }
+        }
+      );
+
+      return res.status(200).json(
+        {
+          error: false,
+          message: "Adress inserted succesfully"
+        }
+      );
+      
+    }catch(err){
+      console.log("Error: add adress", err);
+      return res.status(500).json(
+        {
+          error: true,
+          message: "Internal server error"
+        }
+      );
+    }
+  }
+);
+
 //add Iban
 router.put(
   "/iban",
