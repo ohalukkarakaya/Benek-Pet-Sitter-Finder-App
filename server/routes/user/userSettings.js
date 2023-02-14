@@ -651,6 +651,7 @@ router.put(
 
       //insert ID
       user.identity.nationalId.isTCCitizen = isTCCitizen;
+      user.identity.nationalId.iv = iv;
       user.identity.nationalId.idNumber = encrypted;
       user.markModified("identity");
       user.save(
@@ -739,7 +740,7 @@ router.put(
           message: "Adress inserted succesfully"
         }
       );
-      
+
     }catch(err){
       console.log("Error: add adress", err);
       return res.status(500).json(
@@ -843,6 +844,129 @@ router.put(
           }
         );
       }
+
+      const iban = user.iban;
+      if( !iban ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "You haveto insert iban firstly"
+          }
+        );
+      }
+
+      
+      //decrypt national id number
+      const recordedIv = user.identity.nationalId.iv;
+      if( !recordedIv ){
+        return res.status( 500 ).json(
+          {
+            error: true,
+            message: "Internal server error"
+          }
+        );
+      }
+
+      const cryptedNationalId = user.identity.nationalId.idNumber;
+      if( !cryptedNationalId ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "You haveto insert your id number or passport number firstly"
+          }
+        );
+      }
+
+      const iv = Buffer.from(recordedIv, 'hex');
+      const decipher = crypto.createDecipheriv(
+        process.env.NATIONAL_ID_CRYPTO_ALGORITHM, 
+        Buffer.from( process.env.NATIONAL_ID_CRYPTO_KEY ), 
+        iv
+      );
+
+      let nationalIdNo = decipher.update( cryptedNationalId, 'hex', 'utf8');
+      nationalIdNo += decipher.final('utf8');
+      //national id number decrypted
+
+      const phoneNumber = user.phone;
+      if( !phoneNumber ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "You have to insert phone number firstly"
+          }
+        );
+      }
+
+      const email = user.email;
+      if( !email ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "You have to insert email firstly"
+          }
+        );
+      }
+
+      const firstName = user.identity.firstName;
+      if( !firstName ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "You have to insert firstName"
+          }
+        );
+      }
+
+      const middleName = user.identity.middleName;
+
+      const lastName = user.identity.lastName;
+      if( !lastName ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "You have to insert lastname"
+          }
+        );
+      }
+
+      const openAdress = user.identity.openAdress;
+      if( !openAdress ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "You have to insert openAdress"
+          }
+        );
+      }      
+
+      //send xml soap request to param
+      const soapRequest = `<?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"> 
+        <soap:Body>
+            <Pazaryeri_TP_AltUyeIsyeri_Ekleme xmlns="https://turkpos.com.tr/">
+                <G>
+                    <CLIENT_CODE>${process.env.PARAM_CLIENT_CODE}</CLIENT_CODE>
+                    <CLIENT_USERNAME>${process.env.PARAM_CLIENT_USERNAME}</CLIENT_USERNAME>
+                    <CLIENT_PASSWORD>${process.env.PARAM_CLIENT_PASSWORD}</CLIENT_PASSWORD>
+                </G> 
+                <ETS_GUID>${process.env.PARAM_GUID}</ETS_GUID>
+                <Tip>1</Tip>
+                <Ad_Soyad>${firstName} ${middleName} ${lastName}</Ad_Soyad>
+                <Unvan>Benek Bakıcı</Unvan>
+                <TC_VN>${nationalIdNo}</TC_VN>
+                <Kisi_DogumTarihi>01.12.2022</Kisi_DogumTarihi>
+                <GSM_No>${phoneNumber}</GSM_No>
+                <IBAN_No>${iban}</IBAN_No>
+                <IBAN_Unvan>Test Deneme</IBAN_Unvan>
+                <Adres>${openAdress}</Adres>
+                <Il>7</Il>
+                <Ilce>1215</Ilce>
+                <Vergi_Daire>1000587</Vergi_Daire>
+            </Pazaryeri_TP_AltUyeIsyeri_Ekleme>
+        </soap:Body>
+      </soap:Envelope>`;
+
 
       const isCareGiver = user.isCareGiver;
 

@@ -38,8 +38,11 @@ const UserSchema = new mongoose.Schema(
                     type: Boolean,
                     default: true
                 },
+                "iv": {
+                    type: String
+                },
                 "idNumber": {
-                    type: String,
+                    type: String
                 }
             },
             "openAdress": {
