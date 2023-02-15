@@ -4,6 +4,7 @@ import auth from "../../middleware/auth.js";
 import { updateProfileImg } from "../../middleware/imageHandle/serverHandleProfileImage.js";
 import userSetingsRoutes from './userSettings.js';
 import userInterractionsRoutes from "./userInterractions.js"
+import User from "../../models/User.js";
 
 
 dotenv.config();
@@ -109,6 +110,58 @@ router.post(
         {
           error: true,
           message: "Empty Request Body"
+        }
+      );
+    }
+  }
+);
+
+//update birthday
+router.put(
+  "/birthday",
+  auth,
+  async(req, res) => {
+    try{
+      const birthDay = req.body.birthday;
+      if( !birthDay ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "Missing param"
+          }
+        );
+      }
+
+      const user = await User.findById( req.user._id.toString() );
+      if( !user ){
+        return res.status( 404 ).json(
+          {
+            error: true,
+            message: "User not found"
+          }
+        );
+      }
+
+      user.identity.birthday = birthDay;
+      user.markModified("identity");
+      user.save(
+        (err) => {
+          if(err){
+              return res.status( 500 ).json(
+                  {
+                      error: true,
+                      message: "ERROR: while saving user"
+                  }
+              );
+          }
+        }
+      );
+    }catch(err){
+      console.log("Error: add birthday", err);
+      return res.status(500).json(
+        {
+          error: true,
+          message: "Internal server error"
         }
       );
     }

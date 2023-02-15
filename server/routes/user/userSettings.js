@@ -11,6 +11,7 @@ import sendOneTimePassword from "../../utils/sendOneTimePasswordEmail.js";
 import { sendOTPVerificationSMS, verifyOTPVerificationSMS } from "../../utils/sendValidationSMS.js";
 import { resetPasswordBodyValidation, resetEmailBodyValidation } from "../../utils/bodyValidation/user/userSettingsRequestsValidationSchema.js";
 import { addPhoneBodyValidation, verifyPhoneBodyValidation } from "../../utils/bodyValidation/user/addPhoneNumberValidationSchema.js";
+import paramRegisterSubSellerRequest from "../../utils/paramRegisterSubSellerRequest.js";
 
 import auth from "../../middleware/auth.js";
 
@@ -753,14 +754,15 @@ router.put(
   }
 );
 
-//add Iban
+//update careGiver Payment Info
 router.put(
-  "/iban",
+  "/careGiverPaymentInfo",
   auth,
   async (req, res) => {
     try{
+      const name = req.body.name;
       const iban = req.body.iban;
-      if( !iban ){
+      if( !iban && !name ){
         return res.status(400).json(
           {
             error: true,
@@ -769,51 +771,86 @@ router.put(
         );
       }
 
-      //validate iban
-      const ibanWithoutSpaces = iban.toString().replaceAll(" ", "").toUpperCase();
-      const ibanValidate = IBANValidator.isValid(ibanWithoutSpaces);
-      if( !ibanValidate ){
-        return res.status(400).json(
+      const user = await User.findById( req.user._id.toString() );
+      if(!user || user.deactivation.isDeactive){
+        return res.status(404).json(
           {
             error: true,
-            message: "IBAN is not valid"
+            message: "User couldn't find"
           }
         );
       }
 
-      await User.findByIdAndUpdate(
-        req.user._id,
-        {
-          iban: iban
-        }
-      ).then(
-        (user) => {
-          if(!user || user.deactivation.isDeactive){
-            return res.status(404).json(
-              {
-                error: true,
-                message: "User couldn't find"
-              }
-            );
+      if( !(user.identity.firstName && user.identity.lastName) && !name ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "You have to insert official name"
           }
+        );
+      }
 
-          return res.status(200).json(
+      if( name ){
+        const splitedName = name.toString().split(" ");
+        if( splitedName.length < 2 ){
+          return res.status( 400 ).json(
             {
-              error: false,
-              message: "iban inserted succesfully"
+              error: true,
+              message: "You have to send your full name"
+            }
+          );
+        }else if( splitedName.length > 2 ){
+          user.identity.middleName = splitedName.slice(1, -1).join(" ");
+        }
+        
+        user.identity.firstName = splitedName[0];
+        user.identity. lastName = splitedName[ splitedName.length - 1 ];
+        
+        user.markModified( "identity" );
+      }
+
+      if( !( user.iban ) && !iban ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "You haveto insert iban"
+          }
+        );
+      }
+
+      if( iban ){
+        //validate iban
+        const ibanWithoutSpaces = iban.toString().replaceAll(" ", "").toUpperCase();
+        const ibanValidate = IBANValidator.isValid(ibanWithoutSpaces);
+        if( !ibanValidate ){
+          return res.status(400).json(
+            {
+              error: true,
+              message: "IBAN is not valid"
             }
           );
         }
-      ).catch(
-        (error) => {
-          console.log(error);
-          return res.status(500).json(
-              {
-                error: true,
-                message: "An error occured while saving",
-                errorData: error
-              }
-            );
+
+        user.iban = ibanWithoutSpaces;
+        user.markModified( "iban" );
+      }
+      user.save(
+        (err) => {
+          if(err){
+              return res.status(500).json(
+                  {
+                      error: true,
+                      message: "ERROR: while saving user data"
+                  }
+              );
+          }
+        }
+      );
+
+      return res.status( 200 ).json(
+        {
+          error: false,
+          message: "payment Info updated succesfully"
         }
       );
     }catch(err){
@@ -845,7 +882,7 @@ router.put(
         );
       }
 
-      const iban = user.iban;
+      const iban = user.iban.ibanNo;
       if( !iban ){
         return res.status( 400 ).json(
           {
@@ -938,35 +975,58 @@ router.put(
             message: "You have to insert openAdress"
           }
         );
-      }      
+      }
 
-      //send xml soap request to param
-      const soapRequest = `<?xml version="1.0" encoding="utf-8"?>
-      <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"> 
-        <soap:Body>
-            <Pazaryeri_TP_AltUyeIsyeri_Ekleme xmlns="https://turkpos.com.tr/">
-                <G>
-                    <CLIENT_CODE>${process.env.PARAM_CLIENT_CODE}</CLIENT_CODE>
-                    <CLIENT_USERNAME>${process.env.PARAM_CLIENT_USERNAME}</CLIENT_USERNAME>
-                    <CLIENT_PASSWORD>${process.env.PARAM_CLIENT_PASSWORD}</CLIENT_PASSWORD>
-                </G> 
-                <ETS_GUID>${process.env.PARAM_GUID}</ETS_GUID>
-                <Tip>1</Tip>
-                <Ad_Soyad>${firstName} ${middleName} ${lastName}</Ad_Soyad>
-                <Unvan>Benek Bakıcı</Unvan>
-                <TC_VN>${nationalIdNo}</TC_VN>
-                <Kisi_DogumTarihi>01.12.2022</Kisi_DogumTarihi>
-                <GSM_No>${phoneNumber}</GSM_No>
-                <IBAN_No>${iban}</IBAN_No>
-                <IBAN_Unvan>Test Deneme</IBAN_Unvan>
-                <Adres>${openAdress}</Adres>
-                <Il>7</Il>
-                <Ilce>1215</Ilce>
-                <Vergi_Daire>1000587</Vergi_Daire>
-            </Pazaryeri_TP_AltUyeIsyeri_Ekleme>
-        </soap:Body>
-      </soap:Envelope>`;
+      const birthday = user.identity.birthday.toString();
+      if( !birthday ){
+        return res.status( 400 ).json(
+          {
+            error: true,
+            message: "Insert birthday firstly"
+          }
+        );
+      }
 
+      const paramRequest = await paramRegisterSubSellerRequest(
+        firstName,
+        middleName,
+        lastName,
+        birthday,
+        nationalIdNo,
+        phoneNumber,
+        openAdress
+      );
+
+      if( !(paramRequest.response) ){
+        return res.status( 500 ).json(
+          {
+            error: true,
+            message: "Internal server error"
+          }
+        );
+      }
+
+      if( paramRequest.response.error ){
+        return res.status( 500 ).json(
+          {
+            error: true,
+            message: paramRequest.response.data.sonucStr
+          }
+        );
+      }
+
+      if( paramRequest.response.sonuc !== "1" ){
+        return res.status( 500 ).json(
+          {
+            error: true,
+            message: "Internal server error",
+            data: paramRequest.response.data.sonucStr
+          }
+        );
+      }
+
+      user.careGiveGUID = paramRequest.response.data.guidAltUyeIsyeri;
+      user.markModified("careGiveGUID");
 
       const isCareGiver = user.isCareGiver;
 

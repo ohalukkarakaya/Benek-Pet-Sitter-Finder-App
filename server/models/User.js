@@ -45,6 +45,9 @@ const UserSchema = new mongoose.Schema(
                     type: String
                 }
             },
+            "birthDay:": {
+                type: String
+            },
             "openAdress": {
                 type: String
             },
@@ -79,7 +82,7 @@ const UserSchema = new mongoose.Schema(
             default: null
         },
         iban: {
-            type: String,
+            type: String
         },
         password: {
             type: String,
@@ -151,6 +154,9 @@ const UserSchema = new mongoose.Schema(
         isCareGiver: {
             type: Boolean,
             default: false
+        },
+        careGiveGUID: {
+            type: String
         },
         pastCaregivers: {
             type: Array,
