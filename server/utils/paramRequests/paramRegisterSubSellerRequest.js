@@ -51,7 +51,7 @@ const paramRegisterSubSellerRequest = async (
 
     const config = {
       headers: {
-        'Content-Type': 'text/xml',
+        'Content-Type': 'text/xml;charset=UTF-8',
         'SOAPAction': 'https://turkpos.com.tr/Pazaryeri_TP_AltUyeIsyeri_Ekleme',
       }
     };
