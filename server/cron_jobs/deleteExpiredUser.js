@@ -16,6 +16,8 @@ import Story from "../models/Story.js";
 import ChangeEmailModel from "../models/UserSettings/ChangeEmail.js";
 import PhoneOtpVerificationModel from "../models/UserSettings/PhoneOTPVerification.js";
 
+import paramDeleteSubSellerRequest from "../utils/paramRequests/paramDeleteSubSellerRequest.js";
+
 import s3 from "../utils/s3Service.js";
 
 dotenv.config();
@@ -586,6 +588,39 @@ const expireUser = cron.schedule(
                         }
                         emptyS3Directory(process.env.BUCKET_NAME, `profileAssets/${user._id.toString()}/`).then(
                             (_) => {
+
+                                if( user.isCareGiver && user.careGiveGUID ){
+                                    //if user is a caregiver, delete caregiver registration
+                                    const paramRequest = await paramDeleteSubSellerRequest( careGiverGUID );
+                                    if( !paramRequest || !(paramRequest.response) ){
+                                        return res.status( 500 ).json(
+                                            {
+                                                error: true,
+                                                message: "Internal server error"
+                                            }
+                                        );
+                                    }
+
+                                    if( paramRequest.response.error ){
+                                        return res.status( 500 ).json(
+                                            {
+                                                error: true,
+                                                message: paramRequest.response.data.sonucStr
+                                            }
+                                        );
+                                    }
+
+                                    if( paramRequest.response.sonuc !== "1" ){
+                                        return res.status( 500 ).json(
+                                            {
+                                                error: true,
+                                                message: "Internal server error",
+                                                data: paramRequest.response.data.sonucStr
+                                            }
+                                        );
+                                    }
+                                }
+
                                 //delete user
                                 user.deleteOne().then(
                                     (_) => {
