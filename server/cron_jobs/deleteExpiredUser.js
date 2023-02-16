@@ -587,7 +587,7 @@ const expireUser = cron.schedule(
                             if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
                         }
                         emptyS3Directory(process.env.BUCKET_NAME, `profileAssets/${user._id.toString()}/`).then(
-                            (_) => {
+                            async (_) => {
 
                                 if( user.isCareGiver && user.careGiveGUID ){
                                     //if user is a caregiver, delete caregiver registration
