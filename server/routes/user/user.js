@@ -133,7 +133,7 @@ router.put(
       }
 
       const user = await User.findById( req.user._id.toString() );
-      if( !user ){
+      if( !user || user.deactivation.isDeactive ){
         return res.status( 404 ).json(
           {
             error: true,

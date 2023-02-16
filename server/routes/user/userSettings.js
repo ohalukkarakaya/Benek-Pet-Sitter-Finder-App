@@ -395,7 +395,7 @@ router.put(
                     email: req.body.email
                 }
             );
-            if(!user || user.deactivation.isDeactive){
+            if( !user || user.deactivation.isDeactive ){
                 return res.status(404).json(
                     {
                         error: true,
@@ -616,7 +616,7 @@ router.put(
       }
       
       const user = await User.findById(userId);
-      if(!user){
+      if( !user || user.deactivation.isDeactive ){
         return res.status(404).json(
           {
             error: true,
@@ -712,7 +712,7 @@ router.put(
       }
 
       const user = await User.findById( userId );
-      if( !user ){
+      if( !user || user.user.deactivation.isDeactive ){
         return res.status(404).json(
           {
             error: true,
