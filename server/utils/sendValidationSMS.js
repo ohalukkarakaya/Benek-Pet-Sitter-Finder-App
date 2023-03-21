@@ -3,6 +3,8 @@ import twilio from "twilio";
 import PhoneOtpVerification from "../models/UserSettings/PhoneOTPVerification.js";
 import User from "../models/User.js";
 
+import paramUpdateSubSellerRequest from "../utils/paramRequests/paramUpdateSubSellerRequest.js";
+
 dotenv.config();
 
 const twilioClient = twilio(
@@ -78,6 +80,46 @@ const twilioClient = twilio(
                                       }
                                         PhoneOtpVerification.deleteOne().then(
                                             (_) => {
+                                              if( user.careGiveGUID ){
+                                                const paramRequest = await paramUpdateSubSellerRequest(
+                                                  user.careGiveGUID,
+                                                  null,
+                                                  null,
+                                                  null,
+                                                  null,
+                                                  user.phone,
+                                                  null,
+                                                  null
+                                                );
+
+                                                if( !paramRequest || !(paramRequest.response) ){
+                                                  return res.status( 500 ).json(
+                                                    {
+                                                      error: true,
+                                                      message: "Internal server error"
+                                                    }
+                                                  );
+                                                }
+                                        
+                                                if( paramRequest.response.error ){
+                                                  return res.status( 500 ).json(
+                                                    {
+                                                      error: true,
+                                                      message: paramRequest.response.data.sonucStr
+                                                    }
+                                                  );
+                                                }
+                                        
+                                                if( paramRequest.response.sonuc !== "1" ){
+                                                  return res.status( 500 ).json(
+                                                    {
+                                                      error: true,
+                                                      message: "Internal server error",
+                                                      data: paramRequest.response.data.sonucStr
+                                                    }
+                                                  );
+                                                }
+                                              }
                                               return res.status(200).json(
                                                 {
                                                   error: false,

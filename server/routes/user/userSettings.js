@@ -5,6 +5,7 @@ import CareGive from "../../models/CareGive/CareGive.js";
 import UserToken from "../../models/UserToken.js";
 import ChangeEmailOTP from "../../models/UserSettings/ChangeEmail.js";
 import PhoneOtpVerification from "../../models/UserSettings/PhoneOTPVerification.js";
+import UserOtpVerification from "../../models/UserOtpVerification.js";
 
 import sendOTPVerificationEmailForResetPassword from "../../utils/sendValidationEmailForResetPassword.js";
 import sendOneTimePassword from "../../utils/sendOneTimePasswordEmail.js";
@@ -13,6 +14,7 @@ import { resetPasswordBodyValidation, resetEmailBodyValidation } from "../../uti
 import { addPhoneBodyValidation, verifyPhoneBodyValidation } from "../../utils/bodyValidation/user/addPhoneNumberValidationSchema.js";
 import paramRegisterSubSellerRequest from "../../utils/paramRequests/paramRegisterSubSellerRequest.js";
 import paramDeleteSubSellerRequest from "../../utils/paramRequests/paramDeleteSubSellerRequest.js";
+import paramUpdateSubSellerRequest from "../../utils/paramRequests/paramUpdateSubSellerRequest.js";
 
 import auth from "../../middleware/auth.js";
 
@@ -263,7 +265,7 @@ router.post(
                             email: ChangeEmailOTPVerificationRecords[0].newEmail
                         }
                       );
-                      await UserOTPVerification.deleteMany(
+                      await UserOtpVerification.deleteMany(
                         {
                             userId: req.user._id.toString()
                         }
@@ -721,6 +723,47 @@ router.put(
         );
       }
 
+      if( user.careGiveGUID ){
+        const paramRequest = await paramUpdateSubSellerRequest(
+          user.careGiveGUID,
+          null,
+          null,
+          null,
+          null,
+          null,
+          adress,
+          null
+        );
+        
+        if( !paramRequest || !(paramRequest.response) ){
+          return res.status( 500 ).json(
+            {
+              error: true,
+              message: "Internal server error"
+            }
+          );
+        }
+
+        if( paramRequest.response.error ){
+          return res.status( 500 ).json(
+            {
+              error: true,
+              message: paramRequest.response.data.sonucStr
+            }
+          );
+        }
+
+        if( paramRequest.response.sonuc !== "1" ){
+          return res.status( 500 ).json(
+            {
+              error: true,
+              message: "Internal server error",
+              data: paramRequest.response.data.sonucStr
+            }
+          );
+        }
+      }
+
       user.identity.openAdress = adress;
       user.markModified("identity");
       user.save(
@@ -814,7 +857,7 @@ router.put(
         return res.status( 400 ).json(
           {
             error: true,
-            message: "You haveto insert iban"
+            message: "You have to insert iban"
           }
         );
       }
@@ -847,6 +890,57 @@ router.put(
           }
         }
       );
+      
+      if( user.careGiveGUID ){
+        let middleName;
+
+        const splitedName = name.toString().split(" ");
+          if( splitedName.length > 2 ){
+            middleName = splitedName.slice(1, -1).join(" ");
+          }
+          
+          const firstName = splitedName[0];
+          const lastName = splitedName[ splitedName.length - 1 ];
+
+        const paramRequest = await paramUpdateSubSellerRequest(
+          user.careGiveGUID,
+          firstName,
+          middleName,
+          lastName,
+          null,
+          null,
+          null,
+          iban.toString().replaceAll(" ", "").toUpperCase(),
+        );
+
+        if( !paramRequest || !(paramRequest.response) ){
+          return res.status( 500 ).json(
+            {
+              error: true,
+              message: "Internal server error"
+            }
+          );
+        }
+
+        if( paramRequest.response.error ){
+          return res.status( 500 ).json(
+            {
+              error: true,
+              message: paramRequest.response.data.sonucStr
+            }
+          );
+        }
+
+        if( paramRequest.response.sonuc !== "1" ){
+          return res.status( 500 ).json(
+            {
+              error: true,
+              message: "Internal server error",
+              data: paramRequest.response.data.sonucStr
+            }
+          );
+        }
+      }
 
       return res.status( 200 ).json(
         {
@@ -999,7 +1093,8 @@ router.put(
           birthday,
           nationalIdNo,
           phoneNumber,
-          openAdress
+          openAdress,
+          iban
         );
 
         if( !paramRequest || !(paramRequest.response) ){

@@ -4,12 +4,12 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const paramRegisterSubSellerRequest = async (
+const paramUpdateSubSellerRequest = async (
+    guid,
     firstName,
     middleName,
     lastName,
-    birthday,
-    nationalIdNo,
+    email,
     phoneNumber,
     openAdress,
     iban
@@ -24,31 +24,23 @@ const paramRegisterSubSellerRequest = async (
     const fullName = name.join(" ");
 
     //send xml soap request to param
-    const soapRequest = `<?xml version="1.0" encoding="utf-8"?>
-        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"> 
+    const soapRequest = `<?xml version="1.0" encoding="utf-8"?> <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
-            <Pazaryeri_TP_AltUyeIsyeri_Ekleme xmlns="https://turkpos.com.tr/">
+            <Pazaryeri_TP_AltUyeIsyeri_Guncelleme xmlns="https://turkpos.com.tr/">
                 <G>
                     <CLIENT_CODE>${process.env.PARAM_CLIENT_CODE}</CLIENT_CODE>
                     <CLIENT_USERNAME>${process.env.PARAM_CLIENT_USERNAME}</CLIENT_USERNAME>
                     <CLIENT_PASSWORD>${process.env.PARAM_CLIENT_PASSWORD}</CLIENT_PASSWORD>
                 </G> 
-                <ETS_GUID>${process.env.PARAM_GUID}</ETS_GUID>
-                <Tip>1</Tip>
-                <Ad_Soyad>${fullName}</Ad_Soyad>
-                <Unvan>Benek Bakıcı</Unvan>
-                <TC_VN>${nationalIdNo}</TC_VN>
-                <Kisi_DogumTarihi>${birthday}</Kisi_DogumTarihi>
-                <GSM_No>${phoneNumber}</GSM_No>
-                <IBAN_No>${iban}</IBAN_No>
-                <IBAN_Unvan>${fullName}</IBAN_Unvan>
-                <Adres>${openAdress}</Adres>
-                <Il>${process.env.MERSIS_IL_KOD}</Il>
-                <Ilce>${process.env.MERSIS_ILCE_KOD}</Ilce>
-                <Vergi_Daire>${process.env.VERGI_DAIRE_KOD}</Vergi_Daire>
-            </Pazaryeri_TP_AltUyeIsyeri_Ekleme>
+                <GUID_AltUyeIsyeri>${guid}</GUID_AltUyeIsyeri>`
+                + ( fullName.replace(/\s+/g, '') !== null ) ? `<Ad_Soyad>${fullName}</Ad_Soyad>` : "" 
+                + ( phoneNumber.replace(/\s+/g, '') !== null ) ? `<GSM_No>${phoneNumber}</GSM_No>` : ""
+                + ( iban.replace(/\s+/g, '') !== null ) ? `<IBAN_No>${iban}</IBAN_No>` : ""
+                + ( openAdress.replace(/\s+/g, '') !== null ) ? `<Adres>${openAdress}</Adres>` : ""
+                + ( email.replace(/\s+/g, '') !== null ) ? `<EPosta>${email}</EPosta>` : ""
+            + `</Pazaryeri_TP_AltUyeIsyeri_Guncelleme>
         </soap:Body>
-        </soap:Envelope>`;
+    </soap:Envelope>`;
 
     const config = {
       headers: {
@@ -77,16 +69,14 @@ const paramRegisterSubSellerRequest = async (
 
                         return response;
                     } else {
-                        const sonuc = result["soap:Envelope"]["soap:Body"][0]["Pazaryeri_TP_AltUyeIsyeri_EklemeResponse"][0]["Pazaryeri_TP_AltUyeIsyeri_EklemeResult"][0]["Sonuc"][0];
-                        const sonucStr = result["soap:Envelope"]["soap:Body"][0]["Pazaryeri_TP_AltUyeIsyeri_EklemeResponse"][0]["Pazaryeri_TP_AltUyeIsyeri_EklemeResult"][0]["Sonuc_Str"][0];
-                        const guidAltUyeIsyeri = result["soap:Envelope"]["soap:Body"][0]["Pazaryeri_TP_AltUyeIsyeri_EklemeResponse"][0]["Pazaryeri_TP_AltUyeIsyeri_EklemeResult"][0]["GUID_AltUyeIsyeri"][0];
+                        const sonuc = result["soap:Envelope"]["soap:Body"][0]["Pazaryeri_TP_AltUyeIsyeri_GuncellemeResponse"][0]["Pazaryeri_TP_AltUyeIsyeri_GuncellemeResult"][0]["Sonuc"][0];
+                        const sonucStr = result["soap:Envelope"]["soap:Body"][0]["Pazaryeri_TP_AltUyeIsyeri_GuncellemeResponse"][0]["Pazaryeri_TP_AltUyeIsyeri_GuncellemeResult"][0]["Sonuc_Str"][0];
 
                         response = {
                             error: false,
                             data: {
                                 sonuc: sonuc,
-                                sonucStr: sonucStr,
-                                guidAltUyeIsyeri: guidAltUyeIsyeri
+                                sonucStr: sonucStr
                             }
                         }
 
@@ -113,4 +103,4 @@ const paramRegisterSubSellerRequest = async (
     );
 }
 
-export default paramRegisterSubSellerRequest;
+export default paramUpdateSubSellerRequest;

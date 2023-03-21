@@ -49,7 +49,11 @@ const UserSchema = new mongoose.Schema(
                 type: String
             },
             "openAdress": {
-                type: String
+                type: String,
+                maxLength: [
+                    200,
+                    '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
+                ],
             },
             "job": {
                 type: String,
