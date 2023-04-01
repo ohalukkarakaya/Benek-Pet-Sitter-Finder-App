@@ -33,3 +33,4 @@ const paramsha2b64Request = async (
                 );
 }
 
+export default paramsha2b64Request;
