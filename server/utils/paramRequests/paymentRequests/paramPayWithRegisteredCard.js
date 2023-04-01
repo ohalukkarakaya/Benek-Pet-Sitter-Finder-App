@@ -1,5 +1,4 @@
 import axios from "axios";
-import { json } from "body-parser";
 import dotenv from "dotenv";
 
 dotenv.config();
