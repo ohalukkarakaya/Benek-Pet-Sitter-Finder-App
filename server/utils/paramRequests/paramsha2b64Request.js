@@ -1,4 +1,7 @@
-const axios = require('axios');
+import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const paramsha2b64Request = async (
     data
@@ -15,7 +18,7 @@ const paramsha2b64Request = async (
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
-                    url: 'https://test-dmz.param.com.tr/turkpos.ws/service_turkpos_test.asmx',
+                    url: process.env.PARAM_TEST_URL,
                     headers: { 
                         'Content-Type': 'text/xml;charset=UTF-8'
                     },
