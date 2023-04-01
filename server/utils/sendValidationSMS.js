@@ -81,7 +81,7 @@ const twilioClient = twilio(
                                         PhoneOtpVerification.deleteOne().then(
                                             (_) => {
                                               if( user.careGiveGUID ){
-                                                const paramRequest = await paramUpdateSubSellerRequest(
+                                                const paramRequest = paramUpdateSubSellerRequest(
                                                   user.careGiveGUID,
                                                   null,
                                                   null,

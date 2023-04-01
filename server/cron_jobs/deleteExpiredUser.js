@@ -16,7 +16,7 @@ import Story from "../models/Story.js";
 import ChangeEmailModel from "../models/UserSettings/ChangeEmail.js";
 import PhoneOtpVerificationModel from "../models/UserSettings/PhoneOTPVerification.js";
 
-import paramDeleteSubSellerRequest from "../utils/paramRequests/paramDeleteSubSellerRequest.js";
+import paramDeleteSubSellerRequest from "../utils/paramRequests/subSellerRequests/paramDeleteSubSellerRequest.js";
 
 import s3 from "../utils/s3Service.js";
 
