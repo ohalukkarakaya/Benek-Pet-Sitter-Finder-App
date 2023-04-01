@@ -11,7 +11,7 @@ const paramCancelOrderRequest = async (
     price
 ) => {
 
-    if( situation != 'IPTAL' && situation != 'IADE' ){
+    if( situation !== 'IPTAL' && situation !== 'IADE' ){
         return json(
             {
                 error: true,

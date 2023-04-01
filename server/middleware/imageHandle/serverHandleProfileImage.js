@@ -27,14 +27,14 @@ const storage = multerS3(
 
             const splitedOriginalName = originalname.split(".");
 
-            if(file.fieldname == "profileImg"){
+            if(file.fieldname === "profileImg"){
                 const newFileName = `${userId}_profileImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.profileImgNewFileName = newFileName;
                 req.profileCdnPath = `${process.env.CDN_SUBDOMAIN}profileAssets/${userId}/${newFileName}`;
                 
                 cb(null, "profileAssets/"+userId+"/"+newFileName);
 
-            }else if(file.fieldname == "coverImg"){
+            }else if(file.fieldname === "coverImg"){
                 const newFileName = `${userId}_coverImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.coverImgNewFileName = newFileName;
                 req.coverCdnPath = `${process.env.CDN_SUBDOMAIN}profileAssets/${userId}/${newFileName}`;

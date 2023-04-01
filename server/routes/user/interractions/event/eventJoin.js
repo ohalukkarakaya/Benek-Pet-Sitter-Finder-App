@@ -3,10 +3,13 @@ import User from "../../../../models/User.js";
 import Event from "../../../../models/Event/Event.js";
 import EventTicket from "../../../../models/Event/EventTicket.js";
 import EventInvitation from "../../../../models/Event/Invitations/InviteEvent.js";
+
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+
 import auth from "../../../../middleware/auth.js";
 import QRCode from "qrcode";
+import paramPayWithRegisteredCard from "../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
 
 dotenv.config();
 
@@ -188,7 +191,7 @@ router.put(
             }
 
             const event = await Event.findById(invitation.eventId);
-            const isAlreadyJoined = event.willJoin.find(userId => userId === req.user._id.toString());
+            const isAlreadyJoined = event.willJoin.find( userId => userId === req.user._id.toString() );
             if(
                 isAlreadyJoined
                 || !response
@@ -198,7 +201,7 @@ router.put(
             ){
                 await invitation.deleteOne().then(
                     (_) => {
-                        if(!response){
+                        if( !response ){
                             return res.status(500).json(
                                 {
                                     error: true,
@@ -206,7 +209,7 @@ router.put(
                                 }
                             );
                         }else{
-                            if(isAlreadyJoined){
+                            if( isAlreadyJoined ){
                                 return res.status(400).json(
                                     {
                                         error: true,
@@ -237,7 +240,45 @@ router.put(
             }
 
             if(event.ticketPrice.priceType !== "Free" && event.ticketPrice.price !== 0){
-                //TO DO: payment will be here
+                var recordCard = true;
+
+                const cardGuid = req.body.cardGuid.toString();
+                const cardNo = req.body.cardNo.toString();
+                const cvv = req.body.cvv.toString();
+                const user = await User.findById( req.user._id.toString() );
+
+                if( !user.phone ){
+                    return res.status( 400 ).json(
+                        {
+                            error: true,
+                            message: "user doesn't have phone number inserted"
+                        }
+                    );
+                }
+                var phoneNumberWithoutZero = user.phone.replace(/\D/g, '').slice(-10);
+
+                //take payment
+                if( req.body.recordCard && req.body.recordCard === false ){
+                    recordCard = false;
+                }
+
+                if( cardGuid ){
+                    const payWithRegisteredCardRequest = await paramPayWithRegisteredCard(
+                        cardGuid, //kkGuid
+                        cvv, //cvv
+                        phoneNumberWithoutZero,//phone number
+                        "https://dev.param.com.tr/tr", //success url
+                        "https://dev.param.com.tr/tr", //error url
+                        invitation.eventId, //order Id
+                        event.desc, //order desc
+                        'NS', //payment type
+                        'https://dev.param.com.tr/tr' // ref url
+                    );
+                    
+                    if( !payWithRegisteredCardRequest ){
+                        //To Do: Check payment data
+                    }
+                }
             }
 
             const randPassword = Buffer.from(Math.random().toString()).toString("base64").substring(0,20);

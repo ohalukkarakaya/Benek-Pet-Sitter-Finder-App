@@ -18,7 +18,7 @@ const paramPayWithRegisteredCard = async (
     
     var is3d = false
 
-    if( paymentType != 'NS' && paymentType == '3d' ){
+    if( paymentType !== 'NS' && paymentType === '3d' ){
         return json(
             {
                 error: true,
@@ -26,14 +26,14 @@ const paramPayWithRegisteredCard = async (
             }
         );
     }
-    if( paymentType == '3D' && !cvv ){
+    if( paymentType === '3D' && !cvv ){
         return json(
             {
                 error: true,
                 message: 'cvv is required for 3d payment'
             }
         );
-    }else if( paymentType == '3D' && cvv  ){
+    }else if( paymentType === '3D' && cvv  ){
         is3d = true;
     }
 
