@@ -12,9 +12,9 @@ import sendOneTimePassword from "../../utils/sendOneTimePasswordEmail.js";
 import { sendOTPVerificationSMS, verifyOTPVerificationSMS } from "../../utils/sendValidationSMS.js";
 import { resetPasswordBodyValidation, resetEmailBodyValidation } from "../../utils/bodyValidation/user/userSettingsRequestsValidationSchema.js";
 import { addPhoneBodyValidation, verifyPhoneBodyValidation } from "../../utils/bodyValidation/user/addPhoneNumberValidationSchema.js";
-import paramRegisterSubSellerRequest from "../../utils/paramRequests/paramRegisterSubSellerRequest.js";
-import paramDeleteSubSellerRequest from "../../utils/paramRequests/paramDeleteSubSellerRequest.js";
-import paramUpdateSubSellerRequest from "../../utils/paramRequests/paramUpdateSubSellerRequest.js";
+import paramRegisterSubSellerRequest from "../../utils/paramRequests/subSellerRequests/paramRegisterSubSellerRequest.js";
+import paramDeleteSubSellerRequest from "../../utils/paramRequests/subSellerRequests/paramDeleteSubSellerRequest.js";
+import paramUpdateSubSellerRequest from "../../utils/paramRequests/subSellerRequests/paramUpdateSubSellerRequest.js";
 
 import auth from "../../middleware/auth.js";
 

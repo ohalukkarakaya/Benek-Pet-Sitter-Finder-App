@@ -3,7 +3,7 @@ import twilio from "twilio";
 import PhoneOtpVerification from "../models/UserSettings/PhoneOTPVerification.js";
 import User from "../models/User.js";
 
-import paramUpdateSubSellerRequest from "../utils/paramRequests/paramUpdateSubSellerRequest.js";
+import paramUpdateSubSellerRequest from "./paramRequests/subSellerRequests/paramUpdateSubSellerRequest.js";
 
 dotenv.config();
 
