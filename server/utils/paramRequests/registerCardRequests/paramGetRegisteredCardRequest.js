@@ -3,14 +3,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const paramRegisterCreditCardRequest = async (
+const paramGetRegisteredCreditCard = async (
     firstName,
     middleName,
     lastName,
     kkGuid,
-    CardExpiryMonth,
-    CardExpiryYear,
-    CardName,
 ) => {
 
     const name = [
@@ -58,6 +55,8 @@ const paramRegisterCreditCardRequest = async (
             }
         );
 }
+
+export default paramGetRegisteredCreditCard;
 
 
 
