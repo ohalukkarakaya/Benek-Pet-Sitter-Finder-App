@@ -1,4 +1,5 @@
 import axios from "axios";
+import xml2js from "xml2js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -76,8 +77,44 @@ const paramPayWithRegisteredCard = async (
 
     axios.request( config )
          .then(
-            ( response ) => {
-                return JSON.stringify( response.data );
+            ( serverResponse ) => {
+                let response;
+    
+                xml2js.parseString(
+                    serverResponse.data,
+                    (err, result) => {
+    
+                        if(err){
+                            console.log(err);
+                            response = {
+                                error: true,
+                            };
+    
+                            return response;
+                        } else {
+                            const sonuc = result["soap:Envelope"]["soap:Body"][0]["KS_TahsilatResponse"][0]["KS_TahsilatResult"][0]["Sonuc"][0];
+                            const sonucStr = result["soap:Envelope"]["soap:Body"][0]["KS_TahsilatResponse"][0]["KS_TahsilatResult"][0]["Sonuc_Str"][0];
+                            const islemID = result["soap:Envelope"]["soap:Body"][0]["KS_TahsilatResponse"][0]["KS_TahsilatResult"][0]["Islem_ID"][0];
+                            const UCDURL = result["soap:Envelope"]["soap:Body"][0]["KS_TahsilatResponse"][0]["KS_TahsilatResult"][0]["UCD_URL"][0];
+    
+                            response = {
+                                error: false,
+                                data: {
+                                    sonuc: sonuc,
+                                    sonucStr: sonucStr,
+                                    islemID: islemID,
+                                    UCDURL: UCDURL
+                                }
+                            }
+    
+                            if( sonuc !== "1" ){
+                                response.error = true;
+                            }
+                            
+                            return response;
+                        }
+                    }
+                );
             }
         ).catch(
             ( error ) => {

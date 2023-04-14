@@ -50,8 +50,8 @@ const paramDeleteRegisteredCard = async (
     
                             return response;
                         } else {
-                            const sonuc = result["soap:Envelope"]["soap:Body"][0]["KS_Kart_ListeResponse"][0]["KS_Kart_ListeResult"][0]["Sonuc"][0];
-                            const sonucStr = result["soap:Envelope"]["soap:Body"][0]["KS_Kart_ListeResponse"][0]["KS_Kart_ListeResult"][0]["Sonuc_Str"][0];
+                            const sonuc = result["soap:Envelope"]["soap:Body"][0]["KS_Kart_SilResponse"][0]["KS_Kart_SilResult"][0]["Sonuc"][0];
+                            const sonucStr = result["soap:Envelope"]["soap:Body"][0]["KS_Kart_SilResponse"][0]["KS_Kart_SilResult"][0]["Sonuc_Str"][0];
 
                             response = {
                                 error: false,
