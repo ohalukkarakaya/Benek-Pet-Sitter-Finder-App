@@ -33,7 +33,7 @@ const paramDeleteSubSellerRequest = async (
         soapRequest,
         config
     ).then(
-        serverResponse => {
+        ( serverResponse ) => {
             let response;
 
             xml2js.parseString(

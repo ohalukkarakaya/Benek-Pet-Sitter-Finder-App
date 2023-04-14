@@ -1,4 +1,5 @@
 import axios from "axios";
+import xml2js from "xml2js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -46,8 +47,43 @@ const paramGetRegisteredCreditCard = async (
 
     axios.request( config )
          .then(
-            ( response ) => {
-                return JSON.stringify( response.data );
+            ( serverResponse ) => {
+                let response;
+    
+                xml2js.parseString(
+                    serverResponse.data,
+                    (err, result) => {
+    
+                        if(err){
+                            console.log(err);
+                            response = {
+                                error: true,
+                            };
+    
+                            return response;
+                        } else {
+                            const sonuc = result["soap:Envelope"]["soap:Body"][0]["KS_Kart_ListeResponse"][0]["KS_Kart_ListeResult"][0]["Sonuc"][0];
+                            const sonucStr = result["soap:Envelope"]["soap:Body"][0]["KS_Kart_ListeResponse"][0]["KS_Kart_ListeResult"][0]["Sonuc_Str"][0];
+    
+                            const DTBilgi = JSON.stringify(result.NewDataSet);
+
+                            response = {
+                                error: false,
+                                data: {
+                                    sonuc: sonuc,
+                                    sonucStr: sonucStr,
+                                    DTBilgi: DTBilgi
+                                }
+                            }
+    
+                            if( sonuc !== "1" ){
+                                response.error = true;
+                            }
+                            
+                            return response;
+                        }
+                    }
+                );
             }
         ).catch(
             ( error ) => {

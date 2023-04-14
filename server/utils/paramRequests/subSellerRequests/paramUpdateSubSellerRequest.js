@@ -54,7 +54,7 @@ const paramUpdateSubSellerRequest = async (
         soapRequest,
         config)
     .then(
-        serverResponse => {
+        ( serverResponse ) => {
             let response;
 
             xml2js.parseString(
@@ -90,7 +90,7 @@ const paramUpdateSubSellerRequest = async (
             );
         }
     ).catch(
-        error => {
+        ( error ) => {
             console.log(err);
 
             const response = {

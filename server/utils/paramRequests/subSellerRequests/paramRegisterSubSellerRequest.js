@@ -62,7 +62,7 @@ const paramRegisterSubSellerRequest = async (
         soapRequest,
         config)
     .then(
-        serverResponse => {
+        ( serverResponse ) => {
             let response;
 
             xml2js.parseString(
@@ -100,7 +100,7 @@ const paramRegisterSubSellerRequest = async (
             );
         }
     ).catch(
-        error => {
+        ( error ) => {
             console.log(err);
 
             const response = {
