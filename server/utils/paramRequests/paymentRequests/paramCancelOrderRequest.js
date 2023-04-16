@@ -50,8 +50,45 @@ const paramCancelOrderRequest = async (
 
     axios.request( config )
          .then(
-            ( response ) => {
-                return JSON.stringify( response.data );
+            ( serverResponse ) => {
+                let response;
+    
+                xml2js.parseString(
+                    serverResponse.data,
+                    (err, result) => {
+    
+                        if(err){
+                            console.log(err);
+                            response = {
+                                error: true,
+                            };
+    
+                            return response;
+                        } else {
+                            const sonuc = result["soap:Envelope"]["soap:Body"][0]["Pazaryeri_TP_Iptal_IadeResponse"][0]["Pazaryeri_TP_Iptal_IadeResult"][0]["Sonuc"][0];
+                            const sonucStr = result["soap:Envelope"]["soap:Body"][0]["Pazaryeri_TP_Iptal_IadeResponse"][0]["Pazaryeri_TP_Iptal_IadeResult"][0]["Sonuc_Str"][0];
+                            const Durum = result["soap:Envelope"]["soap:Body"][0]["Pazaryeri_TP_Iptal_IadeResponse"][0]["Pazaryeri_TP_Iptal_IadeResult"][0]["Durum"][0];
+                            const Durum_Str = result["soap:Envelope"]["soap:Body"][0]["Pazaryeri_TP_Iptal_IadeResponse"][0]["Pazaryeri_TP_Iptal_IadeResult"][0]["Durum_Str"][0];
+                            
+
+                            response = {
+                                error: false,
+                                data: {
+                                    sonuc: sonuc,
+                                    sonucStr: sonucStr,
+                                    Durum: Durum,
+                                    Durum_Str: Durum_Str
+                                }
+                            }
+    
+                            if( sonuc !== "1" ){
+                                response.error = true;
+                            }
+                            
+                            return response;
+                        }
+                    }
+                );
             }
         ).catch(
             ( error ) => {

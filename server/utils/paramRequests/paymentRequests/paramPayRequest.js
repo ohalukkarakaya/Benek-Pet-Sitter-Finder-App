@@ -1,5 +1,6 @@
 import axios from "axios";
 import { json } from "body-parser";
+import xml2js from "xml2js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -98,8 +99,51 @@ const paramPayRequest = async (
 
     axios.request( config )
          .then(
-            ( response ) => {
-                return JSON.stringify( response.data );
+            ( serverResponse ) => {
+                let response;
+    
+                xml2js.parseString(
+                    serverResponse.data,
+                    (err, result) => {
+    
+                        if(err){
+                            console.log(err);
+                            response = {
+                                error: true,
+                            };
+    
+                            return response;
+                        } else {
+                            const sonuc = result["soap:Envelope"]["soap:Body"][0]["TP_WMD_UCDResponse"][0]["TP_WMD_UCDResult"][0]["Sonuc"][0];
+                            const sonucStr = result["soap:Envelope"]["soap:Body"][0]["TP_WMD_UCDResponse"][0]["TP_WMD_UCDResult"][0]["Sonuc_Str"][0];
+                            const islemId = result["soap:Envelope"]["soap:Body"][0]["TP_WMD_UCDResponse"][0]["TP_WMD_UCDResult"][0]["Islem_ID"][0];
+                            const UCD_HTML = result["soap:Envelope"]["soap:Body"][0]["TP_WMD_UCDResponse"][0]["TP_WMD_UCDResult"][0]["UCD_HTML"][0];
+                            const Bank_Trans_ID = result["soap:Envelope"]["soap:Body"][0]["TP_WMD_UCDResponse"][0]["TP_WMD_UCDResult"][0]["Bank_Trans_ID"][0];
+                            const Bank_AuthCode = result["soap:Envelope"]["soap:Body"][0]["TP_WMD_UCDResponse"][0]["TP_WMD_UCDResult"][0]["Bank_AuthCode"][0];
+                            const Banka_Sonuc_Kod = result["soap:Envelope"]["soap:Body"][0]["TP_WMD_UCDResponse"][0]["TP_WMD_UCDResult"][0]["Banka_Sonuc_Kod"][0];
+                            
+
+                            response = {
+                                error: false,
+                                data: {
+                                    sonuc: sonuc,
+                                    sonucStr: sonucStr,
+                                    islemId: islemId,
+                                    UCD_HTML: UCD_HTML,
+                                    Bank_Trans_ID: Bank_Trans_ID,
+                                    Bank_AuthCode: Bank_AuthCode,
+                                    Banka_Sonuc_Kod: Banka_Sonuc_Kod
+                                }
+                            }
+    
+                            if( sonuc !== "1" ){
+                                response.error = true;
+                            }
+                            
+                            return response;
+                        }
+                    }
+                );
             }
         ).catch(
             ( error ) => {
