@@ -21,14 +21,22 @@ router.post(
     uploadEventImage,
     async (req, res) => {
         try{
-            const user = await User.findById(req.user._id);
-            if(!user || user.deactivation.isDeactive){
-                return res.status(404).json(
+            let eventOwnerParamGuid;
+
+            const user = await User.findById( req.user._id );
+            if( !user || user.deactivation.isDeactive ){
+                return res.status( 404 ).json(
                     {
                         error: true,
                         message: "User couldn't found"
                     }
                 );
+            }
+
+            if( user.careGiveGUID ){
+                eventOwnerParamGuid = user.careGiveGUID.toString()
+            }else{
+                //if user is not registered to param
             }
 
             if(
@@ -37,7 +45,7 @@ router.post(
                 || !req.body.lat
                 || !req.body.long
             ){
-                return res.status(400).json(
+                return res.status( 400 ).json(
                     {
                         error: true,
                         message: "Missing property"
@@ -46,8 +54,8 @@ router.post(
             }
 
             if(
-                req.body.ticketPrice && !req.body.ticketPriceType
-                || !req.body.ticketPrice && req.body.ticketPriceType
+                ( req.body.ticketPrice && !req.body.ticketPriceType )
+                || ( !req.body.ticketPrice && req.body.ticketPriceType )
             ){
                 return res.status(400).json(
                     {

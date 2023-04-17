@@ -35,7 +35,7 @@ router.post(
                 );
             }
 
-            const event = await Event.findById(req.params.eventId);
+            const event = await Event.findById( req.params.eventId );
             if(!event){
                 return res.status(404).json(
                     {
@@ -55,8 +55,15 @@ router.post(
                 );
             }
 
-            const isAdmin = req.user._id.toString === event.eventAdmin;
-            const isOrganizer = event.eventOrganizers.find(userId => userId === req.user._id);
+            const isAdmin = req.user._id.toString() === event.eventAdmin;
+            const isOrganizer = event.eventOrganizers
+                                     .find( 
+                                        userId => 
+                                            userId.toString() === req.user
+                                                                     ._id
+                                                                     .toString() 
+                                    );
+
             const isPrivate = event.isPrivate;
 
             if(
@@ -448,6 +455,7 @@ router.put(
                 }
 
                 //add order detail
+
             }
 
             const randPassword = crypto.randomBytes(10).toString('hex');
