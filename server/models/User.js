@@ -118,6 +118,19 @@ const UserSchema = new mongoose.Schema(
                 required: true
             },
         },
+        cardGuidies: [
+            {
+                cardName: {
+                    type: String,
+                    required: true,
+                    unique: true
+                },
+                cardGuid: {
+                    type: String,
+                    required: true
+                }
+            }
+        ],
         profileImg: {
             isDefaultImg: {
                 type: Boolean,

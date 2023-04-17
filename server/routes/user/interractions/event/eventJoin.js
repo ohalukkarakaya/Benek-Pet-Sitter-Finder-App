@@ -5,12 +5,14 @@ import EventTicket from "../../../../models/Event/EventTicket.js";
 import EventInvitation from "../../../../models/Event/Invitations/InviteEvent.js";
 
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import dotenv from "dotenv";
 
 import auth from "../../../../middleware/auth.js";
 import QRCode from "qrcode";
-import paramPayWithRegisteredCard from "../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
 
+import paramPayWithRegisteredCard from "../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
+import paramRegisterCreditCardRequest from "../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
 dotenv.config();
 
 const router = express.Router();
@@ -245,6 +247,7 @@ router.put(
                 const cardGuid = req.body.cardGuid.toString();
                 const cardNo = req.body.cardNo.toString();
                 const cvv = req.body.cvv.toString();
+                const cardExpiryDate = req.body.cardExpiryDate.toString();
                 const user = await User.findById( req.user._id.toString() );
 
                 if( !user.phone ){
@@ -262,7 +265,60 @@ router.put(
                     recordCard = false;
                 }
 
-                if( cardGuid ){
+                if( 
+                    cardGuid 
+                    || (
+                        recordCard
+                        && cardNo
+                        && cvv
+                    )
+                ){
+                    if(
+                        !cardGuid
+                        && recordCard
+                        && cardNo
+                        && cvv
+                    ){
+                        const cardName = user.userName + crypto.randomBytes(6).toString('hex');
+                        //register card
+                        const registerCardRequest = await paramRegisterCreditCardRequest(
+                            user.identity.firstName, //firstname
+                            user.identity.middleName, //middlename
+                            user.identity.lastName, //lastname
+                            cardNo, //card no
+                            cardExpiryDate.split("/")[0], //expiry date month
+                            cardExpiryDate.split("/")[1], //expiry date year
+                            cardName // random card name to keep it
+                        );
+
+                        if( !registerCardRequest || registerCardRequest.error === true ){
+                            return res.status(500).json(
+                                {
+                                    error: true,
+                                    message: "error while registering card"
+                                }
+                            );
+                        }
+
+                        cardGuid = registerCardRequest.data.ksGuid;
+
+                        user.cardGuidies.push(
+                            {
+                                cardName: cardName,
+                                cardGuid: cardGuid
+                            }
+                        );
+                        
+                        user.markModified("cardGuidies");
+                        user.save(
+                            (err) => {
+                                if(err){
+                                    console.log(err);
+                                }
+                            }
+                        );
+                    }
+
                     const payWithRegisteredCardRequest = await paramPayWithRegisteredCard(
                         cardGuid, //kkGuid
                         cvv, //cvv
@@ -275,13 +331,21 @@ router.put(
                         'https://dev.param.com.tr/tr' // ref url
                     );
                     
-                    if( !payWithRegisteredCardRequest ){
+                    if( !payWithRegisteredCardRequest || payWithRegisteredCardRequest.error === true ){
                         //To Do: Check payment data
+                        return res.status(500).json(
+                            {
+                                error: true,
+                                message: "error paying with registered card"
+                            }
+                        );
                     }
+
+                    //set order id
                 }
             }
 
-            const randPassword = Buffer.from(Math.random().toString()).toString("base64").substring(0,20);
+            const randPassword = crypto.randomBytes(10).toString('hex');
 
             //generate ticket
             const salt = await bcrypt.genSalt(Number(process.env.SALT));
