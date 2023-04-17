@@ -12,7 +12,10 @@ import auth from "../../../../middleware/auth.js";
 import QRCode from "qrcode";
 
 import paramPayWithRegisteredCard from "../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
+import paramPayRequest from "../../../../utils/paramRequests/paymentRequests/paramPayRequest";
 import paramRegisterCreditCardRequest from "../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
+import paramsha2b64Request from "../../../../utils/paramRequests/paramsha2b64Request.js";
+
 dotenv.config();
 
 const router = express.Router();
@@ -161,6 +164,7 @@ router.put(
     async(req, res) => {
         try{
             const response = req.params.response === "true";
+            let orderId;
             if(
                 !req.params.invitationId
                 || !req.params.response !== Boolean
@@ -241,14 +245,30 @@ router.put(
                 );
             }
 
-            if(event.ticketPrice.priceType !== "Free" && event.ticketPrice.price !== 0){
+            if(invitation.ticketPrice.priceType !== "Free" && invitation.ticketPrice.price !== 0){
                 var recordCard = true;
 
-                const cardGuid = req.body.cardGuid.toString();
+                let cardGuid;
+
+                cardGuid = req.body.cardGuid.toString();
                 const cardNo = req.body.cardNo.toString();
                 const cvv = req.body.cvv.toString();
                 const cardExpiryDate = req.body.cardExpiryDate.toString();
                 const user = await User.findById( req.user._id.toString() );
+
+                const price = invitation.ticketPrice
+                                        .price
+                                        .toLocaleString( 'tr-TR' )
+                                        .replace( '.', '' );
+
+                const priceForEventOwner = (
+                                            invitation.ticketPrice
+                                                      .price - ( 
+                                                                 invitation.ticketPrice
+                                                                           .price * 100 
+                                                               ) / 15
+                                           ).toLocaleString( 'tr-TR' )
+                                            .replace( '.', '' );
 
                 if( !user.phone ){
                     return res.status( 400 ).json(
@@ -271,6 +291,7 @@ router.put(
                         recordCard
                         && cardNo
                         && cvv
+                        && cardExpiryDate
                     )
                 ){
                     if(
@@ -278,6 +299,7 @@ router.put(
                         && recordCard
                         && cardNo
                         && cvv
+                        && cardExpiryDate
                     ){
                         const cardName = user.userName + crypto.randomBytes(6).toString('hex');
                         //register card
@@ -325,8 +347,10 @@ router.put(
                         phoneNumberWithoutZero,//phone number
                         "https://dev.param.com.tr/tr", //success url
                         "https://dev.param.com.tr/tr", //error url
-                        invitation.eventId, //order Id
+                        invitation._id, //order Id
                         event.desc, //order desc
+                        price,
+                        priceForEventOwner,
                         'NS', //payment type
                         'https://dev.param.com.tr/tr' // ref url
                     );
@@ -340,9 +364,90 @@ router.put(
                             }
                         );
                     }
-
                     //set order id
+                    orderId = payWithRegisteredCardRequest.data.islemID;
+                } else if(
+                    !cardGuid 
+                    && !recordCard
+                    && cardNo
+                    && cvv
+                    && cardExpiryDate
+                ){
+                    const shaData = process.env.PARAM_CLIENT_CODE 
+                                    + process.env.PARAM_GUID 
+                                    + 1 
+                                    + price 
+                                    + priceForEventOwner
+                                    + invitation._id;
+
+                    // take payment regularly
+                    const sha2b64Request = await paramsha2b64Request( shaData );
+                    if( 
+                        !sha2b64Request 
+                        || sha2b64Request.error === true 
+                        || !( sha2b64Request.data.sha2b64result ) 
+                    ){
+                        return res.status( 500 ).json(
+                            {
+                                error: true,
+                                message: "error on sha2b64 crypto api"
+                            }
+                        );
+                    } 
+
+                    const payRequest = await paramPayRequest(
+                        user.identity.firstName, //firstname
+                        user.identity.middleName, //middlename
+                        user.identity.lastName, //lastname
+                        price,
+                        priceForEventOwner,
+                        cardNo,
+                        cardExpiryDate.split("/")[0],
+                        cardExpiryDate.split("/")[1],
+                        cvv,
+                        phoneNumberWithoutZero,
+                        "https://dev.param.com.tr/tr", //success url
+                        "https://dev.param.com.tr/tr", //error url
+                        invitation._id,
+                        event.desc, //order desc
+                        sha2b64Request.data.sha2b64result.toString(),
+                        "NS",
+                        'https://dev.param.com.tr/tr' // ref url
+                    );
+
+                    if( 
+                        !payRequest 
+                        || payRequest.error === true 
+                        || !( payRequest.data.islemId ) 
+                    ){
+                        return res.status( 500 ).json(
+                            {
+                                error: true,
+                                message: "error on pay request"
+                            }
+                        );
+                    }
+
+                    orderId = payRequest.data.islemId;
+                }else{
+                    return res.status( 400 ).json(
+                        {
+                            error: true,
+                            message: "Missing payment info"
+                        }
+                    );
                 }
+
+                if( !orderId ){
+                    return res.status( 500 ).json(
+                        {
+                            error: true,
+                            message: "Internal server error"
+                        }
+                    );
+                }
+
+                //add order detail
             }
 
             const randPassword = crypto.randomBytes(10).toString('hex');
@@ -357,7 +462,8 @@ router.put(
                     eventId: event._id.toString(),
                     userId: req.user._id.toString(),
                     ticketPassword: hashTicketPassword,
-                    paidPrice: event.ticketPrice,
+                    paidPrice: invitation.ticketPrice,
+                    orderId: orderId,
                     eventDate: event.date,
                     expiryDate: event.expiryDate,
                     isPrivate: event.isPrivate

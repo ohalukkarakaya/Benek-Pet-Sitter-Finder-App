@@ -26,8 +26,38 @@ const paramsha2b64Request = async (
                 };
 
                 axios.request (config ).then(
-                    ( response ) => {
-                        return JSON.stringify( response.data );
+                    ( serverResponse ) => {
+                        let response;
+            
+                        xml2js.parseString(
+                            serverResponse.data,
+                            (err, result) => {
+            
+                                if(err){
+                                    console.log(err);
+                                    response = {
+                                        error: true,
+                                    };
+            
+                                    return response;
+                                } else {
+                                    const SHA2B64Result = result["soap:Envelope"]["soap:Body"][0]["SHA2B64Response"][0]["SHA2B64Result"][0];
+            
+                                    response = {
+                                        error: false,
+                                        data: {
+                                            sha2b64result: SHA2B64Result
+                                        }
+                                    }
+            
+                                    if( !SHA2B64Result ){
+                                        response.error = true;
+                                    }
+                                    
+                                    return response;
+                                }
+                            }
+                        );
                     }
                 ).catch(
                     ( error ) => {

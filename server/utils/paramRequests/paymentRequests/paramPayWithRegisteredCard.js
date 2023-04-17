@@ -12,6 +12,8 @@ const paramPayWithRegisteredCard = async (
     errorUrl,
     siparisId,
     siparisAciklama,
+    price,
+    priceForEventOwner,
     paymentType,
     refUrl
 ) => {
@@ -37,6 +39,15 @@ const paramPayWithRegisteredCard = async (
         is3d = true;
     }
 
+    if( !price || !priceForEventOwner ){
+        return json(
+            {
+                error: true,
+                message: 'price is required for payment'
+            }
+        );
+    }
+
     let data = `<?xml version="1.0" encoding="utf-8"?>
         <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
             <soap:Body>\n
@@ -55,8 +66,8 @@ const paramPayWithRegisteredCard = async (
                     <Siparis_ID>${siparisId}</Siparis_ID>\n
                     <Siparis_Aciklama>${siparisAciklama}</Siparis_Aciklama>\n
                     <Taksit>1</Taksit>\n
-                    <Islem_Tutar>1,00</Islem_Tutar>\n
-                    <Toplam_Tutar>1,00</Toplam_Tutar>\n
+                    <Islem_Tutar>${price}</Islem_Tutar>\n
+                    <Toplam_Tutar>${priceForEventOwner}</Toplam_Tutar>\n
                     <Islem_Guvenlik_Tip>${paymentType}</Islem_Guvenlik_Tip>\n
                     <IPAdr>127.0.0.1</IPAdr>\n
                     <Ref_URL>${refUrl}</Ref_URL>\n
