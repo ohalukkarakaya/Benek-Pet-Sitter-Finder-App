@@ -29,6 +29,20 @@ const EventTicketSchema = new mongoose.Schema(
       orderId: {
         type: String
       },
+      orderInfo: {
+        pySiparisGuid: {
+          type: String,
+          required: true
+        },
+        sanalPosIslemId: {
+          type: String,
+          required: true
+        },
+        subSellerGuid: {
+          type: String,
+          required: true
+        }
+      },
       boughtAt: {
         type: Date,
         dafeult: Date.now()

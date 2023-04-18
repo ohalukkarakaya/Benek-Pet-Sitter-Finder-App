@@ -21,8 +21,6 @@ router.post(
     uploadEventImage,
     async (req, res) => {
         try{
-            let eventOwnerParamGuid;
-
             const user = await User.findById( req.user._id );
             if( !user || user.deactivation.isDeactive ){
                 return res.status( 404 ).json(
@@ -33,11 +31,16 @@ router.post(
                 );
             }
 
-            if( user.careGiveGUID ){
-                eventOwnerParamGuid = user.careGiveGUID.toString()
-            }else{
-                //if user is not registered to param
+            if( !( user.careGiveGUID ) ){
+                return res.status( 404 ).json(
+                    {
+                        error: true,
+                        message: "You are not subseller"
+                    }
+                );
             }
+
+            const eventAdminParamGuid = user.careGiveGUID.toString()
 
             if(
                 !req.body.desc
@@ -70,6 +73,7 @@ router.post(
             await new Event(
                 {
                     eventAdmin: user._id.toString(),
+                    eventAdminsParamGuid: eventAdminParamGuid,
                     eventOrganizers: [ req.user._id.toString() ],
                     desc: req.body.desc,
                     ticketPrice: {

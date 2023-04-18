@@ -12,8 +12,9 @@ import auth from "../../../../middleware/auth.js";
 import QRCode from "qrcode";
 
 import paramPayWithRegisteredCard from "../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
-import paramPayRequest from "../../../../utils/paramRequests/paymentRequests/paramPayRequest";
+import paramPayRequest from "../../../../utils/paramRequests/paymentRequests/paramPayRequest.js";
 import paramRegisterCreditCardRequest from "../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
+import paramAddDetailToOrder from "../../../../utils/paramRequests/paymentRequests/paramAddDetailToOrder.js"
 import paramsha2b64Request from "../../../../utils/paramRequests/paramsha2b64Request.js";
 
 dotenv.config();
@@ -402,7 +403,7 @@ router.put(
                         );
                     } 
 
-                    const payRequest = await paramPayRequest(
+                    const paramRegularPayRequest = await paramPayRequest(
                         user.identity.firstName, //firstname
                         user.identity.middleName, //middlename
                         user.identity.lastName, //lastname
@@ -423,7 +424,7 @@ router.put(
                     );
 
                     if( 
-                        !payRequest 
+                        !paramRegularPayRequest 
                         || payRequest.error === true 
                         || !( payRequest.data.islemId ) 
                     ){
@@ -455,6 +456,26 @@ router.put(
                 }
 
                 //add order detail
+                const subsellerGuid = event.eventAdminsParamGuid;
+                const paramAddDetailToOrderRequest = await paramAddDetailToOrder(
+                    price,
+                    priceForEventOwner,
+                    orderId,
+                    subsellerGuid
+                );
+
+                if( 
+                    !paramAddDetailToOrderRequest 
+                    || !paramAddDetailToOrderRequest
+                    || paramAddDetailToOrderRequest.error === true 
+                ){
+                    return res.status( 500 ).json(
+                        {
+                            error: true,
+                            message: "Internal server error"
+                        }
+                    );
+                }
 
             }
 
@@ -472,6 +493,11 @@ router.put(
                     ticketPassword: hashTicketPassword,
                     paidPrice: invitation.ticketPrice,
                     orderId: orderId,
+                    orderInfo: {
+                        pySiparisGuid: paramAddDetailToOrderRequest.data.PYSiparis_GUID,
+                        sanalPosIslemId: paramAddDetailToOrderRequest.data.SanalPOS_Islem_ID,
+                        subSellerGuid: paramAddDetailToOrderRequest.data.GUID_AltUyeIsyeri
+                    },
                     eventDate: event.date,
                     expiryDate: event.expiryDate,
                     isPrivate: event.isPrivate

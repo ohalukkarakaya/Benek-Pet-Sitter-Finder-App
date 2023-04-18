@@ -6,6 +6,10 @@ const EventSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
+      eventAdminsParamGuid: {
+        type: String,
+        required: true
+      },
       eventOrganizers: [ String ],
       desc: {
         type: String,
