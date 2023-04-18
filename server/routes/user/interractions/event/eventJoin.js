@@ -14,7 +14,8 @@ import QRCode from "qrcode";
 import paramPayWithRegisteredCard from "../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
 import paramPayRequest from "../../../../utils/paramRequests/paymentRequests/paramPayRequest.js";
 import paramRegisterCreditCardRequest from "../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
-import paramAddDetailToOrder from "../../../../utils/paramRequests/paymentRequests/paramAddDetailToOrder.js"
+import paramAddDetailToOrder from "../../../../utils/paramRequests/paymentRequests/paramAddDetailToOrder.js";
+import paramCancelOrderRequest from "../../../../utils/paramRequests/paymentRequests/paramCancelOrderRequest.js";
 import paramsha2b64Request from "../../../../utils/paramRequests/paramsha2b64Request.js";
 
 dotenv.config();
@@ -484,6 +485,10 @@ router.put(
             //generate ticket
             const salt = await bcrypt.genSalt(Number(process.env.SALT));
             const hashTicketPassword = await bcrypt.hash(randPassword, salt);
+            const paidPrice = invitation.ticketPrice
+                                        .price
+                                        .toLocaleString( 'tr-TR' )
+                                        .replace( '.', '' );
 
             await new EventTicket(
                 {
@@ -491,7 +496,7 @@ router.put(
                     eventId: event._id.toString(),
                     userId: req.user._id.toString(),
                     ticketPassword: hashTicketPassword,
-                    paidPrice: invitation.ticketPrice,
+                    paidPrice: paidPrice,
                     orderId: orderId,
                     orderInfo: {
                         pySiparisGuid: paramAddDetailToOrderRequest.data.PYSiparis_GUID,
@@ -658,16 +663,59 @@ router.post(
             }
 
             if(isAllreadyJoined){
-                await EventTicket.findOneAndDelete(
+                const eventTicket = await EventTicket.findOne(
                     {
                         eventId: event._id.toString(),
                         userId: req.user._id.toString()
                     }
                 );
 
-                if(event.ticketPrice.priceType !== "Free" && event.ticketPrice.price !== 0){
-                    //TO DO: cancel payment
+                if( !eventTicket ){
+                    return res.status( 500 ).json(
+                        {
+                            error: true,
+                            message: "Internal server error"
+                        }
+                    );
                 }
+
+                if(
+                    event.ticketPrice.priceType !== "Free" 
+                    && event.ticketPrice.price !== 0
+                    && event.orderId
+                    && event.orderInfo
+                ){
+                    //cancel payment
+                    const cancelPayment = await paramCancelOrderRequest(
+                        eventTicket.orderInfo.pySiparisGuid,
+                        "IPTAL",
+                        eventTicket.orderId,
+                        eventTicket.paidPrice
+                    );
+
+                    if( 
+                        !cancelPayment 
+                        || cancelPayment.error === true 
+                        || !( cancelPayment.data )
+                    ){
+                        return res.status( 500 ).json(
+                            {
+                                error: true,
+                                message: "Internal server error"
+                            }
+                        );
+                    }
+                }
+
+                eventTicket.deleteOne().then(
+                    (_) => {
+                        console.log("deleted an ticket");
+                    }
+                ).catch(
+                    (error) => {
+                        console.log(error);
+                    }
+                );
 
                 event.willJoin = event.willJoin.filter(userId => userId !== req.user._id.toString());
                 event.markModified("willJoin");
@@ -691,11 +739,15 @@ router.post(
                     }
                 );
             }else{
-                if(event.ticketPrice.priceType !== "Free" && event.ticketPrice.price !== 0){
-                    //TO DO: payment will be here
+                if(
+                    event.ticketPrice.priceType !== "Free" 
+                    && event.ticketPrice.price !== 0
+                ){
+                    //get payment
+
                 }
 
-                const randPassword = Buffer.from(Math.random().toString()).toString("base64").substring(0,20);
+                const randPassword = crypto.randomBytes(10).toString('hex');
 
                 //generate ticket
                 const salt = await bcrypt.genSalt(Number(process.env.SALT));
