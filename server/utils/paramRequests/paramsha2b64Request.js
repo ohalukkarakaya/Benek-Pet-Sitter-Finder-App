@@ -6,7 +6,7 @@ dotenv.config();
 const paramsha2b64Request = async (
     data
 ) => {
-    let data = `<?xml version="1.0" encoding="utf-8"?> 
+    let requestData = `<?xml version="1.0" encoding="utf-8"?> 
                 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                     <soap:Body>\n
                         <SHA2B64 xmlns="https://turkpos.com.tr/">\n
@@ -22,10 +22,10 @@ const paramsha2b64Request = async (
                     headers: { 
                         'Content-Type': 'text/xml;charset=UTF-8'
                     },
-                    data : data
+                    data : requestData
                 };
 
-                axios.request (config ).then(
+                axios.request( config ).then(
                     ( serverResponse ) => {
                         let response;
             
