@@ -1,9 +1,5 @@
 import express from "express";
-import Pet from "../../models/Pet.js";
 import auth from "../../middleware/auth.js";
-import User from "../../models/User.js";
-import { handOverInvitationReqParamsValidation } from "../../utils/bodyValidation/pets/handOverInvitationValidationSchema.js";
-import PetHandOverInvitation from "../../models/ownerOperations/PetHandOverInvitation.js";
 
 //controllers
 import inviteSecondaryOwnerController from "../../controllers/petRoutesControllers/petOwnerOperationsControllers/inviteSecondaryOwnerController.js";
