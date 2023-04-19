@@ -1,10 +1,7 @@
 import express from "express";
-import User from "../../../../models/User.js";
-import Story from "../../../../models/Story.js";
 import dotenv from "dotenv";
 import auth from "../../../../middleware/auth.js";
 import { uploadStory } from "../../../../middleware/contentHandle/serverHandleStoryContent.js";
-import s3 from "../../../../utils/s3Service.js";
 import storyCommentEndpoints from "./storyComments.js";
 
 //controllers

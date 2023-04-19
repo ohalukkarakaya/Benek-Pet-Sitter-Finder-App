@@ -1,11 +1,11 @@
 import User from "../../../../../models/User.js";
 import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
-import EventInvitation from "../../../models/Event/Invitations/InviteEvent.js";
+import EventInvitation from "../../../../../models/Event/Invitations/InviteEvent.js";
 
 import paramPayWithRegisteredCard from "../../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
 import paramPayRequest from "../../../../../utils/paramRequests/paymentRequests/paramPayRequest.js";
-import paramRegisterCreditCardRequest from "../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
+import paramRegisterCreditCardRequest from "../../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
 import paramAddDetailToOrder from "../../../../../utils/paramRequests/paymentRequests/paramAddDetailToOrder.js";
 import paramsha2b64Request from "../../../../../utils/paramRequests/paramsha2b64Request.js";
 
