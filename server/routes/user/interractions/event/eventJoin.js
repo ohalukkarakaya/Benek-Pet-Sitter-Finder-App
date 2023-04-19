@@ -16,6 +16,7 @@ import paramPayRequest from "../../../../utils/paramRequests/paymentRequests/par
 import paramRegisterCreditCardRequest from "../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
 import paramAddDetailToOrder from "../../../../utils/paramRequests/paymentRequests/paramAddDetailToOrder.js";
 import paramCancelOrderRequest from "../../../../utils/paramRequests/paymentRequests/paramCancelOrderRequest.js";
+import paramAproveOrderRequest from "../../../../utils/paramRequests/paymentRequests/paramAproveOrderRequest.js";
 import paramsha2b64Request from "../../../../utils/paramRequests/paramsha2b64Request.js";
 
 dotenv.config();
@@ -743,7 +744,230 @@ router.post(
                     event.ticketPrice.priceType !== "Free" 
                     && event.ticketPrice.price !== 0
                 ){
+
                     //get payment
+                    var recordCard = true;
+
+                    let cardGuid;
+
+                    cardGuid = req.body.cardGuid.toString();
+                    const cardNo = req.body.cardNo.toString();
+                    const cvv = req.body.cvv.toString();
+                    const cardExpiryDate = req.body.cardExpiryDate.toString();
+                    const user = await User.findById( req.user._id.toString() );
+
+                    const price = invitation.ticketPrice
+                                            .price
+                                            .toLocaleString( 'tr-TR' )
+                                            .replace( '.', '' );
+
+                    const priceForEventOwner = (
+                                                invitation.ticketPrice
+                                                        .price - ( 
+                                                                    invitation.ticketPrice
+                                                                            .price * 100 
+                                                                ) / 15
+                                            ).toLocaleString( 'tr-TR' )
+                                                .replace( '.', '' );
+
+                    if( !user.phone ){
+                        return res.status( 400 ).json(
+                            {
+                                error: true,
+                                message: "user doesn't have phone number inserted"
+                            }
+                        );
+                    }
+                    var phoneNumberWithoutZero = user.phone.replace(/\D/g, '').slice(-10);
+
+                    //take payment
+                    if( req.body.recordCard && req.body.recordCard === false ){
+                        recordCard = false;
+                    }
+
+                    if( 
+                        cardGuid 
+                        || (
+                            recordCard
+                            && cardNo
+                            && cvv
+                            && cardExpiryDate
+                        )
+                    ){
+                        if(
+                            !cardGuid
+                            && recordCard
+                            && cardNo
+                            && cvv
+                            && cardExpiryDate
+                        ){
+                            const cardName = user.userName + crypto.randomBytes(6).toString('hex');
+                            //register card
+                            const registerCardRequest = await paramRegisterCreditCardRequest(
+                                user.identity.firstName, //firstname
+                                user.identity.middleName, //middlename
+                                user.identity.lastName, //lastname
+                                cardNo, //card no
+                                cardExpiryDate.split("/")[0], //expiry date month
+                                cardExpiryDate.split("/")[1], //expiry date year
+                                cardName // random card name to keep it
+                            );
+
+                            if( !registerCardRequest || registerCardRequest.error === true ){
+                                return res.status(500).json(
+                                    {
+                                        error: true,
+                                        message: "error while registering card"
+                                    }
+                                );
+                            }
+
+                            cardGuid = registerCardRequest.data.ksGuid;
+
+                            user.cardGuidies.push(
+                                {
+                                    cardName: cardName,
+                                    cardGuid: cardGuid
+                                }
+                            );
+                            
+                            user.markModified("cardGuidies");
+                            user.save(
+                                (err) => {
+                                    if(err){
+                                        console.log(err);
+                                    }
+                                }
+                            );
+                        }
+
+                        const payWithRegisteredCardRequest = await paramPayWithRegisteredCard(
+                            cardGuid, //kkGuid
+                            cvv, //cvv
+                            phoneNumberWithoutZero,//phone number
+                            "https://dev.param.com.tr/tr", //success url
+                            "https://dev.param.com.tr/tr", //error url
+                            invitation._id, //order Id
+                            event.desc, //order desc
+                            price,
+                            priceForEventOwner,
+                            'NS', //payment type
+                            'https://dev.param.com.tr/tr' // ref url
+                        );
+                        
+                        if( !payWithRegisteredCardRequest || payWithRegisteredCardRequest.error === true ){
+                            //To Do: Check payment data
+                            return res.status(500).json(
+                                {
+                                    error: true,
+                                    message: "error paying with registered card"
+                                }
+                            );
+                        }
+                        //set order id
+                        orderId = payWithRegisteredCardRequest.data.islemID;
+                    } else if(
+                        !cardGuid 
+                        && !recordCard
+                        && cardNo
+                        && cvv
+                        && cardExpiryDate
+                    ){
+                        const shaData = process.env.PARAM_CLIENT_CODE 
+                                        + process.env.PARAM_GUID 
+                                        + 1 
+                                        + price 
+                                        + priceForEventOwner
+                                        + invitation._id;
+
+                        // take payment regularly
+                        const sha2b64Request = await paramsha2b64Request( shaData );
+                        if( 
+                            !sha2b64Request 
+                            || sha2b64Request.error === true 
+                            || !( sha2b64Request.data.sha2b64result ) 
+                        ){
+                            return res.status( 500 ).json(
+                                {
+                                    error: true,
+                                    message: "error on sha2b64 crypto api"
+                                }
+                            );
+                        } 
+
+                        const paramRegularPayRequest = await paramPayRequest(
+                            user.identity.firstName, //firstname
+                            user.identity.middleName, //middlename
+                            user.identity.lastName, //lastname
+                            price,
+                            priceForEventOwner,
+                            cardNo,
+                            cardExpiryDate.split("/")[0],
+                            cardExpiryDate.split("/")[1],
+                            cvv,
+                            phoneNumberWithoutZero,
+                            "https://dev.param.com.tr/tr", //success url
+                            "https://dev.param.com.tr/tr", //error url
+                            invitation._id,
+                            event.desc, //order desc
+                            sha2b64Request.data.sha2b64result.toString(),
+                            "NS",
+                            'https://dev.param.com.tr/tr' // ref url
+                        );
+
+                        if( 
+                            !paramRegularPayRequest 
+                            || payRequest.error === true 
+                            || !( payRequest.data.islemId ) 
+                        ){
+                            return res.status( 500 ).json(
+                                {
+                                    error: true,
+                                    message: "error on pay request"
+                                }
+                            );
+                        }
+
+                        orderId = payRequest.data.islemId;
+                    }else{
+                        return res.status( 400 ).json(
+                            {
+                                error: true,
+                                message: "Missing payment info"
+                            }
+                        );
+                    }
+
+                    if( !orderId ){
+                        return res.status( 500 ).json(
+                            {
+                                error: true,
+                                message: "Internal server error"
+                            }
+                        );
+                    }
+
+                    //add order detail
+                    const subsellerGuid = event.eventAdminsParamGuid;
+                    const paramAddDetailToOrderRequest = await paramAddDetailToOrder(
+                        price,
+                        priceForEventOwner,
+                        orderId,
+                        subsellerGuid
+                    );
+
+                    if( 
+                        !paramAddDetailToOrderRequest 
+                        || !paramAddDetailToOrderRequest
+                        || paramAddDetailToOrderRequest.error === true 
+                    ){
+                        return res.status( 500 ).json(
+                            {
+                                error: true,
+                                message: "Internal server error"
+                            }
+                        );
+                    }
 
                 }
 
@@ -754,17 +978,23 @@ router.post(
                 const hashTicketPassword = await bcrypt.hash(randPassword, salt);
 
                 await new EventTicket(
-                    {
-                        eventOrganizers: event.eventOrganizers,
-                        eventId: event._id.toString(),
-                        userId: req.user._id.toString(),
-                        ticketPassword: hashTicketPassword,
-                        paidPrice: event.ticketPrice,
-                        eventDate: event.date,
-                        expiryDate: event.expiryDate,
-                        isPrivate: event.isPrivate
-                    }
-                ).save().then(
+                {
+                    eventOrganizers: event.eventOrganizers,
+                    eventId: event._id.toString(),
+                    userId: req.user._id.toString(),
+                    ticketPassword: hashTicketPassword,
+                    paidPrice: paidPrice,
+                    orderId: orderId,
+                    orderInfo: {
+                        pySiparisGuid: paramAddDetailToOrderRequest.data.PYSiparis_GUID,
+                        sanalPosIslemId: paramAddDetailToOrderRequest.data.SanalPOS_Islem_ID,
+                        subSellerGuid: paramAddDetailToOrderRequest.data.GUID_AltUyeIsyeri
+                    },
+                    eventDate: event.date,
+                    expiryDate: event.expiryDate,
+                    isPrivate: event.isPrivate
+                }
+            ).save().then(
                     (ticket) => {
                         const data = {
                             ticketId: ticket._id.toString(),
@@ -896,7 +1126,7 @@ router.put(
                 );
             }
 
-            if(ticket.eventOrganizers  !== meetingEvent.eventOrganizers){
+            if(ticket.eventOrganizers !== meetingEvent.eventOrganizers){
                 ticket.eventOrganizers = meetingEvent.eventOrganizers;
                 ticket.markModified("eventOrganizers");
             }
@@ -995,8 +1225,24 @@ router.put(
 
         meetingEvent.save().then(
             (_) => {
-                if(meetingEvent.ticketPrice.priceType !== "Free" && meetingEvent.ticketPrice.price !== 0){
-                    //TO DO: payment approvement will be here
+                if(
+                    meetingEvent.ticketPrice.priceType !== "Free" 
+                    && meetingEvent.ticketPrice.price !== 0
+                    && ticket.orderId
+                    && ticket.orderInfo.pySiparisGuid
+                ){
+                    //approve payment
+                    const approvePayment = await paramAproveOrderRequest(
+                        ticket.orderInfo.pySiparisGuid
+                    );
+                    if( !approvePayment || approvePayment.error === true ){
+                        return res.status( 500 ).json(
+                            {
+                                error: true,
+                                message: "error on aprrove payment"
+                            }
+                        );
+                    }
                 }
 
                 ticket.deleteOne().then(
