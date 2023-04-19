@@ -1,12 +1,12 @@
-import User from "../../../../../../models/User.js";
-import Event from "../../../../../../models/Event/Event.js";
-import EventInvitation from "../../../../../../models/Event/Invitations/InviteEvent.js";
+import User from "../../../models/User.js";
+import Event from "../../../models/Event/Event.js";
+import EventInvitation from "../../../models/Event/Invitations/InviteEvent.js";
 
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const invitePrivateEvent = async ( req, res ) => {
+const invitePrivateEventController = async ( req, res ) => {
     try{
         if(!req.params.eventId){
             return res.status(400).json(
@@ -145,4 +145,4 @@ const invitePrivateEvent = async ( req, res ) => {
     }
 };
 
-export default invitePrivateEvent;
+export default invitePrivateEventController;

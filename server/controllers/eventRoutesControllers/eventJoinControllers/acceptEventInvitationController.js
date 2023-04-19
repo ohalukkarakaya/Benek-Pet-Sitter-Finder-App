@@ -1,13 +1,13 @@
-import User from "../../../../../../models/User.js";
-import Event from "../../../../../../models/Event/Event.js";
-import EventTicket from "../../../../../../models/Event/EventTicket.js";
-import EventInvitation from "../../../../../../models/Event/Invitations/InviteEvent.js";
+import User from "../../../models/User.js";
+import Event from "../../../models/Event/Event.js";
+import EventTicket from "../../../models/Event/EventTicket.js";
+import EventInvitation from "../../../models/Event/Invitations/InviteEvent.js";
 
-import paramPayWithRegisteredCard from "../../../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
-import paramPayRequest from "../../../../../../utils/paramRequests/paymentRequests/paramPayRequest.js";
-import paramRegisterCreditCardRequest from "../../../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
-import paramAddDetailToOrder from "../../../../../../utils/paramRequests/paymentRequests/paramAddDetailToOrder.js";
-import paramsha2b64Request from "../../../../../../utils/paramRequests/paramsha2b64Request.js";
+import paramPayWithRegisteredCard from "../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
+import paramPayRequest from "../../../utils/paramRequests/paymentRequests/paramPayRequest.js";
+import paramRegisterCreditCardRequest from "../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
+import paramAddDetailToOrder from "../../../utils/paramRequests/paymentRequests/paramAddDetailToOrder.js";
+import paramsha2b64Request from "../../../utils/paramRequests/paramsha2b64Request.js";
 
 import bcrypt from "bcrypt";
 import crypto from "crypto";
@@ -16,7 +16,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const acceptEventInvitation = async (req, res) => {
+const acceptEventInvitationController = async (req, res) => {
     try{
         const response = req.params.response === "true";
         let orderId;
@@ -453,4 +453,4 @@ const acceptEventInvitation = async (req, res) => {
     }
 } 
 
-export default acceptEventInvitation;
+export default acceptEventInvitationController;

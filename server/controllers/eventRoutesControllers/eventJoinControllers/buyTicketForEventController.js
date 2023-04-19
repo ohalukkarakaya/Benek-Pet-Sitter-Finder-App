@@ -1,13 +1,13 @@
-import User from "../../../../../../models/User.js";
-import Event from "../../../../../../models/Event/Event.js";
-import EventTicket from "../../../../../../models/Event/EventTicket.js";
+import User from "../../../models/User.js";
+import Event from "../../../models/Event/Event.js";
+import EventTicket from "../../../models/Event/EventTicket.js";
 
-import paramPayWithRegisteredCard from "../../../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
-import paramPayRequest from "../../../../../../utils/paramRequests/paymentRequests/paramPayRequest.js";
-import paramRegisterCreditCardRequest from "../../../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
-import paramAddDetailToOrder from "../../../../../../utils/paramRequests/paymentRequests/paramAddDetailToOrder.js";
-import paramCancelOrderRequest from "../../../../../../utils/paramRequests/paymentRequests/paramCancelOrderRequest.js";
-import paramsha2b64Request from "../../../../../../utils/paramRequests/paramsha2b64Request.js";
+import paramPayWithRegisteredCard from "../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
+import paramPayRequest from "../../../utils/paramRequests/paymentRequests/paramPayRequest.js";
+import paramRegisterCreditCardRequest from "../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
+import paramAddDetailToOrder from "../../../utils/paramRequests/paymentRequests/paramAddDetailToOrder.js";
+import paramCancelOrderRequest from "../../../utils/paramRequests/paymentRequests/paramCancelOrderRequest.js";
+import paramsha2b64Request from "../../../utils/paramRequests/paramsha2b64Request.js";
 
 import bcrypt from "bcrypt";
 import crypto from "crypto";
@@ -16,7 +16,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const buyTicketForEvent = async (req, res) => {
+const buyTicketForEventController = async (req, res) => {
     try{
         if(!req.params.eventId){
             return res.status(400).json(
@@ -484,4 +484,4 @@ const buyTicketForEvent = async (req, res) => {
     }
 }
 
-export default buyTicketForEvent;
+export default buyTicketForEventController;
