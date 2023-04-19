@@ -1,4 +1,4 @@
-import Event from "../../../models/Event/Event.js";
+import Event from "../../../../../models/Event/Event.js";
 import dotenv from "dotenv";
 
 dotenv.config();

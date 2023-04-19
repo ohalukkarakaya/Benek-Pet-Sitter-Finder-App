@@ -1,18 +1,19 @@
 import express from "express";
-import dotenv from "dotenv";
 import auth from "../../../../middleware/auth.js";
-import { uploadEventImage } from "../../../../middleware/contentHandle/serverHandleEventImage.js";
+
+//controllers
+import createEventController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventControllers/createEventController.js";
+import uploadEventImageController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventControllers/uploadEventImageController.js";
+import editEventController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventControllers/editEventController.js";
+import deleteEventController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventControllers/deleteEventController.js";
 
 //imported endpoints
 import eventJoinEndpoints from "./eventJoin.js";
 import afterEventEndpoints from "./eventGuestInterractions.js";
 import organizerEndpoints from "./organizerOperations.js";
 
-//controllers
-import createEventController from "../../../../controllers/eventRoutesControllers/eventControllers/createEventController.js";
-import uploadEventImageController from "../../../../controllers/eventRoutesControllers/eventControllers/uploadEventImageController.js";
-import editEventController from "../../../../controllers/eventRoutesControllers/eventControllers/editEventController.js";
-import deleteEventController from "../../../../controllers/eventRoutesControllers/eventControllers/deleteEventController.js";
+import { uploadEventImage } from "../../../../middleware/contentHandle/serverHandleEventImage.js";
+import dotenv from "dotenv";
 
 dotenv.config();
 

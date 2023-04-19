@@ -1,12 +1,12 @@
+//controllers
+import afterEventCreateCommentOrReplyCommentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventCreateCommentOrReplyCommentController.js";
+import afterEventEditCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventEditCommentOrReplyController.js";
+import afterEventDeleteCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventDeleteCommentOrReplyController.js";
+import afterEventLikeCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventLikeCommentOrReplyController.js";
+
 import express from "express";
 import dotenv from "dotenv";
 import auth from "../../../../middleware/auth.js";
-
-//controllers
-import afterEventCreateCommentOrReplyCommentController from "../../../../controllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventCreateCommentOrReplyCommentController.js";
-import afterEventEditCommentOrReplyController from "../../../../controllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventEditCommentOrReplyController.js";
-import afterEventDeleteCommentOrReplyController from "../../../../controllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventDeleteCommentOrReplyController.js";
-import afterEventLikeCommentOrReplyController from "../../../../controllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventLikeCommentOrReplyController.js";
 
 dotenv.config();
 

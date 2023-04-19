@@ -2,9 +2,9 @@ import express from "express";
 import auth from "../../../../middleware/auth.js";
 
 //controllers
-import addOrganizerController from "../../../../controllers/eventRoutesControllers/eventOrganizerOperationsController/addOrganizerController.js";
-import acceptOrganizeInvitationController from "../../../../controllers/eventRoutesControllers/eventOrganizerOperationsController/acceptOrganizeInvitationController.js";
-import cancelOrganizerStatusController from "../../../../controllers/eventRoutesControllers/eventOrganizerOperationsController/cancelOrganizerStatusController.js";
+import addOrganizerController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventOrganizerOperationsController/addOrganizerController.js";
+import acceptOrganizeInvitationController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventOrganizerOperationsController/acceptOrganizeInvitationController.js";
+import cancelOrganizerStatusController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventOrganizerOperationsController/cancelOrganizerStatusController.js";
 
 const router = express.Router();
 

@@ -1,5 +1,5 @@
-import Event from "../../../models/Event/Event.js";
-import OrganizerInvitation from "../../../models/Event/Invitations/InviteOrganizer.js";
+import Event from "../../../../../models/Event/Event.js";
+import OrganizerInvitation from "../../../../../models/Event/Invitations/InviteOrganizer.js";
 
 const acceptOrganizeInvitationController = async (req,res) => {
     try{

@@ -1,6 +1,6 @@
-import Event from "../../../models/Event/Event.js";
-import EventTicket from "../../../models/Event/EventTicket.js";
-import s3 from "../../../utils/s3Service.js";
+import Event from "../../../../../models/Event/Event.js";
+import EventTicket from "../../../../../models/Event/EventTicket.js";
+import s3 from "../../../../../utils/s3Service.js";
 import dotenv from "dotenv";
 
 dotenv.config();

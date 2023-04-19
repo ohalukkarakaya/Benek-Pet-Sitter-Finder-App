@@ -1,15 +1,14 @@
-import Event from "../../../models/Event/Event.js";
+import Event from "../../../../../models/Event/Event.js";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const afterEventEditCommentOrReplyController = async (req, res) => {
+const afterEventDeleteCommentOrReplyController = async (req, res) => {
     try{
         const eventId = req.params.eventId;
         const contentId = req.params.contentId;
         const commentId = req.body.commentId;
-        const newComment = req.body.desc;
-        if(!eventId || !contentId || !newComment){
+        if(!eventId || !contentId){
             return res.status(400).json(
                 {
                     error: true,
@@ -75,7 +74,10 @@ const afterEventEditCommentOrReplyController = async (req, res) => {
                 );
             }
             
-            reply.reply = newComment;
+            comment.replies = comment.replies.filter(
+                replyObject =>
+                    replyObject._id.toString() !== req.body.replyId.toString()
+            );
         }else{
             if(
                 meetingEvent.eventAdmin.toString() !== req.user._id.toString()
@@ -89,7 +91,10 @@ const afterEventEditCommentOrReplyController = async (req, res) => {
                 );
             }
 
-            comment.comment = newComment;
+            content.comments = content.comments.filter(
+                commentObject =>
+                    commentObject._id.toString() !== commentId
+            );
         }
 
         meetingEvent.markModified("afterEvent");
@@ -123,4 +128,4 @@ const afterEventEditCommentOrReplyController = async (req, res) => {
     }
 }
 
-export default afterEventEditCommentOrReplyController;
+export default afterEventDeleteCommentOrReplyController;

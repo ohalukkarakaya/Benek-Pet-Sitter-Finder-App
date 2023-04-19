@@ -1,5 +1,5 @@
-import User from "../../../models/User.js";
-import Event from "../../../models/Event/Event.js";
+import User from "../../../../../models/User.js";
+import Event from "../../../../../models/Event/Event.js";
 import dotenv from "dotenv";
 
 dotenv.config();

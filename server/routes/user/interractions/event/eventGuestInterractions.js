@@ -5,10 +5,10 @@ import afterEventCommentEndpoints from "./afterEventCommentOperations.js";
 import { uploadEventContent } from "../../../../middleware/contentHandle/serverHandleAfterEventContent.js";
 
 //controllers
-import eventUploadContentController from "../../../../controllers/eventRoutesControllers/eventGuestInterractionsControllers/eventUploadContentController.js";
-import eventEditContentController from "../../../../controllers/eventRoutesControllers/eventGuestInterractionsControllers/eventEditContentController.js";
-import eventDeleteContentController from "../../../../controllers/eventRoutesControllers/eventGuestInterractionsControllers/eventDeleteContentController.js";
-import afterEventContentLileRemoveLikeController from "../../../../controllers/eventRoutesControllers/eventGuestInterractionsControllers/afterEventContentLileRemoveLikeController.js";
+import eventUploadContentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/eventUploadContentController.js";
+import eventEditContentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/eventEditContentController.js";
+import eventDeleteContentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/eventDeleteContentController.js";
+import afterEventContentLileRemoveLikeController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/afterEventContentLileRemoveLikeController.js";
 
 dotenv.config();
 

@@ -1,8 +1,8 @@
-import User from "../../../models/User.js";
-import Event from "../../../models/Event/Event.js";
-import EventTicket from "../../../models/Event/EventTicket.js";
+import User from "../../../../../models/User.js";
+import Event from "../../../../../models/Event/Event.js";
+import EventTicket from "../../../../../models/Event/EventTicket.js";
 
-import paramAproveOrderRequest from "../../../utils/paramRequests/paymentRequests/paramAproveOrderRequest.js";
+import paramAproveOrderRequest from "../../../../../utils/paramRequests/paymentRequests/paramAproveOrderRequest.js";
 
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
