@@ -9,6 +9,7 @@ import paramAddDetailToOrder from "../../../utils/paramRequests/paymentRequests/
 import paramsha2b64Request from "../../../utils/paramRequests/paramsha2b64Request.js";
 
 import dotenv from "dotenv";
+import crypto from "crypto";
 import bcrypt from "bcrypt";
 import QRCode from "qrcode";
 
@@ -162,7 +163,7 @@ const replyCareGiveInvitationController = async (req, res) => {
                                     const cardExpiryDate = req.body.cardExpiryDate.toString();
                                     const user = await User.findById( req.user._id.toString() );
                     
-                                    const price = price.servicePrice
+                                    const priceForService = price.servicePrice
                                                        .toLocaleString( 'tr-TR' )
                                                        .replace( '.', '' );
                     
@@ -170,10 +171,10 @@ const replyCareGiveInvitationController = async (req, res) => {
                                                                 price.servicePrice - ( 
                                                                         price.servicePrice * 100 
                                                                                      ) / 30
-                                                            ).toLocaleString( 'tr-TR' )
-                                                             .replace( '.', '' );
+                                                              ).toLocaleString( 'tr-TR' )
+                                                               .replace( '.', '' );
                     
-                                    if( !user.phone ){
+                                    if( !user || user.isDeactive || !user.phone ){
                                         return res.status( 400 ).json(
                                             {
                                                 error: true,
@@ -189,7 +190,7 @@ const replyCareGiveInvitationController = async (req, res) => {
                                     }
 
                                     const generatedOrderId = invitedCareGive._id + crypto.randomBytes(3).toString('hex');
-                                    const careGiveOrderDesc = `${ generatedOrderId } nolu Bakım Hizmeti Siparişi`;
+                                    const careGiveOrderDesc = `Bakım Hizmeti Siparişi, No: ${ generatedOrderId }`;
                     
                                     if( 
                                         cardGuid 
@@ -255,14 +256,14 @@ const replyCareGiveInvitationController = async (req, res) => {
                                             "https://dev.param.com.tr/tr", //error url
                                             generatedOrderId, //order Id
                                             careGiveOrderDesc, //order desc
-                                            price,
+                                            priceForService,
                                             priceForCareGiver,
                                             'NS', //payment type
                                             'https://dev.param.com.tr/tr' // ref url
                                         );
                                         
                                         if( !payWithRegisteredCardRequest || payWithRegisteredCardRequest.error === true ){
-                                            //To Do: Check payment data
+                                            // Check payment data
                                             return res.status(500).json(
                                                 {
                                                     error: true,
@@ -282,7 +283,7 @@ const replyCareGiveInvitationController = async (req, res) => {
                                         const shaData = process.env.PARAM_CLIENT_CODE 
                                                         + process.env.PARAM_GUID 
                                                         + 1 
-                                                        + price 
+                                                        + priceForService 
                                                         + priceForCareGiver
                                                         + generatedOrderId;
                     
@@ -305,7 +306,7 @@ const replyCareGiveInvitationController = async (req, res) => {
                                             user.identity.firstName, //firstname
                                             user.identity.middleName, //middlename
                                             user.identity.lastName, //lastname
-                                            price,
+                                            priceForService,
                                             priceForCareGiver,
                                             cardNo,
                                             cardExpiryDate.split("/")[0],
@@ -356,7 +357,7 @@ const replyCareGiveInvitationController = async (req, res) => {
                                     //add order detail
                                     const subsellerGuid = invitedCareGive.invitation.careGiverParamGuid;
                                     const paramAddDetailToOrderRequest = await paramAddDetailToOrder(
-                                        price,
+                                        priceForService,
                                         priceForCareGiver,
                                         orderId,
                                         subsellerGuid
@@ -420,14 +421,11 @@ const replyCareGiveInvitationController = async (req, res) => {
                                                 invitedCareGive.invitation.actionCode.code = url;
                                                 invitedCareGive.markModified("invitation");
 
-                                                invitedCareGive.prices.orderIds.add( orderId );
-                                                invitedCareGive.prices.ordersInfoList.add(
-                                                    {
-                                                        pySiparisGuid: pySiparisGuid,
-                                                        sanalPosIslemId: sanalPosIslemId,
-                                                        subSellerGuid: subSellerGuid
-                                                    }
-                                                );
+                                                invitedCareGive.prices.orderId = orderId;
+                                                invitedCareGive.prices.orderInfo.pySiparisGuid = pySiparisGuid;
+                                                invitedCareGive.prices.orderInfo.sanalPosIslemId = sanalPosIslemId;
+                                                invitedCareGive.prices.orderInfo.subSellerGuid = subSellerGuid;
+                                                
                                                 invitedCareGive.markModified("prices");
                                                 
                                                 invitedCareGive.save().then(

@@ -157,7 +157,7 @@ const expireUser = cron.schedule(
                         );
 
                         if(events){
-                            //To Do: delete events with all conditions
+                            // delete events with all conditions
                             await Promise.all(
                                 events.map(
                                     async (meetingEvent) => {

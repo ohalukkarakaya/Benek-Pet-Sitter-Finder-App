@@ -2,6 +2,9 @@ import cron from "node-cron";
 import CareGive from "../models/CareGive/CareGive.js";
 import ReportedMission from "../models/report/ReportMission.js";
 import s3 from "../utils/s3Service.js";
+
+import paramAproveOrderRequest from "../utils/paramRequests/paymentRequests/paramAproveOrderRequest.js";
+
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -19,9 +22,11 @@ const expireCareGive = cron.schedule(
                 async (careGive) => {
                     const isCareGiveReported = await ReportedMission.find(
                         reportedMissionObject =>
-                            reportedMissionObject.careGiveId.toString() === careGive._id.toString()
+                            reportedMissionObject.careGiveId
+                                                 .toString() === careGive._id
+                                                                         .toString()
                     );
-                    if(!isCareGiveReported){
+                    if( !isCareGiveReported ){
                         //delete images of event
                         async function emptyS3Directory(bucket, dir){
                             const listParams = {
@@ -41,8 +46,34 @@ const expireCareGive = cron.schedule(
                             await s3.deleteObjects(deleteParams);
                             if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
                         }
-                        emptyS3Directory(process.env.BUCKET_NAME, `careGive/${careGive._id.toString()}/`).then(
-                            (_) => {
+                        emptyS3Directory(
+                            process.env.BUCKET_NAME, 
+                            `careGive/${careGive._id.toString()}/`
+                        ).then(
+                            async (_) => {
+
+                                if( careGive.prices.priceType !== "Free" && careGive.prices.servicePrice !== 0 ){
+                                    //approve payments
+                                    const approveCareGivePayment = await paramAproveOrderRequest(
+                                        careGive.prices.orderInfo.pySiparisGuid
+                                    );
+                                    if( !approveCareGivePayment || approveCareGivePayment.error === true ){
+                                        console.log( approveCareGivePayment.sonucStr );
+                                    }
+                                }
+
+                                for( var mission in careGive.missionCallender ){
+                                    if( mission.isExtra && mission.extraMissionInfo && mission.extraMissionInfo.paidPrice ){
+                                        //approve extra mission payments
+                                        const approveCareGivePayment = await paramAproveOrderRequest(
+                                            mission.extraMissionInfo.pySiparisGuid
+                                        );
+                                        if( !approveCareGivePayment || approveCareGivePayment.error === true ){
+                                            console.log( approveCareGivePayment.sonucStr );
+                                        }
+                                    }
+                                }
+
                                 //delete CareGive
                                 careGive.deleteOne().then(
                                     (_) => {

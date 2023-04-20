@@ -1,6 +1,7 @@
 import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
 import s3 from "../../../../../utils/s3Service.js";
+import paramCancelOrderRequest from "../../../../../utils/paramRequests/paymentRequests/paramCancelOrderRequest.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -49,12 +50,31 @@ const deleteEventController = async (req, res) => {
         const cancelPayments = soldTickets.map(
             (ticket) => {
                 return new Promise(
-                    (resolve, reject) => {
+                    async (resolve, reject) => {
                         if(
                             ticket.paidPrice.priceType !== "Free"
                             && ticket.paidPrice.price > 0
                         ){
-                            //To Do: cancel payment
+                            //cancel payment
+                            const cancelPayment = await paramCancelOrderRequest(
+                                ticket.orderInfo.pySiparisGuid,
+                                "IPTAL",
+                                ticket.orderId,
+                                ticket.paidPrice
+                            );
+
+                            if(
+                                !cancelPayment 
+                                || cancelPayment.error === true 
+                                || !( cancelPayment.data )
+                            ){
+                                return res.status( 500 ).json(
+                                    {
+                                        error: true,
+                                        message: "Internal server error"
+                                    }
+                                );
+                            }                            
                         }
 
                         ticket.deleteOne().then(

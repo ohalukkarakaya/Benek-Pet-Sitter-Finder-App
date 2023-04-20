@@ -1,4 +1,5 @@
 import CareGive from "../../../../models/CareGive/CareGive.js";
+import paramCancelOrderRequest from "../../../../utils/paramRequests/paymentRequests/paramCancelOrderRequest.js";
 
 import dotenv from "dotenv";
 
@@ -47,6 +48,30 @@ const deleteMissionController = async (req, res) => {
                     message: "mission not found"
                 }
             );
+        }
+
+        if( mission.isExtra && mission.extraMissionInfo ){
+
+            //cancel payment
+            const cancelPayment = await paramCancelOrderRequest(
+                mission.extraMissionInfo.pySiparisGuid,
+                "IPTAL",
+                mission.extraMissionInfo.orderId,
+                mission.extraMissionInfo.paidPrice
+            );
+
+            if(
+                !cancelPayment 
+                || cancelPayment.error === true 
+                || !( cancelPayment.data )
+            ){
+                return res.status( 500 ).json(
+                    {
+                        error: true,
+                        message: "Internal server error"
+                    }
+                );
+            }
         }
 
         careGive.missionCallender = careGive.missionCallender.filter(

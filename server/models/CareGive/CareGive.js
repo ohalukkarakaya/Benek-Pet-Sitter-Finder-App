@@ -93,13 +93,10 @@ const CareGiveSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
-        orderIds: [
-            {
-                type: String,
-            }
-        ],
-        ordersInfoList: [
-          {
+        orderId: {
+            type: String,
+        },
+        orderInfo: {
             pySiparisGuid: {
               type: String,
               required: true
@@ -112,8 +109,7 @@ const CareGiveSchema = new mongoose.Schema(
               type: String,
               required: true
             }
-          }
-        ],
+        },
         extraMissionPrice: {
             type: Number,
             default: 0,
@@ -184,6 +180,28 @@ const CareGiveSchema = new mongoose.Schema(
             isExtra: {
                 type: Boolean,
                 default: false
+            },
+            extraMissionInfo: {
+                orderId: {
+                    type: String,
+                    required: true
+                },
+                pySiparisGuid: {
+                    type: String,
+                    required: true
+                },
+                sanalPosIslemId: {
+                    type: String,
+                    required: true
+                },
+                subSellerGuid: {
+                    type: String,
+                    required: true
+                },
+                paidPrice: {
+                    type: String,
+                    required: true
+                }
             },
             missionContent:{
                 timeSignature: {

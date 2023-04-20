@@ -259,7 +259,7 @@ const buyTicketForEventController = async (req, res) => {
                     );
                     
                     if( !payWithRegisteredCardRequest || payWithRegisteredCardRequest.error === true ){
-                        //To Do: Check payment data
+                        // Check payment data
                         return res.status(500).json(
                             {
                                 error: true,
