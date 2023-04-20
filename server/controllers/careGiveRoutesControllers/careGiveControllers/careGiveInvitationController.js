@@ -136,8 +136,12 @@ const careGiveInvitationController = async (req, res) => {
             );
         }
         const isOwnerVerified = owner.email;
-        const isCareGiverVerified = careGiver.isCareGiver && careGiver.email && careGiver.phone && careGiver.iban;
-        if(!isCareGiverVerified){
+        const isCareGiverVerified = careGiver.isCareGiver 
+                                    && careGiver.email 
+                                    && careGiver.phone 
+                                    && careGiver.iban
+                                    && careGiver.careGiveGUID;
+        if( !isCareGiverVerified ){
             return res.status(403).json(
                 {
                     error: true,
@@ -149,7 +153,8 @@ const careGiveInvitationController = async (req, res) => {
                 {
                     invitation: {
                         from: req.user._id.toString(),
-                        to: req.body.userId.toString()
+                        to: req.body.userId.toString(),
+                        careGiverParamGuid: careGiver.careGiveGUID.toString()
                     },
                     petId: pet._id.toString(),
                     careGiver: {

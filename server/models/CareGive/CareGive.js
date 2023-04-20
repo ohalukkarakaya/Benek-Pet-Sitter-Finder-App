@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 const CareGiveSchema = new mongoose.Schema(
   {
       invitation: {
+        careGiverParamGuid: {
+
+        },
         from: {
             type: String,
             required: true
@@ -90,6 +93,27 @@ const CareGiveSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+        orderIds: [
+            {
+                type: String,
+            }
+        ],
+        ordersInfoList: [
+          {
+            pySiparisGuid: {
+              type: String,
+              required: true
+            },
+            sanalPosIslemId: {
+              type: String,
+              required: true
+            },
+            subSellerGuid: {
+              type: String,
+              required: true
+            }
+          }
+        ],
         extraMissionPrice: {
             type: Number,
             default: 0,

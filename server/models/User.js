@@ -225,17 +225,6 @@ const UserSchema = new mongoose.Schema(
                 speciesId: String
             }
         ],
-        refundCredit:{
-            priceType: {
-                type: String,
-                enum: [ "None", "TL", "USD", "EUR" ],
-                default: "None"
-            },
-            credit: {
-                type: Number,
-                default: 0
-            }
-        },
         deactivation: {
             isDeactive: {
                 type: Boolean,

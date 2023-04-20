@@ -17,6 +17,7 @@ import ChangeEmailModel from "../models/UserSettings/ChangeEmail.js";
 import PhoneOtpVerificationModel from "../models/UserSettings/PhoneOTPVerification.js";
 
 import paramDeleteSubSellerRequest from "../utils/paramRequests/subSellerRequests/paramDeleteSubSellerRequest.js";
+import paramCancelOrderRequest from "../utils/paramRequests/paymentRequests/paramCancelOrderRequest.js";
 
 import s3 from "../utils/s3Service.js";
 
@@ -167,12 +168,34 @@ const expireUser = cron.schedule(
                                             const cancelPayments = soldTickets.map(
                                                 (ticket) => {
                                                     return new Promise(
-                                                        (resolve, reject) => {
+                                                        async (resolve, reject) => {
                                                             if(
                                                                 ticket.paidPrice.priceType !== "Free"
                                                                 && ticket.paidPrice.price > 0
+                                                                && ticket.orderId
+                                                                && ticket.orderInfo
+                                                                && ticket.orderInfo.pySiparisGuid
                                                             ){
-                                                                //To Do: cancel payment
+                                                                //cancel payment
+                                                                const cancelPayment = await paramCancelOrderRequest(
+                                                                    ticket.orderInfo.pySiparisGuid,
+                                                                    "IPTAL",
+                                                                    ticket.orderId,
+                                                                    ticket.paidPrice
+                                                                );
+                                                
+                                                                if( 
+                                                                    !cancelPayment 
+                                                                    || cancelPayment.error === true 
+                                                                    || !( cancelPayment.data )
+                                                                ){
+                                                                    return res.status( 500 ).json(
+                                                                        {
+                                                                            error: true,
+                                                                            message: "Internal server error"
+                                                                        }
+                                                                    );
+                                                                }
                                                             }
 
                                                             ticket.deleteOne().then(

@@ -361,7 +361,8 @@ const buyTicketForEventController = async (req, res) => {
 
                 if( 
                     !paramAddDetailToOrderRequest 
-                    || !paramAddDetailToOrderRequest
+                    || !paramAddDetailToOrderRequest.PYSiparis_GUID
+                    || !paramAddDetailToOrderRequest.SanalPOS_Islem_ID
                     || paramAddDetailToOrderRequest.error === true 
                 ){
                     return res.status( 500 ).json(
