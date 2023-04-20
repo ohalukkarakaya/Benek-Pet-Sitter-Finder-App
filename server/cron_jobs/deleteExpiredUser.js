@@ -9,7 +9,6 @@ import Event from "../models/Event/Event.js";
 import EventTicket from "../models/Event/EventTicket.js";
 import EventInvitation from "../models/Event/Invitations/InviteEvent.js";
 import OrganizerInvitation from "../models/Event/Invitations/InviteOrganizer.js";
-import DeletedUserRefund from "../models/DeletedUserRefund/DeletedUserRefund.js";
 import CareGive from "../models/CareGive/CareGive.js";
 import ReportedMission from "../models/report/ReportMission.js";
 import Story from "../models/Story.js";
@@ -389,54 +388,22 @@ const expireUser = cron.schedule(
                         );
                         
                         if(ticket){
-                            if(ticket.paidPrice.priceType === "Free" && ticket.paidPrice.price === 0){
-                                //delete event
-                                ticket.deleteOne().then(
-                                    (_) => {
-                                        console.log("an event ticket deleted because of user")
-                                    }
-                                ).catch(
-                                    (error) => {
-                                        console.log(error);
-                                    }
+                            if(ticket.paidPrice.priceType !== "Free" && ticket.paidPrice.price > 0){
+                                //cancel payment
+                                const cancelPayment = await paramCancelOrderRequest(
+                                    ticket.orderInfo.pySiparisGuid,
+                                    "IPTAL",
+                                    ticket.orderId,
+                                    ticket.paidPrice
                                 );
-                            }else{
-                                //keep money for one year
-                                const emailsPastRefund = await DeletedUserRefund.findOne(
-                                    {
-                                        email: user.email
-                                    }
-                                );
-                                if(emailsPastRefund){
-                                    emailsPastRefund.refundPrice.price = emailsPastRefund.refundPrice.price + ticket.paidPrice.price;
-                                    emailsPastRefund.markModified("refundPrice");
-                                    emailsPastRefund.save(
-                                        (err) => {
-                                            if(err){
-                                                console.log(err);
-                                            }
-                                        }
-                                    );
-                                }else{
-                                    await new DeletedUserRefund(
-                                        {
-                                            email: user.email,
-                                            refundPrice: {
-                                                price: ticket.paidPrice.price
-                                            }
-                                        }
-                                    ).save(
-                                        (err) => {
-                                            if(err){
-                                                console.log(err);
-                                            }
-                                        }
-                                    ).then(
-                                        (newRefund) => {
-                                            console.log(`new refund with id: ${newRefund._id.toString()} inserted`);
-                                        }
-                                    );
-                                }
+
+                                if(
+                                    !cancelPayment 
+                                    || cancelPayment.error === true 
+                                    || !( cancelPayment.data )
+                                ){
+                                    console.log( cancelPayment.data.sonucStr );
+                                } 
                             }
                             ticket.deleteOne().then(
                                 (_) => {

@@ -58,7 +58,7 @@ const expireCareGive = cron.schedule(
                                         careGive.prices.orderInfo.pySiparisGuid
                                     );
                                     if( !approveCareGivePayment || approveCareGivePayment.error === true ){
-                                        console.log( approveCareGivePayment.sonucStr );
+                                        console.log( approveCareGivePayment.data.sonucStr );
                                     }
                                 }
 
@@ -69,7 +69,7 @@ const expireCareGive = cron.schedule(
                                             mission.extraMissionInfo.pySiparisGuid
                                         );
                                         if( !approveCareGivePayment || approveCareGivePayment.error === true ){
-                                            console.log( approveCareGivePayment.sonucStr );
+                                            console.log( approveCareGivePayment.data.sonucStr );
                                         }
                                     }
                                 }

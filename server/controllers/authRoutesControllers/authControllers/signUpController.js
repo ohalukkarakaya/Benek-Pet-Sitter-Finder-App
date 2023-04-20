@@ -1,5 +1,4 @@
 import User from "../../../models/User.js";
-import DeletedUserRefund from "../../../models/DeletedUserRefund/DeletedUserRefund.js";
 
 import sendOTPVerificationEmail from "../../../utils/sendValidationEmail.js";
 import { signUpBodyValidation } from "../../../utils/bodyValidation/user/signUpValidationSchema.js";
@@ -28,27 +27,6 @@ const signUpController = async (req, res) => {
             message: "User Allready Exists"
           }
         );
-
-      var refundCredit = 0;
-      let refundCreditPriceType;
-      const pastRefund = await DeletedUserRefund.find({ email: req.body.email });
-      if(pastRefund){
-        await Promise.all(
-          pastRefund.map(
-            (refund) => {
-              refundCredit = refundCredit + refund.refundPrice.price;
-              refundCreditPriceType = refund.refundPrice.priceType;
-              refund.deleteOne().save(
-                function (err) {
-                  if(err) {
-                      console.error('ERROR: While Update!');
-                  }
-                }
-              );
-            }
-          )
-        );
-      }
   
       const salt = await bcrypt.genSalt(Number(process.env.SALT));
       const hashPassword = await bcrypt.hash(req.body.password, salt);
@@ -60,11 +38,7 @@ const signUpController = async (req, res) => {
           identity: req.body.identity,
           location: req.body.location,
           password: hashPassword,
-          trustedIps: [req.body.ip],
-          refundCredit: {
-            priceType: refundCreditPriceType,
-            credit: refundCredit
-          }
+          trustedIps: [req.body.ip]
         }
       ).save().then(
         (result) => {
