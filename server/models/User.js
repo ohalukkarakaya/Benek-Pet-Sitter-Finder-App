@@ -187,6 +187,10 @@ const UserSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
+        blockedUsers: {
+            type: Array,
+            default: []
+        },
         followers: {
             type: Array,
             default: []

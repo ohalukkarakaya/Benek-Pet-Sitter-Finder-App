@@ -1,8 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
 
-import User from "../../models/User.js";
-
 import auth from "../../middleware/auth.js";
 import { updateProfileImg } from "../../middleware/imageHandle/serverHandleProfileImage.js";
 
