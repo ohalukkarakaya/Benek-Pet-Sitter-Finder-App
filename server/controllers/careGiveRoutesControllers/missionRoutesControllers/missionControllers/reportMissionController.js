@@ -1,5 +1,5 @@
 import CareGive from "../../../../models/CareGive/CareGive.js";
-import ReportMission from "../../../../models/report/ReportMission.js";
+import ReportMission from "../../../../models/Report/ReportMission.js";
 
 import dotenv from "dotenv";
 

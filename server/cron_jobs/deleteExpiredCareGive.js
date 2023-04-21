@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import CareGive from "../models/CareGive/CareGive.js";
-import ReportedMission from "../models/report/ReportMission.js";
+import ReportedMission from "../models/Report/ReportMission.js";
 import s3 from "../utils/s3Service.js";
 
 import paramAproveOrderRequest from "../utils/paramRequests/paymentRequests/paramAproveOrderRequest.js";

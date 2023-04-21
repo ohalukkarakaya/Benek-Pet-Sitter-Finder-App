@@ -1,6 +1,6 @@
 import User from "../../../models/User.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
-import ReportMission from "../../../models/report/ReportMission.js";
+import ReportMission from "../../../models/Report/ReportMission.js";
 
 import s3 from "../../../utils/s3Service.js";
 

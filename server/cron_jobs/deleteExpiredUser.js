@@ -10,7 +10,7 @@ import EventTicket from "../models/Event/EventTicket.js";
 import EventInvitation from "../models/Event/Invitations/InviteEvent.js";
 import OrganizerInvitation from "../models/Event/Invitations/InviteOrganizer.js";
 import CareGive from "../models/CareGive/CareGive.js";
-import ReportedMission from "../models/report/ReportMission.js";
+import ReportedMission from "../models/Report/ReportMission.js";
 import Story from "../models/Story.js";
 import ChangeEmailModel from "../models/UserSettings/ChangeEmail.js";
 import PhoneOtpVerificationModel from "../models/UserSettings/PhoneOTPVerification.js";

@@ -47,6 +47,7 @@ expireCareGive;
 expireUser;
 
 const connect = () => {
+    mongoose.set("strictQuery", false);
     mongoose.connect(process.env.DB).then(
         () => {
           console.log("MongoDB Status: Connected");
