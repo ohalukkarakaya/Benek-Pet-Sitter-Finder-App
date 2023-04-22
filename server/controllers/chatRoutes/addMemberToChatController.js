@@ -61,7 +61,7 @@ const addMemberToChatController = async (req, res) => {
                     memberUserId.toString() === addingUserId
         );
 
-        if( membersWithoutCreater.length <= 0 ){
+        if( membersWithoutAdder.length <= 0 ){
             return res.status(500).json(
                 {
                     error: true,
@@ -106,10 +106,36 @@ const addMemberToChatController = async (req, res) => {
 
         const areThereChatWithSameMembers = await Chat.find(
             {
-                members: {
-                    $size: memberList.length,
-                    $all: memberList.map( ( userId ) => ({ userId: userId }) ) //işe yaramzsa contains denenecek
-                }
+                $and: [
+                  { 'members.userId': { $in: memberList } },
+                  {
+                    'members.userId': {
+                        $nin: memberUserIdList.filter(
+                                                id => 
+                                                  id !== null 
+                                                  && id !== undefined
+                                               ) 
+                    } 
+                 },
+                 {
+                   $where: `this.members.length === ${ memberList.length } 
+                            && new Set(
+                                this.members.map(
+                                    member => 
+                                        member.userId
+                                )
+                            ).size === ${ memberList.length }
+                            && this.members.map(
+                                member => 
+                                    member.userId
+                            ).every(
+                                ( item ) => 
+                                    new Set(
+                                        ${ JSON.stringify( memberList ) }
+                                    ).has( item )
+                            )`
+                 }
+                ]
             }
         );
 
@@ -132,13 +158,13 @@ const addMemberToChatController = async (req, res) => {
         chat.save()
         .then(
             (chat) => {
-            return res.status(200).json(
-                {
-                    error: false,
-                    chatId: chat._id.toString(),
-                    message: "New user added succesfully"
-                }
-            );
+                return res.status(200).json(
+                    {
+                        error: false,
+                        chatId: chat._id.toString(),
+                        message: "New user added succesfully"
+                    }
+                );
             }
         );
     }catch(err){

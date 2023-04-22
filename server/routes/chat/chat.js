@@ -6,6 +6,7 @@ import auth from "../../middleware/auth.js";
 //controllers
 import createChatController from "../../controllers/chatRoutes/createChatController.js";
 import addMemberToChatController from "../../controllers/chatRoutes/addMemberToChatController.js";
+import leaveChatController from "../../controllers/chatRoutes/leaveChatController.js";
 
 dotenv.config();
 const router = express.Router();
@@ -22,6 +23,13 @@ router.post(
     "/addMember/:chatId/:userId",
     auth,
     addMemberToChatController
-)
+);
+
+//leave chat
+router.delete(
+    "/leave/:chatId",
+    auth,
+    leaveChatController
+);
 
 export default router;

@@ -65,10 +65,36 @@ const createChatController = async (req, res) => {
 
         const areThereChatWithSameMembers = await Chat.find(
             {
-            members: {
-                $size: memberList.length,
-                $all: memberList.map((userId) => ({ userId: userId }))
-            }
+                $and: [
+                  { 'members.userId': { $in: memberList } },
+                  {
+                    'members.userId': {
+                        $nin: memberUserIdList.filter(
+                                                id => 
+                                                  id !== null 
+                                                  && id !== undefined
+                                               ) 
+                    } 
+                 },
+                 {
+                   $where: `this.members.length === ${ memberList.length } 
+                            && new Set(
+                                this.members.map(
+                                    member => 
+                                        member.userId
+                                )
+                            ).size === ${ memberList.length }
+                            && this.members.map(
+                                member => 
+                                    member.userId
+                            ).every(
+                                ( item ) => 
+                                    new Set(
+                                        ${ JSON.stringify( memberList ) }
+                                    ).has( item )
+                            )`
+                 }
+                ]
             }
         );
 
