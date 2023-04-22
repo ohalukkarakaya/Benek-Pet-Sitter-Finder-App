@@ -1,4 +1,4 @@
-import Chat from "../../models/Chat";
+import Chat from "../../models/Chat.js";
 
 const addMemberToChatController = async (req, res) => {
     try{
