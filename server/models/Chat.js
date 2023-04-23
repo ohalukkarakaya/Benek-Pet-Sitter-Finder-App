@@ -22,7 +22,7 @@ const ChatSchema = new mongoose.Schema(
         type: String
       },
       chatImageUrl: {
-
+        type: String
       },
       messages: [
       {

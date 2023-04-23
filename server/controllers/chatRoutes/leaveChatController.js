@@ -43,26 +43,50 @@ const leaveChatController = async (req, res) => {
         );
 
         if( idListWithOutLeavingUser.length < 2 ){
-            chat.deleteOne().then(
-                (_) => {
-                    return res.status(200).json(
-                        {
-                            error: false,
-                            message: "chat deleted succesfully"
+            //delete images of user
+            async function emptyS3Directory(bucket, dir){
+                const listParams = {
+                    Bucket: bucket,
+                    Prefix: dir
+                };
+                const listedObjects = await s3.listObjectsV2(listParams);
+                if (listedObjects.Contents.length === 0) return;
+                const deleteParams = {
+                    Bucket: bucket,
+                    Delete: { Objects: [] }
+                };
+
+                listedObjects.Contents.forEach(({ Key }) => {
+                    deleteParams.Delete.Objects.push({ Key });
+                });
+                await s3.deleteObjects(deleteParams);
+                if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
+            }
+            emptyS3Directory(process.env.BUCKET_NAME, `chatAssets/${chat._id.toString()}/`).then(
+                async (_) => {
+                    //delete chat
+                    chat.deleteOne().then(
+                        (_) => {
+                            return res.status(200).json(
+                                {
+                                    error: false,
+                                    message: "chat deleted succesfully"
+                                }
+                            );
+                        }
+                    ).catch(
+                        (error) => {
+                            if(error){
+                                console.log(error);
+                                return res.status(500).json(
+                                    {
+                                        error: true,
+                                        message: "Internal server error"
+                                    }
+                                );
+                            }
                         }
                     );
-                }
-            ).catch(
-                (error) => {
-                    if(error){
-                        console.log(error);
-                        return res.status(500).json(
-                            {
-                                error: true,
-                                message: "Internal server error"
-                            }
-                        );
-                    }
                 }
             );
         }
