@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 
 import auth from "../../middleware/auth.js";
-import updateChatImg from "../../middleware/imageHandle/serverHandleChatImage.js";
+import { updateChatImg } from "../../middleware/imageHandle/serverHandleChatImage.js";
 
 //controllers
 import createChatController from "../../controllers/chatRoutes/createChatController.js";
