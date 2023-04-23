@@ -8,6 +8,7 @@ import { updateChatImg } from "../../middleware/imageHandle/serverHandleChatImag
 import createChatController from "../../controllers/chatRoutes/createChatController.js";
 import addMemberToChatController from "../../controllers/chatRoutes/addMemberToChatController.js";
 import leaveChatController from "../../controllers/chatRoutes/leaveChatController.js";
+import updateChatNameController from "../../controllers/chatRoutes/updateChatNameController.js";
 
 dotenv.config();
 const router = express.Router();
@@ -33,14 +34,19 @@ router.delete(
     leaveChatController
 );
 
-//To Do: add chat image
+//add chat image
 router.post(
-    "/image",
+    "/image/:chatId",
     auth,
     updateChatImg
 );
 
-//To Do: add chat name
+//add chat name
+router.put(
+    "/name/:chatId",
+    auth,
+    updateChatNameController
+);
 
 //To Do: add chat desc
 

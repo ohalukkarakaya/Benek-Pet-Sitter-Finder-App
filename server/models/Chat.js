@@ -18,6 +18,9 @@ const ChatSchema = new mongoose.Schema(
         type: Date,
         default: Date.now()
       },
+      chatName: {
+        type: String
+      },
       chatDesc: {
         type: String
       },
