@@ -50,7 +50,8 @@ const updateChatDescController = async (req, res) => {
         return res.status(200).json(
             {
                 error: true,
-                mesage: "chat desc updated succesfully"
+                mesage: "chat desc updated succesfully",
+                chatId: chatId
             }
         );
     }catch(err){

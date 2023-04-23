@@ -10,6 +10,7 @@ import addMemberToChatController from "../../controllers/chatRoutes/addMemberToC
 import leaveChatController from "../../controllers/chatRoutes/leaveChatController.js";
 import updateChatNameController from "../../controllers/chatRoutes/updateChatNameController.js";
 import updateChatDescController from "../../controllers/chatRoutes/updateChatDescController.js";
+import getChatsController from "../../controllers/chatRoutes/getChatsController.js";
 
 dotenv.config();
 const router = express.Router();
@@ -57,5 +58,10 @@ router.post(
 );
 
 //To Do: get chats
+router.get(
+    "/get/:skip/:limit",
+    auth,
+    getChatsController
+);
 
 export default router;
