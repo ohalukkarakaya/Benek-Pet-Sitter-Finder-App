@@ -9,6 +9,7 @@ import createChatController from "../../controllers/chatRoutes/createChatControl
 import addMemberToChatController from "../../controllers/chatRoutes/addMemberToChatController.js";
 import leaveChatController from "../../controllers/chatRoutes/leaveChatController.js";
 import updateChatNameController from "../../controllers/chatRoutes/updateChatNameController.js";
+import updateChatDescController from "../../controllers/chatRoutes/updateChatDescController.js";
 
 dotenv.config();
 const router = express.Router();
@@ -42,13 +43,18 @@ router.post(
 );
 
 //add chat name
-router.put(
+router.post(
     "/name/:chatId",
     auth,
     updateChatNameController
 );
 
-//To Do: add chat desc
+//add chat desc
+router.post(
+    "/desc/:chatId",
+    auth,
+    updateChatDescController
+);
 
 //To Do: get chats
 
