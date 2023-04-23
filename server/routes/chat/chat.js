@@ -5,12 +5,14 @@ import auth from "../../middleware/auth.js";
 import { updateChatImg } from "../../middleware/imageHandle/serverHandleChatImage.js";
 
 //controllers
-import createChatController from "../../controllers/chatRoutes/createChatController.js";
-import addMemberToChatController from "../../controllers/chatRoutes/addMemberToChatController.js";
-import leaveChatController from "../../controllers/chatRoutes/leaveChatController.js";
-import updateChatNameController from "../../controllers/chatRoutes/updateChatNameController.js";
-import updateChatDescController from "../../controllers/chatRoutes/updateChatDescController.js";
-import getChatsController from "../../controllers/chatRoutes/getChatsController.js";
+import createChatController from "../../controllers/chatRoutesControllers/chatControllers/createChatController.js";
+import addMemberToChatController from "../../controllers/chatRoutesControllers/chatControllers/addMemberToChatController.js";
+import leaveChatController from "../../controllers/chatRoutesControllers/chatControllers/leaveChatController.js";
+import updateChatNameController from "../../controllers/chatRoutesControllers/chatControllers/updateChatNameController.js";
+import updateChatDescController from "../../controllers/chatRoutesControllers/chatControllers/updateChatDescController.js";
+import getChatsController from "../../controllers/chatRoutesControllers/chatControllers/getChatsController.js";
+
+import messagesRoutes from "./messages.js";
 
 dotenv.config();
 const router = express.Router();
@@ -57,11 +59,14 @@ router.post(
     updateChatDescController
 );
 
-//To Do: get chats
+//get chats
 router.get(
     "/get/:skip/:limit",
     auth,
     getChatsController
 );
+
+//message routes
+router.use( "/messages", messagesRoutes );
 
 export default router;

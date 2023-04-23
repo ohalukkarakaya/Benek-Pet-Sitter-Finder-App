@@ -37,10 +37,7 @@ const ChatSchema = new mongoose.Schema(
             type: String,
             enum: [ "Text", "File", "PaymentOffer", "UserProfile", "PetProfile" ]
         },
-        IdOfTheUserWhichProfileSended: {
-            type: String
-        },
-        IdOfThePetWhichProfileSended: {
+        IdOfTheUserOrPetWhichProfileSended: {
             type: String
         },
         fileUrl: {
@@ -59,7 +56,7 @@ const ChatSchema = new mongoose.Schema(
                 enum: [ "EventTicket", "CareGive" ],
                 required: true
             },
-            releatedSchemaId: {
+            releatedrecordId: {
                 type: String,
                 required: true
             }

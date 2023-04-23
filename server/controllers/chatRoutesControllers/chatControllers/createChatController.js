@@ -1,67 +1,26 @@
-import Chat from "../../models/Chat.js";
+import Chat from "../../../models/Chat.js";
+import User from "../../../models/User.js";
 
-const addMemberToChatController = async (req, res) => {
+const createChatController = async (req, res) => {
     try{
-        const chatId = req.params.chatId.toString();
-        const memberToAdd = req.params.userId.toString();
-        if( !memberToAdd || !chatId ){
+        const memberList = req.body.memberList;
+        if( !memberList ){
             return res.status(400).json(
                 {
                     error: true,
-                    message: "missing params"
+                    message: "MemberUserList is necessary"
                 }
             );
         }
 
-        const chat = await Chat.findById( chatId.toString() );
-        if( !chat ){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "chat not found"
-                }
-            );
-        }
+        const createrUserId = req.user._id.toString();
 
-        const isUserTryingToAddAlreadyMember = chat.members.where(
-            member =>
-                member.userId.toString() === memberToAdd
-        );
-
-        const isUserMember = chat.members.where(
-            member =>
-                member.userId.toString() === req.user._id.toString()
-        );
-
-        if( !isUserMember || isUserTryingToAddAlreadyMember ){
-            return res.status(401).json(
-                {
-                    error: true,
-                    message: "you are not allowed to add this member to this chat"
-                }
-            );
-        }
-
-        const memberList = chat.members.map( member => member.userId.toString() );
-        memberList.add( memberToAdd );
-
-        if( !memberList || memberList.length <= 1 ){
-            return res.status(500).json(
-                {
-                    error: true,
-                    message: "Internal Server Error"
-                }
-            );
-        }
-
-        const addingUserId = req.user._id.toString();
-
-        const membersWithoutAdder = memberList.filter(
+        const membersWithoutCreater = memberList.filter(
             memberUserId =>
-                    memberUserId.toString() === addingUserId
+                    memberUserId.toString() === createrUserId
         );
 
-        if( membersWithoutAdder.length <= 0 ){
+        if( membersWithoutCreater.length <= 0 ){
             return res.status(500).json(
                 {
                     error: true,
@@ -70,11 +29,11 @@ const addMemberToChatController = async (req, res) => {
             );
         }
 
-        for( var memberId in membersWithoutAdder ){
+        for( var memberId in membersWithoutCreater ){
             const member = await User.findById( memberId.toString() );
             const didMeberBlockedCreater = member.blockedUsers.where(
                 blockedUserId =>
-                        blockedUserId.toString() === addingUserId
+                        blockedUserId.toString() === createrUserId
             );
 
             if( !member || didMeberBlockedCreater ){
@@ -149,22 +108,32 @@ const addMemberToChatController = async (req, res) => {
             );
         }
 
-        chat.members.add(
+        const memberLisToAdd = [];
+
+        for(var memberId in memberList ){
+            memberLisToAdd.add(
+                {
+                    userId: memberId,
+                    joinDate: Date.now()
+                }
+            );
+        }
+
+        await new Chat(
             {
-                userId: memberToAdd
+            members: memberLisToAdd,
+            chatDesc: req.body.chatDesc.toString()
             }
-        );
-        chat.markModified("members");
-        chat.save()
+        ).save()
         .then(
             (chat) => {
-                return res.status(200).json(
-                    {
-                        error: false,
-                        chatId: chat._id.toString(),
-                        message: "New user added succesfully"
-                    }
-                );
+            return res.status(200).json(
+                {
+                    error: false,
+                    chatId: chat._id.toString(),
+                    message: "New chat creates succesfully"
+                }
+            );
             }
         );
     }catch(err){
@@ -178,4 +147,4 @@ const addMemberToChatController = async (req, res) => {
     }
 }
 
-export default addMemberToChatController;
+export default createChatController;
