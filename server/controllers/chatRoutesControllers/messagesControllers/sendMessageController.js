@@ -5,6 +5,13 @@ import CareGive from "../../../models/CareGive/CareGive.js";
 import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 
+import dotenv from "dotenv";
+import io from "socket.io-client";
+
+dotenv.config();
+const socket = io(process.env.SOCKET_URL);
+
+
 const sendMessageController = async (req, res) => {
     try{
         const userId = req.user._id.toString();
@@ -376,6 +383,19 @@ const sendMessageController = async (req, res) => {
                 }
 
                 //send responseChat data to socket server
+                const chatMembers = chat.members.map( member => member.userId );
+                const receiverList = chatMembers.filter(
+                    memberId =>
+                        memberId.toString() !== userId
+                );
+
+                socket.emit(
+                    "sendMessage",
+                    {
+                        chatObject: responseChat,
+                        receiverIdList: receiverList
+                    }
+                );
 
                 return res.status(200).json(
                     {
