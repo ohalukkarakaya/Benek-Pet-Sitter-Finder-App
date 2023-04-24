@@ -1,5 +1,9 @@
 import Chat from "../../../models/Chat.js";
 import EventInvitation from "../../../models/Event/Invitations/InviteEvent.js";
+import Event from "../../../models/Event/Event.js";
+import CareGive from "../../../models/CareGive/CareGive.js";
+import User from "../../../models/User.js";
+import Pet from "../../../models/Pet.js";
 
 const sendMessageController = async (req, res) => {
     try{
@@ -118,6 +122,8 @@ const sendMessageController = async (req, res) => {
             );
         }
 
+        const chatMembers = chat.members.map( member => member.userId );
+
         //text mesajını ekle
         if( messageType === "Text" ){
 
@@ -132,10 +138,8 @@ const sendMessageController = async (req, res) => {
             }
 
             chat.messages.add( messageObject );
-        }
-
-        //file mesajını ekle
-        if( messageType === "File" ){
+        }else if( messageType === "File" ){
+            //file mesajını ekle
 
             const messageObject = {
                 sendedUserId: userId,
@@ -148,10 +152,8 @@ const sendMessageController = async (req, res) => {
             }
 
             chat.messages.add( messageObject );
-        }   
-
-        //payment offer mesajını ekle
-        if( messageType === "PaymentOffer"){
+        }else if( messageType === "PaymentOffer"){
+            //payment offer mesajını ekle
 
             if( paymentType === "EventInvitation" ){
 
@@ -167,7 +169,6 @@ const sendMessageController = async (req, res) => {
 
                 const eventAdmin = invitation.eventAdminId.toString();
                 const invitedId = invitation.invitedId.toString();
-                const chatMembers = chat.members.map( member => member.userId );
 
                 if( eventAdmin !== userId || !(chatMembers.includes( invitedId )) ){
                     return res.status(401).json(
@@ -183,7 +184,7 @@ const sendMessageController = async (req, res) => {
                     messageType: messageType,
                     paymentOffer: {
                         receiverUserId: invitedId,
-                        paymentType: "EventInvitation",
+                        paymentType: paymentType,
                         releatedRecordId: paymentReleatedRecordId
                     },
                     seenBy: [
@@ -195,19 +196,148 @@ const sendMessageController = async (req, res) => {
                 chat.messages.add( messageObject );
 
             }else if( paymentType === "CareGive" ){
+                
+                const careGive = await CareGive.findById( paymentReleatedRecordId );
+                if( !careGive ){
+                    return res.status(404).json(
+                        {
+                            error: true,
+                            message: "Invitation not found"
+                        }
+                    );
+                }
 
+                const invitation = careGive.invitation;
+                if( 
+                    !(invitation.from.toString() !== userId) 
+                    || !(chatMembers.includes( invitation.to.toString() ))
+                ){
+                    return res.status(401).json(
+                        {
+                            error: true,
+                            message: "UnAthorized"
+                        }
+                    );
+                }
+
+                const messageObject = {
+                    sendedUserId: userId,
+                    messageType: messageType,
+                    paymentOffer: {
+                        receiverUserId: invitedId,
+                        paymentType: paymentType,
+                        releatedRecordId: paymentReleatedRecordId
+                    },
+                    seenBy: [
+                        userId
+                    ],
+                    sendDate: Date.now()
+                }
+
+                chat.messages.add( messageObject );
             }
 
-        }
+        }else if( messageType === "UserProfile" ){
+            //user profili mesajını ekle
 
-        //user profili mesajını ekle
-        if( messageType === "UserProfile" ){
+            const sharedProfileUser = await User.findById( IdOfTheUserOrPetWhichProfileSended );
+            if( !sharedProfileUser ){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "User not found"
+                    }
+                );
+            }
 
-        }
+            const messageObject = {
+                sendedUserId: userId,
+                messageType: messageType,
+                IdOfTheUserOrPetWhichProfileSended: sharedProfileUser._id.toString(),
+                seenBy: [
+                    userId
+                ],
+                sendDate: Date.now()
+            }
 
-        //pet profili mesajını ekle
-        if( messageType === "PetProfile" ){
+            chat.messages.add( messageObject );
+
+        }else if( messageType === "PetProfile" ){
+            //pet profili mesajını ekle
+
+            const sharedProfilePet = await Pet.findById( IdOfTheUserOrPetWhichProfileSended );
+            if( !sharedProfilePet ){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "Pet not found"
+                    }
+                );
+            }
             
+            const messageObject = {
+                sendedUserId: userId,
+                messageType: messageType,
+                IdOfTheUserOrPetWhichProfileSended: sharedProfilePet._id.toString(),
+                seenBy: [
+                    userId
+                ],
+                sendDate: Date.now()
+            }
+
+            chat.messages.add( messageObject );
+
+        }else if( messageType === "Event" ){
+            //pet profili mesajını ekle
+
+            const sharedProfileEvent = await Event.findById( IdOfTheUserOrPetWhichProfileSended );
+            if( !sharedProfileEvent ){
+                return res.status(404).json(
+                    {
+                        error: true,
+                        message: "Event not found"
+                    }
+                );
+            }
+
+            const willJoin = sharedProfileEvent.willJoin;
+            const joined = sharedProfileEvent.joined;
+
+            const authorizedUsers = Array.from(
+                new Set(
+                    willJoin.concat( joined )
+                )
+            );
+
+            const unAuthorizedUsersInChat = chatMembers.filter(
+                memberId =>
+                    !authorizedUsers.includes( memberId )
+            );
+
+            if(
+                sharedProfileEvent.isPrivate
+                && unAuthorizedUsersInChat
+            ){
+                return res.status(401).json(
+                    {
+                        error: true,
+                        message: "UnAthorized"
+                    }
+                );
+            }
+            
+            const messageObject = {
+                sendedUserId: userId,
+                messageType: messageType,
+                IdOfTheUserOrPetWhichProfileSended: sharedProfileEvent._id.toString(),
+                seenBy: [
+                    userId
+                ],
+                sendDate: Date.now()
+            }
+
+            chat.messages.add( messageObject );
+
         }
 
         chat.markModified("messages");
@@ -245,7 +375,7 @@ const sendMessageController = async (req, res) => {
                     message: chat.messages[ chat.messages.length - 1 ]
                 }
 
-                //send response chat to socket server
+                //send responseChat data to socket server
 
                 return res.status(200).json(
                     {

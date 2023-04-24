@@ -4,7 +4,7 @@ const CareGiveSchema = new mongoose.Schema(
   {
       invitation: {
         careGiverParamGuid: {
-
+            type: String
         },
         from: {
             type: String,

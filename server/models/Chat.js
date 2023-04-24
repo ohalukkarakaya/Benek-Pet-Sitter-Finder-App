@@ -35,7 +35,7 @@ const ChatSchema = new mongoose.Schema(
         },
         messageType: {
             type: String,
-            enum: [ "Text", "File", "PaymentOffer", "UserProfile", "PetProfile" ]
+            enum: [ "Text", "File", "PaymentOffer", "UserProfile", "PetProfile", "Event" ]
         },
         IdOfTheUserOrPetWhichProfileSended: {
             type: String
