@@ -43,7 +43,7 @@ const addMemberToChatController = async (req, res) => {
         }
 
         const memberList = chat.members.map( member => member.userId.toString() );
-        memberList.add( memberToAdd );
+        memberList.push( memberToAdd );
 
         if( !memberList || memberList.length <= 1 ){
             return res.status(500).json(
@@ -92,7 +92,7 @@ const addMemberToChatController = async (req, res) => {
                     memberUserId.toString() === createrUserId
         );
         if( !isCreatingUserInList ){
-            memberList.add( createrUserId );
+            memberList.push( createrUserId );
         }
 
         if( memberList.length > 5 ){
@@ -149,7 +149,7 @@ const addMemberToChatController = async (req, res) => {
             );
         }
 
-        chat.members.add(
+        chat.members.push(
             {
                 userId: memberToAdd
             }

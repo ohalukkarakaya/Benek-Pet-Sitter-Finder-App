@@ -144,7 +144,7 @@ const sendMessageController = async (req, res) => {
                 sendDate: Date.now()
             }
 
-            chat.messages.add( messageObject );
+            chat.messages.push( messageObject );
         }else if( messageType === "File" ){
             //file mesajını ekle
 
@@ -158,7 +158,7 @@ const sendMessageController = async (req, res) => {
                 sendDate: Date.now()
             }
 
-            chat.messages.add( messageObject );
+            chat.messages.push( messageObject );
         }else if( messageType === "PaymentOffer"){
             //payment offer mesajını ekle
 
@@ -200,7 +200,7 @@ const sendMessageController = async (req, res) => {
                     sendDate: Date.now()
                 }
 
-                chat.messages.add( messageObject );
+                chat.messages.push( messageObject );
 
             }else if( paymentType === "CareGive" ){
                 
@@ -241,7 +241,7 @@ const sendMessageController = async (req, res) => {
                     sendDate: Date.now()
                 }
 
-                chat.messages.add( messageObject );
+                chat.messages.push( messageObject );
             }
 
         }else if( messageType === "UserProfile" ){
@@ -267,7 +267,7 @@ const sendMessageController = async (req, res) => {
                 sendDate: Date.now()
             }
 
-            chat.messages.add( messageObject );
+            chat.messages.push( messageObject );
 
         }else if( messageType === "PetProfile" ){
             //pet profili mesajını ekle
@@ -292,7 +292,7 @@ const sendMessageController = async (req, res) => {
                 sendDate: Date.now()
             }
 
-            chat.messages.add( messageObject );
+            chat.messages.push( messageObject );
 
         }else if( messageType === "Event" ){
             //pet profili mesajını ekle
@@ -343,7 +343,7 @@ const sendMessageController = async (req, res) => {
                 sendDate: Date.now()
             }
 
-            chat.messages.add( messageObject );
+            chat.messages.push( messageObject );
 
         }
 

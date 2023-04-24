@@ -51,7 +51,7 @@ const createChatController = async (req, res) => {
                     memberUserId.toString() === createrUserId
         );
         if( !isCreatingUserInList ){
-            memberList.add( createrUserId );
+            memberList.push( createrUserId );
         }
 
         if( memberList.length > 5 ){
@@ -111,7 +111,7 @@ const createChatController = async (req, res) => {
         const memberLisToAdd = [];
 
         for(var memberId in memberList ){
-            memberLisToAdd.add(
+            memberLisToAdd.push(
                 {
                     userId: memberId,
                     joinDate: Date.now()
