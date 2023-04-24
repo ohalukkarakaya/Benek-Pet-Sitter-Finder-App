@@ -122,7 +122,7 @@ const uploadChatFile = async ( req, res, next ) => {
                             }
                             if( 
                                 req.chatFileName != undefined 
-                                && req.chatFileName 
+                                && req.chatFileName
                                 && req.chatFileCdnPath !== undefined 
                                 && req.chatFileCdnPath 
                             ){
