@@ -42,7 +42,7 @@ const storage = multerS3(
 //File Filter
 const fileFilter = (req, file, cb) => {
     if(file){
-        if(file.mimetype === 'image/jpeg' || file.mimetype === 'application/pdf'){
+        if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg' || file.mimetype === 'application/pdf'){
             cb( null, true );
         }else{
             cb( new Error('You can just upload ".jpg" or ".pdf"'), false );

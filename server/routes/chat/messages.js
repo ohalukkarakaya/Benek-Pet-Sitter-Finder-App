@@ -4,6 +4,7 @@ import express from "express";
 import sendMessageController from "../../controllers/chatRoutesControllers/messagesControllers/sendMessageController.js";
 
 import auth from "../../middleware/auth.js";
+import { uploadChatFile } from "../../middleware/imageHandle/serverHandleChatFile.js";
 
 import dotenv from "dotenv";
 
@@ -16,6 +17,7 @@ const router = express.Router();
 router.post(
     "/send/:chatId",
     auth,
+    uploadChatFile,
     sendMessageController
 );
 

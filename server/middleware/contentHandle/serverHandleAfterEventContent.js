@@ -43,7 +43,7 @@ const storage = multerS3(
 //File Filter
 const fileFilter = (req, file, cb) => {
     if(file){
-        if(file.mimetype === 'image/jpeg' || file.mimetype === 'video/mp4'){
+        if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg' || file.mimetype === 'video/mp4'){
             cb( null, true );
         }else{
             cb( new Error('You can just upload ".jpg" or ".mp4"'), false );

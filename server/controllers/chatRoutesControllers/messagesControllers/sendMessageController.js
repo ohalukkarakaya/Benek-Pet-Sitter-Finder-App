@@ -7,7 +7,7 @@ const sendMessageController = async (req, res) => {
         const chatId = req.params.chatId.toString();
         const messageType = req.body.messageType.toString();
         const IdOfTheUserOrPetWhichProfileSended = req.body.IdOfTheUserWhichProfileSended.toString();
-        const fileUrlPath = req.fileCdnUrl.toString();
+        const fileUrlPath = req.chatFileCdnPath.toString();
         const message = req.body.message.toString();
         const paymentType = req.body.paymentType.toString();
         const paymentReceiverUserId = req.body.paymentReceiverUserId.toString();
@@ -121,11 +121,66 @@ const sendMessageController = async (req, res) => {
 
         //text mesajını ekle
         if( messageType === "Text" ){
-            
+
+            const messageObject = {
+                sendedUserId: userId,
+                messageType: messageType,
+                message: message,
+                seenBy: [
+                    userId
+                ],
+                sendDate: Date.now()
+            }
+
+            chat.messages.add( messageObject );
+            chat.markModified("messages");
+            chat.save(
+                function (err) {
+                    if(err) {
+                        console.error('ERROR: While send message!');
+                    }
+                  }
+            );
+
+            return res.status(200).json(
+                {
+                    error: true,
+                    message: "message sended succesfully",
+                    chatId: chatId
+                }
+            );
         }
 
         //file mesajını ekle
         if( messageType === "File" ){
+
+            const messageObject = {
+                sendedUserId: userId,
+                messageType: messageType,
+                fileUrl: fileUrlPath,
+                seenBy: [
+                    userId
+                ],
+                sendDate: Date.now()
+            }
+
+            chat.messages.add( messageObject );
+            chat.markModified("messages");
+            chat.save(
+                function (err) {
+                    if(err) {
+                        console.error('ERROR: While send message!');
+                    }
+                  }
+            );
+
+            return res.status(200).json(
+                {
+                    error: true,
+                    message: "file message sended succesfully",
+                    chatId: chatId
+                }
+            );
 
         }
 

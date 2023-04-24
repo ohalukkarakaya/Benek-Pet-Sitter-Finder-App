@@ -30,7 +30,7 @@ const storage = multerS3(
             if(file.fieldname === "chatImage"){
                 const newFileName = `${chatId}_chatImageImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
                 req.chatNewFileName = newFileName;
-                req.chatImageCdnPath = `${process.env.CDN_SUBDOMAIN}profileAssets/${chatId}/${newFileName}`;
+                req.chatImageCdnPath = `${process.env.CDN_SUBDOMAIN}chatAssets/${chatId}/${newFileName}`;
                 
                 cb(null, "chatAssets/"+chatId+"/"+newFileName);
             }
@@ -41,7 +41,7 @@ const storage = multerS3(
 //File Filter
 const fileFilter = (req, file, cb) => {
     if(file){
-        if(file.mimetype === 'image/jpeg'){
+        if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg'){
             cb( null, true );
         }else{
             cb( new Error("You can just upload '.jpg"), false );
