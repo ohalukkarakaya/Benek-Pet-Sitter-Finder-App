@@ -46,14 +46,14 @@ const ChatSchema = new mongoose.Schema(
         message: {
             type: String
         },
-        PaymentOffer: {
+        paymentOffer: {
             receiverUserId: {
                 type: String,
                 required: true
             },
             paymentType: {
                 type: String,
-                enum: [ "EventTicket", "CareGive" ],
+                enum: [ "EventInvitation", "CareGive" ],
                 required: true
             },
             releatedrecordId: {

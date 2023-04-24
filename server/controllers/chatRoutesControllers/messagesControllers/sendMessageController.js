@@ -1,4 +1,5 @@
 import Chat from "../../../models/Chat.js";
+import EventInvitation from "../../../models/Event/Invitations/InviteEvent.js";
 
 const sendMessageController = async (req, res) => {
     try{
@@ -10,7 +11,6 @@ const sendMessageController = async (req, res) => {
         const fileUrlPath = req.chatFileCdnPath.toString();
         const message = req.body.message.toString();
         const paymentType = req.body.paymentType.toString();
-        const paymentReceiverUserId = req.body.paymentReceiverUserId.toString();
         const paymentReleatedRecordId = req.body.paymentReleatedRecordId.toString();
 
         if( !chatId || !messageType ){
@@ -64,12 +64,11 @@ const sendMessageController = async (req, res) => {
         if(
             messageType === "PaymentOffer"
             && !(
-                paymentType === "EventTicket"
+                paymentType === "EventInvitation"
                 || paymentType === "CareGive"
             )
             && !(
                 paymentType
-                && paymentReceiverUserId
                 && paymentReleatedRecordId
             )
         ){
@@ -133,22 +132,6 @@ const sendMessageController = async (req, res) => {
             }
 
             chat.messages.add( messageObject );
-            chat.markModified("messages");
-            chat.save(
-                function (err) {
-                    if(err) {
-                        console.error('ERROR: While send message!');
-                    }
-                  }
-            );
-
-            return res.status(200).json(
-                {
-                    error: true,
-                    message: "message sended succesfully",
-                    chatId: chatId
-                }
-            );
         }
 
         //file mesajını ekle
@@ -165,27 +148,55 @@ const sendMessageController = async (req, res) => {
             }
 
             chat.messages.add( messageObject );
-            chat.markModified("messages");
-            chat.save(
-                function (err) {
-                    if(err) {
-                        console.error('ERROR: While send message!');
-                    }
-                  }
-            );
-
-            return res.status(200).json(
-                {
-                    error: true,
-                    message: "file message sended succesfully",
-                    chatId: chatId
-                }
-            );
-
-        }
+        }   
 
         //payment offer mesajını ekle
         if( messageType === "PaymentOffer"){
+
+            if( paymentType === "EventInvitation" ){
+
+                const invitation = await EventInvitation.findById( paymentReleatedRecordId );
+                if( !invitation ){
+                    return res.status(404).json(
+                        {
+                            error: true,
+                            message: "Invitation not found"
+                        }
+                    );
+                }
+
+                const eventAdmin = invitation.eventAdminId.toString();
+                const invitedId = invitation.invitedId.toString();
+                const chatMembers = chat.members.map( member => member.userId );
+
+                if( eventAdmin !== userId || !(chatMembers.includes( invitedId )) ){
+                    return res.status(401).json(
+                        {
+                            error: true,
+                            message: "UnAthorized"
+                        }
+                    );
+                }
+
+                const messageObject = {
+                    sendedUserId: userId,
+                    messageType: messageType,
+                    paymentOffer: {
+                        receiverUserId: invitedId,
+                        paymentType: "EventInvitation",
+                        releatedRecordId: paymentReleatedRecordId
+                    },
+                    seenBy: [
+                        userId
+                    ],
+                    sendDate: Date.now()
+                }
+
+                chat.messages.add( messageObject );
+
+            }else if( paymentType === "CareGive" ){
+
+            }
 
         }
 
@@ -198,6 +209,53 @@ const sendMessageController = async (req, res) => {
         if( messageType === "PetProfile" ){
             
         }
+
+        chat.markModified("messages");
+        chat.save(
+            function (err) {
+                if(err) {
+                    console.error(`ERROR: While send message!, ${err}`);
+                    return res.status(500).json(
+                        {
+                            error: true,
+                            message: "Internal Server Error"
+                        }
+                    );
+                }
+                }
+        ).then(
+            ( chat ) => {
+                if( !chat ) {
+                    console.error(`ERROR: While send message!, ${err}`);
+                    return res.status(500).json(
+                        {
+                            error: true,
+                            message: "Internal Server Error"
+                        }
+                    );
+                }
+
+                const responseChat = {
+                    id: chat._id.toString(),
+                    members: chat.members,
+                    chatStratDate: chat.chatStartDate,
+                    chatName: chat.chatName,
+                    chatDesc: chat.chatDesc,
+                    chatImageUrl: chat.chatImageUrl,
+                    message: chat.messages[ chat.messages.length - 1 ]
+                }
+
+                //send response chat to socket server
+
+                return res.status(200).json(
+                    {
+                        error: true,
+                        message: "message sended succesfully",
+                        chat: responseChat
+                    }
+                );
+            }
+        );
         
     }catch(err){
         console.log(err);

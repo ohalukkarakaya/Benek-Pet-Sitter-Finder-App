@@ -71,6 +71,7 @@ const uploadChatFile = async ( req, res, next ) => {
     try{
         const userId = req.user._id.toString();
         const chatId = req.params.chatId;
+        if( req.body.messageType.toString() === "File" ){ 
             await Chat.findOne(
                 { 
                     _id: chatId,
@@ -134,6 +135,9 @@ const uploadChatFile = async ( req, res, next ) => {
                     );
                 }
             ).clone();
+        }else{
+            next();
+        }
     }catch(err){
         return res.status(500).json(
             {
