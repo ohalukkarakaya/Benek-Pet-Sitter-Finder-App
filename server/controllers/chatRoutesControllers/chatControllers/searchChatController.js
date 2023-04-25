@@ -86,7 +86,7 @@ const searchChatController = async (req, res) => {
                 //prepare profile info of chat members
 
                 chat.members.forEach(
-                    ( member ) => {
+                    async ( member ) => {
                         let userObject = await User.findById( member.userId.toString() );
                         if( !userObject ){ 
                             console.log("user not found"); 
@@ -107,7 +107,7 @@ const searchChatController = async (req, res) => {
                 let seenUsersList = [];
 
                 chat.lastMessage.seenBy.forEach(
-                    ( seenUserId ) => {
+                    async ( seenUserId ) => {
                         let userObject = await User.findById( seenUserId.toString() );
                         if( !userObject ){ 
                             console.log("user not found"); 
