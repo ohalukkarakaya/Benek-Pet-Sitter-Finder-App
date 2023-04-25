@@ -3,6 +3,7 @@ import express from "express";
 //controllers
 import sendMessageController from "../../controllers/chatRoutesControllers/messagesControllers/sendMessageController.js";
 import seeMessagesController from "../../controllers/chatRoutesControllers/messagesControllers/seeMessagesController.js";
+import getMessagesController from "../../controllers/chatRoutesControllers/messagesControllers/getMessagesController.js";
 
 import auth from "../../middleware/auth.js";
 import { uploadChatFile } from "../../middleware/imageHandle/serverHandleChatFile.js";
@@ -27,6 +28,13 @@ router.post(
     "/see/:chatId",
     auth,
     seeMessagesController
+);
+
+//get messages
+router.get(
+    "/get/:chatId/:skip/:limit",
+    auth,
+    getMessagesController
 );
 
 export default router;

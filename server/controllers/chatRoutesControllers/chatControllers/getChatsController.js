@@ -1,4 +1,5 @@
 import Chat from "../../../models/Chat.js";
+import User from "../../../models/User.js";
 
 const getChatsController = async (req, res) => {
     try{
@@ -49,6 +50,23 @@ const getChatsController = async (req, res) => {
                 }
               );
             }
+
+            for( let chat of chats ){
+
+              for( let member of chat.members ){
+
+                let memberObject = await User.findById( member.userId );
+                if( !memberObject ){ break; }
+
+                member.userId = memberObject._id.toString();
+                member.username = memberObject.userName;
+                member.profileImg = memberObject.profileImg.imgUrl;
+
+              }
+              
+            }
+
+            
             
             return res.status(200).json(
                 {
