@@ -11,6 +11,7 @@ import leaveChatController from "../../controllers/chatRoutesControllers/chatCon
 import updateChatNameController from "../../controllers/chatRoutesControllers/chatControllers/updateChatNameController.js";
 import updateChatDescController from "../../controllers/chatRoutesControllers/chatControllers/updateChatDescController.js";
 import getChatsController from "../../controllers/chatRoutesControllers/chatControllers/getChatsController.js";
+import searchChatController from "../../controllers/chatRoutesControllers/chatControllers/searchChatController.js";
 
 import messagesRoutes from "./messages.js";
 
@@ -64,6 +65,13 @@ router.get(
     "/get/:skip/:limit",
     auth,
     getChatsController
+);
+
+//search chat
+router.get(
+    "/search/:searchValue",
+    auth,
+    searchChatController
 );
 
 //message routes
