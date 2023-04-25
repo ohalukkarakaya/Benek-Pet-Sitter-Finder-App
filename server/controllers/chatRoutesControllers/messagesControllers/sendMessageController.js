@@ -361,7 +361,7 @@ const sendMessageController = async (req, res) => {
                 }
                 }
         ).then(
-            ( chat ) => {
+            async ( chat ) => {
                 if( !chat ) {
                     console.error(`ERROR: While send message!, ${err}`);
                     return res.status(500).json(
@@ -372,14 +372,48 @@ const sendMessageController = async (req, res) => {
                     );
                 }
 
+                const messageToSend = chat.messages[ chat.messages.length - 1 ];
+                let seenByList = [];
+
+                for( let seenUserId of messageToSend.seenBy ){
+                    let userData = await User.findById( seenUserId );
+                    if( !userData ){ break; }
+
+                    let seenUserData = {
+                        userId: userData._id.toString(),
+                        username: userData.userName,
+                        profileImg: userData.profileImg.imgUrl
+                    }
+
+                    if( seenUserData ){
+                        seenByList.push( seenUserData );
+                    }
+                }
+
+                if( seenByList.length === messageToSend.seenBy.length ){
+                    messageToSend.seenBy = seenByList
+                }
+
+                let chatMemberInfoList = chat.members;
+                for( let member of chatMemberInfoList ){
+
+                    let memberObject = await User.findById( member.userId );
+                    if( !memberObject ){ break; }
+    
+                    member.userId = memberObject._id.toString();
+                    member.username = memberObject.userName;
+                    member.profileImg = memberObject.profileImg.imgUrl;
+    
+                }
+
                 const responseChat = {
                     id: chat._id.toString(),
-                    members: chat.members,
+                    members: chatMemberInfoList,
                     chatStratDate: chat.chatStartDate,
                     chatName: chat.chatName,
                     chatDesc: chat.chatDesc,
                     chatImageUrl: chat.chatImageUrl,
-                    message: chat.messages[ chat.messages.length - 1 ]
+                    message: messageToSend
                 }
 
                 //send responseChat data to socket server

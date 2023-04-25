@@ -40,7 +40,7 @@ const getChatsController = async (req, res) => {
               $limit: limitValue
             }
           ], 
-          function(err, chats) {
+          async (err, chats) => {
             if ( err ){
               console.log(err);
               return res.status(500).json(
@@ -63,7 +63,7 @@ const getChatsController = async (req, res) => {
                 member.profileImg = memberObject.profileImg.imgUrl;
 
               }
-              
+
             }
 
             
