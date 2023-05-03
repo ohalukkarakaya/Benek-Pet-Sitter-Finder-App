@@ -1,7 +1,7 @@
 import multer from "multer";
 import multerS3 from "multer-s3";
 import dotenv from "dotenv";
-import Chat from "../../models/Chat.js";
+import Chat from "../../models/Chat/Chat.js";
 import s3 from "../../utils/s3Service.js";
 dotenv.config();
 
