@@ -1,4 +1,4 @@
-import Chat from "../../../models/Chat.js";
+import Chat from "../../../models/Chat/Chat.js";
 import EventInvitation from "../../../models/Event/Invitations/InviteEvent.js";
 import Event from "../../../models/Event/Event.js";
 import CareGive from "../../../models/CareGive/CareGive.js";

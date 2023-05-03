@@ -14,6 +14,21 @@ const ChatSchema = new mongoose.Schema(
           }
         },
       ],
+      meeting: [
+        {
+          date: {
+            type: Date,
+            default: Date.now()
+          },
+          joinedUsers: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              required: true,
+              ref: "MeetingUser"
+            }
+          ]
+        }
+      ],
       chatStartDate: {
         type: Date,
         default: Date.now()

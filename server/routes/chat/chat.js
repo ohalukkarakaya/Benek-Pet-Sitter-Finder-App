@@ -14,6 +14,7 @@ import getChatsController from "../../controllers/chatRoutesControllers/chatCont
 import searchChatController from "../../controllers/chatRoutesControllers/chatControllers/searchChatController.js";
 
 import messagesRoutes from "./messages.js";
+import meetingRoutes from "./meeting.js";
 
 dotenv.config();
 const router = express.Router();
@@ -76,5 +77,8 @@ router.get(
 
 //message routes
 router.use( "/messages", messagesRoutes );
+
+//meeting routes
+router.use( "/meeting", meetingRoutes );
 
 export default router;

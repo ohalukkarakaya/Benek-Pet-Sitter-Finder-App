@@ -1,4 +1,4 @@
-import Chat from "../../../models/Chat.js";
+import Chat from "../../../models/Chat/Chat.js";
 
 const seeMessagesController = async (req, res) => {
     try{
