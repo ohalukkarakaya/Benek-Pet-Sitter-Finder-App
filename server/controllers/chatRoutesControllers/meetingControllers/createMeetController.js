@@ -72,24 +72,25 @@ const createMeetController = async ( req, res ) => {
         }else{
             meetingUser.isAlive = true;
             meetingUser.markModified( "isAlive" );
-            meetingUser.save(
-                (err) => {
-                    if(err){
-                        console.log(err);
-                        return res.status( 500 ).json(
-                            {
-                                error: true,
-                                message: "Internal Server Error"
+            meetingUser.save()
+                       .then(
+                            ( meetUser ) => {
+                                searchedMeetingUser = meetUser;
                             }
-                        );
-                    }
+                       ).catch(
+                            ( err ) => {
+                                if( err ){
+                                    console.log( err );
+                                    return res.status( 500 ).json(
+                                        {
+                                            error: true,
+                                            message: "Internal Server Error"
+                                        }
+                                    );
+                                }
+                            }
+                       );
                 }
-            ).then(
-                ( meetUser ) => {
-                    searchedMeetingUser = meetUser;
-                }
-            );
-        }
 
         if( !searchedMeetingUser ){
             return res.status( 500 ).json(
@@ -105,21 +106,30 @@ const createMeetController = async ( req, res ) => {
 
         chat.meeting.push( newMeetingObject );
         chat.markModified( "meeting" );
-        chat.save(
-            (err) => {
-                if(err){
-                    console.log(err);
-                    return res.status( 500 ).json(
+        chat.save()
+            .then(
+                ( meetingChat ) => {
+                    return res.status( 200 ).json(
                         {
-                            error: true,
-                            message: "Internal Server Error"
+                            error: false,
+                            chatId: meetingChat._id.toString(),
+                            metingObject: chat.meeting[ chat.meeting.length -1 ]
                         }
                     );
                 }
-            }
-        );
-
-
+            ).catch(
+                ( err ) => {
+                    if( err ){
+                        console.log( err );
+                        return res.status( 500 ).json(
+                            {
+                                error: true,
+                                message: "Internal Server Error"
+                            }
+                        );
+                    }
+                }
+            );
 
     }catch( err ){
         console.log( err );
