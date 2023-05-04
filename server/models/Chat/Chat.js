@@ -20,6 +20,10 @@ const ChatSchema = new mongoose.Schema(
             type: Date,
             default: Date.now()
           },
+          meetingEndDate: {
+            type: Date,
+            default: null
+          },
           joinedUsers: [
             {
               type: mongoose.Schema.Types.ObjectId,

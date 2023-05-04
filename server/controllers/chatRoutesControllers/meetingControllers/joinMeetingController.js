@@ -11,7 +11,7 @@ const joinMeetingController = async ( req, res ) => {
             || !meetingId
             || !socketId
         ){
-            return res.status(400).json(
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "Missing param"
@@ -33,7 +33,7 @@ const joinMeetingController = async ( req, res ) => {
         if(
             !chat
             || !meeting
-            || isUserChatMember
+            || !isUserChatMember
         ){
             return res.status( 401 ).json(
                 {
@@ -43,7 +43,7 @@ const joinMeetingController = async ( req, res ) => {
             );
         }
 
-        const pastlyRecordedMeetingUser =await  MeetingUser.findOne(
+        const pastlyRecordedMeetingUser = await  MeetingUser.findOne(
             {
                 userId: req.user._id.toString(),
                 meetingId: meeting._id.toString()
@@ -58,7 +58,7 @@ const joinMeetingController = async ( req, res ) => {
                 (err) => {
                     if(err){
                         console.error('ERROR: While following pet - user side!');
-                        return res.status(500).json(
+                        return res.status( 500 ).json(
                             {
                                 error: true,
                                 message: 'ERROR: While following pet - user side!'
@@ -109,11 +109,11 @@ const joinMeetingController = async ( req, res ) => {
             );
     
             meetingUser.save(
-                (err) => {
+                ( err ) => {
 
-                    if(err){
+                    if( err ){
                         console.error('ERROR: While following pet - user side!');
-                        return res.status(500).json(
+                        return res.status( 500 ).json(
                             {
                                 error: true,
                                 message: 'ERROR: While following pet - user side!'
@@ -160,9 +160,9 @@ const joinMeetingController = async ( req, res ) => {
             )
 
         }
-    }catch(err){
-        console.log(err);
-        res.status(500).json(
+    }catch( err ){
+        console.log( err );
+        res.status( 500 ).json(
             {
                 error: true,
                 message: "Internal Server Error"

@@ -3,6 +3,7 @@ import express from "express";
 //controllers
 import getAllMeetingUsersController from "../../controllers/chatRoutesControllers/meetingControllers/getAllMeetingUsersController.js";
 import joinMeetingController from "../../controllers/chatRoutesControllers/meetingControllers/joinMeetingController.js";
+import createMeetController from "../../controllers/chatRoutesControllers/meetingControllers/createMeetController.js";
 
 import auth from "../../middleware/auth.js";
 
@@ -27,7 +28,12 @@ router.post(
     joinMeetingController
 );
 
-// To Do: start meeting
+// create meeting
+router.post(
+    "/createMeet/:chatId",
+    auth,
+    createMeetController
+);
 
 // To Do: check if there is meeting by id
 
