@@ -20,6 +20,7 @@ async function getAllMeetingUsers(
         ){
             const errorResponse = {
                 error: true,
+                statusCode: 400,
                 message: "Meeting not found"
             }
 
@@ -59,6 +60,7 @@ async function createMeeting(
         ){
             const errorObject = {
                 error: true,
+                statusCode: 400,
                 message: "Missing param"
             };
 
@@ -78,6 +80,7 @@ async function createMeeting(
         ){
             const errorObject = {
                 error: true,
+                statusCode: 400,
                 message: "Unauthorized"
             }
 
@@ -98,6 +101,7 @@ async function createMeeting(
             if( !(params.meetingUser) ){
                 errorObject = {
                     error: true,
+                    statusCode: 400,
                     message: "MissingParams"
                 }
 
@@ -145,6 +149,7 @@ async function createMeeting(
         if( !searchedMeetingUser ){
             const errorObject = {
                 error: true,
+                statusCode: 500,
                 message: "Internal Server Error"
             };
 
@@ -159,10 +164,19 @@ async function createMeeting(
         chat.save()
             .then(
                 ( meetingChat ) => {
+                    searchedMeetingUser.meetingId = chat.meeting[ 0 ]._id;
+                    searchedMeetingUser.markModified( "meetingId" );
+                    searchedMeetingUser.save(
+                        ( err ) => {
+                            if( err ){
+                                console.log( err );
+                                return callback( err );
+                            }
+                        }
+                    );
                     const responseObject = {
-                        error: false,
                         chatId: meetingChat._id.toString(),
-                        metingObject: chat.meeting[ chat.meeting.length -1 ]
+                        metingObject: chat.meeting[ 0 ]
                     }
                     return callback( responseObject );
                 }
@@ -195,6 +209,7 @@ async function joinMeeting(
         ){
             const errorObject = {
                 error: true,
+                statusCode: 400,
                 message: "Missing param"
             }
 
@@ -223,6 +238,7 @@ async function joinMeeting(
         ){
             const errorObject = {
                 error: true,
+                statusCode: 401,
                 message: "Unauthorized"
             }
 
@@ -267,6 +283,7 @@ async function joinMeeting(
                                                             console.error('ERROR: While update chat', err );
                                                             const errorObject = {
                                                                 error: true,
+                                                                statusCode: 500,
                                                                 message: 'ERROR: While update chat'
                                                             }
             
@@ -281,6 +298,7 @@ async function joinMeeting(
                                                 console.error('ERROR: While update meeting', err );
                                                 const errorObject = {
                                                     error: true,
+                                                    statusCode: 500,
                                                     message: 'ERROR: While update meeting'
                                                 }
 
@@ -295,6 +313,7 @@ async function joinMeeting(
             if( !(params.meetingUser) ){
                 errorObject = {
                     error: true,
+                    statusCode: 400,
                     message: "MissingParams"
                 }
 
@@ -319,6 +338,7 @@ async function joinMeeting(
                                             console.error( `ERROR: ${ err }` );
                                             const errorObject = {
                                                 error: true,
+                                                statusCode: 500,
                                                 message: "Internal server error"
                                             };
 
@@ -345,6 +365,7 @@ async function joinMeeting(
                                     console.error('ERROR: While update meetingUser', err );
                                     const errorObject = {
                                         error: true,
+                                        statusCode: 500,
                                         message: 'ERROR: While update meetingUser'
                                     }
 
@@ -377,6 +398,7 @@ async function isMeetingExists(
         if( !isUserMemberOfChat ){
             const errorObject = {
                 error: true,
+                statusCode: 401,
                 message: "Unauthorized"
             }
 
@@ -416,6 +438,7 @@ async function getMeetingUser(
         ){
             const errorObject = {
                 error: true,
+                statusCode: 400,
                 message: "Missing Param"
             };
 
@@ -431,6 +454,7 @@ async function getMeetingUser(
         if( !meetingUser ){
             const errorObject = {
                 error: true,
+                statusCode: 404,
                 message: "user not found"
             };
 
@@ -514,7 +538,7 @@ async function getUserBySocketId(
     }
 }
 
-module.exports = {
+export default {
     createMeeting,
     joinMeeting,
     getAllMeetingUsers,

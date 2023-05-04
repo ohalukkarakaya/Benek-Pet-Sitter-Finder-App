@@ -7,7 +7,6 @@ const MeetingUserSchema = new mongoose.Schema(
         },
         meetingId: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true
         },
         userId: {
           type: String,

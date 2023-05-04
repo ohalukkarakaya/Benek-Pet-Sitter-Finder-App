@@ -1,135 +1,56 @@
-import Chat from "../../../models/Chat/Chat.js";
-import MeetingUser from "../../../models/Chat/MeetingUser.js";
+import meetinServices from "../../../utils/meetingServices/meeting.service.js";
+import User from "../../../models/User.js";
 
-const createMeetController = async ( req, res ) => {
+const createMeetController = async ( req, res, next ) => {
     try{
         const chatId = req.params.chatId.toString();
+        const userId = user._id.toString();
+
         if(
             !chatId
+            || !userId
         ){
             return res.status( 400 ).json(
                 {
                     error: true,
-                    message: "Missing param"
+                    message: "Missing Param"
                 }
             );
         }
 
-        const chat = await Chat.findById( chatId );
+        const user = await User.findById( req.user._id.toString() );
+        
+        const userName = (
+            `${ user.identity.firstName } ${ user.identity.middleName } ${ user.identity.lastName }`
+        ).replaceAll( "  ", " ");
 
-        const isUserChatMember = chat.members.where(
-            memberObject =>
-                memberObject.userId.toString === req.user._id.toString()
-        );
+        const model = {
+            userId: user._id.toString(),
+            joined: false,
+            name: userName,
+            isAlive: true
+        };
 
-        if(
-            !chat
-            || !isUserChatMember
-        ){
-            return res.status( 401 ).json(
-                {
-                    error: true,
-                    message: Unauthorized
-                }
-            );
-        }
-
-        let searchedMeetingUser;
-
-        const meetingUser = await  MeetingUser.findOne(
-            {
-                userId: req.user._id.toString(),
-                meetingId: meeting._id.toString()
-            }
-        );
-
-        if( !meetingUser ){
-
-            const meetingUser = new MeetingUser(
-                //To Do
-            );
-
-            meetingUser.save(
-                ( err ) => {
-
-                    if( err ){
-                        console.error('ERROR: While following pet - user side!');
-                        return res.status( 500 ).json(
-                            {
-                                error: true,
-                                message: 'ERROR: While following pet - user side!'
-                            }
-                        );
-                    }
-
-                }
-            ).then(
-                ( createdMeetingUser ) => {
-                    searchedMeetingUser = createdMeetingUser;
-                }
-            );
-
-        }else{
-            meetingUser.isAlive = true;
-            meetingUser.markModified( "isAlive" );
-            meetingUser.save()
-                       .then(
-                            ( meetUser ) => {
-                                searchedMeetingUser = meetUser;
-                            }
-                       ).catch(
-                            ( err ) => {
-                                if( err ){
-                                    console.log( err );
-                                    return res.status( 500 ).json(
-                                        {
-                                            error: true,
-                                            message: "Internal Server Error"
-                                        }
-                                    );
-                                }
-                            }
-                       );
-                }
-
-        if( !searchedMeetingUser ){
-            return res.status( 500 ).json(
-                {
-                    error: true,
-                    message: "Internal Server Error"
-                }
-            );
-        }
-
-        let newMeetingObject;
-        newMeetingObject.joinedUsers = [ searchedMeetingUser._id ];
-
-        chat.meeting.push( newMeetingObject );
-        chat.markModified( "meeting" );
-        chat.save()
-            .then(
-                ( meetingChat ) => {
-                    return res.status( 200 ).json(
+        meetinServices.createMeeting(
+            model,
+            ( error, results ) => {
+                if( error ){
+                    return res.status( error.statusCode ).json(
                         {
-                            error: false,
-                            chatId: meetingChat._id.toString(),
-                            metingObject: chat.meeting[ chat.meeting.length -1 ]
+                            error: true,
+                            message: error.message
                         }
                     );
                 }
-            ).catch(
-                ( err ) => {
-                    if( err ){
-                        console.log( err );
-                        return res.status( 500 ).json(
-                            {
-                                error: true,
-                                message: "Internal Server Error"
-                            }
-                        );
+
+                return res.status( 200 ).json(
+                    {
+                        error: false,
+                        data: results
                     }
-                }
-            );
+                );
+            }
+        );
 
     }catch( err ){
         console.log( err );
