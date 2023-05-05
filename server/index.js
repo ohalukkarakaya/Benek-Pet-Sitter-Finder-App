@@ -42,6 +42,9 @@ import expireEvents from './cron_jobs/deleteExpiredEvents.js';
 import expireCareGive from './cron_jobs/deleteExpiredCareGive.js';
 import expireUser from './cron_jobs/deleteExpiredUser.js';
 
+import http from 'http';
+import initMeetingServer from './utils/meetingServices/meeting-server.js';
+
 const app = express();
 dotenv.config();
 
@@ -62,6 +65,9 @@ const connect = () => {
       }
     );
 }
+
+const server = http.createServer( app );
+initMeetingServer( server );
 
 app.use(express.static('src'));
 

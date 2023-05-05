@@ -1,5 +1,5 @@
 import Chat from "../../../models/Chat/Chat.js";
-import MeetingUser from "../../../models/Chat/MeetingUser.js";
+import meetingService from "../../../utils/meetingServices/meeting.service.js";
 
 const getAllMeetingUsersController = async ( req, res ) => {
     try{
@@ -35,26 +35,23 @@ const getAllMeetingUsersController = async ( req, res ) => {
             );
         }
 
-        MeetingUser.find(
-            {
-                meetingId: meeting._id.toString()
-            }
-        ).then(
-            ( response ) => {
-                return res.status(200).json(
+        await meetingService.getAllMeetingUsers(
+            chatId,
+            meetingId,
+            ( error, result ) => {
+                if( error ){
+                    return res.status( error.statusCode ).json(
+                        {
+                            error: true,
+                            message: error.message
+                        }
+                    );
+                }
+
+                return res.status( 200 ).json(
                     {
                         error: false,
-                        message: "Users Found Succesfully",
-                        users: response
-                    }
-                );
-            }
-        ).catch(
-            ( error ) => {
-                return res.status(500).json(
-                    {
-                        error: true,
-                        message: "Internal Server Error"
+                        meetingUsers: result
                     }
                 );
             }
