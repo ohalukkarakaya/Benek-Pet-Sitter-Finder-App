@@ -1,8 +1,9 @@
 import Chat from "../../../models/Chat/Chat.js";
-import MeetingUser from "../../../models/Chat/MeetingUser.js";
+import meetingService from "../../../utils/meetingServices/meeting.service.js";
 
 const isMeetingExistsController = async ( req, res ) => {
     try{
+        const userId = req.user._id.toString();
         const chatId = req.params.chatId.toString();
         const meetingId = req.params.meetingId.toString();
         if(
@@ -30,32 +31,29 @@ const isMeetingExistsController = async ( req, res ) => {
                 }
             );
         }
-        
-        const meeting = await chat.meeting.where(
-            meetingObject =>
-                meetingObject._id.toString() === meetingId
-        );
 
-        if( 
-            !chat
-            || !meeting
-        ){
-            return res.status( 200 ).json(
-                {
-                    error: false,
-                    message: "Meeting Not Found",
-                    isMeetingExist: false
+        await meetingService.isMeetingExists(
+            userId,
+            chatId,
+            meetingId,
+            ( error, result ) => {
+                if( error ){
+                    return res.status( error.statusCode ).json(
+                        {
+                            error: true,
+                            message: error.message
+                        }
+                    );
                 }
-            );
-        }else{
-            return res.status( 200 ).json(
-                {
-                    error: false,
-                    message: "Meeting Found",
-                    isMeetingExist: true
-                }
-            );
-        }
+
+                return res.status( 200 ).json(
+                    {
+                        error: false,
+                        isUserExist: result
+                    }
+                );
+            }
+        );
     }catch( err ){
         console.log( err );
         res.status( 500 ).json(

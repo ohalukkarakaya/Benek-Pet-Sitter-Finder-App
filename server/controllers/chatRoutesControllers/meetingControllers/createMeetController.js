@@ -1,4 +1,4 @@
-import meetinServices from "../../../utils/meetingServices/meeting.service.js";
+import meetinService from "../../../utils/meetingServices/meeting.service.js";
 import User from "../../../models/User.js";
 
 const createMeetController = async ( req, res, next ) => {
@@ -31,7 +31,7 @@ const createMeetController = async ( req, res, next ) => {
             isAlive: true
         };
 
-        meetinServices.createMeeting(
+        await meetinService.createMeeting(
             model,
             ( error, results ) => {
                 if( error ){
