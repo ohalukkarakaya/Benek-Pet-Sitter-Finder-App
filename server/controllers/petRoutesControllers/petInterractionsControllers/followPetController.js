@@ -14,7 +14,10 @@ const followPetController = async (req, res) => {
         }
 
         const user = await User.findById( req.user._id );
-        if(!user || user.deactivation.isDeactive){
+        if(
+            !user 
+            || user.deactivation.isDeactive
+        ){
             return res.status(404).json(
                 {
                     error: true,
@@ -24,7 +27,14 @@ const followPetController = async (req, res) => {
         }
 
         const pet = await Pet.findById( petId );
-        if(!pet){
+        const petOwner = await User.findById( pet.primaryOwner.toString() );
+
+        if( 
+            !pet
+            || !petOwner
+            || petOwner.blockedUsers.includes( req.user._id.toString() )
+            || petOwner.deactivation.isDeactive
+        ){
             return res.status(404).json(
                 {
                     error: true,

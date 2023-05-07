@@ -15,13 +15,19 @@ import QRCode from "qrcode";
 
 dotenv.config();
 
-const replyCareGiveInvitationController = async (req, res) => {
+const replyCareGiveInvitationController = async ( req, res ) => {
     try{
-        const careGiveId = req.params.careGiveId;
-        const usersResponse = req.params.response;
+        const careGiveId = req.params
+                              .careGiveId;
 
-        if(!careGiveId || !usersResponse){
-            return res.status(400).json(
+        const usersResponse = req.params
+                                 .response;
+
+        if(
+            !careGiveId 
+            || !usersResponse
+        ){
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "missing params"
@@ -29,9 +35,9 @@ const replyCareGiveInvitationController = async (req, res) => {
             );
         }
 
-        const invitedCareGive = await CareGive.findById(careGiveId);
-        if(!invitedCareGive){
-            return res.status(404).json(
+        const invitedCareGive = await CareGive.findById( careGiveId );
+        if( !invitedCareGive ){
+            return res.status( 404 ).json(
                 {
                     error: true,
                     message: "care give not found"
@@ -40,10 +46,18 @@ const replyCareGiveInvitationController = async (req, res) => {
         }
 
         if(
-            invitedCareGive.invitation.to !== req.user._id.toString()
-            || req.user._id.toString() !== invitedCareGive.petOwner.toString()
+
+            invitedCareGive.invitation
+                           .to !== req.user
+                                      ._id
+                                      .toString()
+
+            || req.user
+                  ._id
+                  .toString() !== invitedCareGive.petOwner
+                                                 .toString()
         ){
-            return res.status(401).json(
+            return res.status( 401 ).json(
                 {
                     error: true,
                     message: "you are not authorized to accept this invitation"
@@ -51,8 +65,11 @@ const replyCareGiveInvitationController = async (req, res) => {
             );
         }
         
-        if(usersResponse !== "true" && usersResponse !== "false"){
-            return res.status(400).json(
+        if(
+            usersResponse !== "true" 
+            && usersResponse !== "false"
+        ){
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "Invalid response"
@@ -61,11 +78,14 @@ const replyCareGiveInvitationController = async (req, res) => {
         }
 
         const response = usersResponse === "true";
-        if(response){
+        if( response ){
             //accept invitation
-            const pet = await Pet.findById( invitedCareGive.petId.toString() );
-            if(!pet){
-                return res.status(404).json(
+            const pet = await Pet.findById( 
+                                    invitedCareGive.petId
+                                                   .toString() 
+                                  );
+            if( !pet ){
+                return res.status( 404 ).json(
                     {
                         error: true,
                         message: "pet not found"
@@ -73,9 +93,26 @@ const replyCareGiveInvitationController = async (req, res) => {
                 );
             }
 
-            const careGiver = await User.findById( invitedCareGive.careGiver.careGiverId.toString() );
-            if(!careGiver || careGiver.deactivation.isDeactive){
-                return res.status(404).json(
+            const careGiver = await User.findById( 
+                                            invitedCareGive.careGiver
+                                                           .careGiverId
+                                                           .toString()
+                                         );
+
+            if(
+                !careGiver 
+
+                || careGiver.deactivation
+                            .isDeactive
+
+                || careGiver.blockedUsers
+                            .includes(
+                                invitedCareGive.petOwner
+                                               .petOwnerId
+                                               .toString() 
+                            )
+            ){
+                return res.status( 404 ).json(
                     {
                         error: false,
                         message: "user not found"
@@ -83,8 +120,23 @@ const replyCareGiveInvitationController = async (req, res) => {
                 );
             }
 
-            const petOwner = await User.findById( invitedCareGive.petOwner.petOwnerId.toString() );
-            if(!petOwner || petOwner.deactivation.isDeactive){
+            const petOwner = await User.findById( 
+                                            invitedCareGive.petOwner
+                                                           .petOwnerId
+                                                           .toString() 
+                                        );
+            if(
+                !petOwner
+
+                || petOwner.deactivation
+                           .isDeactive
+
+                || petOwner.includes(
+                                invitedCareGive.careGiver
+                                               .careGiverId
+                                               .toString()
+                )
+            ){
                 return res.status(404).json(
                     {
                         error: true,
@@ -93,10 +145,16 @@ const replyCareGiveInvitationController = async (req, res) => {
                 );
             }
 
-            const isPetOwner = req.user._id.toString() === invitedCareGive.petOwner.petOwnerId.toString();
+            const isPetOwner = req.user
+                                  ._id
+                                  .toString() === invitedCareGive.petOwner
+                                                                 .petOwnerId
+                                                                 .toString();
+
             const isEmailValid = petOwner.email;
-            if(!isEmailValid){
-                return res.status(400).json(
+
+            if( !isEmailValid ){
+                return res.status( 400 ).json(
                     {
                         error: true,
                         message: "please verify your email firstly"
@@ -104,8 +162,14 @@ const replyCareGiveInvitationController = async (req, res) => {
                 );
             }
 
-            invitedCareGive.petOwner.petOwnerContact.petOwnerEmail = petOwner.email;
-            invitedCareGive.petOwner.petOwnerContact.petOwnerPhone = petOwner.phone;
+            invitedCareGive.petOwner
+                           .petOwnerContact
+                           .petOwnerEmail = petOwner.email;
+
+            invitedCareGive.petOwner
+                           .petOwnerContact
+                           .petOwnerPhone = petOwner.phone;
+
             invitedCareGive.markModified("petOwner");
 
             const careGiveHistoryRecordforPet = {
@@ -130,16 +194,28 @@ const replyCareGiveInvitationController = async (req, res) => {
                 price: invitedCareGive.prices
             }
 
-            pet.careGiverHistory.push(careGiveHistoryRecordforPet);
-            pet.markModified("careGiverHistory");
+            pet.careGiverHistory
+               .push( 
+                  careGiveHistoryRecordforPet 
+                );
 
-            careGiver.caregiverCareer.push(careGiveHistoryRecordforCareGiver);
-            careGiver.markModified("caregiverCareer");
+            pet.markModified( "careGiverHistory" );
 
-            petOwner.pastCaregivers.push(careGiveHistoryRecordforPetOwner);
-            petOwner.markModified("pastCaregivers");
+            careGiver.caregiverCareer
+                     .push(
+                        careGiveHistoryRecordforCareGiver
+                      );
 
-            invitedCareGive.invitation.isAccepted = true;
+            careGiver.markModified( "caregiverCareer" );
+
+            petOwner.pastCaregivers
+                    .push(
+                       careGiveHistoryRecordforPetOwner
+                    );
+            petOwner.markModified( "pastCaregivers" );
+
+            invitedCareGive.invitation
+                           .isAccepted = true;
 
             pet.save().then(
                 (_) => {
@@ -157,15 +233,31 @@ const replyCareGiveInvitationController = async (req, res) => {
                                     var recordCard = true;
                                     let cardGuid;
                     
-                                    cardGuid = req.body.cardGuid.toString();
-                                    const cardNo = req.body.cardNo.toString();
-                                    const cvv = req.body.cvv.toString();
-                                    const cardExpiryDate = req.body.cardExpiryDate.toString();
-                                    const user = await User.findById( req.user._id.toString() );
+                                    cardGuid = req.body
+                                                  .cardGuid
+                                                  .toString();
+
+                                    const cardNo = req.body
+                                                      .cardNo
+                                                      .toString();
+
+                                    const cvv = req.body
+                                                   .cvv
+                                                   .toString();
+
+                                    const cardExpiryDate = req.body
+                                                              .cardExpiryDate
+                                                              .toString();
+
+                                    const user = await User.findById( 
+                                                                req.user
+                                                                   ._id
+                                                                   .toString() 
+                                                            );
                     
                                     const priceForService = price.servicePrice
-                                                       .toLocaleString( 'tr-TR' )
-                                                       .replace( '.', '' );
+                                                                 .toLocaleString( 'tr-TR' )
+                                                                 .replace( '.', '' );
                     
                                     const priceForCareGiver = (
                                                                 price.servicePrice - ( 
@@ -174,7 +266,11 @@ const replyCareGiveInvitationController = async (req, res) => {
                                                               ).toLocaleString( 'tr-TR' )
                                                                .replace( '.', '' );
                     
-                                    if( !user || user.isDeactive || !user.phone ){
+                                    if( 
+                                        !user 
+                                        || user.isDeactive 
+                                        || !user.phone 
+                                    ){
                                         return res.status( 400 ).json(
                                             {
                                                 error: true,
@@ -182,14 +278,23 @@ const replyCareGiveInvitationController = async (req, res) => {
                                             }
                                         );
                                     }
-                                    var phoneNumberWithoutZero = user.phone.replace(/\D/g, '').slice(-10);
+
+                                    var phoneNumberWithoutZero = user.phone
+                                                                     .replace(/\D/g, '')
+                                                                     .slice(-10);
                     
                                     //take payment
-                                    if( req.body.recordCard && req.body.recordCard === false ){
+                                    if( 
+                                        req.body
+                                           .recordCard 
+
+                                        && req.body
+                                              .recordCard === false 
+                                    ){
                                         recordCard = false;
                                     }
 
-                                    const generatedOrderId = invitedCareGive._id + crypto.randomBytes(3).toString('hex');
+                                    const generatedOrderId = invitedCareGive._id + crypto.randomBytes( 3 ).toString( 'hex' );
                                     const careGiveOrderDesc = `Bakım Hizmeti Siparişi, No: ${ generatedOrderId }`;
                     
                                     if( 

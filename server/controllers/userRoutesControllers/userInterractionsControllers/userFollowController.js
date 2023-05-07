@@ -16,7 +16,10 @@ const userFollowController = async (req, res) => {
         }
 
         const user = await User.findById( req.user._id );
-        if(!user || user.deactivation.isDeactive){
+        if(
+            !user 
+            || user.deactivation.isDeactive
+        ){
             return res.status(404).json(
                 {
                     error: true,
@@ -27,7 +30,11 @@ const userFollowController = async (req, res) => {
         const userFollowings = user.followingUsersOrPets;
 
         const followingUser = await User.findById( followingUserId );
-        if(!followingUser || followingUser.deactivation.isDeactive){
+        if(
+            !followingUser 
+            || followingUser.deactivation.isDeactive
+            || followingUser.blockedUsers.includes( req.user._id )
+        ){
             return res.status(404).json(
                 {
                     error: true,

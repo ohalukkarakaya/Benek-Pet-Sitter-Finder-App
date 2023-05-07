@@ -17,11 +17,15 @@ const petHandOverInvitationController = async (req, res) => {
           }
     
           const invitedUserId = req.params.invitedUserId;
-          const invitedUser = await User.findById(invitedUserId);
+          const invitedUser = await User.findById( invitedUserId );
           const petId = req.params.petId;
           const userId = req.user._id;
     
-          if(!invitedUser || invitedUser.deactivation.isDeactive){
+          if(
+            !invitedUser 
+            || invitedUser.deactivation.isDeactive
+            || invitedUser.blockedUsers.includes( req.user._id.toString() )
+          ){
             return res.status(404).json(
               {
                 error: true,
@@ -30,9 +34,15 @@ const petHandOverInvitationController = async (req, res) => {
             );
           }
     
-          if(invitedUser && userId !== invitedUserId){
-            const pet = await Pet.findById(petId);
-            if(pet && pet.primaryOwner === userId){
+          if(
+            invitedUser 
+            && userId !== invitedUserId
+          ){
+            const pet = await Pet.findById( petId );
+            if(
+              pet 
+              && pet.primaryOwner === userId
+            ){
               await new PetHandOverInvitation(
                 {
                   from: userId,
@@ -40,8 +50,8 @@ const petHandOverInvitationController = async (req, res) => {
                   petId: petId
                 }
               ).save().then(
-                (invitation) => {
-                  return res.status(200).json(
+                ( invitation ) => {
+                  return res.status( 200 ).json(
                     {
                       error: false,
                       invitation: invitation
@@ -50,7 +60,7 @@ const petHandOverInvitationController = async (req, res) => {
                 }
               );
             }else{
-              return res.status(400).json(
+              return res.status( 400 ).json(
                 {
                   error: true,
                   message: "Pet couldn't found or it doesn't belong to you"
@@ -58,7 +68,7 @@ const petHandOverInvitationController = async (req, res) => {
               );
             }
           }else{
-            return res.status(400).json(
+            return res.status( 400 ).json(
               {
                 error: true,
                 message: "ivited user couldn't found or it is you"
@@ -67,7 +77,7 @@ const petHandOverInvitationController = async (req, res) => {
           }
         }catch(err){
           console.log(err);
-          res.status(500).json(
+          res.status( 500 ).json(
             {
               error: true,
               message: "Internal Server Error"

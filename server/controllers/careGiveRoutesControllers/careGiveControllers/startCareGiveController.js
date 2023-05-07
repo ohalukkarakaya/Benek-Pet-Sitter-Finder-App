@@ -9,13 +9,28 @@ dotenv.config();
 
 const startCareGiveController = async (req, res) => {
     try{
-        const careGiveId = req.params.careGiveId;
-        const actionCodePassword = req.body.actionCodePassword;
-        const petOwnerIdFromCode = req.body.petOwnerIdFromCode;
-        const petIdFromCode = req.body.petIdFromCode;
-        const careGiverIdFromCode = req.body.careGiverIdFromCode;
-        const codeType = req.body.codeType;
-        const userId = req.user._id.toString();
+        const careGiveId = req.params
+                              .careGiveId;
+
+        const actionCodePassword = req.body
+                                      .actionCodePassword;
+
+        const petOwnerIdFromCode = req.body
+                                      .petOwnerIdFromCode;
+
+        const petIdFromCode = req.body
+                                 .petIdFromCode;
+
+        const careGiverIdFromCode = req.body
+                                       .careGiverIdFromCode;
+
+        const codeType = req.body
+                            .codeType;
+
+        const userId = req.user
+                          ._id
+                          .toString();
+
         if(
             !careGiveId
             || !actionCodePassword
@@ -24,7 +39,7 @@ const startCareGiveController = async (req, res) => {
             || !careGiverIdFromCode
             || !codeType
         ){
-            return res.status(400).json(
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "missing params"
@@ -32,8 +47,8 @@ const startCareGiveController = async (req, res) => {
             );
         }
 
-        if(codeType !== "start"){
-            return res.status(400).json(
+        if( codeType !== "start" ){
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "This is not a start code"
@@ -41,17 +56,21 @@ const startCareGiveController = async (req, res) => {
             );
         }
 
-        const careGive = await CareGive.findById(careGiveId);
-        if(!careGive){
-            return res.status(404).json(
+        const careGive = await CareGive.findById( careGiveId );
+        if( !careGive ){
+            return res.status( 404 ).json(
                 {
                     error: true,
                     message: "Care give not found"
                 }
             );
         }
-        if(userId !== careGive.careGiver.careGiverId.toString()){
-            return res.status(400).json(
+        if(
+            userId !== careGive.careGiver
+                               .careGiverId
+                               .toString()
+        ){
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "care giver should scan this code"
@@ -59,9 +78,12 @@ const startCareGiveController = async (req, res) => {
             );
         }
 
-        const pet = await Pet.findById(careGive.petId.toString());
-        if(!pet){
-            return res.status(404).json(
+        const pet = await Pet.findById(
+                                    careGive.petId
+                                            .toString()
+                              );
+        if( !pet ){
+            return res.status( 404 ).json(
                 {
                     error: true,
                     message: "Pet not found"
@@ -69,8 +91,20 @@ const startCareGiveController = async (req, res) => {
             );
         }
 
-        const careGiver = await User.findById(userId);
-        if(!careGiver || careGiver.deactivation.isDeactive){
+        const careGiver = await User.findById( userId );
+        if(
+            !careGiver 
+
+            || careGiver.deactivation
+                        .isDeactive
+
+            || careGiver.blockedUsers
+                        .includes(
+                            careGive.petOwner
+                                    .petOwnerId
+                                    .toString()
+                        )
+        ){
             return res.status(404).json(
                 {
                     error: true,
@@ -79,9 +113,21 @@ const startCareGiveController = async (req, res) => {
             );
         }
 
-        const petOwner = await User.findById(careGive.petOwner.petOwnerId.toString());
-        if(!petOwner || petOwner.deactivation.isDeactive){
-            return res.status(404).json(
+        const petOwner = await User.findById(
+                                        careGive.petOwner
+                                                .petOwnerId
+                                                .toString()
+                                    );
+
+        if(
+            !petOwner
+
+            || petOwner.deactivation
+                       .isDeactive
+
+            || petOwner.blockedUsers.includes( userId )
+        ){
+            return res.status( 404 ).json(
                 {
                     error: true,
                     message: "pet owner not found"
@@ -90,11 +136,15 @@ const startCareGiveController = async (req, res) => {
         }
 
         if(
-            pet._id.toString() !== petIdFromCode
+            pet._id
+               .toString() !== petIdFromCode
+               
             || userId !== careGiverIdFromCode
-            || petOwner._id.toString() !== petOwnerIdFromCode
+
+            || petOwner._id
+                       .toString() !== petOwnerIdFromCode
         ){
-            return res.status(400).json(
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "data in code is invalid"
@@ -103,10 +153,10 @@ const startCareGiveController = async (req, res) => {
         }
 
         if(
-            Date.parse(careGive.startDate) > Date.now()
-            || Date.parse(careGive.startDate) < Date.now()
+            Date.parse( careGive.startDate ) > Date.now()
+            || Date.parse( careGive.startDate ) < Date.now()
         ){
-            return res.status(400).json(
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "care give was past"
@@ -116,10 +166,14 @@ const startCareGiveController = async (req, res) => {
 
         const verifiedPassword = await bcrypt.compare(
             actionCodePassword,
-            careGive.invitation.actionCode.code
+
+            careGive.invitation
+                    .actionCode
+                    .code
         );
-        if(!verifiedPassword){
-            return res.status(403).json(
+
+        if( !verifiedPassword ){
+            return res.status( 403 ).json(
                 {
                     error: true,
                     message: "Invalid password"
@@ -128,9 +182,19 @@ const startCareGiveController = async (req, res) => {
         }
 
         //generate password
-        const randPassword = Buffer.from(Math.random().toString()).toString("base64").substring(0,20);
-        const salt = await bcrypt.genSalt(Number(process.env.SALT));
-        const hashCodePassword = await bcrypt.hash(randPassword, salt);
+        const randPassword = crypto.randomBytes( 10 )
+                                   .toString( 'hex' );
+
+        const salt = await bcrypt.genSalt( 
+                                    Number( 
+                                        process.env
+                                               .SALT
+                                    ) 
+                                );
+        const hashCodePassword = await bcrypt.hash(
+            randPassword, 
+            salt
+        );
 
         //qr code data
         const data = {
@@ -142,13 +206,13 @@ const startCareGiveController = async (req, res) => {
             codePassword: randPassword,
         }
 
-        let qrCodeData = JSON.stringify(data);
+        let qrCodeData = JSON.stringify( data );
 
         // Get the base64 url
         QRCode.toDataURL(
             qrCodeData,
-            function (err, url) {
-                if(err){
+            function ( err, url ) {
+                if( err ){
                     return res.status(500).json(
                         {
                             error: true,

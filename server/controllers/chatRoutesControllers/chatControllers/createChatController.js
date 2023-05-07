@@ -31,12 +31,12 @@ const createChatController = async (req, res) => {
 
         for( var memberId in membersWithoutCreater ){
             const member = await User.findById( memberId.toString() );
-            const didMeberBlockedCreater = member.blockedUsers.where(
-                blockedUserId =>
-                        blockedUserId.toString() === createrUserId
-            );
 
-            if( !member || didMeberBlockedCreater ){
+            if( 
+                !member 
+                || member.deactivation.isDeactive
+                || member.blockedUsers.includes( createrUserId ) 
+            ){
                 return res.status(404).json(
                     {
                         error: true,

@@ -23,7 +23,7 @@ const finishCareGiveController = async (req, res) => {
             || !careGiverIdFromCode
             || !codeType
         ){
-            return res.status(400).json(
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "missing params"
@@ -31,8 +31,8 @@ const finishCareGiveController = async (req, res) => {
             );
         }
 
-        if(codeType !== "finish"){
-            return res.status(400).json(
+        if( codeType !== "finish" ){
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "This is not a finish code"
@@ -40,9 +40,9 @@ const finishCareGiveController = async (req, res) => {
             );
         }
 
-        const careGive = await CareGive.findById(careGiveId);
-        if(!careGive){
-            return res.status(404).json(
+        const careGive = await CareGive.findById( careGiveId );
+        if( !careGive ){
+            return res.status( 404 ).json(
                 {
                     error: true,
                     message: "Care give not found"
@@ -50,8 +50,12 @@ const finishCareGiveController = async (req, res) => {
             );
         }
 
-        if(userId !== careGive.petOwner.petOwnerId.toString()){
-            return res.status(400).json(
+        if( 
+            userId !== careGive.petOwner
+                               .petOwnerId
+                               .toString() 
+        ){
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "care giver should scan this code"
@@ -59,9 +63,9 @@ const finishCareGiveController = async (req, res) => {
             );
         }
 
-        const pet = await Pet.findById(careGive.petId.toString());
-        if(!pet){
-            return res.status(404).json(
+        const pet = await Pet.findById( careGive.petId.toString() );
+        if( !pet ){
+            return res.status( 404 ).json(
                 {
                     error: true,
                     message: "Pet not found"
@@ -69,9 +73,21 @@ const finishCareGiveController = async (req, res) => {
             );
         }
 
-        const careGiver = await User.findById(userId);
-        if(!careGiver || careGiver.deactivation.isDeactive){
-            return res.status(404).json(
+        const careGiver = await User.findById( userId );
+        if( 
+            !careGiver 
+
+            || careGiver.deactivation
+                        .isDeactive
+
+            || careGiver.blockedUsers
+                        .includes( 
+                            careGive.petOwner
+                                    .petOwnerId
+                                    .toString() 
+                        )
+        ){
+            return res.status( 404 ).json(
                 {
                     error: true,
                     message: "Care giver not found"
@@ -79,9 +95,21 @@ const finishCareGiveController = async (req, res) => {
             );
         }
 
-        const petOwner = await User.findById(careGive.petOwner.petOwnerId.toString());
-        if(!petOwner || petOwner.deactivation.isDeactive){
-            return res.status(404).json(
+        const petOwner = await User.findById(
+                                        careGive.petOwner
+                                                .petOwnerId
+                                                .toString()
+                                    );
+        if(
+            !petOwner
+
+            || petOwner.deactivation
+                       .isDeactive
+
+            || petOwner.blockedUsers
+                       .includes( userId )
+        ){
+            return res.status( 404 ).json(
                 {
                     error: true,
                     message: "pet owner not found"
@@ -94,7 +122,7 @@ const finishCareGiveController = async (req, res) => {
             || careGiver._id.toString() !== careGiverIdFromCode
             || req.user._id.toString() !== petOwnerIdFromCode
         ){
-            return res.status(400).json(
+            return res.status( 400 ).json(
                 {
                     error: true,
                     message: "data in code is invalid"
@@ -103,11 +131,16 @@ const finishCareGiveController = async (req, res) => {
         }
 
         const verifiedPassword = await bcrypt.compare(
+
             actionCodePassword,
-            careGive.invitation.actionCode.code
+
+            careGive.invitation
+                    .actionCode
+                    .code
+
         );
-        if(!verifiedPassword){
-            return res.status(403).json(
+        if( !verifiedPassword ){
+            return res.status( 403 ).json(
                 {
                     error: true,
                     message: "Invalid password"
@@ -115,18 +148,31 @@ const finishCareGiveController = async (req, res) => {
             );
         }
 
-        careGive.invitation.actionCode.codeType = "Done";
-        careGive.invitation.actionCode.codePassword = "-";
-        careGive.invitation.actionCode.codePassword = "_";
-        careGive.markModified("invitation");
+        careGive.invitation
+                .actionCode
+                .codeType = "Done";
 
-        careGive.finishProcess.isFinished = true;
-        careGive.finishProcess.finishDate = Date.now();
-        careGive.markModified("finishProcess");
+        careGive.invitation
+                .actionCode
+                .codePassword = "-";
+
+        careGive.invitation
+                .actionCode
+                .codePassword = "_";
+
+        careGive.markModified( "invitation" );
+
+        careGive.finishProcess
+                .isFinished = true;
+
+        careGive.finishProcess
+                .finishDate = Date.now();
+
+        careGive.markModified( "finishProcess" );
 
         careGive.save().then(
             (_) => {
-                return res.status(200).json(
+                return res.status( 200 ).json(
                     {
                         error: false,
                         message: "Care give finished succesfully"
@@ -134,10 +180,10 @@ const finishCareGiveController = async (req, res) => {
                 );
             }
         ).catch(
-            (error) => {
-                if(error){
-                    console.log(error);
-                    return res.statu(500).json(
+            ( error ) => {
+                if( error ){
+                    console.log( error );
+                    return res.statu( 500 ).json(
                         {
                             error: true,
                             message: "Internal server error"
@@ -148,8 +194,8 @@ const finishCareGiveController = async (req, res) => {
         );
 
     }catch(err){
-        console.log("ERROR: finish care give", err);
-        return res.status(500).json(
+        console.log( "ERROR: finish care give", err );
+        return res.status( 500 ).json(
             {
                 error: true,
                 message: "Internal server error"

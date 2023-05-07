@@ -54,11 +54,18 @@ const replySecondaryOwnerInvitationController = async (req, res) => {
           }
         );
         if(invitation){
-          const owner = await User.findById(invitation.from);
-          const secondaryOwner = await User.findById(invitation.to);
-          const pet = await Pet.findById(invitation.petId);
+          const owner = await User.findById( invitation.from );
+          const secondaryOwner = await User.findById( invitation.to );
+          const pet = await Pet.findById( invitation.petId );
   
-          if(!owner || owner.deactivation.isDeactive || !secondaryOwner || secondaryOwner.deactivation.isDeactive){
+          if(
+            !owner 
+            || owner.deactivation.isDeactive
+            || owner.blockedUsers.includes( invitation.to )
+            || !secondaryOwner 
+            || secondaryOwner.deactivation.isDeactive
+            || secondaryOwner.blockedUsers.includes( invitation.from )
+          ){
             return res.status(404).json(
               {
                 error: true,
@@ -68,8 +75,8 @@ const replySecondaryOwnerInvitationController = async (req, res) => {
           }
   
           //check if pet exists
-          if(pet){
-            if(!pet.allOwners.includes(secondaryOwner._id)){
+          if( pet ){
+            if( !pet.allOwners.includes(secondaryOwner._id) ){
               if(pet.primaryOwner.toString() === owner._id.toString() &&  pet.primaryOwner.toString() !== secondaryOwner._id.toString()){
       
                 //check if the user which is gonna be secondary user does exists

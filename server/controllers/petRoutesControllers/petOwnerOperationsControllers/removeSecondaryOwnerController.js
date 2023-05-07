@@ -27,7 +27,11 @@ const removeSecondaryOwnerController = async (req, res) => {
               req.params.secondaryOwnerId
             );
           
-            if(!secondaryOwner || secondaryOwner.deactivation.isDeactive){
+            if(
+              !secondaryOwner
+              || secondaryOwner.blockedUsers.includes( req.user._id.toString() )
+              || secondaryOwner.deactivation.isDeactive
+            ){
               return res.status(404).json(
                 {
                   error: true,
@@ -36,30 +40,50 @@ const removeSecondaryOwnerController = async (req, res) => {
               );
             }
   
-            pet.allOwners = pet.allOwners.filter( owner => owner.toString() !== secondaryOwner._id.toString() );
-            pet.markModified("allOwners");
+            pet.allOwners = pet.allOwners
+                               .filter( 
+                                  owner => 
+                                      owner.toString() !== secondaryOwner._id
+                                                                         .toString() 
+                                );
+            pet.markModified( "allOwners" );
             pet.save(
-              function (err) {
-                if(err) {
-                  console.error('ERROR: While Update!');
+              function ( err ) {
+                if( err ) {
+                  console.error( 'ERROR: While Update!' );
                 }
               }
             );
     
-            if(req.user._id.toString() === pet.primaryOwner.toString() || req.user._id.toString() === secondaryOwner._id.toString() ){
+            if(
+              req.user
+                 ._id.toString() === pet.primaryOwner
+                                        .toString() 
+                                
+              || req.user
+                    ._id
+                    .toString() === secondaryOwner._id
+                                                  .toString() 
+            ){
               //find primary owner
               const primaryOwner = await User.findById(
                 pet.primaryOwner
               );
-              if(!primaryOwner || primaryOwner.deactivation.isDeactive){
-                return res.status(404).json(
+              if(
+                !primaryOwner
+
+                || primaryOwner.deactivation
+                               .isDeactive
+              ){
+                return res.status( 404 ).json(
                   {
                     error: true,
                     message: "User not found"
                   }
                 );
               }
-              primaryOwnerId = primaryOwner._id.toString();
+              primaryOwnerId = primaryOwner._id
+                                           .toString();
     
               //check dependency status of primary owner
               var isPrimaryUserAllreadyDepended = false;

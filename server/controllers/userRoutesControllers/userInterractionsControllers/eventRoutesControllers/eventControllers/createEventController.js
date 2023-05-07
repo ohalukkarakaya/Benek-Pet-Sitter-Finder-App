@@ -80,7 +80,7 @@ const createEventController = async (req,res) => {
                 return res.status(200).json(
                     {
                         error: false,
-                        message: `Story with id ${event._id}, planed succesfully at ${event.date}`,
+                        message: `Event with id ${event._id}, planed succesfully at ${event.date}`,
                         eventId: event._id.toString(),
                         desc: event.desc,
                         ticketPrice: event.ticketPrice,

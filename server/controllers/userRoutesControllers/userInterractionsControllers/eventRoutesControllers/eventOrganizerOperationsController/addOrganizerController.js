@@ -44,8 +44,12 @@ const addOrganizerController = async (req, res) => {
             );
         }
 
-        const organizer = await User.findById(organizerId);
-        if(!organizer || organizer.deactivation.isDeactive){
+        const organizer = await User.findById( organizerId );
+        if(
+            !organizer 
+            || organizer.deactivation.isDeactive
+            || organizer.blockedUsers.includes( req.user._id.toString() )
+        ){
             return res.status(404).json(
                 {
                     error: true,

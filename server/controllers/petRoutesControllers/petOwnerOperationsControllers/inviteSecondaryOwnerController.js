@@ -31,7 +31,11 @@ const inviteSecondaryOwnerController = async (req, res) => {
               );
 
               //check if the user which is gonna be secondary user does exists
-              if(!secondaryOwner || secondaryOwner.deactivation.isDeactive){
+              if(
+                !secondaryOwner 
+                || secondaryOwner.deactivation.isDeactive
+                || secondaryOwner.blockedUsers.includes( req.user._id.toString() )
+              ){
                 return res.status(404).json(
                   {
                     error: true,

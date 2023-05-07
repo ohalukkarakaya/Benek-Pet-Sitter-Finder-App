@@ -80,8 +80,18 @@ const replyPetHandOverInvitationController = async (req, res) => {
         const invitedUser = await User.findOne({_id: invitedUserId});
   
         //validate users and pet
-        if(!pet || !owner || owner.deactivation.isDeactive || !invitedUser || invitedUser.deactivation.isDeactive || req.user._id.toString() !== invitedUser._id.toString() || pet.primaryOwner.toString() !== owner._id.toString()){
-          return res.status(404).json(
+        if(
+          !pet 
+          || !owner 
+          || owner.deactivation.isDeactive 
+          || owner.blockedUsers.includes( invitedUserId )
+          || !invitedUser 
+          || invitedUser.deactivation.isDeactive
+          || invitedUser.blockedUsers.includes( invitedUserId )
+          || req.user._id.toString() !== invitedUser._id.toString() 
+          || pet.primaryOwner.toString() !== owner._id.toString()
+        ){
+          return res.status( 404 ).json(
             {
               error: true,
               message: "Pet, user or invited user couldn't found or there is an issue with authorization"

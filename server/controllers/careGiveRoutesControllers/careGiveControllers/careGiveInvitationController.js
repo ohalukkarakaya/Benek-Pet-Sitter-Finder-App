@@ -127,7 +127,14 @@ const careGiveInvitationController = async (req, res) => {
 
         const careGiver = await User.findById(req.user._id.toString());
         const owner = await User.findById(pet.primaryOwner.toString());
-        if(!owner || !careGiver || owner.deactivation.isDeactive || careGiver.deactivation.isDeactive){
+        if(
+            !owner 
+            || !careGiver 
+            || owner.deactivation.isDeactive 
+            || careGiver.deactivation.isDeactive
+            || careGiver.blockedUsers.includes( owner._id.toString() )
+            || owner.blockedUsers.includes( careGiver._id.toString() )
+        ){
             return res.status(404).json(
                 {
                     error: true,
