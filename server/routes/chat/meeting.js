@@ -14,7 +14,7 @@ dotenv.config();
 
 const router = express.Router();
 
-//get all meeting users
+// get all meeting users
 router.get(
     "/getAllUsers/:chatId/:meetingId",
     auth,
@@ -28,7 +28,7 @@ router.post(
     createMeetController
 );
 
-// To Do: check if there is meeting by id
+// check if there is meeting by id
 router.get(
     "/isMeetingExist/:chatId/:meetingId",
     auth,

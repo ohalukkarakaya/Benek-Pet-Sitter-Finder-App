@@ -14,6 +14,8 @@ import updateCareGiverPaymentInfoController from "../../controllers/userRoutesCo
 import becomeCareGiverController from "../../controllers/userRoutesControllers/userSettingsControllers/becomeCareGiverController.js";
 import deactivateUserController from "../../controllers/userRoutesControllers/userSettingsControllers/deactivateUserController.js";
 import deleteUserController from "../../controllers/userRoutesControllers/userSettingsControllers/deleteUserController.js";
+import blockUserController from "../../controllers/userRoutesControllers/userSettingsControllers/blockUserController.js";
+import unblockUserController from "../../controllers/userRoutesControllers/userSettingsControllers/unblockUserController.js";
 
 import auth from "../../middleware/auth.js";
 
@@ -98,6 +100,20 @@ router.put(
   "/becomeCareGiver",
   auth,
   becomeCareGiverController
+);
+
+//block a user
+router.put(
+  "block/:userId",
+  auth,
+  blockUserController
+);
+
+//unblock a user
+router.put(
+  "unblock/:userId",
+  auth,
+  unblockUserController
 );
 
 //deactivate user
