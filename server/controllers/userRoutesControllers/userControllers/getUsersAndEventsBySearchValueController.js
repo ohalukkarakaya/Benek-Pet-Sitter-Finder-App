@@ -2,17 +2,19 @@ import User from "../../../models/User.js";
 import Event from "../../../models/Event/Event.js";
 import Pet from "../../../models/Pet.js";
 
-const getUsersAndEventsByLocationController = async ( req, res) => {
+const getUsersAndEventsBySearchValueController = async ( req, res ) => {
     try{
-        const lat = req.body.lat;
-        const lng = req.body.lng;
         const limit = req.params.limit || 10;
         const skip = req.params.skip || 0;
+        const lat = req.body.lat;
+        const lng = req.body.lng;
+        const searchTerm = req.body.searchValue.toString();
         const userId = req.user._id.toString();
 
         if(
             !lat
             || !lng
+            || !searchTerm
         ){
             return res.status( 400 ).json(
                 {
@@ -25,39 +27,39 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
         const users = await User.aggregate(
             [
                 {
-                // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
-                $addFields: {
-                    distance: {
-                    $sqrt: {
-                        $add: [
-                        { 
-                            $pow: [ 
-                                { 
-                                    $subtract: 
-                                        [
-                                            lat, 
-                                            "$location.lat"
-                                        ] 
-                                }, 
-                                2 
-                            ] 
+                    // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
+                    $addFields: {
+                        distance: {
+                        $sqrt: {
+                            $add: [
+                            { 
+                                $pow: [ 
+                                    { 
+                                        $subtract: 
+                                            [
+                                                lat, 
+                                                "$location.lat"
+                                            ] 
+                                    }, 
+                                    2 
+                                ] 
+                            },
+                            {
+                                $pow: [ 
+                                    { 
+                                        $subtract: 
+                                            [
+                                                lng, 
+                                                "$location.lng"
+                                            ] 
+                                    },
+                                    2 
+                                ] 
+                            },
+                            ],
                         },
-                        {
-                            $pow: [ 
-                                { 
-                                    $subtract: 
-                                        [
-                                            lng, 
-                                            "$location.lng"
-                                        ] 
-                                },
-                                2 
-                            ] 
                         },
-                        ],
                     },
-                    },
-                },
                 },
                 // En yakın kullanıcılara öncelik ver
                 { 
@@ -68,24 +70,64 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 // Kullanıcıları stars, followers, followingUsersOrPets, caregiverCareer ve pastCaregivers
                 // değerlerine göre tekrar sırala
                 {
-                $sort: {
-                    "stars.star": -1,
-                    followers: -1,
-                    followingUsersOrPets: 1,
-                    caregiverCareer: -1,
-                    pastCaregivers: -1,
-                },
+                    $sort: {
+                        "stars.star": -1,
+                        followers: -1,
+                        followingUsersOrPets: 1,
+                        caregiverCareer: -1,
+                        pastCaregivers: -1,
+                    },
                 },
                 // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
                 {
-                $match: {
-                    "deactivation.isDeactive": false,
-                    blockedUsers: { 
-                        $nin: [
-                            userId
-                        ] 
+                    $match: {
+                        $and: [
+                            {
+                                "deactivation.isDeactive": false
+                            },
+                            {
+                                blockedUsers: {
+                                    $nin: [
+                                        userId
+                                    ]
+                                }
+                            },
+                            {
+                                $or: [
+                                    {
+                                        "userName": {
+                                            $regex: searchTerm,
+                                            $options: "i"
+                                        }
+                                    },
+                                    {
+                                        "identity.firstName": {
+                                            $regex: searchTerm,
+                                            $options: "i"
+                                        }
+                                    },
+                                    {
+                                        "identity.middleName": {
+                                            $regex: searchTerm,
+                                            $options: "i"
+                                        }
+                                    },
+                                    {
+                                        "identity.lastName": {
+                                            $regex: searchTerm,
+                                            $options: "i"
+                                        }
+                                    },
+                                    {
+                                        "identity.openAdress": {
+                                            $regex: searchTerm,
+                                            $options: "i"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
                     },
-                },
                 },
             ]
         );
@@ -102,7 +144,21 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 },
                 date: { 
                     $gte: new Date() 
-                }
+                },
+                $or: [
+                    { 
+                        "adress.adressDesc": { 
+                            $regex: searchTerm, 
+                            $options: "i" 
+                        } 
+                    },
+                    { 
+                        desc: { 
+                            $regex: searchTerm, 
+                            $options: "i" 
+                        } 
+                    }
+                ]
             }
         ).sort(
             {
@@ -240,17 +296,17 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                             const joiningUser = await User.findById( joiningUserId );
                             const usersWhoWillJoinInfo = {
                                 userId: joiningUserId,
-                                userProfileImg: joiningUser.profileImg,
+                                userProfileImg: joiningUser.profileImg.imgUrl,
                                 username: joiningUser.userName,
                                 usersFullName: `${
-                                    joiningUser.identity
-                                            .firstName
+                                        joiningUser.identity
+                                                   .firstName
                                     } ${
                                         joiningUser.identity
-                                                .middleName
+                                                   .middleName
                                     } ${
                                         joiningUser.identity
-                                                    .lastName
+                                                   .lastName
                                     }`.replaceAll( "  ", " ")
                             }
                             item.usersWhoWillJoin.push( usersWhoWillJoinInfo );
@@ -279,7 +335,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
             }
         );
     }catch( err ){
-        console.log("ERROR: getUsersAndEventsByLocationController - ", err);
+        console.log("ERROR: getUsersAndEventsBySearchValueController - ", err);
         return res.status(500).json(
             {
                 error: true,
@@ -287,6 +343,6 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
             }
         );
     }
-  }
+}
 
-  export default getUsersAndEventsByLocationController;
+export default getUsersAndEventsBySearchValueController;

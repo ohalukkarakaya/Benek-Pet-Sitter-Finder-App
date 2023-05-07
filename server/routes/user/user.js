@@ -11,6 +11,7 @@ import userInterractionsRoutes from "./userInterractions.js"
 import userGetMoreInfoController from "../../controllers/userRoutesControllers/userControllers/userGetMoreInfoController.js";
 import userUpdateBirthDayController from "../../controllers/userRoutesControllers/userControllers/userUpdateBirthDayController.js";
 import getUsersAndEventsByLocationController from "../../controllers/userRoutesControllers/userControllers/getUsersAndEventsByLocationController.js";
+import getUsersAndEventsBySearchValueController from "../../controllers/userRoutesControllers/userControllers/getUsersAndEventsBySearchValueController.js";
 
 dotenv.config();
 const router = express.Router();
@@ -30,11 +31,18 @@ router.put(
   userUpdateBirthDayController
 );
 
-//get users and events for main screen
+//get users and events by location data
 router.post(
-  '/users', 
+  '/getUsersandEventsByLocation/:skip/:limit', 
   auth,
   getUsersAndEventsByLocationController
+);
+
+//get users and events with search value
+router.post(
+  '/getUsersandEventsBySearchValue/:skip/:limit', 
+  auth,
+  getUsersAndEventsBySearchValueController
 );
 
 router.use( "/profileSettings", userSetingsRoutes );
