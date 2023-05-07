@@ -1,0 +1,248 @@
+import User from "../../../models/User.js";
+import Event from "../../../models/Event/Event.js";
+import Pet from "../../../models/Pet.js";
+
+const getUsersAndEventsByLocationController = async ( req, res) => {
+    try{
+        const lat = req.body.lat;
+        const lng = req.body.lng;
+        const limit = req.params.limit || 10;
+        const skip = req.params.skip || 0;
+        const userId = req.user._id.toString();
+
+        if(
+            !lat
+            || !lng
+        ){
+            return res.status( 400 ).json(
+                {
+                    error: true,
+                    message: "missing params"
+                }
+            );
+        }
+    
+        const users = await User.aggregate(
+        [
+            {
+            // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
+            $addFields: {
+                distance: {
+                $sqrt: {
+                    $add: [
+                    { 
+                        $pow: [ 
+                            { 
+                                $subtract: 
+                                    [
+                                        lat, 
+                                        "$location.lat"
+                                    ] 
+                            }, 
+                            2 
+                        ] 
+                    },
+                    {
+                        $pow: [ 
+                            { 
+                                $subtract: 
+                                    [
+                                        lng, 
+                                        "$location.lng"
+                                    ] 
+                            },
+                            2 
+                        ] 
+                    },
+                    ],
+                },
+                },
+            },
+            },
+            // En yakın kullanıcılara öncelik ver
+            { 
+                $sort: { 
+                    distance: 1 
+                } 
+            },
+            // Kullanıcıları stars, followers, followingUsersOrPets, caregiverCareer ve pastCaregivers
+            // değerlerine göre tekrar sırala
+            {
+            $sort: {
+                "stars.star": -1,
+                followers: -1,
+                followingUsersOrPets: 1,
+                caregiverCareer: -1,
+                pastCaregivers: -1,
+            },
+            },
+            // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
+            {
+            $match: {
+                "deactivation.isDeactive": false,
+                blockedUsers: { 
+                    $nin: [
+                        userId
+                    ] 
+                },
+            },
+            },
+        ]
+        );
+        
+        // prepare events
+        const events = await Event.find(
+            {
+                isPrivate: isPrivate === "false",
+                "adress.lat": { 
+                    $exists: true 
+                },
+                "adress.long": { 
+                    $exists: true 
+                },
+                date: { 
+                    $gte: new Date() 
+                }
+            }
+        ).sort(
+            {
+                "adress.lat": 1,
+                "adress.long": 1,
+                date: 1,
+            }
+        );
+
+        events.filter(
+            ( event ) => {
+
+                if( event.maxGuests !== -1 ){
+
+                    return event.maxGuests >= event.willJoin
+                                                .length;
+
+                }else{
+
+                    return true
+
+                }
+            }
+        );
+
+        const sortedEvents = events.map(
+            ( event ) => {
+                const distance = Math.pow(
+                                    event.adress.lat - lat, 
+                                    2
+                                ) 
+                                + Math.pow(
+                                    event.adress.long - lng, 
+                                    2
+                                );
+                return { ...event.toObject(), distance };
+            }
+        ).sort(
+            ( a, b ) => 
+                a.distance - b.distance
+        );
+
+        const mergedList = [...users, ...sortedEvents];
+
+        mergedList.forEach(
+            item => {
+                if(item instanceof User) {
+                    const { location } = item;
+                    const distance = Math.sqrt(
+                        Math.pow(
+                                location.lat - lat, 
+                                2
+                            ) 
+                        + Math.pow(
+                                location.lng - lng, 
+                                2
+                            )
+                    );
+                    item.distance = distance;
+                    
+                    item.pets.forEach(
+                        async ( petId ) => {
+                            const pet = await Pet.findById( petId.toString() );
+                            const petInfo = {
+                                petId: petId.toString(),
+                                petProfileImgUrl: pet.petProfileImg.imgUrl,
+                                petName: pet.name
+                            }
+                            item.petList.push( petInfo );
+                        }
+                    );
+                    if( item.petList.length === item.pets ){
+                        delete item.pets;
+                    }
+                }else if( item instanceof Event ) {
+                    const { adress } = item;
+                    const distance = Math.sqrt(
+                        Math.pow(
+                                adress.lat - lat, 
+                                2
+                            ) 
+                        + Math.pow(
+                                adress.long - lng, 
+                                2
+                            )
+                    );
+                    item.distance = distance;
+
+                    item.willJoin.forEach(
+                        async ( joiningUserId ) => {
+                            const joiningUser = await User.findById( joiningUserId );
+                            const usersWhoWillJoinInfo = {
+                                userId: joiningUserId,
+                                userProfileImg: joiningUser.profileImg,
+                                username: joiningUser.userName,
+                                usersFullName: `${
+                                    joiningUser.identity
+                                            .firstName
+                                    } ${
+                                        joiningUser.identity
+                                                .middleName
+                                    } ${
+                                        joiningUser.identity
+                                                    .lastName
+                                    }`.replaceAll( "  ", " ")
+                            }
+                            item.usersWhoWillJoin.push( usersWhoWillJoinInfo );
+                        }
+                    );
+                    
+                    if( item.usersWhoWillJoin === item.willJoin ){
+                        delete item.willJoin;
+                    }
+                }
+            }
+        );
+
+        mergedList.sort(
+            ( a, b ) => 
+                a.distance - b.distance
+        );
+
+        const resultList = mergedList.slice(skip, skip + limit);
+
+        return res.status( 200 ).json(
+            {
+                error: false,
+                message: "discover screen users and events list is prepared succesfully",
+                dataList: resultList
+            }
+        );
+    }catch( err ){
+        console.log("ERROR: getUsersAndEventsByLocationController - ", err);
+        return res.status(500).json(
+            {
+                error: true,
+                message: "Internal server error"
+            }
+        );
+    }
+  }
+
+  export default getUsersAndEventsByLocationController;

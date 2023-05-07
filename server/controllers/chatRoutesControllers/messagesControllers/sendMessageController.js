@@ -35,10 +35,10 @@ const sendMessageController = async (req, res) => {
 
         if(
             messageType !== "Text"
-            || messageType !== "File"
-            || messageType !== "PaymentOffer"
-            || messageType !== "UserProfile"
-            || messageType !== "PetProfile"
+            && messageType !== "File"
+            && messageType !== "PaymentOffer"
+            && messageType !== "UserProfile"
+            && messageType !== "PetProfile"
         ){
             return res.status(400).json(
                 {
@@ -116,7 +116,7 @@ const sendMessageController = async (req, res) => {
             );
         }
 
-        const isUserMember = chat.members.where(
+        const isUserMember = chat.members.some(
             member =>
                 member.userId.toString() === userId
         );
