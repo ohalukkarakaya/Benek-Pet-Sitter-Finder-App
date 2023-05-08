@@ -287,6 +287,7 @@ const getEventsByUserIdController = async ( req, res ) => {
                     delete lastAfterEventObject.userId;
         
                     releatedEvent.afterEvent = lastAfterEventObject;
+                    delete releatedEvent.eventAdminsParamGuid;
                 }
             }
         );
@@ -298,7 +299,7 @@ const getEventsByUserIdController = async ( req, res ) => {
                 events: events
             }
         );
-        
+
     }catch( err ){
         console.log("ERROR: getEventsByUserIdController - ", err);
         res.status(500).json(

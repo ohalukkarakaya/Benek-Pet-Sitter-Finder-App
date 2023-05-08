@@ -224,6 +224,7 @@ const getEventByIdController = async ( req, res ) => {
             delete lastAfterEventObject.userId;
 
             searchedEvent.afterEvent = lastAfterEventObject;
+            delete searchedEvent.eventAdminsParamGuid;
         }
 
         return res.status( 200 ).json(
