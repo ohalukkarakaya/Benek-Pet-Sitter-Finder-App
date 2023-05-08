@@ -271,7 +271,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                             item.petList.push( petInfo );
                         }
                     );
-                    if( item.petList.length === item.pets ){
+                    if( item.petList.length === item.pets.length ){
                         delete item.pets;
                     }
                 }else if( item instanceof Event ) {
@@ -354,7 +354,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                         }
                     );
                     
-                    if( item.usersWhoWillJoin === item.willJoin ){
+                    if( item.usersWhoWillJoin.length === item.willJoin.length ){
                         delete item.willJoin;
                     }
                 }

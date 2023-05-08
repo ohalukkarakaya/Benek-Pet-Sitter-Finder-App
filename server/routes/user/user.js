@@ -10,9 +10,12 @@ import userInterractionsRoutes from "./userInterractions.js"
 //controllers
 import userGetMoreInfoController from "../../controllers/userRoutesControllers/userControllers/userGetMoreInfoController.js";
 import userUpdateBirthDayController from "../../controllers/userRoutesControllers/userControllers/userUpdateBirthDayController.js";
+import getLoggedInUserInfoController from "../../controllers/userRoutesControllers/userControllers/getLoggedInUserInfoController.js";
+import getUserByIdController from "../../controllers/userRoutesControllers/userControllers/getUserByIdController.js";
 import getUsersAndEventsByLocationController from "../../controllers/userRoutesControllers/userControllers/getUsersAndEventsByLocationController.js";
 import getUsersAndEventsBySearchValueController from "../../controllers/userRoutesControllers/userControllers/getUsersAndEventsBySearchValueController.js";
 import getCareGiversByLocationController from "../../controllers/userRoutesControllers/userControllers/getCareGiversByLocationController.js";
+import getCareGiversBySearchValueController from "../../controllers/userRoutesControllers/userControllers/getCareGiversBySearchValueController.js";
 
 dotenv.config();
 const router = express.Router();
@@ -32,26 +35,46 @@ router.put(
   userUpdateBirthDayController
 );
 
+//get user by jwt
+router.get(
+  "/getLoggedInUserInfo",
+  auth,
+  getLoggedInUserInfoController
+);
+
+//get user by id
+router.get(
+  "getUserById/:userId",
+  auth,
+  getUserByIdController
+);
+
 //get users and events by location data
 router.post(
-  '/getUsersandEventsByLocation/:skip/:limit', 
+  "/getUsersAndEventsByLocation/:skip/:limit", 
   auth,
   getUsersAndEventsByLocationController
 );
 
 //get users and events with search value
 router.post(
-  '/getUsersandEventsBySearchValue/:skip/:limit', 
+  "/getUsersAndEventsBySearchValue/:skip/:limit", 
   auth,
   getUsersAndEventsBySearchValueController
 );
 
 //get careGivers by location
 router.post(
-  '/getCareGiversByLocation/:skip/:limit',
+  "/getCareGiversByLocation/:skip/:limit",
   auth,
   getCareGiversByLocationController
-)
+);
+
+router.post(
+  "/getCareGiversBySearchValue/:skip/:limit",
+  auth,
+  getCareGiversBySearchValueController
+);
 
 router.use( "/profileSettings", userSetingsRoutes );
 router.use( "/interractions", userInterractionsRoutes );

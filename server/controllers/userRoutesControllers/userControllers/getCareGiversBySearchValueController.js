@@ -161,7 +161,7 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
                             item.petList.push( petInfo );
                         }
                     );
-                    if( item.petList.length === item.pets ){
+                    if( item.petList.length === item.pets.length ){
                         delete item.pets;
                     }
             }
