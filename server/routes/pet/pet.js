@@ -19,6 +19,7 @@ import editPetVaccinationCertificateDescController from "../../controllers/petRo
 import deletePetVaccinationCertificateController from "../../controllers/petRoutesControllers/petControllers/deletePetVaccinationCertificateController.js";
 import deletePetController from "../../controllers/petRoutesControllers/petControllers/deletePetController.js";
 import getPetByIdController from "../../controllers/petRoutesControllers/petControllers/getPetByIdController.js";
+import getPetsByJwtController from "../../controllers/petRoutesControllers/petControllers/getPetsByJwtController.js";
 
 import dotenv from "dotenv";
 
@@ -104,6 +105,13 @@ router.get(
   "/getPetById/:petId",
   auth,
   getPetByIdController
+);
+
+//get pets by jwt token
+router.get(
+  "/getPets",
+  auth,
+  getPetsByJwtController
 );
 
 router.use("/interractions", petInteractions);
