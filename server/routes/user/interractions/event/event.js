@@ -6,6 +6,7 @@ import createEventController from "../../../../controllers/userRoutesControllers
 import uploadEventImageController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventControllers/uploadEventImageController.js";
 import editEventController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventControllers/editEventController.js";
 import deleteEventController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventControllers/deleteEventController.js";
+import getEventByIdController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventControllers/getEventByIdController.js";
 
 //imported endpoints
 import eventJoinEndpoints from "./eventJoin.js";
@@ -47,6 +48,13 @@ router.delete(
     "/:eventId",
     auth,
     deleteEventController
+);
+
+// get event by id
+router.get(
+    "/getEvent/:eventId",
+    auth,
+    getEventByIdController
 );
 
 //organizer operations
