@@ -28,9 +28,11 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
         if( 
             filter
             && filter !== "user" 
-            && filter !== "User"  
+            && filter !== "User"
+            && filter !== "USER"
             && filter !== "event" 
-            && filter !== "Event" 
+            && filter !== "Event"
+            && filter !== "EVENT"
         ){
             return res.status( 400 ).json(
                 {
@@ -47,6 +49,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
             !filter
             || filter === "user" 
             || filter === "User"
+            || filter === "USER"
         ){
             const users = await User.aggregate(
                 [
@@ -163,6 +166,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
             !filter
             || filter === "event"
             || filter === "Event"
+            || filter === "EVENT"
         ){
             // prepare events
             const events = await Event.find(
