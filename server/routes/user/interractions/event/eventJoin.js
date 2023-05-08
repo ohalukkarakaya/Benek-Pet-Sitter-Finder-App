@@ -8,6 +8,7 @@ import acceptEventInvitationController from "../../../../controllers/userRoutesC
 import buyTicketForEventController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/buyTicketForEventController.js";
 import useTicketController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/useTicketController.js";
 import getEventInvitationsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/getEventInvitationsController.js";
+import getSendedEventInvitationsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/getSendedEventInvitationsController.js";
 
 const router = express.Router();
 
@@ -44,6 +45,13 @@ router.get(
     "/getInvitationList",
     auth,
     getEventInvitationsController
+);
+
+//get sended event invitations by user id
+router.get(
+    "/getInvitationList",
+    auth,
+    getSendedEventInvitationsController
 );
 
 export default router;
