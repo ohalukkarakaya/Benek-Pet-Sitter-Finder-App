@@ -7,6 +7,7 @@ import invitePrivateEventController from "../../../../controllers/userRoutesCont
 import acceptEventInvitationController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/acceptEventInvitationController.js";
 import buyTicketForEventController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/buyTicketForEventController.js";
 import useTicketController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/useTicketController.js";
+import getEventInvitationsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/getEventInvitationsController.js";
 
 const router = express.Router();
 
@@ -36,6 +37,13 @@ router.put(
     "/:eventId",
     auth,
     useTicketController
+);
+
+//get event invitations by user id
+router.get(
+    "/getInvitationList",
+    auth,
+    getEventInvitationsController
 );
 
 export default router;
