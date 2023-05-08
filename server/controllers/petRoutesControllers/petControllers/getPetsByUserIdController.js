@@ -1,4 +1,4 @@
-import User from "../../../models/User";
+import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 
 const getPetsByUserIdController = async ( req, res ) => {
