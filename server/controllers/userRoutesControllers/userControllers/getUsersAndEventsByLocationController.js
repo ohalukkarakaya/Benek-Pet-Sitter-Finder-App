@@ -240,7 +240,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                             const joiningUser = await User.findById( joiningUserId );
                             const usersWhoWillJoinInfo = {
                                 userId: joiningUserId,
-                                userProfileImg: joiningUser.profileImg,
+                                userProfileImg: joiningUser.profileImg.imgUrl,
                                 username: joiningUser.userName,
                                 usersFullName: `${
                                     joiningUser.identity

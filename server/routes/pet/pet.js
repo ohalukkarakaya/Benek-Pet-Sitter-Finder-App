@@ -18,6 +18,7 @@ import insertPetVaccinationCertificateController from "../../controllers/petRout
 import editPetVaccinationCertificateDescController from "../../controllers/petRoutesControllers/petControllers/editPetVaccinationCertificateDescController.js";
 import deletePetVaccinationCertificateController from "../../controllers/petRoutesControllers/petControllers/deletePetVaccinationCertificateController.js";
 import deletePetController from "../../controllers/petRoutesControllers/petControllers/deletePetController.js";
+import getPetByIdController from "../../controllers/petRoutesControllers/petControllers/getPetByIdController.js";
 
 import dotenv from "dotenv";
 
@@ -96,6 +97,13 @@ router.delete(
   auth,
   editPetAuth,
   deletePetController
+);
+
+//get pet by id
+router.get(
+  "/getPetById/:petId",
+  auth,
+  getPetByIdController
 );
 
 router.use("/interractions", petInteractions);
