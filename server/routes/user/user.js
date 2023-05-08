@@ -12,6 +12,7 @@ import userGetMoreInfoController from "../../controllers/userRoutesControllers/u
 import userUpdateBirthDayController from "../../controllers/userRoutesControllers/userControllers/userUpdateBirthDayController.js";
 import getUsersAndEventsByLocationController from "../../controllers/userRoutesControllers/userControllers/getUsersAndEventsByLocationController.js";
 import getUsersAndEventsBySearchValueController from "../../controllers/userRoutesControllers/userControllers/getUsersAndEventsBySearchValueController.js";
+import getCareGiversByLocationController from "../../controllers/userRoutesControllers/userControllers/getCareGiversByLocationController.js";
 
 dotenv.config();
 const router = express.Router();
@@ -44,6 +45,13 @@ router.post(
   auth,
   getUsersAndEventsBySearchValueController
 );
+
+//get careGivers by location
+router.post(
+  '/getCareGiversByLocation/:skip/:limit',
+  auth,
+  getCareGiversByLocationController
+)
 
 router.use( "/profileSettings", userSetingsRoutes );
 router.use( "/interractions", userInterractionsRoutes );
