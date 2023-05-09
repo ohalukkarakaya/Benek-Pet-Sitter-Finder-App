@@ -19,7 +19,7 @@ const isMeetingExistsController = async ( req, res ) => {
         }
 
         const chat = await Chat.findById( chatId );
-        const isUserMemberOfChat = chat.members.where(
+        const isUserMemberOfChat = chat.members.filter(
             member =>
                 member.userId.toString === req.user._id.toString()
         );

@@ -104,7 +104,7 @@ const updateChatImg = async ( req, res, next ) => {
                         );
                     }
 
-                    const isUserMember = chat.mambers.where(
+                    const isUserMember = chat.mambers.filter(
                         member => 
                             member.userId.toString() === userId
                     );

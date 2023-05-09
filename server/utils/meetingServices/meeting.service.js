@@ -9,7 +9,7 @@ async function getAllMeetingUsers(
 ){
     try{
         const chat = await Chat.findById( chatId );
-        const meeting = chat.meeting.where(
+        const meeting = chat.meeting.filter(
             meetingObject =>
                 meetingObject._id.toString() === meetingId
         );
@@ -69,7 +69,7 @@ async function createMeeting(
 
         const chat = await Chat.findById( chatId );
 
-        const isUserChatMember = chat.members.where(
+        const isUserChatMember = chat.members.filter(
             memberObject =>
                 memberObject.userId.toString() === userId
         );
@@ -218,14 +218,14 @@ async function joinMeeting(
 
         const chat = await Chat.findById( chatId );
         const meeting = chat.meeting
-                            .where(
+                            .filter(
                                 meetingObject =>
                                     meetingObject._id
                                                  .toString() === meetingId
                             );
 
         const isUserChatMember = chat.members
-                                     .where(
+                                     .filter(
                                          memberObject =>
                                             memberObject.userId
                                                         .toString() === userId
@@ -391,7 +391,7 @@ async function isMeetingExists(
     try{
 
         const chat = await Chat.findById( chatId );
-        const isUserMemberOfChat = chat.members.where(
+        const isUserMemberOfChat = chat.members.filter(
             member =>
                 member.userId.toString() === userId
         );
@@ -405,9 +405,9 @@ async function isMeetingExists(
             return callback( errorObject );
         }
         
-        const meeting = await chat.meeting.where(
+        const meeting =  chat.meeting.filter(
             meetingObject =>
-                meetingObject._id.toString() === meetingId
+                meetingObject._id.toString() !== meetingId
         );
 
         if( 

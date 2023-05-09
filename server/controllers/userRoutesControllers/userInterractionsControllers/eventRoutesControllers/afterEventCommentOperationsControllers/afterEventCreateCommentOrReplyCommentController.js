@@ -8,7 +8,8 @@ const afterEventCreateCommentOrReplyCommentController = async (req, res) => {
         const eventId = req.params.eventId;
         const contentId = req.params.contentId;
         const commentContent = req.body.desc;
-        if(!eventId || contentId || !commentContent){
+        const isReply = req.body.commentId;
+        if(!eventId || !contentId || !commentContent){
             return res.status(400).json(
                 {
                     error: true,
@@ -39,8 +40,6 @@ const afterEventCreateCommentOrReplyCommentController = async (req, res) => {
                 }
             );
         }
-
-        const isReply = req.body.commentId;
 
         if(isReply){
             const comment = content.comments.find(

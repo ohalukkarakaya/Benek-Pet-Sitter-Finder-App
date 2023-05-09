@@ -53,7 +53,7 @@ const getMessagesController = async (req, res) => {
             }
         }
 
-        const usersChatInfo = chat.members.where(
+        const usersChatInfo = chat.members.filter(
             member =>
                 member.userId.toString() === userId
         );

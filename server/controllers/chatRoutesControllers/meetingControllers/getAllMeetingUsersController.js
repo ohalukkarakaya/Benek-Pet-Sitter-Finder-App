@@ -18,7 +18,7 @@ const getAllMeetingUsersController = async ( req, res ) => {
         }
 
         const chat = await Chat.findById( chatId );
-        const meeting = chat.meeting.where(
+        const meeting = chat.meeting.filter(
             meetingObject =>
                 meetingObject._id.toString() === meetingId
         );

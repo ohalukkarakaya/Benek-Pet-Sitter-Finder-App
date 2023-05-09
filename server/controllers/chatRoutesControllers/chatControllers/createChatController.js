@@ -46,7 +46,7 @@ const createChatController = async (req, res) => {
             }        
         }
 
-        const isCreatingUserInList = memberList.where(
+        const isCreatingUserInList = memberList.filter(
             memberUserId =>
                     memberUserId.toString() === createrUserId
         );

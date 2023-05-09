@@ -23,12 +23,12 @@ const addMemberToChatController = async (req, res) => {
             );
         }
 
-        const isUserTryingToAddAlreadyMember = chat.members.where(
+        const isUserTryingToAddAlreadyMember = chat.members.filter(
             member =>
                 member.userId.toString() === memberToAdd
         );
 
-        const isUserMember = chat.members.where(
+        const isUserMember = chat.members.filter(
             member =>
                 member.userId.toString() === req.user._id.toString()
         );
@@ -87,7 +87,7 @@ const addMemberToChatController = async (req, res) => {
             }        
         }
 
-        const isCreatingUserInList = memberList.where(
+        const isCreatingUserInList = memberList.filter(
             memberUserId =>
                     memberUserId.toString() === createrUserId
         );

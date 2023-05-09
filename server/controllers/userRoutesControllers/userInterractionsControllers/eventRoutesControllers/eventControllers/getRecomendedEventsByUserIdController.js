@@ -305,7 +305,7 @@ const getRecomendedEventsByUserIdController = async ( req, res ) => {
                                 }
                                 releatedEvent.releatedUser = connectedUserInfo;
 
-                                const isReleatedEventAlreadyInserted = recomendedEvents.where(
+                                const isReleatedEventAlreadyInserted = recomendedEvents.filter(
                                     recomendEventObject =>
                                             recomendEventObject._id.toString() === releatedEvent._id.toString()
                                 );

@@ -20,12 +20,12 @@ const joinMeetingController = async ( req, res ) => {
         }
 
         const chat = await Chat.findById( chatId );
-        const meeting = chat.meeting.where(
+        const meeting = chat.meeting.filter(
             meetingObject =>
                 meetingObject._id.toString() === meetingId
         );
 
-        const isUserChatMember = chat.members.where(
+        const isUserChatMember = chat.members.filter(
             memberObject =>
                 memberObject.userId.toString === req.user._id.toString()
         );

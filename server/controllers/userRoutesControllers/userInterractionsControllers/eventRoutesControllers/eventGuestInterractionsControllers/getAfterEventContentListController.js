@@ -151,15 +151,15 @@ const getAfterEventContentListController = async ( req, res ) => {
 
         const usersAfterEventObject = searchedEvent.afterEvent.filter(
             afterEventObject =>
-                afterEventObject.userId.toString() !== userId
+                afterEventObject.userId.toString() === userId
         ).sort(
             ( a, b ) => 
-                b.createdAt -a.createdAt
+                b.createdAt - a.createdAt
         );
 
         const otherAfterEvents = searchedEvent.afterEvent.filter(
             afterEventObject =>
-                afterEventObject.userId.toString() === userId
+                afterEventObject.userId.toString() !== userId
         ).sort(
             ( a, b ) => 
                 b.createdAt -a.createdAt

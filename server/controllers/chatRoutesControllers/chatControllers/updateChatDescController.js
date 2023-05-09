@@ -24,7 +24,7 @@ const updateChatDescController = async (req, res) => {
             );
         }
 
-        const isUserMember = chat.members.where(
+        const isUserMember = chat.members.filter(
             member =>
                 member.userId.toString() === userId
         );

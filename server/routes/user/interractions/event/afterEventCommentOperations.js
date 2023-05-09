@@ -3,6 +3,7 @@ import afterEventCreateCommentOrReplyCommentController from "../../../../control
 import afterEventEditCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventEditCommentOrReplyController.js";
 import afterEventDeleteCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventDeleteCommentOrReplyController.js";
 import afterEventLikeCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventLikeCommentOrReplyController.js";
+import getAfterEventCommentsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/getAfterEventCommentsController.js";
 
 import express from "express";
 import dotenv from "dotenv";
@@ -38,6 +39,13 @@ router.put(
     "/like/:eventId/:contentId/:commentId",
     auth,
     afterEventLikeCommentOrReplyController
+);
+
+//get comment list by afterEvent Id
+router.get(
+    "getComments/:eventId/:contentId",
+    auth,
+    getAfterEventCommentsController
 );
 
 export default router;

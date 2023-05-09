@@ -24,7 +24,7 @@ const seeMessagesController = async (req, res) => {
             );
         }
 
-        const isUserMember = chat.members.where(
+        const isUserMember = chat.members.filter(
             member =>
                 member.userId.toString === userId
         );
@@ -38,7 +38,7 @@ const seeMessagesController = async (req, res) => {
         }
 
         for( let messageId in messageIdsList ){
-            var message = chat.messages.where(
+            var message = chat.messages.filter(
                 message =>
                     message._id.toString() === messageId.toString()
             );
