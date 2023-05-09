@@ -23,35 +23,35 @@ const getSendedEventInvitationsController = async ( req, res ) => {
 
         invitations.forEach(
             async ( invitation ) => {
-                const eventAdmin = await User.findById( 
-                                                    invitation.eventAdminId
+                const invitedUser = await User.findById( 
+                                                    invitation.invitedId
                                                               .toString() 
                                          );
 
-                const eventAdminInfo = {
+                const invitedUserInfo = {
 
-                    userId: eventAdmin._id
-                                      .toString(),
+                    userId: invitedUser._id
+                                       .toString(),
     
-                    userProfileImg: eventAdmin.profileImg
-                                              .imgUrl,
+                    userProfileImg: invitedUser.profileImg
+                                               .imgUrl,
     
-                    username: eventAdmin.userName,
+                    username: invitedUser.userName,
     
                     userFullName: `${
-                            eventAdmin.identity
-                                      .firstName
+                            invitedUser.identity
+                                       .firstName
                         } ${
-                            eventAdmin.identity
-                                      .middleName
+                            invitedUser.identity
+                                       .middleName
                         } ${
-                            eventAdmin.identity
-                                      .lastName
+                            invitedUser.identity
+                                       .lastName
                         }`.replaceAll( "  ", " ")
                 }
 
-                invitation.admin = eventAdminInfo;
-                delete invitation.eventAdminId;
+                invitation.admin = invitedUserInfo;
+                delete invitation.invitedId;
 
                 const invitedEvent = await Event.findById( invitation.eventId );
 
@@ -85,7 +85,7 @@ const getSendedEventInvitationsController = async ( req, res ) => {
 
                 invitation.event = eventInfo;
                 delete invitation.eventId;
-                delete invitation.invitedId;
+                delete invitation.eventAdminId;
             }
         );
 
