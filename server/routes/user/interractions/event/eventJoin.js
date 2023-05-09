@@ -9,6 +9,9 @@ import buyTicketForEventController from "../../../../controllers/userRoutesContr
 import useTicketController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/useTicketController.js";
 import getEventInvitationsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/getEventInvitationsController.js";
 import getSendedEventInvitationsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/getSendedEventInvitationsController.js";
+import getOwnedTicketsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/getOwnedTicketsController.js";
+import getTicketByIdController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/getTicketByIdController.js";
+import getTicketsByEventIdController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventJoinControllers/getTicketsByEventIdController.js";
 
 const router = express.Router();
 
@@ -52,6 +55,27 @@ router.get(
     "/getInvitationList",
     auth,
     getSendedEventInvitationsController
+);
+
+//get owned tickets
+router.get(
+    "/getOwnedTickets",
+    auth,
+    getOwnedTicketsController
+);
+
+//get ticket by id
+router.get(
+    "/getTicketById/:ticketId",
+    auth,
+    getTicketByIdController
+);
+
+//get tickets by eventId
+router.get(
+    "/getTicketsByEventId/:EventId",
+    auth,
+    getTicketsByEventIdController
 );
 
 export default router;
