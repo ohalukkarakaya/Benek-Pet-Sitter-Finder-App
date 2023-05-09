@@ -16,6 +16,7 @@ import getUsersAndEventsByLocationController from "../../controllers/userRoutesC
 import getUsersAndEventsBySearchValueController from "../../controllers/userRoutesControllers/userControllers/getUsersAndEventsBySearchValueController.js";
 import getCareGiversByLocationController from "../../controllers/userRoutesControllers/userControllers/getCareGiversByLocationController.js";
 import getCareGiversBySearchValueController from "../../controllers/userRoutesControllers/userControllers/getCareGiversBySearchValueController.js";
+import getLightWeightUserInfoController from "../../controllers/userRoutesControllers/userControllers/getLightWeightUserInfoController.js";
 
 dotenv.config();
 const router = express.Router();
@@ -70,10 +71,18 @@ router.post(
   getCareGiversByLocationController
 );
 
+//get careGiver by search value
 router.post(
   "/getCareGiversBySearchValue/:skip/:limit",
   auth,
   getCareGiversBySearchValueController
+);
+
+//get light weight user id with user id list
+router.post(
+  "/getLightWeightUserInfo",
+  auth,
+  getLightWeightUserInfoController
 );
 
 router.use( "/profileSettings", userSetingsRoutes );

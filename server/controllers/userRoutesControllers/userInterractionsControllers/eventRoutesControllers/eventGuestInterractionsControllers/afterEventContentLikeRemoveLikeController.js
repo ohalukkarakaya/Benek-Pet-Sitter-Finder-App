@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const afterEventContentLileRemoveLikeController = async (req, res) => {
+const afterEventContentLikeRemoveLikeController = async (req, res) => {
     try{
         const eventId = req.params.eventId;
         const contentId = req.params.contentId;
@@ -85,4 +85,4 @@ const afterEventContentLileRemoveLikeController = async (req, res) => {
     }
 }
 
-export default afterEventContentLileRemoveLikeController;
+export default afterEventContentLikeRemoveLikeController;

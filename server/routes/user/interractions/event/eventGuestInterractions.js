@@ -8,8 +8,8 @@ import { uploadEventContent } from "../../../../middleware/contentHandle/serverH
 import eventUploadContentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/eventUploadContentController.js";
 import eventEditContentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/eventEditContentController.js";
 import eventDeleteContentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/eventDeleteContentController.js";
-import afterEventContentLileRemoveLikeController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/afterEventContentLileRemoveLikeController.js";
-import getAfterEventListController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/getAfterEventListController.js";
+import afterEventContentLikeRemoveLikeController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/afterEventContentLikeRemoveLikeController.js";
+import getAfterEventContentListController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/getAfterEventContentListController.js";
 
 dotenv.config();
 
@@ -42,14 +42,14 @@ router.delete(
 router.put(
     "/like/:eventId/:contentId",
     auth,
-    afterEventContentLileRemoveLikeController
+    afterEventContentLikeRemoveLikeController
 );
 
 //get after event list by event Id
 router.get(
     "/get/:eventId/:skip/:limit",
     auth,
-    getAfterEventListController
+    getAfterEventContentListController
 );
 
 router.use("/comment", afterEventCommentEndpoints);

@@ -1,6 +1,7 @@
 import Event from "../../../../../models/Event/Event.js";
+import User from "../../../../../models/User.js";
 
-const getAfterEventListController = async ( req, res ) => {
+const getAfterEventContentListController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
         const eventId = req.params.eventId.toString();
@@ -86,12 +87,65 @@ const getAfterEventListController = async ( req, res ) => {
         }
 
         searchedEvent.afterEvent.forEach(
-            ( afterEventObject ) => {
-                const lastComment = afterEventObject.comments.pop();
+            async ( afterEventObject ) => {
+                var lastComment = afterEventObject.comments.pop();
+
+                const commentCount = afterEventObject.comments.length;
+                lastComment.replyCount = lastComment.replies.length;
+
                 delete lastComment.replies;
 
                 afterEventObject.lastComment = lastComment;
+                afterEventObject.commentCount = commentCount;
+
                 delete afterEventObject.comments;
+
+                const sharedUser = await User.findById( afterEventObject.userId );
+                const sharedUserInfo = {
+                    
+                    userId: sharedUser._id
+                                      .toString(),
+                    userProfileImg: sharedUser.profileImg
+                                              .imgUrl,
+                    username: sharedUser.userName,
+                    userFullName: `${
+                            sharedUser.identity
+                                      .firstName
+                        } ${
+                            sharedUser.identity
+                                      .middleName
+                        } ${
+                            sharedUser.identity
+                                      .lastName
+                        }`.replaceAll( "  ", " ")
+                }
+
+                afterEventObject.user = sharedUserInfo;
+                delete afterEventObject.userId;
+
+                for( let i = 0; i <= 5; i++ ){
+                    const likedUser = await User.findById( afterEventObject.likes[ i ].toString() );
+                    const likedUserInfo = {
+                    
+                        userId: likedUser._id
+                                         .toString(),
+                        userProfileImg: likedUser.profileImg
+                                                 .imgUrl,
+                        username: likedUser.userName,
+                        userFullName: `${
+                                likedUser.identity
+                                         .firstName
+                            } ${
+                                likedUser.identity
+                                         .middleName
+                            } ${
+                                likedUser.identity
+                                         .lastName
+                            }`.replaceAll( "  ", " ")
+                        }
+
+                    afterEventObject.firstFiveLikedUser.push( likedUserInfo );
+                }
             }
         );
 
@@ -131,4 +185,4 @@ const getAfterEventListController = async ( req, res ) => {
     }
 }
 
-export default getAfterEventListController;
+export default getAfterEventContentListController;
