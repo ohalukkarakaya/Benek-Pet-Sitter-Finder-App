@@ -83,7 +83,7 @@ const getEventsByUserIdController = async ( req, res ) => {
                                  .length === releatedEvent.willJoin
                                                           .length 
                 ){
-                    delete releatedEvent.willJoinUserList;
+                    delete releatedEvent.willJoin;
                 }
 
                 releatedEvent.joined
