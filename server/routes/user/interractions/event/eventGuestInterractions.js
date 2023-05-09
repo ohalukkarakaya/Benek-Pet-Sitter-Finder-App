@@ -9,6 +9,7 @@ import eventUploadContentController from "../../../../controllers/userRoutesCont
 import eventEditContentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/eventEditContentController.js";
 import eventDeleteContentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/eventDeleteContentController.js";
 import afterEventContentLileRemoveLikeController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/afterEventContentLileRemoveLikeController.js";
+import getAfterEventListController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/getAfterEventListController.js";
 
 dotenv.config();
 
@@ -42,6 +43,13 @@ router.put(
     "/like/:eventId/:contentId",
     auth,
     afterEventContentLileRemoveLikeController
+);
+
+//get after event list by event Id
+router.get(
+    "/get/:eventId/:skip/:limit",
+    auth,
+    getAfterEventListController
 );
 
 router.use("/comment", afterEventCommentEndpoints);

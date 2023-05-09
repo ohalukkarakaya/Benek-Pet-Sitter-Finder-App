@@ -208,10 +208,7 @@ const getRecomendedEventsByUserIdController = async ( req, res ) => {
                                              .length > 0 
                             ){
 
-                                const lastAfterEventObject = releatedEvent.afterEvent[ 
-                                                                                        releatedEvent.afterEvent
-                                                                                                    .length -1 
-                                                                                    ];
+                                const lastAfterEventObject = releatedEvent.afterEvent.pop();
                                 delete lastAfterEventObject.comments;
                     
                                 lastAfterEventObject.likes
@@ -307,7 +304,15 @@ const getRecomendedEventsByUserIdController = async ( req, res ) => {
                                         }`.replaceAll( "  ", " ")
                                 }
                                 releatedEvent.releatedUser = connectedUserInfo;
-                                recomendedEvents.push( releatedEvent );
+
+                                const isReleatedEventAlreadyInserted = recomendedEvents.where(
+                                    recomendEventObject =>
+                                            recomendEventObject._id.toString() === releatedEvent._id.toString()
+                                );
+
+                                if( !isReleatedEventAlreadyInserted ){
+                                    recomendedEvents.push( releatedEvent );
+                                }
                             }
 
                         }
