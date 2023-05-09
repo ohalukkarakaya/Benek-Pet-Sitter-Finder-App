@@ -5,6 +5,8 @@ import auth from "../../../../middleware/auth.js";
 import addOrganizerController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventOrganizerOperationsController/addOrganizerController.js";
 import acceptOrganizeInvitationController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventOrganizerOperationsController/acceptOrganizeInvitationController.js";
 import cancelOrganizerStatusController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventOrganizerOperationsController/cancelOrganizerStatusController.js";
+import getOrganizerInvitationsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventOrganizerOperationsController/getOrganizerInvitationsController.js";
+import getSendedOrganizerInvitationsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventOrganizerOperationsController/getSendedOrganizerInvitationsController.js";
 
 const router = express.Router();
 
@@ -13,6 +15,20 @@ router.post(
     "/:eventId",
     auth,
     addOrganizerController
+);
+
+//get organizer invitations by user Id
+router.get(
+    "/getInvitations",
+    auth,
+    getOrganizerInvitationsController
+);
+
+//get sended organizer invitations by user id
+router.get(
+    "/getSendedInvitations",
+    auth,
+    getSendedOrganizerInvitationsController
 );
 
 //accept organizer invitation
