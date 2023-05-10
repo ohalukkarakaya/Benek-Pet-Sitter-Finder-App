@@ -32,6 +32,7 @@ const getLoggedInUserInfoController = async ( req, res ) => {
         delete user.trustedIps;
         delete user.blockedUsers;
         delete user.saved;
+        delete item.identity.nationalId;
                 
         user.dependedUsers.forEach(
             async ( dependedId ) => {

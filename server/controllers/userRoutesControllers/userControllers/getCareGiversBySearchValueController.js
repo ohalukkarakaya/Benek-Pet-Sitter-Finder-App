@@ -161,13 +161,14 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
                         petId = petInfo;
                     }
                 );
-                
+
                 delete item.password;
                 delete item.iban;
                 delete item.cardGuidies;
                 delete item.trustedIps;
                 delete item.blockedUsers;
                 delete item.saved;
+                delete item.identity.nationalId;
                 
                 item.dependedUsers.forEach(
                     async ( dependedId ) => {

@@ -181,6 +181,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                     delete item.trustedIps;
                     delete item.blockedUsers;
                     delete item.saved;
+                    delete item.identity.nationalId;
                     
                     item.dependedUsers.forEach(
                         async ( dependedId ) => {
@@ -217,7 +218,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
 
                     item.totalStar = starCount;
                     item.stars = starAvarage;
-                    
+
                 }else if( item instanceof Event ) {
                     const { adress } = item;
                     const distance = Math.sqrt(
