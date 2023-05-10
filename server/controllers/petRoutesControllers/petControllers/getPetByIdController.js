@@ -73,6 +73,12 @@ const getPetByIdController = async ( req, res ) => {
             delete pet.allOwners
         }
 
+        pet.images.forEach(
+            ( image ) => {
+                image = image.imgUrl
+            }
+        );
+
         return res.status( 200 ).json(
             {
                 error: false,

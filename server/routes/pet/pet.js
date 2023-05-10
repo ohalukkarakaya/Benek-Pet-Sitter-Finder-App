@@ -21,6 +21,8 @@ import deletePetController from "../../controllers/petRoutesControllers/petContr
 import getPetByIdController from "../../controllers/petRoutesControllers/petControllers/getPetByIdController.js";
 import getPetsByJwtController from "../../controllers/petRoutesControllers/petControllers/getPetsByJwtController.js";
 import getPetsByUserIdController from "../../controllers/petRoutesControllers/petControllers/getPetsByUserIdController.js"
+import getPetImageCommentsController from "../../controllers/petRoutesControllers/petControllers/getPetImageCommentsController.js";
+import getPetImageCommentsRepliesController from "../../controllers/petRoutesControllers/petControllers/getPetImageCommentsRepliesController.js";
 
 import dotenv from "dotenv";
 
@@ -120,6 +122,20 @@ router.get(
   "/getPetsByUserId/:userId",
   auth,
   getPetsByUserIdController
+);
+
+//get image comments
+router.get(
+  "/getImageComments/:petId/:imageId",
+  auth,
+  getPetImageCommentsController
+);
+
+//get image comment replies
+router.get(
+  "/getImageCommentsReplies/:petId/:imageId/:commentId",
+  auth,
+  getPetImageCommentsRepliesController
 );
 
 router.use("/interractions", petInteractions);
