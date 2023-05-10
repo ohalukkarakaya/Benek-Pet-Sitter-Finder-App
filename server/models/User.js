@@ -223,7 +223,7 @@ const UserSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
-        interestingPetTags: [
+        interestingPetTags: [ 
             {
                 petId: String,
                 speciesId: String

@@ -138,32 +138,72 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
         users.forEach(
             async ( item ) => {
                 const { location } = item;
-                    const distance = Math.sqrt(
-                        Math.pow(
-                                location.lat - lat, 
-                                2
-                            ) 
-                        + Math.pow(
-                                location.lng - lng, 
-                                2
-                            )
-                    );
-                    item.distance = distance;
+                const distance = Math.sqrt(
+                    Math.pow(
+                            location.lat - lat, 
+                            2
+                        ) 
+                    + Math.pow(
+                            location.lng - lng, 
+                            2
+                        )
+                );
+                item.distance = distance;
                     
-                    item.pets.forEach(
-                        async ( petId ) => {
-                            const pet = await Pet.findById( petId.toString() );
-                            const petInfo = {
-                                petId: petId.toString(),
-                                petProfileImgUrl: pet.petProfileImg.imgUrl,
-                                petName: pet.name
-                            }
-                            item.petList.push( petInfo );
+                item.pets.forEach(
+                    async ( petId ) => {
+                        const pet = await Pet.findById( petId.toString() );
+                        const petInfo = {
+                            petId: petId.toString(),
+                            petProfileImgUrl: pet.petProfileImg.imgUrl,
+                            petName: pet.name
                         }
-                    );
-                    if( item.petList.length === item.pets.length ){
-                        delete item.pets;
+                        petId = petInfo;
                     }
+                );
+                
+                delete item.password;
+                delete item.iban;
+                delete item.cardGuidies;
+                delete item.trustedIps;
+                delete item.blockedUsers;
+                delete item.saved;
+                
+                item.dependedUsers.forEach(
+                    async ( dependedId ) => {
+                        const depended = await User.findById( dependedId );
+                        const dependedInfo = {
+                    
+                            userId: depended._id
+                                            .toString(),
+                            userProfileImg: depended.profileImg
+                                                    .imgUrl,
+                            username: depended.userName,
+                            userFullName: `${
+                                    depended.identity
+                                            .firstName
+                                } ${
+                                    depended.identity
+                                            .middleName
+                                } ${
+                                    depended.identity
+                                            .lastName
+                                }`.replaceAll( "  ", " ")
+                        }
+                        dependedId = dependedInfo;
+                    }
+                );
+
+                const starValues = item.stars.map( starObject => starObject.star );
+                const totalStarValue = starValues.reduce(
+                    ( acc, curr ) =>
+                            acc + curr, 0
+                );
+                const starCount = item.stasr.length;
+                const starAvarage = totalStarValue / starCount;
+
+                item.totalStar = starCount;
+                item.stars = starAvarage;
             }
         );
 

@@ -51,7 +51,7 @@ const insertKeyWordsController = async (req, res) => {
                                             && tag.speciesId !== petTag.speciesId 
                                     );
                                 }else{
-                                    updateUser.interestingPetTags.push(petTag);
+                                    updateUser.interestingPetTags.push( petTag );
                                 }
                             };
                             updateUser.markModified('interestingPetTags');

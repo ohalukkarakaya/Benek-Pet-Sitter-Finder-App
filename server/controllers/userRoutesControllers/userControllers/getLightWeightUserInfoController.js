@@ -21,20 +21,20 @@ const getLightWeightUserInfoController = async ( req, res ) => {
                 }else{
                     const userrInfo = {
                     
-                        userId: likedUser._id
-                                         .toString(),
-                        userProfileImg: likedUser.profileImg
-                                                 .imgUrl,
-                        username: likedUser.userName,
+                        userId: user._id
+                                    .toString(),
+                        userProfileImg: user.profileImg
+                                            .imgUrl,
+                        username: user.userName,
                         userFullName: `${
-                                likedUser.identity
-                                         .firstName
+                                user.identity
+                                    .firstName
                             } ${
-                                likedUser.identity
-                                         .middleName
+                                user.identity
+                                    .middleName
                             } ${
-                                likedUser.identity
-                                         .lastName
+                                user.identity
+                                    .lastName
                             }`.replaceAll( "  ", " ")
                     }
 

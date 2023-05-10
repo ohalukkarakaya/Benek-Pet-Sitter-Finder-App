@@ -268,12 +268,52 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                                 petProfileImgUrl: pet.petProfileImg.imgUrl,
                                 petName: pet.name
                             }
-                            item.petList.push( petInfo );
+                            petId = petInfo;
                         }
                     );
-                    if( item.petList.length === item.pets.length ){
-                        delete item.pets;
-                    }
+                    delete item.password;
+                    delete item.iban;
+                    delete item.cardGuidies;
+                    delete item.trustedIps;
+                    delete item.blockedUsers;
+                    delete item.saved;
+                    
+                    item.dependedUsers.forEach(
+                        async ( dependedId ) => {
+                            const depended = await User.findById( dependedId );
+                            const dependedInfo = {
+                        
+                                userId: depended._id
+                                                .toString(),
+                                userProfileImg: depended.profileImg
+                                                        .imgUrl,
+                                username: depended.userName,
+                                userFullName: `${
+                                        depended.identity
+                                                .firstName
+                                    } ${
+                                        depended.identity
+                                                .middleName
+                                    } ${
+                                        depended.identity
+                                                .lastName
+                                    }`.replaceAll( "  ", " ")
+                            }
+                            dependedId = dependedInfo;
+                        }
+                    );
+
+                    const starValues = item.stars.map( starObject => starObject.star );
+                    const totalStarValue = starValues.reduce(
+                        ( acc, curr ) =>
+                                acc + curr, 0
+                    );
+                    const starCount = item.stasr.length;
+                    const starAvarage = totalStarValue / starCount;
+
+                    item.totalStar = starCount;
+                    item.stars = starAvarage;
+                    
                 }else if( item instanceof Event ) {
                     const { adress } = item;
                     const distance = Math.sqrt(

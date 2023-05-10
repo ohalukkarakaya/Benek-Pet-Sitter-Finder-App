@@ -36,13 +36,52 @@ const getUserByIdController = async ( req, res ) => {
                     petProfileImgUrl: pet.petProfileImg.imgUrl,
                     petName: pet.name
                 }
-                searchedUser.petList.push( petInfo );
+                petId = petInfo;
             }
         );
 
-        if( searchedUser.petList.length === searchedUser.pets.length ){
-            delete searchedUser.pets;
-        }
+        delete searchedUser.password;
+        delete searchedUser.iban;
+        delete searchedUser.cardGuidies;
+        delete searchedUser.trustedIps;
+        delete searchedUser.blockedUsers;
+        delete searchedUser.saved;
+                
+        searchedUser.dependedUsers.forEach(
+            async ( dependedId ) => {
+                const depended = await User.findById( dependedId );
+                const dependedInfo = {
+                    
+                    userId: depended._id
+                                    .toString(),
+                    userProfileImg: depended.profileImg
+                                            .imgUrl,
+                    username: depended.userName,
+                    userFullName: `${
+                            depended.identity
+                                    .firstName
+                        } ${
+                            depended.identity
+                                    .middleName
+                        } ${
+                            depended.identity
+                                    .lastName
+                        }`.replaceAll( "  ", " ")
+                }
+                dependedId = dependedInfo;
+            }
+        );
+
+        const starValues = searchedUser.stars.map( starObject => starObject.star );
+        const totalStarValue = starValues.reduce(
+            ( acc, curr ) =>
+                    acc + curr, 0
+        );
+        const starCount = searchedUser.stasr.length;
+        const starAvarage = totalStarValue / starCount;
+
+        searchedUser.totalStar = starCount;
+        searchedUser.stars = starAvarage;
 
         return res.status( 200 ).json(
             {
