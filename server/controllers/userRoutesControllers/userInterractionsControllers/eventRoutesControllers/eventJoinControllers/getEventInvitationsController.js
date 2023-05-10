@@ -8,7 +8,7 @@ const getEventInvitationsController = async ( req, res ) => {
 
         const invitations = await EventInvitation.find(
             {
-                invitedId: userId
+                invitedId: userId 
             }
         );
 

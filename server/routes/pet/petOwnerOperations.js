@@ -7,6 +7,10 @@ import replySecondaryOwnerInvitationController from "../../controllers/petRoutes
 import removeSecondaryOwnerController from "../../controllers/petRoutesControllers/petOwnerOperationsControllers/removeSecondaryOwnerController.js";
 import petHandOverInvitationController from "../../controllers/petRoutesControllers/petOwnerOperationsControllers/petHandOverInvitationController.js";
 import replyPetHandOverInvitationController from "../../controllers/petRoutesControllers/petOwnerOperationsControllers/replyPetHandOverInvitationController.js";
+import getSecondaryOwnerInvitationsController from "../../controllers/petRoutesControllers/petOwnerOperationsControllers/getSecondaryOwnerInvitationsController.js";
+import getPetHandOverInvitationsController from "../../controllers/petRoutesControllers/petOwnerOperationsControllers/getPetHandOverInvitationsController.js";
+import getPetSendedHandOverInvitationsController from "../../controllers/petRoutesControllers/petOwnerOperationsControllers/getPetSendedHandOverInvitationsController.js";
+import getSendedSecondaryOwnerInvitationsController from "../../controllers/petRoutesControllers/petOwnerOperationsControllers/getSendedSecondaryOwnerInvitationsController.js";
 
 const router = express.Router();
 
@@ -22,6 +26,20 @@ router.put(
   "/secondaryOwnerInvitation/:invitationId/:usersResponse",
   auth,
   replySecondaryOwnerInvitationController
+);
+
+//get secondary pet owner invitations
+router.get(
+  "/secondaryOwnerInvitations",
+  auth,
+  getSecondaryOwnerInvitationsController
+);
+
+//get sended secondary pet owner invitations
+router.get(
+  "/sendedSecondaryOwnerInvitations",
+  auth,
+  getSendedSecondaryOwnerInvitationsController
 );
   
 //Remove secondary owner of the pet
@@ -43,6 +61,20 @@ router.put(
   "/petHandOverInvitation/:invitationId/:usersResponse",
   auth,
   replyPetHandOverInvitationController
+);
+
+//get hand over invitations
+router.get(
+  "/petHandOverInvitations",
+  auth,
+  getPetHandOverInvitationsController
+);
+
+//get sended hand over invitations
+router.get(
+  "/petSendedHandOverInvitations",
+  auth,
+  getPetSendedHandOverInvitationsController
 );
 
 export default router;
