@@ -16,8 +16,12 @@ import deactivateUserController from "../../controllers/userRoutesControllers/us
 import deleteUserController from "../../controllers/userRoutesControllers/userSettingsControllers/deleteUserController.js";
 import blockUserController from "../../controllers/userRoutesControllers/userSettingsControllers/blockUserController.js";
 import unblockUserController from "../../controllers/userRoutesControllers/userSettingsControllers/unblockUserController.js";
+import insertCareGiverCertificateController from "../../controllers/userRoutesControllers/userSettingsControllers/insertCareGiverCertificateController.js";
+import editCareGiveCertificateDescController from "../../controllers/userRoutesControllers/userSettingsControllers/editCareGiveCertificateDescController.js"
+import deleteCareGiveCertificateController from "../../controllers/userRoutesControllers/userSettingsControllers/deleteCareGiveCertificateController.js"
 
 import auth from "../../middleware/auth.js";
+import { uploadCareGiverCertificate } from "../../middleware/imageHandle/serverHandleCareGiveCertificates.js";
 
 import dotenv from "dotenv";
 
@@ -56,8 +60,8 @@ router.put(
 
 //forget password
 router.put(
-    "/forgetMyPassword",
-    forgetPasswordController
+  "/forgetMyPassword",
+  forgetPasswordController
 );
 
 //insert phone number
@@ -86,6 +90,28 @@ router.put(
   "/addAdress",
   auth,
   addAdressController
+);
+
+//upload user careGiver certificate
+router.post(
+  "/certificate",
+  auth,
+  uploadCareGiverCertificate,
+  insertCareGiverCertificateController
+);
+
+//edt careGiver certificate desc
+router.put(
+  "/editCertificate",
+  auth,
+  editCareGiveCertificateDescController
+);
+
+//delete careGiver certificate desc
+router.delete(
+  "/certificate",
+  auth,
+  deleteCareGiveCertificateController
 );
 
 //update careGiver Payment Info

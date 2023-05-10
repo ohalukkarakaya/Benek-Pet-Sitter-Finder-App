@@ -8,7 +8,7 @@ const editPetVaccinationCertificateDescController = async (req, res) => {
     try{
         const { error } = editVaccinationCertificateValidation(req.body);
         if(error){
-          return res.status(400).json(
+          return res.status( 400 ).json(
             {
               error: true,
               message: error.details[0].message
@@ -20,9 +20,21 @@ const editPetVaccinationCertificateDescController = async (req, res) => {
         const certificateUrl = req.body.certificateUrl;
         const newDesc = req.body.newDesc;
   
-        for(var i = 0; i < req.pet.vaccinations.length; i ++){
-          if(req.pet.vaccinations[i].fileUrl === certificateUrl){
-            req.pet.vaccinations[i].desc = newDesc;
+        for(
+          var i = 0; 
+          i < req.pet
+                 .vaccinations
+                 .length; 
+          i ++
+        ){
+          if(
+            req.pet
+               .vaccinations[i]
+               .fileUrl === certificateUrl
+          ){
+            req.pet
+               .vaccinations[i]
+               .desc = newDesc;
           }
         }
   
