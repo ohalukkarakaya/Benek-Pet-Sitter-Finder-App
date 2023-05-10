@@ -1,78 +1,56 @@
-import Event from "../../../../../models/Event/Event.js";
 import User from "../../../../../models/User.js";
+import Story from "../../../../../models/Story.js";
 
-const getRepliesOfAfterEventCommentController = async ( req, res ) => {
+const getStoryCommentRepliesController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const eventId = req.params.eventId.toString();
-        const afterEventId = req.params.contentId.toString();
+        const storyId = req.params.storyId.toString();
         const commentId = req.params.commentId.toString();
         const skip = parseInt( req.params.skip ) || 0;
         const limit = parseInt( req.params.limit ) || 15;
-        if(
-            !eventId
-            || !afterEventId
+
+        if( 
+            !storyId
             || !commentId
         ){
             return res.status( 400 ).json(
                 {
                     error: true,
-                    message: "Missing Params"
+                    message: "Missing Param"
                 }
             );
         }
 
-        const searchedEvent = await Event.findById( eventId );
+        const story = await Story.findById( storyId );
+        if( !story ){
+            return res.status( 404 ).json(
+                {
+                    error: true,
+                    message: "Story Not Found"
+                }
+            );
+        }
+
+        const storyOwner = await User.findById( story.userId.toString() );
         if(
-            !searchedEvent 
-            || (
-                searchedEvent.isPrivate
-                && (
-                    searchedEvent.eventAdmin !== userId
-                    && !(
-                            searchedEvent.eventOrganizers
-                                         .includes( userId )
-                        )
-                    && !(
-                        searchedEvent.willJoin
-                                     .includes( userId )
-                       )
-                    && !(
-                        searchedEvent.joined
-                                     .includes( userId )
-                       )
-                )
-            )
+            !storyOwner
+            || storyOwner.blockedUsers.includes( req.user._id.toString() )
         ){
-            return res.status( 404 ).json(
+            return res.status( 401 ).json(
                 {
                     error: true,
-                    message: "Event not found"
+                    message: "Unauthorized"
                 }
             );
         }
 
-        const afterEvent = searchedEvent.afterEvent
-                                        .find(
-                                            afterEventObject =>
-                                                afterEventObject._id
-                                                                .toString() === afterEventId
-                                        );
-        if( !afterEvent ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "AfterEvent Not Found"
-                }
-            );
-        }
+        const comment = story.comments
+                              .find(
+                                  commentObject =>
+                                    commentObject._id
+                                                 .toString() === commentId
+                               );
 
-        const comment = afterEvent.comments
-                                  .find(
-                                     commentObject =>
-                                         commentObject._id
-                                                      .toString() === commentId
-                                   );
         if( !comment ){
             return res.status( 404 ).json(
                 {
@@ -189,7 +167,7 @@ const getRepliesOfAfterEventCommentController = async ( req, res ) => {
             return res.status( 200 ).json(
                 {
                     error: false,
-                    message: "reply Prepared succesfully",
+                    message: "Reply List Prepared Succesfully",
                     replyCount: replies.length,
                     replies: resultreplyData
                 }
@@ -203,14 +181,14 @@ const getRepliesOfAfterEventCommentController = async ( req, res ) => {
             );
         }
     }catch( err ){
-        console.log("ERROR: getAfterEventListController - ", err);
-        res.status(500).json(
+        console.log("ERROR: getStoryCommentRepliesController - ", err);
+        return res.status(500).json(
             {
                 error: true,
-                message: "Internal Server Error",
+                message: "Internal server error"
             }
         );
     }
 }
 
-export default getRepliesOfAfterEventCommentController;
+export default getStoryCommentRepliesController;

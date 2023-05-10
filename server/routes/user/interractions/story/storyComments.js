@@ -6,6 +6,8 @@ import auth from "../../../../middleware/auth.js";
 import storyCreateCommentOrReplyCommentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/storyCreateCommentOrReplyCommentController.js";
 import storyEditCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/storyEditCommentOrReplyController.js";
 import storyDeleteCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/storyDeleteCommentOrReplyController.js";
+import getStoryCommentsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/getStoryCommentsController.js";
+import getStoryCommentRepliesController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/getStoryCommentRepliesController.js"
 
 const router = express.Router();
 
@@ -28,6 +30,20 @@ router.delete(
     "/:storyId",
     auth,
     storyDeleteCommentOrReplyController
+);
+
+//get comments
+router.get(
+    "/:storyId/:skip/:limit",
+    auth,
+    getStoryCommentsController
+);
+
+//get replies
+router.get(
+    "/getReplies/:storyId/:commentId/:skip/:limit",
+    auth,
+    getStoryCommentRepliesController
 );
 
 export default router;
