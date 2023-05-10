@@ -4,6 +4,7 @@ import afterEventEditCommentOrReplyController from "../../../../controllers/user
 import afterEventDeleteCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventDeleteCommentOrReplyController.js";
 import afterEventLikeCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/afterEventLikeCommentOrReplyController.js";
 import getAfterEventCommentsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/getAfterEventCommentsController.js";
+import getRepliesOfAfterEventCommentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/afterEventCommentOperationsControllers/getRepliesOfAfterEventCommentController.js"
 
 import express from "express";
 import dotenv from "dotenv";
@@ -43,9 +44,16 @@ router.put(
 
 //get comment list by afterEvent Id
 router.get(
-    "getComments/:eventId/:contentId",
+    "getComments/:eventId/:contentId/:skip/:limit",
     auth,
     getAfterEventCommentsController
+);
+
+//To Do: get comment replyies
+router.get(
+    "getReplies/:eventId/:contentId/:commentId/:skip/:limit",
+    auth,
+    getRepliesOfAfterEventCommentController
 );
 
 export default router;

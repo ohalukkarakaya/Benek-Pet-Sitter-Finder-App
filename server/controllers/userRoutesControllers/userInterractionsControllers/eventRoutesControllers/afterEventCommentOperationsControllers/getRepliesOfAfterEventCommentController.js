@@ -1,21 +1,23 @@
 import Event from "../../../../../models/Event/Event.js";
 import User from "../../../../../models/User.js";
 
-const getAfterEventCommentsController = async ( req, res ) => {
+const getRepliesOfAfterEventCommentController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
         const eventId = req.params.eventId.toString();
         const afterEventId = req.params.contentId.toString();
-        let skip = parseInt( req.params.skip ) || 0;
-        let limit = parseInt( req.params.limit ) || 15;
+        const commentId = req.params.commentId.toString();
+        const skip = parseInt( req.params.skip ) || 0;
+        const limit = parseInt( req.params.limit ) || 15;
         if(
             !eventId
             || !afterEventId
+            || !commentId
         ){
             return res.status( 400 ).json(
                 {
                     error: true,
-                    message: "Missing Param"
+                    message: "Missing Params"
                 }
             );
         }
@@ -45,7 +47,7 @@ const getAfterEventCommentsController = async ( req, res ) => {
             return res.status( 404 ).json(
                 {
                     error: true,
-                    message: "Event Not Found"
+                    message: "Event not found"
                 }
             );
         }
@@ -63,65 +65,78 @@ const getAfterEventCommentsController = async ( req, res ) => {
             );
         }
 
-        let comments;
-        if( skip = 0 ){
-            const usersComments = afterEvent.comments.filter(
-                commentObject =>
-                    commentObject.userId.toString() === userId
+        const comment = afterEvent.find(
+            commentObject =>
+                commentObject._id.toString() === commentId
+        );
+        if( !comment ){
+            return res.status( 404 ).json(
+                {
+                    error: true,
+                    message: "Comment Not Found"
+                }
+            );
+        }
+
+        let replies;
+        if( skip === 0 ){
+            const usersReplies = comment.replies.filter(
+                replyObject =>
+                    replyObject.userId.toString() === userId
             );
 
-            limit = limit - usersComments.length;
-            comments = usersComments;
+            limit = limit - usersReplies.length;
+            replies = usersReplies;
         }
 
         if( limit >= 0 ){
-            const commentList = afterEvent.comments
-                                          .reverse()
-                                          .filter(
-                                            commentObject =>
-                                                commentObject.userId.toString() !== userId
-                                          );
-            const startIndex = commentList.length - skip - 1;
+            const replyList = comment.replies
+                                     .reverse()
+                                     .filter(
+                                        replyObject =>
+                                            replyObject.userId.toString() !== userId
+                                      );
+            const startIndex = replyList.length - skip - 1;
             const endIndex = startIndex + limit;
 
-            const limitedComments = commentList.slice( startIndex, endIndex );
+            const limitedReplies = replyList.slice( startIndex, endIndex );
 
-            comments.push( limitedComments );
+            replies.push( limitedReplies );
         }
 
-        if( comments.length > 0 ){
-            comments.forEach(
-                async ( commentObject) => {
-                    const commentedUser = await User.findById( commentObject.userId.toString() );
-                    const commentedUserInfo = {
+        if( replies.length > 0 ){
+            replies.forEach(
+                async ( replyObject) => {
+                    const repliedUser = await User.findById( replyObject.userId.toString() );
+                    const repliedUserInfo = {
                     
-                        userId: commentedUser._id
-                                             .toString(),
-                        userProfileImg: commentedUser.profileImg
-                                                     .imgUrl,
-                        username: commentedUser.userName,
+                        userId: repliedUser._id
+                                           .toString(),
+                        userProfileImg: repliedUser.profileImg
+                                                   .imgUrl,
+                        username: repliedUser.userName,
                         userFullName: `${
-                                commentedUser.identity
-                                             .firstName
+                                repliedUser.identity
+                                           .firstName
                             } ${
-                                commentedUser.identity
-                                             .middleName
+                                repliedUser.identity
+                                           .middleName
                             } ${
-                                commentedUser.identity
-                                             .lastName
+                                repliedUser.identity
+                                           .lastName
                             }`.replaceAll( "  ", " ")
                     }
-                    commentObject.user = commentedUserInfo;
-                    delete commentObject.userId;
+                    replyObject.user = repliedUserInfo;
+                    delete replyObject.userId;
 
                     let firstFiveOfLikeLimit = 5;
-                    
+
                     if( replyObject.likes.length < 5 ){
                         firstFiveOfLikeLimit = replyObject.likes.length;
                     }
 
                     for( let i = 0; i <= firstFiveOfLikeLimit; i++ ){
-                        const likedUser = await User.findById( commentObject.likes[ i ].toString() );
+                        const likedUser = await User.findById( replyObject.likes[ i ].toString() );
                         const likedUserInfo = {
                         
                             userId: likedUser._id
@@ -141,41 +156,38 @@ const getAfterEventCommentsController = async ( req, res ) => {
                                 }`.replaceAll( "  ", " ")
                         }
     
-                        commentObject.firstFiveLikedUser.push( likedUserInfo );
+                        replyObject.firstFiveLikedUser.push( likedUserInfo );
                     }
 
                     const replyCount = commentObject.replies.length;
-                    const lastReply = commentObject.replies.pop();
                     
-                    commentObject.lastReply = lastReply;
-                    commentObject.replyCount = replyCount;
-                    delete commentObject.replies;
+                    replyObject.replyCount = replyCount;
                 }
             );
 
-            const usersComments = comments.filter(
-                commentObject =>
-                    commentObject.user.userId === userId
+            const usersReplies = replies.filter(
+                replyObject =>
+                    replyObject.user.userId === userId
             ).sort(
                 ( a, b ) => 
                     b.createdAt - a.createdAt
             );
 
-            const otherComments = comments.filter(
-                commentObject =>
-                    commentObject.user.userId !== userId
+            const otherReplies = replies.filter(
+                replyObject =>
+                    replyObject.user.userId !== userId
             ).sort(
                 ( a, b ) => 
                     b.createdAt - a.createdAt
             );
 
-            const resultCommentData = [...usersComments, ...otherComments];
+            const resultreplyData = [...usersReplies, ...otherReplies];
             return res.status( 200 ).json(
                 {
                     error: false,
-                    message: "Comments Prepared succesfully",
-                    commentCount: comments.length,
-                    comments: resultCommentData
+                    message: "reply Prepared succesfully",
+                    replyCount: replies.length,
+                    replies: resultreplyData
                 }
             );
         }else{
@@ -186,16 +198,15 @@ const getAfterEventCommentsController = async ( req, res ) => {
                 }
             );
         }
-        
     }catch( err ){
-        console.log("ERROR: getAfterEventCommentsController - ", err);
-        return res.status(500).json(
+        console.log("ERROR: getAfterEventListController - ", err);
+        res.status(500).json(
             {
                 error: true,
-                message: "Internal server error"
+                message: "Internal Server Error",
             }
         );
     }
 }
 
-export default getAfterEventCommentsController;
+export default getRepliesOfAfterEventCommentController;
