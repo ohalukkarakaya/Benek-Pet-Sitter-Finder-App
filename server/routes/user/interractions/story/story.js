@@ -8,6 +8,8 @@ import storyCommentEndpoints from "./storyComments.js";
 import createStoryController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyControllers/createStoryController.js";
 import deleteStoryController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyControllers/deleteStoryController.js";
 import likeStoryController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyControllers/likeStoryController.js";
+import getStoryByUserIdController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyControllers/getStoryByUserIdController.js";
+import getRecomendedStoryListController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyControllers/getRecomendedStoryListController.js";
 
 dotenv.config();
 
@@ -33,6 +35,19 @@ router.put(
     "/:storyId",
     auth,
     likeStoryController
+);
+
+//get story by user Id
+router.get(
+    "/:getStoryByUserId/:userId",
+    auth,
+    getStoryByUserIdController
+);
+
+router.get(
+    "/getRecomendedStoryList/:skip/:limit",
+    auth,
+    getRecomendedStoryListController
 );
 
 router.use("comments", storyCommentEndpoints);
