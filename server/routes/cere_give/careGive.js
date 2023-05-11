@@ -15,6 +15,7 @@ import cancelCareGiveController from "../../controllers/careGiveRoutesController
 import giveStarToCareGiverController from "../../controllers/careGiveRoutesControllers/careGiveControllers/giveStarToCareGiverController.js";
 import getCareGiveInvitationsController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getCareGiveInvitationsController.js";
 import getSendedCareGiveInvitationsController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getSendedCareGiveInvitationsController.js";
+import getCareGiveListController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getCareGiveListController.js";
 
 dotenv.config();
 
@@ -53,6 +54,13 @@ router.put(
     "/start/:careGiveId",
     auth,
     startCareGiveController
+);
+
+//get careGive
+router.get(
+    "/getCareGiveList/:skip/:limit",
+    auth,
+    getCareGiveListController
 );
 
 //extend care give
