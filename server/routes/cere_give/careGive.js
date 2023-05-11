@@ -13,6 +13,8 @@ import extendCareGiveController from "../../controllers/careGiveRoutesController
 import finishCareGiveController from "../../controllers/careGiveRoutesControllers/careGiveControllers/finishCareGiveController.js";
 import cancelCareGiveController from "../../controllers/careGiveRoutesControllers/careGiveControllers/cancelCareGiveController.js";
 import giveStarToCareGiverController from "../../controllers/careGiveRoutesControllers/careGiveControllers/giveStarToCareGiverController.js";
+import getCareGiveInvitationsController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getCareGiveInvitationsController.js";
+import getSendedCareGiveInvitationsController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getSendedCareGiveInvitationsController.js";
 
 dotenv.config();
 
@@ -23,6 +25,20 @@ router.post(
     "/",
     auth,
     careGiveInvitationController
+);
+
+//get care give invitations
+router.get(
+    "/invitations",
+    auth,
+    getCareGiveInvitationsController
+);
+
+//get sended care give invitations
+router.get(
+    "/sendedInvitations",
+    auth,
+    getSendedCareGiveInvitationsController
 );
 
 //accept invitation

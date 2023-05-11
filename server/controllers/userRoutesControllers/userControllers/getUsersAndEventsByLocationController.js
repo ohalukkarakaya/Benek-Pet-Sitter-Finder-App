@@ -182,6 +182,9 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                     delete item.blockedUsers;
                     delete item.saved;
                     delete item.identity.nationalId;
+                    delete item.identity.openAdress;
+                    delete item.phone;
+                    delete item.email;
                     
                     item.dependedUsers.forEach(
                         async ( dependedId ) => {

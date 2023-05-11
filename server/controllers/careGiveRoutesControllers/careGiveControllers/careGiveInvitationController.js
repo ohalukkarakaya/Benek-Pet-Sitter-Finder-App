@@ -6,7 +6,9 @@ import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
 const rawPricingDataset = require('../../../src/care_give_pricing.json');
-const pricingDataset = JSON.parse(JSON.stringify(rawPricingDataset));
+const pricingDataset = JSON.parse(
+                            JSON.stringify( rawPricingDataset )
+                       );
 
 dotenv.config();
 
@@ -188,7 +190,7 @@ const careGiveInvitationController = async (req, res) => {
                     return res.status(200).json(
                         {
                             error: false,
-                            message: `user with th id "${req.body.ownerId}" invented to careGive`
+                            message: `user with the id "${req.body.ownerId}" invented to careGive`
                         }
                     );
                 }

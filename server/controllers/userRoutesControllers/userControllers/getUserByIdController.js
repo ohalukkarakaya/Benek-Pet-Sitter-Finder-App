@@ -47,6 +47,9 @@ const getUserByIdController = async ( req, res ) => {
         delete searchedUser.blockedUsers;
         delete searchedUser.saved;
         delete item.identity.nationalId;
+        delete item.identity.openAdress;
+        delete item.phone;
+        delete item.email;
                 
         searchedUser.dependedUsers.forEach(
             async ( dependedId ) => {
