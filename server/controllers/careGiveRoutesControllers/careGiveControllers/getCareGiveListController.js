@@ -10,8 +10,18 @@ const getCareGiveListController = async ( req, res ) => {
 
         const careGiveQuery = {
             $or: [
-                { "invitation.from": userId },
-                { "invitation.to" : userId },
+                { 
+                    $and: [
+                        { "invitation.from": userId },
+                        { "finishProcess.isFinished": false }
+                    ] 
+                },
+                { 
+                    $and: [
+                        { "invitation.to": userId },
+                        { "finishProcess.isFinished": false }
+                    ] 
+                },
             ]
         };
 
@@ -137,7 +147,6 @@ const getCareGiveListController = async ( req, res ) => {
                     adress: careGive.adress,
                     actionCode: code,
                     isStarted: careGive.isStarted,
-                    finishProcess: careGive.finishProcess,
                     price: price,
                     missionCount: careGive.missionCallender.length
                 }
