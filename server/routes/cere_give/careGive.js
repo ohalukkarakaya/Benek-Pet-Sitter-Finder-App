@@ -29,14 +29,14 @@ router.post(
 
 //get care give invitations
 router.get(
-    "/invitations",
+    "/invitations/:skip/:limit",
     auth,
     getCareGiveInvitationsController
 );
 
 //get sended care give invitations
 router.get(
-    "/sendedInvitations",
+    "/sendedInvitations/:skip/:limit",
     auth,
     getSendedCareGiveInvitationsController
 );
