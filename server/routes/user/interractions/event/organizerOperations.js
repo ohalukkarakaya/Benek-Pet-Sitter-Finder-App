@@ -19,14 +19,14 @@ router.post(
 
 //get organizer invitations by user Id
 router.get(
-    "/getInvitations",
+    "/getInvitations/:skip/:limit",
     auth,
     getOrganizerInvitationsController
 );
 
 //get sended organizer invitations by user id
 router.get(
-    "/getSendedInvitations",
+    "/getSendedInvitations/:skip/:limit",
     auth,
     getSendedOrganizerInvitationsController
 );

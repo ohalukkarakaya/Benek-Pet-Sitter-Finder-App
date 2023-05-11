@@ -9,13 +9,15 @@ const getSendedCareGiveInvitationsController = async ( req, res ) => {
         const skip = parseInt( req.params.skip ) || 0;
         const limit = parseInt( req.params.limit ) || 15;
 
-        const invitedCareGives = await CareGive.find(
-            {
-                "invitation.from": userId,
-                "invitation.isAccepted": false
-            }
-        ).skip( skip )
-         .limit( limit );
+        const invitationQuery = {
+            "invitation.from": userId,
+            "invitation.isAccepted": false
+        }
+        const invitedCareGives = await CareGive.find( invitationQuery )
+                                               .skip( skip )
+                                               .limit( limit );
+
+        const totalInvitationCount = await CareGive.countDocuments( invitationQuery );
 
         if( 
             !invitedCareGives
@@ -92,6 +94,7 @@ const getSendedCareGiveInvitationsController = async ( req, res ) => {
             {
                 error: false,
                 message: "Sended Care Give Inventations Listed",
+                totalInvitationCount: totalInvitationCount,
                 invitations: invitedCareGives
             }
         );

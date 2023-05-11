@@ -5,13 +5,13 @@ import PetHandOverInvitation from "../../../models/ownerOperations/PetHandOverIn
 const getPetSendedHandOverInvitationsController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
+        const skip = parseInt( req.params.skip ) || 0;
+        const limit = parseInt( req.params.limit ) || 15;
 
-        const invitations = await PetHandOverInvitation.find(
-            {
-                from: userId
-            }
-        );
+        invitationQuery = { from: userId };
+        const invitations = await PetHandOverInvitation.find( invitationQuery );
 
+        const totalInvitationCount = await PetHandOverInvitation.countDocuments( invitationQuery );
         if( invitations.length <= 0 ){
             return res.status( 404 ).json(
                 {
@@ -74,6 +74,7 @@ const getPetSendedHandOverInvitationsController = async ( req, res ) => {
             {
                 error: true,
                 message: "Sended Invitation List Prepared Succesfully",
+                totalInvitationCount: totalInvitationCount,
                 invitations: invitations
             }
         );

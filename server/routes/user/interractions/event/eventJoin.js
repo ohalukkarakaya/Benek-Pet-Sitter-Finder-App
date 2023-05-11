@@ -45,14 +45,14 @@ router.put(
 
 //get event invitations by user id
 router.get(
-    "/getInvitationList",
+    "/getInvitationList/:skip/:limit",
     auth,
     getEventInvitationsController
 );
 
 //get sended event invitations by user id
 router.get(
-    "/getInvitationList",
+    "/getInvitationList/:skip/:limit",
     auth,
     getSendedEventInvitationsController
 );

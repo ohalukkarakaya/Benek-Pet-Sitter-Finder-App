@@ -4,12 +4,15 @@ import OrganizerInvitation from "../../../../../models/Event/Invitations/InviteO
 const getSendedOrganizerInvitationsController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
+        const skip = parseInt( req.params.skip ) || 0;
+        const limit = parseInt( req.params.limit ) || 15;
 
-        const organizerInvitations = await OrganizerInvitation.find(
-            {
-                eventAdmin: userId
-            }
-        );
+        const invitationQuery = { eventAdmin: userId };
+        const organizerInvitations = await OrganizerInvitation.find( invitationQuery )
+                                                              .skip( skip )
+                                                              .limit( limit );
+
+        const totalInvitationCount = await OrganizerInvitation.countDocuments( invitationQuery );
 
         if( organizerInvitations.length <= 0 ){
             return res.status( 404 ).json(
@@ -82,6 +85,7 @@ const getSendedOrganizerInvitationsController = async ( req, res ) => {
             {
                 error: false,
                 message: "Invitation list prepared succesfully",
+                totalInvitationCount: totalInvitationCount,
                 organizerInvitations: organizerInvitations
             }
         );

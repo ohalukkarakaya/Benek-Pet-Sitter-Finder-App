@@ -5,12 +5,15 @@ import SecondaryOwnerInvitation from "../../../models/ownerOperations/SecondaryO
 const getSecondaryOwnerInvitationsController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
+        const skip = parseInt( req.params.skip ) || 0;
+        const limit = parseInt( req.params.limit ) || 15;
 
-        const invitations = await SecondaryOwnerInvitation.find(
-            {
-                to: userId
-            }
-        );
+        const invitationQuery = { to: userId };
+        const invitations = await SecondaryOwnerInvitation.find( invitationQuery )
+                                                          .skip( skip )
+                                                          .limit( limit );
+
+        const totalInvitationCount = await SecondaryOwnerInvitation.countDocuments( invitationQuery );
 
         if( invitations.length <= 0 ){
             return res.status( 404 ).json(
@@ -75,6 +78,7 @@ const getSecondaryOwnerInvitationsController = async ( req, res ) => {
             {
                 error: true,
                 message: "Releated Invitation List Prepared Succesfully",
+                totalInvitationCount: totalInvitationCount,
                 invitations: invitations
             }
         );
