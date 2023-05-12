@@ -18,6 +18,11 @@ import getSendedCareGiveInvitationsController from "../../controllers/careGiveRo
 import getCareGiveListController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getCareGiveListController.js";
 import getCareGiveController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getCareGiveController.js";
 import getFinishedCareGiveListController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getFinishedCareGiveListController.js";
+import getPetOwnerCareGiveListController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getPetOwnerCareGiveListController.js";
+import getCareGiverCareGiveListController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getCareGiverCareGiveListController.js";
+import getCareGiverFinishedCareGiveListController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getCareGiverFinishedCareGiveListController.js";
+import getPetOwnerFinishedCareGiveListController from "../../controllers/careGiveRoutesControllers/careGiveControllers/getPetOwnerFinishedCareGiveListController.js";
+
 
 dotenv.config();
 
@@ -65,11 +70,46 @@ router.get(
     getCareGiveListController
 );
 
+//get finished careGive List
+router.get(
+    "/getFinishedCareGiveList/:skip/:limit",
+    auth,
+    getFinishedCareGiveListController
+);
+
 //get careGive by careGiveId
 router.get(
     "/getCareGive/:careGiveId",
     auth,
     getCareGiveController
+);
+
+//get petOwner careGive List
+router.get(
+    "/getPetOwnerCareGiveList/:skip/:limit",
+    auth,
+    getPetOwnerCareGiveListController
+);
+
+//get petOwner Finished careGive List
+router.get(
+    "/getPetOwnerFinishedCareGiveList/:skip/:limit",
+    auth,
+    getPetOwnerFinishedCareGiveListController
+);
+
+//get CareGiver careGive List
+router.get(
+    "/getCareGiverCareGiveList/:skip/:limit",
+    auth,
+    getCareGiverCareGiveListController
+);
+
+//get CareGiver Finished careGive List
+router.get(
+    "/getCareGiverFinishedCareGiveList/:skip/:limit",
+    auth,
+    getCareGiverFinishedCareGiveListController
 );
 
 //extend care give
@@ -84,13 +124,6 @@ router.put(
     "/finish/:careGiveId",
     auth,
     finishCareGiveController
-);
-
-//get finished careGive List
-router.get(
-    "/getCareGiveList/:skip/:limit",
-    auth,
-    getFinishedCareGiveListController
 );
 
 //cancel careGive
