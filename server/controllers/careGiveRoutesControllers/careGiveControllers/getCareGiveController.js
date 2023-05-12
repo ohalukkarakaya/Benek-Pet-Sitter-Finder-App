@@ -155,7 +155,7 @@ const getCareGiveController = async ( req, res ) => {
             isStarted: careGive.isStarted,
             isFinished: careGive.finishProcess
                                 .isFinished,
-            finish: careGive.finishProcess
+            finishDate: careGive.finishProcess
                             .finishDate,
             price: price,
             missionCount: careGive.missionCallender

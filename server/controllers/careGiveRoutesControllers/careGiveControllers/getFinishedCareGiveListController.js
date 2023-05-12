@@ -151,6 +151,10 @@ const getFinishedCareGiveListController = async ( req, res ) => {
                     adress: careGive.adress,
                     actionCode: code,
                     isStarted: careGive.isStarted,
+                    isFinished: careGive.finishProcess
+                                .isFinished,
+                    finishDate: careGive.finishProcess
+                                        .finishDate,
                     price: price,
                     missionCount: careGive.missionCallender.length
                 }
