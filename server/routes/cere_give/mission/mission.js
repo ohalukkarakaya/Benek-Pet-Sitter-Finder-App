@@ -45,6 +45,10 @@ router.put(
     reportMissionController
 );
 
+//To Do: get mission list
+
+//To Do: get mission detail
+
 router.use("/schedule", scheduleMissionEndPoints);
 
 export default router;

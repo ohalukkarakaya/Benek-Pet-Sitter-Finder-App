@@ -2,7 +2,7 @@ import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
 
-const getCareGiveListController = async ( req, res ) => {
+const getFinishedCareGiveListController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
         const skip = parseInt( req.params.skip ) || 0;
@@ -13,13 +13,13 @@ const getCareGiveListController = async ( req, res ) => {
                 { 
                     $and: [
                         { "invitation.from": userId },
-                        { "finishProcess.isFinished": false }
+                        { "finishProcess.isFinished": true }
                     ] 
                 },
                 { 
                     $and: [
                         { "invitation.to": userId },
-                        { "finishProcess.isFinished": false }
+                        { "finishProcess.isFinished": true }
                     ] 
                 },
             ]
@@ -168,7 +168,7 @@ const getCareGiveListController = async ( req, res ) => {
             }
         );
     }catch( err ){
-        console.log("ERROR: getCareGiveListController - ", err);
+        console.log("ERROR: getFinishedCareGiveListController - ", err);
         res.status(500).json(
             {
                 error: true,
@@ -178,4 +178,4 @@ const getCareGiveListController = async ( req, res ) => {
     }
 }
 
-export default getCareGiveListController;
+export default getFinishedCareGiveListController;
