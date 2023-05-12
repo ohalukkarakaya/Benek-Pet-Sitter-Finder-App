@@ -1,8 +1,6 @@
 import CareGive from "../../../../models/CareGive/CareGive.js";
 
-import dotenv from "dotenv";
-
-dotenv.config();
+import crypto from "crypto";
 
 const getTimeCodeForUploadMissionController = async (req, res) => {
     try{
@@ -63,11 +61,7 @@ const getTimeCodeForUploadMissionController = async (req, res) => {
             );
         }
 
-        const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-        let password = "";
-        for (let i = 0; i < 6; i++) {
-            password += characters[Math.floor(Math.random() * characters.length)];
-        }
+        let password = crypto.randomBytes(3).toString('hex').toUpperCase();
 
         if(password !== ""){
             mission.missionContent.timeSignature.timePassword = password;

@@ -107,34 +107,34 @@ const addMemberToChatController = async (req, res) => {
         const areThereChatWithSameMembers = await Chat.find(
             {
                 $and: [
-                  { 'members.userId': { $in: memberList } },
-                  {
-                    'members.userId': {
-                        $nin: memberUserIdList.filter(
-                                                id => 
-                                                  id !== null 
-                                                  && id !== undefined
-                                               ) 
-                    } 
-                 },
-                 {
-                   $where: `this.members.length === ${ memberList.length } 
-                            && new Set(
-                                this.members.map(
+                    { 'members.userId': { $in: memberList } },
+                    {
+                        'members.userId': {
+                            $nin: memberUserIdList.filter(
+                                                    id => 
+                                                    id !== null 
+                                                    && id !== undefined
+                                                ) 
+                        } 
+                    },
+                    {
+                    $where: `this.members.length === ${ memberList.length } 
+                                && new Set(
+                                    this.members.map(
+                                        member => 
+                                            member.userId
+                                    )
+                                ).size === ${ memberList.length }
+                                && this.members.map(
                                     member => 
                                         member.userId
-                                )
-                            ).size === ${ memberList.length }
-                            && this.members.map(
-                                member => 
-                                    member.userId
-                            ).every(
-                                ( item ) => 
-                                    new Set(
-                                        ${ JSON.stringify( memberList ) }
-                                    ).has( item )
-                            )`
-                 }
+                                ).every(
+                                    ( item ) => 
+                                        new Set(
+                                            ${ JSON.stringify( memberList ) }
+                                        ).has( item )
+                                )`
+                    }
                 ]
             }
         );

@@ -10,6 +10,9 @@ import getTimeCodeForUploadMissionController from "../../../controllers/careGive
 import uploadMissionController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/uploadMissionController.js";
 import approveMissionController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/approveMissionController.js";
 import reportMissionController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/reportMissionController.js";
+import getMissionListByCareGiveIdController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/getMissionListByCareGiveIdController.js";
+import getMissionCallenderController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/getMissionListByCareGiveIdController.js";
+import getMissionCallenderByPetIdController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/getMissionCallenderByPetIdController.js";
 
 dotenv.config();
 
@@ -45,9 +48,26 @@ router.put(
     reportMissionController
 );
 
-//To Do: get mission list
+//get mission list by careGiveId
+router.get(
+    "/getMissionCalenderByCareGiveId/:careGiveId/:skip/:limit",
+    auth,
+    getMissionListByCareGiveIdController
+);
 
-//To Do: get mission detail
+//get releated missions by userId
+router.get(
+    "/getMissionCalender/:skip/:limit",
+    auth,
+    getMissionCallenderController
+);
+
+//get missions by pet id
+router.get(
+    "/getMissionCalenderByPetId/:petId/:skip/:limit",
+    auth,
+    getMissionCallenderByPetIdController
+);
 
 router.use("/schedule", scheduleMissionEndPoints);
 
