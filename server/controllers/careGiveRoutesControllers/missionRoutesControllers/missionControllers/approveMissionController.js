@@ -1,3 +1,6 @@
+import CareGive from "../../../../models/CareGive/CareGive.js";
+
+import sendNotification from "../../../../utils/sendNotification.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -16,7 +19,7 @@ const approveMissionController = async (req, res) => {
             );
         }
 
-        const careGive = await careGive.findById(careGiveId.toString());
+        const careGive = await CareGive.findById(careGiveId.toString());
         if(!careGive){
             return res.status(404).json(
                 {
@@ -25,13 +28,20 @@ const approveMissionController = async (req, res) => {
                 }
             );
         }
-        if(careGive.petOwner.petOwnerId.toString() !== req.user._id.toString()){
-            return res.status(401).json(
-                {
-                    error: true,
-                    message: "You are not authorized to approve this mission"
-                }
-            );
+        if(
+            careGive.petOwner
+                    .petOwnerId
+                    .toString() !== req.user
+                                       ._id
+                                       .toString()
+        ){
+            return res.status( 401 )
+                      .json(
+                            {
+                                error: true,
+                                message: "You are not authorized to approve this mission"
+                            }
+                      );
         }
 
         const mission = careGive.missionCallender.find(
@@ -46,25 +56,50 @@ const approveMissionController = async (req, res) => {
                 }
             );
         }
-        if(!mission.missionContent.videoUrl){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "mission content not uploaded"
-                }
-            );
+        if(
+            !mission.missionContent
+                    .videoUrl
+        ){
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "mission content not uploaded"
+                            }
+                       );
         }
 
-        mission.missionContent.isApproved = true;
-        careGive.markModified("missionCallender");
-        careGive.save().then(
-            (_) => {
-                return res.status(200).json(
-                    {
-                        error: false,
-                        message: "mission approved succesfully"
-                    }
+        mission.missionContent
+               .isApproved = true;
+
+        careGive.markModified( "missionCallender" );
+        careGive.save()
+                .then(
+            async ( savedCareGive ) => {
+
+                await sendNotification(
+                    savedCareGive.petOwner
+                                 .petOwnerId
+                                 .toString(),
+                    savedCareGive.careGiver
+                                 .careGiverId
+                                 .toString(),
+                    "missionAprove",
+                    missionId.toString(),
+                    "careGive",
+                    savedCareGive._id
+                                 .toString(),
+                    null,
+                    null
                 );
+
+                return res.status( 200 )
+                          .json(
+                                {
+                                    error: false,
+                                    message: "mission approved succesfully"
+                                }
+                           );
             }
         ).catch(
             (error) => {

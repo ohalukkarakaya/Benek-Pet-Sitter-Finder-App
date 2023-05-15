@@ -1,6 +1,7 @@
 import CareGive from "../../../../models/CareGive/CareGive.js";
 import User from "../../../../models/User.js";
 
+import sendNotification from "../../../../utils/sendNotification.js";
 import paramPayWithRegisteredCard from "../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
 import paramPayRequest from "../../../../utils/paramRequests/paymentRequests/paramPayRequest.js";
 import paramRegisterCreditCardRequest from "../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
@@ -334,13 +335,41 @@ const scheduleMissionController = async (req, res) => {
         );
         careGive.markModified("missionCallender");
         careGive.save().then(
-            (savedMission) => {
-                if(savedMission){
+            async ( savedCareGive ) => {
+
+                const savedMission = savedCareGive.missionCallender
+                                                  .find(
+                                                        missionObject =>
+                                                            missionObject.missionDesc === missionDesc
+                                                            && missionObject.missionDate === missionDate
+                                                            && missionDeadline === Date.parse(missionDate + 1*60*60*1000)
+                                                    );
+
+                if( savedMission ){
+                    
+                    await sendNotification(
+                        savedCareGive.petOwner
+                                     .petOwnerId
+                                     .toString(),
+                        savedCareGive.careGiver
+                                     .careGiverId
+                                     .toString(),
+                        "newMission",
+                        savedMission._id
+                                    .toString(),
+                        "careGive",
+                        savedCareGive._id
+                                     .toString(),
+                        null,
+                        null
+                    );
+
                     return res.status(200).json(
                         {
                             error: false,
                             message: "mission inserted succesfully",
-                            missionId :savedMission._id.toString()
+                            savedCareGiveId :savedCareGive._id.toString(),
+                            savedMissionId: savedMission._id.toString()
                         }
                     );
                 }

@@ -19,7 +19,6 @@ const sendNotification = async (
             || contentType === "newMission"
             || contentType === "missionUpload"
             || contentType === "missionAprove"
-            || contentType === "emergency"
         ){
             if(
                 !parentContentId
@@ -85,6 +84,7 @@ const sendNotification = async (
             || contentType === "careGiveInvitation"
             || contentType === "secondaryPetOwnerInvitation"
             || contentType === "petHandOverInvitation"
+            || contentType === "emergency"
         ){
             notificationData = {
                 from: fromUserId.toString(),

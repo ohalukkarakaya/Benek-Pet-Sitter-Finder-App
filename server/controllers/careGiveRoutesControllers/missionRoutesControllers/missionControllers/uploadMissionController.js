@@ -1,3 +1,4 @@
+import sendNotification from "../../../../utils/sendNotification.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -5,12 +6,17 @@ dotenv.config();
 const uploadMissionController = async (req, res) => {
     try{
         const careGive = req.careGive;
-        const mission = req. mission;
+        const mission = req.mission;
         const cdnUrl = req.cdnUrl;
         const fileName = req.missionContent;
         
-        if(!careGive || !mission || !cdnUrl || !fileName){
-            return res.status(500).json(
+        if(
+            !careGive 
+            || !mission 
+            || !cdnUrl 
+            || !fileName
+        ){
+            return res.status( 500 ).json(
                 {
                     error: true,
                     message: "Internal server error"
@@ -18,28 +24,53 @@ const uploadMissionController = async (req, res) => {
             );
         }
 
-        mission.missionContent.videoUrl = cdnUrl;
-        careGive.markModified("missionCallender");
-        careGive.save().then(
-            (_) => {
-                return res.status(200).json(
-                    {
-                        error: false,
-                        message: "Mission Content Uploaded",
-                        videoUrl: cdnUrl
+        mission.missionContent
+               .videoUrl = cdnUrl;
+
+        careGive.markModified( "missionCallender" );
+
+        careGive.save()
+                .then(
+                    async ( savedCareGive ) => {
+
+                        await sendNotification(
+                            savedCareGive.careGiver
+                                         .careGiverId
+                                         .toString(),
+                            savedCareGive.petOwner
+                                         .petOwnerId
+                                         .toString(),
+                            "missionUpload",
+                            req.params
+                               .missionId
+                               .toString(),
+                            "careGive",
+                            savedCareGive._id
+                                         .toString(),
+                            null,
+                            null
+                        );
+
+                        return res.status( 200 )
+                                .json(
+                                        {
+                                            error: false,
+                                            message: "Mission Content Uploaded",
+                                            videoUrl: cdnUrl
+                                        }
+                                );
                     }
-                );
-            }
         ).catch(
-            (err) => {
-                if(err){
-                    console.log(err);
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                    );
+            ( err ) => {
+                if( err ){
+                    console.log( err );
+                    return res.status( 500 )
+                              .json(
+                                    {
+                                        error: true,
+                                        message: "Internal server error"
+                                    }
+                              );
                 }
             }
         );

@@ -2,6 +2,7 @@ import CareGive from "../../models/CareGive/CareGive.js";
 import User from "../../models/User.js";
 import Pet from "../../models/Pet.js";
 
+import sendNotification from "../../utils/sendNotification.js";
 import twilio from "twilio";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
@@ -21,94 +22,156 @@ const emergencyController = async (req, res) => {
             );
         }
 
-        const careGive = await CareGive.findById(careGiveId);
-        if(!careGive){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "care give not found"
-                }
-            );
+        const careGive = await CareGive.findById( careGiveId );
+        if( !careGive ){
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "care give not found"
+                            }
+                       );
         }
 
-        if(req.user._id.toString() !== careGive.careGiver.careGiverId.toString()){
-            return res.status(401).json(
-                {
-                    error: true,
-                    message: "You are not authorized for this"
-                }
-            );
+        if(
+            req.user
+               ._id
+               .toString() !== careGive.careGiver
+                                       .careGiverId
+                                       .toString()
+        ){
+            return res.status( 401 )
+                      .json(
+                            {
+                                error: true,
+                                message: "You are not authorized for this"
+                            }
+                        );
         }
 
-        const careGiver = await User.findById(careGive.careGiver.careGiverId.toString());
-        if(!careGiver || careGiver.deactivation.isDeactive){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "care giver not found"
-                }
-            );
+        const careGiver = await User.findById(
+                                            careGive.careGiver
+                                                    .careGiverId
+                                                    .toString()
+                                    );
+        if(
+            !careGiver 
+            || careGiver.deactivation
+                        .isDeactive
+        ){
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "care giver not found"
+                            }
+                       );
         }
 
-        const petOwner = await User.findById( careGive.careGiver.careGiverId.toString() );
-        if(!petOwner || petOwner.deactivation.isDeactive){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "Pet owner not found"
-                }
-            );
+        const petOwner = await User.findById( 
+                                        careGive.careGiver
+                                                .careGiverId
+                                                .toString() 
+                                    );
+        if(
+            !petOwner 
+            || petOwner.deactivation
+                       .isDeactive
+        ){
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Pet owner not found"
+                            }
+                       );
         }
 
-        const pet = await Pet.findById(careGive.petId.toString());
-        if(!pet){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "Pet not found"
-                }
-            );
+        const pet = await Pet.findById(
+                                    careGive.petId
+                                            .toString()
+                              );
+        if( !pet ){
+            return res.status( 404 )
+                      .json(
+                        {
+                            error: true,
+                            message: "Pet not found"
+                        }
+                      );
         }
 
-        let petOwnerPhone = careGive.petOwner.petOwnerContact.petOwnerPhone;
-        if( !careGive.petOwner.petOwnerContact.petOwnerPhone ){
+        let petOwnerPhone = careGive.petOwner
+                                    .petOwnerContact
+                                    .petOwnerPhone;
+
+        if( 
+            !careGive.petOwner
+                     .petOwnerContact
+                     .petOwnerPhone 
+        ){
             petOwnerPhone = petOwner.phone;
         }
 
-        let petOwnerEmail = careGive.petOwner.petOwnerContact.petOwnerEmail;
-        if( !careGive.petOwner.petOwnerContact.petOwnerEmail ){
+        let petOwnerEmail = careGive.petOwner
+                                    .petOwnerContact
+                                    .petOwnerEmail;
+
+        if( 
+            !careGive.petOwner
+                     .petOwnerContact
+                     .petOwnerEmail 
+        ){
             petOwnerEmail = petOwner.email;
         }
 
-        if(!petOwnerPhone && !petOwnerEmail){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "Pet owners contact data not found"
-                }
-            );
+        if(
+            !petOwnerPhone 
+            && !petOwnerEmail
+        ){
+            return res.status( 404 )
+                      .json(
+                        {
+                            error: true,
+                            message: "Pet owners contact data not found"
+                        }
+                      );
         }
 
-        if(petOwnerPhone){
-            const accountSid = process.env.TWILIO_ACCOUNT_SID;
-            const authToken = process.env.TWILIO_AUTH_TOKEN;
-            const client = new twilio(accountSid, authToken);
+        if( petOwnerPhone ){
+            const accountSid = process.env
+                                      .TWILIO_ACCOUNT_SID;
 
-            const from = process.env.TWILIO_PHONE_NUMBER;
+            const authToken = process.env
+                                     .TWILIO_AUTH_TOKEN;
+
+            const client = new twilio( 
+                                    accountSid, 
+                                    authToken
+                               );
+
+            const from = process.env
+                                .TWILIO_PHONE_NUMBER;
+
             const to = petOwnerPhone;
             const body = `"${emergencyMessage}". This is an emergency message from your care giver: ${careGiver.identity.firstName} ${careGiver.identity.lastName}, about your pet: ${pet.name}. Please contact with your care giver immediately with the specified contact information. Phone: ${careGiver.phone}, Email: ${careGiver.email}`;
 
             client.messages
-                    .create({
-                        body: body,
-                        from: from,
-                        to: to
-                    })
-                    .then(message => console.log(message.sid));
+                  .create(
+                        {
+                            body: body,
+                            from: from,
+                            to: to
+                        }
+                   ).then(
+                            message => console.log(
+                                                  message.sid
+                                               )
+                         );
 
         }
 
-        if(petOwnerEmail){
+        if( petOwnerEmail ){
             let transporter = nodemailer.createTransport(
                 {
                   host: process.env.AUTH_EMAIL_HOST,
@@ -117,7 +180,11 @@ const emergencyController = async (req, res) => {
                   dkim: {
                     domainName: process.env.DKIM_DOMAIN,
                     keySelector: process.env.DKIM_SELECTOR,
-                    privateKey: fs.readFileSync(process.env.DKIM_PRIVATE_KEY_FILE_PATH, "utf8"),
+                    privateKey: fs.readFileSync(
+                                        process.env
+                                               .DKIM_PRIVATE_KEY_FILE_PATH, 
+                                        "utf8"
+                                ),
                     cacheDir: '/tmp',
                     cacheTreshold: 2048,
                   },
@@ -141,15 +208,31 @@ const emergencyController = async (req, res) => {
 
               };
 
-              await transporter.sendMail(mailOptions);
+              await transporter.sendMail( mailOptions );
         }
 
-        return res.status(200).json(
-            {
-                error: false,
-                message: "Emergancy message succesfully send to pet owner"
-            }
+        await sendNotification(
+            req.user
+               ._id
+               .toString(),
+            careGive.petOwner
+                    .petOwnerId
+                    .toString(),
+            "emergency",
+            careGiveId.toString(),
+            null,
+            null,
+            null,
+            null
         );
+
+        return res.status( 200 )
+                  .json(
+                        {
+                            error: false,
+                            message: "Emergancy message succesfully send to pet owner"
+                        }
+                   );
     }catch(err){
         console.log(err);
         res.status(500).json(
