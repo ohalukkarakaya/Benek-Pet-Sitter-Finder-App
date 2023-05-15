@@ -87,6 +87,20 @@ io.on(
             }
         );
 
+        //send message
+        socket.on(
+            "sendNotification",
+            ( to, notificationObject ) => {
+                let user = getUser( to );
+                if( user ){
+                    io.to(user.socketId).emit(
+                        "getMessage",
+                        notificationObject
+                    )
+                }
+            }
+        );
+
         //when disconnect
         socket.on(
             "disconnect",
