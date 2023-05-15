@@ -1,7 +1,9 @@
 import Pet from "../../../models/Pet.js";
 import User from "../../../models/User.js";
-import { secondaryOwnerInvitationReqParamsValidation } from "../../../utils/bodyValidation/pets/secondaryOwnerInvitationValidationSchema.js";
 import SecondaryOwnerInvitation from "../../../models/ownerOperations/SecondaryOwnerInvitation.js";
+
+import { secondaryOwnerInvitationReqParamsValidation } from "../../../utils/bodyValidation/pets/secondaryOwnerInvitationValidationSchema.js";
+import sendNotification from "../../../utils/sendNotification.js";
 
 const inviteSecondaryOwnerController = async (req, res) => {
     try{
@@ -52,7 +54,17 @@ const inviteSecondaryOwnerController = async (req, res) => {
                   petId: req.params.petId
                 }
               ).save().then(
-                (invitation) => {
+                async ( invitation ) => {
+                  await sendNotification(
+                      invitation.from.toString(),
+                      invitation.to.toString(),
+                      "secondaryPetOwnerInvitation",
+                      invitation._id.toString(),
+                      null,
+                      null,
+                      null,
+                      null
+                  );
                   return res.status(200).json(
                     {
                       error: false,

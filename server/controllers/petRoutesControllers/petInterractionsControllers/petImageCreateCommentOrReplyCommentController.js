@@ -1,5 +1,6 @@
 import Pet from "../../../models/Pet.js";
 import { petImageCommentValidation } from "../../../utils/bodyValidation/pets/petImageCommentsValidationSchemas.js";
+import sendNotification from "../../../utils/sendNotification.js";
 
 const petImageCreateCommentOrReplyCommentController = async (req, res) => {
     try{
@@ -42,12 +43,49 @@ const petImageCreateCommentOrReplyCommentController = async (req, res) => {
                         reply: req.body.comment
                     }
                 );
+
+                const insertedReply = image.comments.find(
+                    comment =>
+                        comment._id.toString() === req.body.commentId.toString()
+                ).replies.find(
+                    reply =>
+                        reply.userId === req.user._id
+                        && reply.reply === req.body.comment
+                );
+
+                await sendNotification(
+                    req.user._id.toString(),
+                    pet.primaryOwner.toString(),
+                    "petImageReply",
+                    insertedReply._id.toString(),
+                    "petImageComment",
+                    req.body.commentId.toString(),
+                    "petImage",
+                    image._id.toString()
+                );
             }else{
                 image.comments.push(
                     {
                         userId: req.user._id,
                         comment: req.body.comment
                     }
+                );
+
+                const insertedComment = image.comments.find(
+                    comment =>
+                        comment.userId === req.user._id.toString()
+                        && comment.comment === commentDesc
+                );
+
+                await sendNotification(
+                    req.user._id.toString(),
+                    pet.primaryOwner.toString(),
+                    "petImageComment",
+                    insertedComment._id.toString(),
+                    "petImage",
+                    image._id.toString(),
+                    null,
+                    null
                 );
             }
 

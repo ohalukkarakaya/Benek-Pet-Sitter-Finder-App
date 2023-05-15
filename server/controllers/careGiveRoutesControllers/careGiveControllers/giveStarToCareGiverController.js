@@ -1,5 +1,7 @@
 import User from "../../../models/User.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
+
+import sendNotification from "../../../utils/sendNotification.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -9,8 +11,10 @@ const giveStarToCareGiverController = async (req, res) => {
         const careGiveId = req.params
                               .careGiveId;
 
-        const star = req.params
-                        .star;
+        const star = parseInt(
+                        req.params
+                           .star
+                     );
 
         if(
             !careGiveId
@@ -101,7 +105,20 @@ const giveStarToCareGiverController = async (req, res) => {
         );
         careGiver.markModified( "stars" );
         careGiver.save().then(
-            (_) => {
+            async (_) => {
+
+                await sendNotification(
+                    req.user._id.toString(),
+                    careGiverId,
+                    "star",
+                    req.user._id.toString(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    star
+                );
+
                 return res.status( 200 ).json(
                     {
                         error: false,

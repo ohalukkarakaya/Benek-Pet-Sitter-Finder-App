@@ -1,4 +1,6 @@
 import User from "../../../models/User.js";
+
+import sendNotification from "../../../utils/sendNotification.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -104,7 +106,7 @@ const userFollowController = async (req, res) => {
 
         const isAlreadyFollowing = isAlreadyFollowingUserSide && isAlreadyFollowingTargetSide;
 
-        if(isAlreadyFollowing){
+        if( isAlreadyFollowing ){
             followingUser.followers = followingUserFollowings.filter(
                 followerId =>
                     followerId !== req.user._id.toString()
@@ -122,6 +124,17 @@ const userFollowController = async (req, res) => {
                     type: "user",
                     followingId: followingUserId.toString()
                 }
+            );
+
+            await sendNotification(
+                user._id.toString(),
+                followingUser._id.toString(),
+                "follow",
+                user._id.toString(),
+                null,
+                null,
+                null,
+                null
             );
         }
 
@@ -153,7 +166,7 @@ const userFollowController = async (req, res) => {
             }
         );
 
-        return res.status(200).json(
+        return res.status( 200 ).json(
             {
                 error: false,
                 message: "user followed or unfollowed succesfully"

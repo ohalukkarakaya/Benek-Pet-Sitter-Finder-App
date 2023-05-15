@@ -1,4 +1,6 @@
 import Story from "../../../../../models/Story.js";
+
+import sendNotification from "../../../../../utils/sendNotification.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -56,12 +58,47 @@ const storyCreateCommentOrReplyCommentController = async (req, res) => {
                     reply: commentDesc
                 }
             );
+
+            const insertedReply = comment.replies
+                                         .find(
+                                            reply =>
+                                                reply.userId === req.user._id.toString()
+                                                && reply.reply === commentDesc
+                                         );
+
+            await sendNotification(
+                req.user._id.toString(),
+                story.userId.toString(),
+                "storyReply",
+                insertedReply._id.toString(),
+                "storyComment",
+                req.body.commentId.toString(),
+                "story",
+                storyId.toString()
+            );
         }else{
             story.comments.push(
                 {
                     userId: req.user._id.toString(),
                     comment: commentDesc
                 }
+            );
+
+            const insertedComment = story.comments.find(
+                comment =>
+                    comment.userId === req.user._id.toString()
+                    && comment.comment === commentDesc
+            );
+
+            await sendNotification(
+                req.user._id.toString(),
+                story.userId.toString(),
+                "storyComment",
+                insertedComment._id.toString(),
+                "story",
+                storyId.toString(),
+                null,
+                null
             );
         }
 

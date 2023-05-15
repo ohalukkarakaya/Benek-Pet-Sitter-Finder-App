@@ -1,7 +1,9 @@
 import Pet from "../../../models/Pet.js";
 import User from "../../../models/User.js";
-import { handOverInvitationReqParamsValidation } from "../../../utils/bodyValidation/pets/handOverInvitationValidationSchema.js";
 import PetHandOverInvitation from "../../../models/ownerOperations/PetHandOverInvitation.js";
+
+import { handOverInvitationReqParamsValidation } from "../../../utils/bodyValidation/pets/handOverInvitationValidationSchema.js";
+import sendNotification from "../../../utils/sendNotification.js";
 
 const petHandOverInvitationController = async (req, res) => {
     try{
@@ -50,7 +52,17 @@ const petHandOverInvitationController = async (req, res) => {
                   petId: petId
                 }
               ).save().then(
-                ( invitation ) => {
+                async ( invitation ) => {
+                  await sendNotification(
+                      invitation.from.toString(),
+                      invitation.to.toString(),
+                      "petHandOverInvitation",
+                      invitation._id.toString(),
+                      null,
+                      null,
+                      null,
+                      null
+                  );
                   return res.status( 200 ).json(
                     {
                       error: false,

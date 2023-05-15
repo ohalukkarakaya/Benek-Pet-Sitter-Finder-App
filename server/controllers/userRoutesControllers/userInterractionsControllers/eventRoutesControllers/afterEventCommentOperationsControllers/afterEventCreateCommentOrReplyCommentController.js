@@ -61,12 +61,47 @@ const afterEventCreateCommentOrReplyCommentController = async (req, res) => {
                     reply: commentContent
                 }
             );
+
+            const insertedReply = comment.replies.find(
+                reply =>
+                    reply.userId === req.user._id
+                    && reply.reply === req.body.comment
+            );
+
+            await sendNotification(
+                req.user._id.toString(),
+                meetingEvent.eventAdmin.toString(),
+                "eventReply",
+                insertedReply._id.toString(),
+                "eventComment",
+                req.body.commentId.toString(),
+                "event",
+                eventId.toString()
+            );
+
         }else{
             content.comments.push(
                 {
                     userId: req.user._id.toString(),
                     comment: commentContent,
                 }
+            );
+
+            const insertedComment = content.comments.find(
+                comment =>
+                    comment.userId === req.user._id.toString()
+                    && comment.comment === commentContent,
+            );
+
+            await sendNotification(
+                req.user._id.toString(),
+                meetingEvent.eventAdmin.toString(),
+                "eventComment",
+                insertedComment._id.toString(),
+                "event",
+                eventId.toString(),
+                null,
+                null
             );
         }
 

@@ -4,6 +4,8 @@ import CareGive from "../../../models/CareGive/CareGive.js";
 import dotenv from "dotenv";
 import { createRequire } from "module";
 
+import sendNotification from "../../../utils/sendNotification.js";
+
 const require = createRequire(import.meta.url);
 const rawPricingDataset = require('../../../src/care_give_pricing.json');
 const pricingDataset = JSON.parse(
@@ -186,7 +188,17 @@ const careGiveInvitationController = async (req, res) => {
                     adress: meetingAdress
                 }
             ).then(
-                (careGiveInvitation) => {
+                async (careGiveInvitation) => {
+                    await sendNotification(
+                        req.user._id.toString(),
+                        req.body.userId.toString(),
+                        "careGiveInvitation",
+                        careGiveInvitation._id.toString(),
+                        null,
+                        null,
+                        null,
+                        null
+                    );
                     return res.status(200).json(
                         {
                             error: false,

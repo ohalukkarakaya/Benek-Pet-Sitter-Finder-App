@@ -2,6 +2,8 @@ import User from "../../../../../models/User.js";
 import Event from "../../../../../models/Event/Event.js";
 import EventInvitation from "../../../../../models/Event/Invitations/InviteEvent.js";
 
+import sendNotification from "../../../../../utils/sendNotification.js";
+
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -37,7 +39,10 @@ const invitePrivateEventController = async ( req, res ) => {
             );
         }
 
-        const isAdmin = req.user._id.toString() === event.eventAdmin;
+        const isAdmin = req.user
+                           ._id
+                           .toString() === event.eventAdmin;
+
         const isOrganizer = event.eventOrganizers
                                  .find( 
                                     userId => 
@@ -49,8 +54,15 @@ const invitePrivateEventController = async ( req, res ) => {
         const isPrivate = event.isPrivate;
 
         if(
-            isPrivate && !isAdmin
-            || !isPrivate && !isAdmin && !isOrganizer
+            ( 
+                isPrivate 
+                && !isAdmin
+            )
+            || (
+                    !isPrivate 
+                    && !isAdmin
+                    && !isOrganizer
+               )
         ){
             return res.status(401).json(
                 {
@@ -113,7 +125,17 @@ const invitePrivateEventController = async ( req, res ) => {
                 isPrivate: event.isPrivate
             }
         ).save().then(
-            (invitation) => {
+            async (invitation) => {
+                await sendNotification(
+                    invitation.eventAdminId.toString(),
+                    invitation.invitedId.toString(),
+                    "eventInvitation",
+                    invitation._id.toString(),
+                    null,
+                    null,
+                    null,
+                    null
+                );
                 return res.status(200).json(
                     {
                         error: false,

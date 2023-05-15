@@ -8,6 +8,8 @@ import Pet from "../../../models/Pet.js";
 import dotenv from "dotenv";
 import io from "socket.io-client";
 
+import sendNotification from "../../../utils/sendNotification.js";
+
 dotenv.config();
 const socket = io(process.env.SOCKET_URL);
 
@@ -423,11 +425,22 @@ const sendMessageController = async (req, res) => {
                         memberId.toString() !== userId
                 );
 
+                await sendNotification(
+                    userId,
+                    receiverList,
+                    "message",
+                    responseChat.id,
+                    null,
+                    null,
+                    null,
+                    null
+                );
+
                 socket.emit(
                     "sendMessage",
                     {
                         chatObject: responseChat,
-                        receiverIdList: receiverList
+                        receiverIdList: receiverList 
                     }
                 );
 
