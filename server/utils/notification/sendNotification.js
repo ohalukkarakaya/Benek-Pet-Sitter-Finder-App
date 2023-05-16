@@ -1,5 +1,7 @@
 import Notification from "../../models/Notification.js";
 
+import prepareNotificationHelper from "./prepareNotificationHelper.js";
+
 const sendNotification = async ( 
     fromUserId, 
     toUserId, 
@@ -148,15 +150,21 @@ const sendNotification = async (
 
         if( notificationData ){
             await new Notification( notificationData ).then(
-                (notification) => {
+                async ( notification ) => {
 
+                    //To Do: prepare Notification to send socket
+                    const preparedNotificationData = await prepareNotificationHelper(
+                                                                        [
+                                                                            notification
+                                                                        ]
+                                                           );
                     //send responseChat data to socket server
                     if( contentType !== "message" ){
                         socket.emit(
                             "sendNotification",
                             {
                                 to: notification.to[0].toString(),
-                                notification: notification
+                                notification: preparedNotificationData[0]
                             }
                         );
                     }
