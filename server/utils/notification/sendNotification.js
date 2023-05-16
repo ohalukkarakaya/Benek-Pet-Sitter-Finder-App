@@ -152,12 +152,9 @@ const sendNotification = async (
             await new Notification( notificationData ).then(
                 async ( notification ) => {
 
-                    //To Do: prepare Notification to send socket
-                    const preparedNotificationData = await prepareNotificationHelper(
-                                                                        [
-                                                                            notification
-                                                                        ]
-                                                           );
+                    //prepare Notification to send socket
+                    const preparedNotificationData = await prepareNotificationHelper( [ notification ] );
+                    
                     //send responseChat data to socket server
                     if( contentType !== "message" ){
                         socket.emit(

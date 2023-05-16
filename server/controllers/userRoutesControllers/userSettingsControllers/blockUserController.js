@@ -6,12 +6,13 @@ const blockUserController = async ( req, res ) => {
         const userId = req.user._id.toString();
         const blockingUserId = req.params.userId.tostring();
         if( !blockingUserId ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "missing params"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                          {
+                              error: true,
+                              message: "missing params"
+                          }
+                      );
         }
 
         const user = await User.findById( userId );
@@ -33,12 +34,13 @@ const blockUserController = async ( req, res ) => {
             user.blockedUsers
                 .includes( blockingUserId ) 
         ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "User already blocked"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                          {
+                              error: true,
+                              message: "User already blocked"
+                          }
+                      );
         }
 
         user.blockedUsers.push( blockingUserId );
@@ -51,21 +53,23 @@ const blockUserController = async ( req, res ) => {
             }
         );
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "User blocked succesfully"
-            }
-        );
+        return res.status( 200 )
+                  .json(
+                      {
+                          error: false,
+                          message: "User blocked succesfully"
+                      }
+                  );
 
     }catch( err ){
         console.log("Error: block user", err);
-        return res.status(500).json(
-          {
-            error: true,
-            message: "Internal server error"
-          }
-        );
+        return res.status( 500 )
+                  .json(
+                        {
+                            error: true,
+                            message: "Internal server error"
+                        }
+                   );
     }
 }
 
