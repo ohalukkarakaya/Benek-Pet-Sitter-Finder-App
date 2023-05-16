@@ -21,9 +21,9 @@ const prepareStarNotificationDataHelper = async ( notification ) => {
                                 .find(
                                     starObject =>
                                         starObject._id
-                                                    .toString() === notification.releatedContent
-                                                                                .id
-                                                                                .toString()
+                                                  .toString() === notification.releatedContent
+                                                                              .id
+                                                                              .toString()
                                 );
 
         const pet = await Pet.findById(
