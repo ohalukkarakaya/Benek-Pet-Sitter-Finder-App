@@ -355,7 +355,7 @@ const expireUser = cron.schedule(
                                             }
 
                                             //check if user was also bought ticket
-                                            const didUserBoughtTicket = meetingEvent.willJoin = meetingEvent.willJoin.finf(
+                                            const didUserBoughtTicket = meetingEvent.willJoin = meetingEvent.willJoin.find(
                                                 userId =>
                                                     userId.toString() === user._id.toString()
                                             );
@@ -429,13 +429,15 @@ const expireUser = cron.schedule(
                             await Promise.all(
                                 eventInvitation.map(
                                     (invitation) => {
-                                        invitation.deleteOne().save(
-                                            (err) => {
-                                                if(err){
-                                                    console.log(err);
-                                                }
-                                            }
-                                        );
+                                        invitation.deleteOne()
+                                                  .then()
+                                                  .catch(
+                                                    ( err ) => {
+                                                        if( err ){
+                                                            console.log( err );
+                                                        }
+                                                    }
+                                                  );
                                     }
                                 )
                             );
@@ -453,13 +455,15 @@ const expireUser = cron.schedule(
                             await Promise.all(
                                 organizerInvitation.map(
                                     (invitation) => {
-                                        invitation.deleteOne().save(
-                                            (err) => {
-                                                if(err){
-                                                    console.log(err);
-                                                }
-                                            }
-                                        );
+                                        invitation.deleteOne()
+                                                  .then()
+                                                  .catch(
+                                                    ( err ) => {
+                                                        if( err ){
+                                                            console.log( err );
+                                                        }
+                                                    }
+                                                  );
                                     }
                                 )
                             );
