@@ -1,7 +1,3 @@
-import User from "../../models/User.js";
-import Pet from "../../models/Pet.js";
-import Chat from "../../models/Chat/Chat.js";
-
 import prepareFollowNotificationDataHelper from "./prepareNotificationHelpers/prepareFollowNotificationDataHelper.js";
 import prepareMessageNotificationDataHelper from "./prepareNotificationHelpers/prepareMessageNotificationDataHelper.js";
 import prepareStarNotificationDataHelper from "./prepareNotificationHelpers/prepareStarNotificationDataHelper.js";
@@ -18,12 +14,17 @@ import prepareEventReplyNotificationDataHelper from "./prepareNotificationHelper
 import prepareEventInvitationNotificationDataHelper from "./prepareNotificationHelpers/prepareEventInvitationNotificationDataHelper.js";
 import prepareCareGiveInvitationNotificationDataHelper from "./prepareNotificationHelpers/prepareCareGiveInvitationNotificationDataHelper.js";
 import prepareSecondaryPetOwnerInvitationNotificationDataHelper from "./prepareNotificationHelpers/prepareSecondaryPetOwnerInvitationNotificationDataHelper.js";
+import preparePetHandOverInvitationNotificationDataHelper from "./prepareNotificationHelpers/preparePetHandOverInvitationNotificationDataHelper.js";
 
-const getNotificationHelper = async( notificationList ) => {
+import prepareNewMissionNotificationDataHelper from "./prepareNotificationHelpers/prepareNewMissionNotificationDataHelper.js";
+import prepareMissionUploadNotificationDataHelper from "./prepareNotificationHelpers/prepareMissionUploadNotificationDataHelper.js";
+import prepareMissionAproveNotificationDataHelper from "./prepareNotificationHelpers/prepareMissionAproveNotificationDataHelper.js";
+
+const prepareNotificationHelper = async( notificationList ) => {
     try{
         notificationList.forEach(
             async ( notification ) => {
-                switch ( 
+                switch (
                     notification.releatedContent
                                 .contentType
                 ){
@@ -149,14 +150,64 @@ const getNotificationHelper = async( notificationList ) => {
                         }
                     break;
 
-                    // To Do: petHandOverInvitation
+                    case "petHandOverInvitation":
+                        try{
+                            const notificationData = await preparePetHandOverInvitationNotificationDataHelper( notification );
+                            notification = notificationData;
+                        }catch( err ){
+                            console.log( "ERROR: prepare pet handOver invitation notification data - ", err );
+                            return err;
+                        }
+                    break;
+
+                    case "newMission":
+                        try{
+                            const notificationData = await prepareNewMissionNotificationDataHelper( notification );
+                            notification = notificationData;
+                        }catch( err ){
+                            console.log( "ERROR: prepare new mission notification data - ", err );
+                            return err;
+                        }
+                    break;
+
+                    case "missionUpload":
+                        try{
+                            const notificationData = await prepareMissionUploadNotificationDataHelper( notification );
+                            notification = notificationData;
+                        }catch( err ){
+                            console.log( "ERROR: prepare mission uploaded notification data - ", err );
+                            return err;
+                        }
+                    break;
+
+                    case "missionAprove":
+                        try{
+                            const notificationData = await prepareMissionAproveNotificationDataHelper( notification );
+                            notification = notificationData;
+                        }catch( err ){
+                            console.log( "ERROR: prepare mission aproved notification data - ", err );
+                            return err;
+                        }
+                    break;
+
+                    case "emergency":
+                        try{
+                            const notificationData = await prepareEmergencyNotificationDataHelper( notification );
+                            notification = notificationData;
+                        }catch( err ){
+                            console.log( "ERROR: prepare emergency notification data - ", err );
+                            return err;
+                        }
+                    break;
                 }
             }
         );
+
+        return notificationList;
     }catch( err ){
-        console.log( "ERROR: getNotificationHelper - ", err );
+        console.log( "ERROR: prepareNotificationHelper - ", err );
         return err
     }
 }
 
-export default getNotificationHelper;
+export default prepareNotificationHelper;

@@ -36,7 +36,7 @@ const prepareSecondaryPetOwnerInvitationNotificationDataHelper = async ( notific
 
         return notificationData;
     }catch( err ){
-        console.log( "ERROR: prepareCareGiveInvitationNotificationDataHelper - ", err );
+        console.log( "ERROR: prepareSecondaryPetOwnerInvitationNotificationDataHelper - ", err );
         return err;
     }
 }

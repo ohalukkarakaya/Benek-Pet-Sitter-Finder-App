@@ -1,5 +1,5 @@
-import User from "../../models/User.js";
-import Chat from "../../models/Chat/Chat.js";
+import User from "../../../models/User.js";
+import Chat from "../../../models/Chat/Chat.js";
 import getLightWeightUserInfoHelper from "../../getLightWeightUserInfoHelper.js";
 
 const prepareMessageNotificationDataHelper = async ( notification ) => {

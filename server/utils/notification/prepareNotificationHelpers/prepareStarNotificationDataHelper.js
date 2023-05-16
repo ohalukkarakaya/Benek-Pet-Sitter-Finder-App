@@ -1,5 +1,5 @@
-import User from "../../models/User.js";
-import Pet from "../../models/Pet.js";
+import User from "../../../models/User.js";
+import Pet from "../../../models/Pet.js";
 import getLightWeightPetInfoHelper from "../../getLightWeightPetInfoHelper.js";
 import getLightWeightUserInfoHelper from "../../getLightWeightUserInfoHelper.js";
 

@@ -1,6 +1,6 @@
 import Notification from "../../models/Notification.js";
-import User from "../../models/User.js";
-import Chat from "../../models/Chat/Chat.js";
+
+import prepareNotificationHelper from "../../utils/notification/prepareNotificationHelper.js";
 
 const getNotificationController = async ( req, res ) => {
     try{
@@ -53,7 +53,7 @@ const getNotificationController = async ( req, res ) => {
                       );
         }
 
-        //To Do: insert notification data helper
+        const preparedNotificationData = await prepareNotificationHelper( notifications );
 
         return res.status( 200 )
                   .json(
@@ -61,7 +61,7 @@ const getNotificationController = async ( req, res ) => {
                         error: false,
                         message: "Notification List Prepared Succesfully",
                         totalNotificationCount: totalNotificationCount,
-                        notifications: notifications
+                        notifications: preparedNotificationData
                     }
                   );
 
