@@ -67,7 +67,7 @@ const getNotificationController = async ( req, res ) => {
 
         
     }catch( err ){
-        console.log("ERROR: getPetByIdController - ", err);
+        console.log("ERROR: getNotificationController - ", err);
         res.status( 500 )
            .json(
                 {

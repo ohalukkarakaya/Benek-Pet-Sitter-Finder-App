@@ -3,6 +3,7 @@ import auth from "../../middleware/auth.js";
 
 //controllers
 import getNotificationController from "../../controllers/notificationRoutesControllers/getNotificationController.js";
+import seeNotificationsController from "../../controllers/notificationRoutesControllers/seeNotificationsController.js";
 
 const router = express.Router();
 
@@ -12,5 +13,12 @@ router.get(
     auth,
     getNotificationController
 );
+
+//see notification
+router.post(
+  "/seen",
+  auth,
+  seeNotificationsController
+); 
 
   export default router;
