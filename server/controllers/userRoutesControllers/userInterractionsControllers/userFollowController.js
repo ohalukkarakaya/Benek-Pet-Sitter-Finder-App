@@ -1,6 +1,6 @@
 import User from "../../../models/User.js";
 
-import sendNotification from "../../../utils/sendNotification.js";
+import sendNotification from "../../../utils/notification/sendNotification.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -131,6 +131,8 @@ const userFollowController = async (req, res) => {
                 followingUser._id.toString(),
                 "follow",
                 user._id.toString(),
+                null,
+                null,
                 null,
                 null,
                 null,

@@ -1,5 +1,6 @@
 import Event from "../../../../../models/Event/Event.js";
 import User from "../../../../../models/User.js";
+import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getRecomendedEventsByUserIdController = async ( req, res ) => {
     try{
@@ -47,27 +48,9 @@ const getRecomendedEventsByUserIdController = async ( req, res ) => {
                                                 const willJoinUser = await User.findById( 
                                                                                     willJoinUserId 
                                                                                 );
-                                                const willJoinUserInfo = {
-
-                                                    userId: willJoinUser._id
-                                                                        .toString(),
-
-                                                    userProfileImg: willJoinUser.profileImg
-                                                                                .imgUrl,
-
-                                                    username: willJoinUser.userName,
-
-                                                    userFullName: `${
-                                                            willJoinUser.identity
-                                                                        .firstName
-                                                        } ${
-                                                            willJoinUser.identity
-                                                                        .middleName
-                                                        } ${
-                                                            willJoinUser.identity
-                                                                        .lastName
-                                                        }`.replaceAll( "  ", " ")
-                                                }
+                                                const willJoinUserInfo = getLightWeightUserInfoHelper(
+                                                                                            willJoinUser
+                                                                        );
                                 
                                                 releatedEvent.willJoinUserList
                                                              .push( willJoinUserInfo );
@@ -88,27 +71,9 @@ const getRecomendedEventsByUserIdController = async ( req, res ) => {
                                                 const joinedUser = await User.findById( 
                                                                                 joinedUserId 
                                                                               );
-                                                const joinedUserInfo = {
-
-                                                    userId: joinedUser._id
-                                                                      .toString(),
-
-                                                    userProfileImg: joinedUser.profileImg
-                                                                              .imgUrl,
-
-                                                    username: joinedUser.userName,
-
-                                                    userFullName: `${
-                                                            joinedUser.identity
-                                                                      .firstName
-                                                        } ${
-                                                            joinedUser.identity
-                                                                      .middleName
-                                                        } ${
-                                                            joinedUser.identity
-                                                                      .lastName
-                                                        }`.replaceAll( "  ", " ")
-                                                }
+                                                const joinedUserInfo = getLightWeightUserInfoHelper(
+                                                                                            joinedUser
+                                                                       );
                                 
                                                 releatedEvent.joinedUserList
                                                              .push( joinedUserInfo );
@@ -141,27 +106,7 @@ const getRecomendedEventsByUserIdController = async ( req, res ) => {
                                 );
                             }
 
-                            const eventAdminUserInfo = {
-
-                                userId: eventAdmin._id
-                                                .toString(),
-
-                                userProfileImg: eventAdmin.profileImg
-                                                        .imgUrl,
-
-                                username: eventAdmin.userName,
-
-                                userFullName: `${
-                                        eventAdmin.identity
-                                                .firstName
-                                    } ${
-                                        eventAdmin.identity
-                                                .middleName
-                                    } ${
-                                        eventAdmin.identity
-                                                .lastName
-                                    }`.replaceAll( "  ", " ")
-                            }
+                            const eventAdminUserInfo = getLightWeightUserInfoHelper( eventAdmin );
 
                             releatedEvent.eventAdmin = eventAdminUserInfo;
 
@@ -217,27 +162,7 @@ const getRecomendedEventsByUserIdController = async ( req, res ) => {
                                                             const likedUser = await User.findById( 
                                                                                             likedUserId.toString() 
                                                                                         );
-                                                            const likedUserInfo = {
-                                        
-                                                                userId: likedUser._id
-                                                                                .toString(),
-                                            
-                                                                userProfileImg: likedUser.profileImg
-                                                                                        .imgUrl,
-                                            
-                                                                username: likedUser.userName,
-                                            
-                                                                userFullName: `${
-                                                                        likedUser.identity
-                                                                                .firstName
-                                                                    } ${
-                                                                        likedUser.identity
-                                                                                .middleName
-                                                                    } ${
-                                                                        likedUser.identity
-                                                                                .lastName
-                                                                    }`.replaceAll( "  ", " ")
-                                                            }
+                                                            const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
                                         
                                                             lastAfterEventObject.likedUsers
                                                                                 .push( likedUserInfo );
@@ -285,24 +210,8 @@ const getRecomendedEventsByUserIdController = async ( req, res ) => {
                                 delete releatedEvent.eventAdminsParamGuid;
 
                                 const connectedUser = await User.findById( followingUserObject.followingId.toString() );
-                                const connectedUserInfo = {
-                    
-                                    userId: connectedUser._id
-                                                         .toString(),
-                                    userProfileImg: connectedUser.profileImg
-                                                                 .imgUrl,
-                                    username: connectedUser.userName,
-                                    userFullName: `${
-                                            connectedUser.identity
-                                                         .firstName
-                                        } ${
-                                            connectedUser.identity
-                                                         .middleName
-                                        } ${
-                                            connectedUser.identity
-                                                         .lastName
-                                        }`.replaceAll( "  ", " ")
-                                }
+                                const connectedUserInfo = getLightWeightUserInfoHelper( connectedUser );
+                                
                                 releatedEvent.releatedUser = connectedUserInfo;
 
                                 const isReleatedEventAlreadyInserted = recomendedEvents.filter(

@@ -2,6 +2,9 @@ import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
 
+import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
+import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
+
 const getSendedCareGiveInvitationsController = async ( req, res ) => {
     try{
 
@@ -39,27 +42,7 @@ const getSendedCareGiveInvitationsController = async ( req, res ) => {
                               .toString() 
                 );
 
-                const invitedUserInfo = {
-
-                    userId: invitedUser._id
-                                       .toString(),
-    
-                    userProfileImg: invitedUser.profileImg
-                                               .imgUrl,
-    
-                    username: invitedUser.userName,
-    
-                    userFullName: `${
-                            invitedUser.identity
-                                       .firstName
-                        } ${
-                            invitedUser.identity
-                                       .middleName
-                        } ${
-                            invitedUser.identity
-                                       .lastName
-                        }`.replaceAll( "  ", " ")
-                }
+                const invitedUserInfo = getLightWeightUserInfoHelper( invitedUser );
 
                 invitation.to = invitedUserInfo;
 
@@ -70,16 +53,8 @@ const getSendedCareGiveInvitationsController = async ( req, res ) => {
                 invitation.price = price;
 
                 const pet = await Pet.findById( careGiveObject.petId.toString() );
-                const petInfo = {
-                    petId: pet._id.toString(),
-                    petProfileImgUrl: pet.petProfileImg.imgUrl,
-                    petName: pet.name,
-                    sex: pet.sex,
-                    birthDay: pet.birthDay,
-                    kind: pet.kind,
-                    species: pet.species,
-                    handoverCount: pet.handOverRecord.length
-                }
+                const petInfo = getLightWeightPetInfoHelper( pet );
+
                 invitation.pet = petInfo;
 
                 delete invitation.actionCode;

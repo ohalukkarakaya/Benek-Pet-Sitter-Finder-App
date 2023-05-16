@@ -14,12 +14,14 @@ const NotificationSchema = new schema(
                 required: true
             }
         ],
+        seenBy: [ String ],
+        openedBy: [ String ],
         releatedContent: {
             id: {
                 type: String,
                 required: true
             },
-            contantType:{
+            contentType:{
                 type: String,
                 enum: [ 
                     "follow", 
@@ -48,7 +50,7 @@ const NotificationSchema = new schema(
                 type: String,
                 required: true
             },
-            contantType:{
+            contentType:{
                 type: String,
                 enum: [ 
                     "petImage",
@@ -68,12 +70,25 @@ const NotificationSchema = new schema(
                 type: String,
                 required: true
             },
-            contantType:{
+            contentType:{
                 type: String,
                 enum: [ 
                     "petImage",
                     "story",
-                    "event",
+                    "event"
+                ],
+                required: true
+            }
+        },
+        thirdParentContent: {
+            id: {
+                type: String,
+                required: true
+            },
+            contentType:{
+                type: String,
+                enum: [ 
+                    "pet"
                 ],
                 required: true
             }
@@ -88,9 +103,7 @@ const NotificationSchema = new schema(
     }
 );
 
-const Story = mongoose.model(
+export default mongoose.model(
     "Notification",
     NotificationSchema
 );
-
-export default Story;

@@ -1,7 +1,7 @@
 import User from "../../../models/User.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
 
-import sendNotification from "../../../utils/sendNotification.js";
+import sendNotification from "../../../utils/notification/sendNotification.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -104,6 +104,18 @@ const giveStarToCareGiverController = async (req, res) => {
             }
         );
         careGiver.markModified( "stars" );
+
+        const starObject = careGiver.stars
+                                    .find(
+                                        starObject =>
+                                            starObject.ownerId === req.user
+                                                                    ._id
+                                                                    .toString()
+                                            && starObject.petId === careGive.petId
+                                                                            .toString()
+                                            && starObject.star === star
+                                    );
+
         careGiver.save().then(
             async (_) => {
 
@@ -111,12 +123,13 @@ const giveStarToCareGiverController = async (req, res) => {
                     req.user._id.toString(),
                     careGiverId,
                     "star",
-                    req.user._id.toString(),
+                    starObject._id.toString(),
                     null,
                     null,
                     null,
                     null,
-                    star
+                    null,
+                    null
                 );
 
                 return res.status( 200 ).json(

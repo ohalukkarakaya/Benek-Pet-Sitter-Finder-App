@@ -1,6 +1,7 @@
 import User from "../../../../../models/User.js";
 import Event from "../../../../../models/Event/Event.js";
 import EventInvitation from "../../../../../models/Event/Invitations/InviteEvent.js";
+import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getSendedEventInvitationsController = async ( req, res ) => {
     try{
@@ -31,27 +32,7 @@ const getSendedEventInvitationsController = async ( req, res ) => {
                                                               .toString() 
                                          );
 
-                const invitedUserInfo = {
-
-                    userId: invitedUser._id
-                                       .toString(),
-    
-                    userProfileImg: invitedUser.profileImg
-                                               .imgUrl,
-    
-                    username: invitedUser.userName,
-    
-                    userFullName: `${
-                            invitedUser.identity
-                                       .firstName
-                        } ${
-                            invitedUser.identity
-                                       .middleName
-                        } ${
-                            invitedUser.identity
-                                       .lastName
-                        }`.replaceAll( "  ", " ")
-                }
+                const invitedUserInfo = getLightWeightUserInfoHelper( invitedUser );
 
                 invitation.admin = invitedUserInfo;
                 delete invitation.invitedId;

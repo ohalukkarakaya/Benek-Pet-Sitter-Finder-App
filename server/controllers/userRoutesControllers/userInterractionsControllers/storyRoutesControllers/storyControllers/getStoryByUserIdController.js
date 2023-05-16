@@ -1,5 +1,6 @@
 import User from "../../../../../models/User.js";
 import Story from "../../../../../models/Story.js";
+import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getStoryByUserIdController = async ( req, res ) => {
     try{
@@ -38,24 +39,7 @@ const getStoryByUserIdController = async ( req, res ) => {
             );
         }
 
-        const userInfo = {
-                        
-            userId: user._id
-                        .toString(),
-            userProfileImg: user.profileImg
-                                .imgUrl,
-            username: user.userName,
-            userFullName: `${
-                    user.identity
-                        .firstName
-                } ${
-                    user.identity
-                        .middleName
-                } ${
-                    user.identity
-                        .lastName
-                }`.replaceAll( "  ", " ")
-        }
+        const userInfo = getLightWeightUserInfoHelper( user );
 
         story.forEach(
             ( storyObject ) => {

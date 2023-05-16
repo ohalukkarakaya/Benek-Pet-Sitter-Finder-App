@@ -3,7 +3,7 @@ import User from "../../../models/User.js";
 import SecondaryOwnerInvitation from "../../../models/ownerOperations/SecondaryOwnerInvitation.js";
 
 import { secondaryOwnerInvitationReqParamsValidation } from "../../../utils/bodyValidation/pets/secondaryOwnerInvitationValidationSchema.js";
-import sendNotification from "../../../utils/sendNotification.js";
+import sendNotification from "../../../utils/notification/sendNotification.js";
 
 const inviteSecondaryOwnerController = async (req, res) => {
     try{
@@ -60,6 +60,8 @@ const inviteSecondaryOwnerController = async (req, res) => {
                       invitation.to.toString(),
                       "secondaryPetOwnerInvitation",
                       invitation._id.toString(),
+                      null,
+                      null,
                       null,
                       null,
                       null,

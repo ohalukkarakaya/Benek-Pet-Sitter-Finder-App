@@ -4,7 +4,7 @@ import CareGive from "../../../models/CareGive/CareGive.js";
 import dotenv from "dotenv";
 import { createRequire } from "module";
 
-import sendNotification from "../../../utils/sendNotification.js";
+import sendNotification from "../../../utils/notification/sendNotification.js";
 
 const require = createRequire(import.meta.url);
 const rawPricingDataset = require('../../../src/care_give_pricing.json');
@@ -194,6 +194,8 @@ const careGiveInvitationController = async (req, res) => {
                         req.body.userId.toString(),
                         "careGiveInvitation",
                         careGiveInvitation._id.toString(),
+                        null,
+                        null,
                         null,
                         null,
                         null,

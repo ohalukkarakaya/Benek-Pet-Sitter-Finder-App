@@ -1,6 +1,8 @@
 import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 
+import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
+
 const getPetsByUserIdController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
@@ -34,16 +36,7 @@ const getPetsByUserIdController = async ( req, res ) => {
         searchedUser.pets.forEach(
             async ( petId ) => {
                 const pet = await Pet.findById( petId.toString() );
-                const petInfo = {
-                    petId: petId.toString(),
-                    petProfileImgUrl: pet.petProfileImg.imgUrl,
-                    petName: pet.name,
-                    sex: pet.sex,
-                    birthDay: pet.birthDay,
-                    kind: pet.kind,
-                    species: pet.species,
-                    handoverCount: pet.handOverRecord.length
-                }
+                const petInfo = getLightWeightPetInfoHelper( pet );
                 petInfoList.push( petInfo );
             }
         );

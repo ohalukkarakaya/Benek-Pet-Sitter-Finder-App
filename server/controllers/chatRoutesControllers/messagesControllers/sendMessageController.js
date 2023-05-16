@@ -8,7 +8,7 @@ import Pet from "../../../models/Pet.js";
 import dotenv from "dotenv";
 import io from "socket.io-client";
 
-import sendNotification from "../../../utils/sendNotification.js";
+import sendNotification from "../../../utils/notification/sendNotification.js";
 
 dotenv.config();
 const socket = io(process.env.SOCKET_URL);
@@ -374,7 +374,11 @@ const sendMessageController = async (req, res) => {
                     );
                 }
 
-                const messageToSend = chat.messages[ chat.messages.length - 1 ];
+                const messageToSend = chat.messages[ 
+                                                chat.messages
+                                                    .length - 1 
+                                           ];
+
                 let seenByList = [];
 
                 for( let seenUserId of messageToSend.seenBy ){
@@ -382,9 +386,11 @@ const sendMessageController = async (req, res) => {
                     if( !userData ){ break; }
 
                     let seenUserData = {
-                        userId: userData._id.toString(),
+                        userId: userData._id
+                                        .toString(),
                         username: userData.userName,
-                        profileImg: userData.profileImg.imgUrl
+                        profileImg: userData.profileImg
+                                            .imgUrl
                     }
 
                     if( seenUserData ){
@@ -392,7 +398,10 @@ const sendMessageController = async (req, res) => {
                     }
                 }
 
-                if( seenByList.length === messageToSend.seenBy.length ){
+                if( 
+                    seenByList.length === messageToSend.seenBy
+                                                       .length 
+                ){
                     messageToSend.seenBy = seenByList
                 }
 
@@ -402,9 +411,11 @@ const sendMessageController = async (req, res) => {
                     let memberObject = await User.findById( member.userId );
                     if( !memberObject ){ break; }
     
-                    member.userId = memberObject._id.toString();
+                    member.userId = memberObject._id
+                                                .toString();
                     member.username = memberObject.userName;
-                    member.profileImg = memberObject.profileImg.imgUrl;
+                    member.profileImg = memberObject.profileImg
+                                                    .imgUrl;
     
                 }
 
@@ -429,6 +440,8 @@ const sendMessageController = async (req, res) => {
                     userId,
                     receiverList,
                     "message",
+                    messageToSend._id.toString(),
+                    "chat",
                     responseChat.id,
                     null,
                     null,

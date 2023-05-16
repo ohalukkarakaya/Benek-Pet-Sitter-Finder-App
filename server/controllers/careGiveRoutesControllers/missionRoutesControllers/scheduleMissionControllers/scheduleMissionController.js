@@ -1,7 +1,7 @@
 import CareGive from "../../../../models/CareGive/CareGive.js";
 import User from "../../../../models/User.js";
 
-import sendNotification from "../../../../utils/sendNotification.js";
+import sendNotification from "../../../../utils/notification/sendNotification.js";
 import paramPayWithRegisteredCard from "../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
 import paramPayRequest from "../../../../utils/paramRequests/paymentRequests/paramPayRequest.js";
 import paramRegisterCreditCardRequest from "../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
@@ -360,6 +360,8 @@ const scheduleMissionController = async (req, res) => {
                         "careGive",
                         savedCareGive._id
                                      .toString(),
+                        null,
+                        null,
                         null,
                         null
                     );

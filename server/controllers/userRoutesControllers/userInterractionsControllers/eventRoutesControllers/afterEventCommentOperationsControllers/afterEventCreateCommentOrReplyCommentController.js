@@ -1,25 +1,39 @@
 import Event from "../../../../../models/Event/Event.js";
+
+import sendNotification from "../../../../../utils/notification/sendNotification.js";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const afterEventCreateCommentOrReplyCommentController = async (req, res) => {
     try{
-        const eventId = req.params.eventId;
-        const contentId = req.params.contentId;
-        const commentContent = req.body.desc;
-        const isReply = req.body.commentId;
-        if(!eventId || !contentId || !commentContent){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "Missing params"
-                }
-            );
+        const eventId = req.params
+                           .eventId;
+
+        const contentId = req.params
+                             .contentId;
+
+        const commentContent = req.body
+                                  .desc;
+
+        const isReply = req.body
+                           .commentId;
+        if(
+            !eventId 
+            || !contentId 
+            || !commentContent
+        ){
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Missing params"
+                            }
+                       );
         }
 
-        const meetingEvent = await Event.findById(eventId);
-        if(!meetingEvent){
+        const meetingEvent = await Event.findById( eventId );
+        if( !meetingEvent ){
             return res.status(404).json(
                 {
                     error: true,
@@ -28,10 +42,12 @@ const afterEventCreateCommentOrReplyCommentController = async (req, res) => {
             );
         }
 
-        const content = meetingEvent.afterEvent.find(
-            afterEventObject =>
-                afterEventObject._id.toString() === contentId.toString()
-        );
+        const content = meetingEvent.afterEvent
+                                    .find(
+                                        afterEventObject =>
+                                            afterEventObject._id
+                                                            .toString() === contentId.toString()
+                                    );
         if(!content){
             return res.status(404).json(
                 {
@@ -42,11 +58,15 @@ const afterEventCreateCommentOrReplyCommentController = async (req, res) => {
         }
 
         if(isReply){
-            const comment = content.comments.find(
-                commentObject =>
-                    commentObject._id.toString() === req.body.commentId.toString()
-            );
-            if(!comment){
+            const comment = content.comments
+                                   .find(
+                                        commentObject =>
+                                            commentObject._id
+                                                         .toString() === req.body
+                                                                            .commentId
+                                                                            .toString()
+                                    );
+            if( !comment ){
                 return res.status(404).json(
                     {
                         error: true,
@@ -55,26 +75,36 @@ const afterEventCreateCommentOrReplyCommentController = async (req, res) => {
                 );
             }
 
-            comment.replies.push(
-                {
-                    userId: req.user._id.toString(),
-                    reply: commentContent
-                }
-            );
+            comment.replies
+                   .push(
+                        {
+                            userId: req.user
+                                    ._id
+                                    .toString(),
+                            reply: commentContent
+                        }
+                    );
 
-            const insertedReply = comment.replies.find(
-                reply =>
-                    reply.userId === req.user._id
-                    && reply.reply === req.body.comment
-            );
+            const insertedReply = comment.replies
+                                         .find(
+                                            reply =>
+                                                reply.userId
+                                                     .toString() === req.user
+                                                                        ._id
+                                                                        .toString()
+                                                && reply.reply === req.body
+                                                                      .comment
+                                          );
 
             await sendNotification(
                 req.user._id.toString(),
-                meetingEvent.eventAdmin.toString(),
+                comment.userId.toString(),
                 "eventReply",
                 insertedReply._id.toString(),
                 "eventComment",
                 req.body.commentId.toString(),
+                "afterEvent",
+                content._id.toString(),
                 "event",
                 eventId.toString()
             );
@@ -82,7 +112,9 @@ const afterEventCreateCommentOrReplyCommentController = async (req, res) => {
         }else{
             content.comments.push(
                 {
-                    userId: req.user._id.toString(),
+                    userId: req.user
+                               ._id
+                               .toString(),
                     comment: commentContent,
                 }
             );
@@ -95,9 +127,11 @@ const afterEventCreateCommentOrReplyCommentController = async (req, res) => {
 
             await sendNotification(
                 req.user._id.toString(),
-                meetingEvent.eventAdmin.toString(),
+                content.userId.toString(),
                 "eventComment",
                 insertedComment._id.toString(),
+                "afterEvent",
+                content._id.toString(),
                 "event",
                 eventId.toString(),
                 null,

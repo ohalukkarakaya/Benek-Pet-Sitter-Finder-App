@@ -1,5 +1,6 @@
 import Event from "../../../../../models/Event/Event.js";
 import OrganizerInvitation from "../../../../../models/Event/Invitations/InviteOrganizer.js";
+import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getSendedOrganizerInvitationsController = async ( req, res ) => {
     try{
@@ -52,27 +53,7 @@ const getSendedOrganizerInvitationsController = async ( req, res ) => {
                 };
 
                 const invitedUser = await User.findById( invitation.invitedId.toString() );
-                const invitedUserInfo = {
-
-                    userId: invitedUser._id
-                                      .toString(),
-    
-                    userProfileImg: invitedUser.profileImg
-                                               .imgUrl,
-    
-                    username: invitedUser.userName,
-    
-                    userFullName: `${
-                            invitedUser.identity
-                                       .firstName
-                        } ${
-                            invitedUser.identity
-                                       .middleName
-                        } ${
-                            invitedUser.identity
-                                       .lastName
-                        }`.replaceAll( "  ", " ")
-                };
+                const invitedUserInfo = getLightWeightUserInfoHelper( invitedUser );
 
                 invitation.event = eventInfo;
                 invitation.invitedUser = eventAdminInfo;

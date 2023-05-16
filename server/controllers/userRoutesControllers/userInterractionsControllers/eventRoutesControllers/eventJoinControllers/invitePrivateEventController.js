@@ -2,7 +2,7 @@ import User from "../../../../../models/User.js";
 import Event from "../../../../../models/Event/Event.js";
 import EventInvitation from "../../../../../models/Event/Invitations/InviteEvent.js";
 
-import sendNotification from "../../../../../utils/sendNotification.js";
+import sendNotification from "../../../../../utils/notification/sendNotification.js";
 
 import dotenv from "dotenv";
 
@@ -131,6 +131,8 @@ const invitePrivateEventController = async ( req, res ) => {
                     invitation.invitedId.toString(),
                     "eventInvitation",
                     invitation._id.toString(),
+                    null,
+                    null,
                     null,
                     null,
                     null,

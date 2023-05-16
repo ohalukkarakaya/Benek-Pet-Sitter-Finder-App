@@ -3,7 +3,7 @@ import User from "../../../models/User.js";
 import PetHandOverInvitation from "../../../models/ownerOperations/PetHandOverInvitation.js";
 
 import { handOverInvitationReqParamsValidation } from "../../../utils/bodyValidation/pets/handOverInvitationValidationSchema.js";
-import sendNotification from "../../../utils/sendNotification.js";
+import sendNotification from "../../../utils/notification/sendNotification.js";
 
 const petHandOverInvitationController = async (req, res) => {
     try{
@@ -58,6 +58,8 @@ const petHandOverInvitationController = async (req, res) => {
                       invitation.to.toString(),
                       "petHandOverInvitation",
                       invitation._id.toString(),
+                      null,
+                      null,
                       null,
                       null,
                       null,

@@ -1,5 +1,6 @@
 import Event from "../../../../../models/Event/Event.js";
 import User from "../../../../../models/User.js";
+import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getAfterEventCommentsController = async ( req, res ) => {
     try{
@@ -93,24 +94,7 @@ const getAfterEventCommentsController = async ( req, res ) => {
             comments.forEach(
                 async ( commentObject) => {
                     const commentedUser = await User.findById( commentObject.userId.toString() );
-                    const commentedUserInfo = {
-                    
-                        userId: commentedUser._id
-                                             .toString(),
-                        userProfileImg: commentedUser.profileImg
-                                                     .imgUrl,
-                        username: commentedUser.userName,
-                        userFullName: `${
-                                commentedUser.identity
-                                             .firstName
-                            } ${
-                                commentedUser.identity
-                                             .middleName
-                            } ${
-                                commentedUser.identity
-                                             .lastName
-                            }`.replaceAll( "  ", " ")
-                    }
+                    const commentedUserInfo = getLightWeightUserInfoHelper( commentedUser );
                     commentObject.user = commentedUserInfo;
                     delete commentObject.userId;
 
@@ -122,24 +106,7 @@ const getAfterEventCommentsController = async ( req, res ) => {
 
                     for( let i = 0; i <= firstFiveOfLikeLimit; i++ ){
                         const likedUser = await User.findById( commentObject.likes[ i ].toString() );
-                        const likedUserInfo = {
-                        
-                            userId: likedUser._id
-                                             .toString(),
-                            userProfileImg: likedUser.profileImg
-                                                     .imgUrl,
-                            username: likedUser.userName,
-                            userFullName: `${
-                                    likedUser.identity
-                                             .firstName
-                                } ${
-                                    likedUser.identity
-                                             .middleName
-                                } ${
-                                    likedUser.identity
-                                             .lastName
-                                }`.replaceAll( "  ", " ")
-                        }
+                        const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
     
                         commentObject.firstFiveLikedUser.push( likedUserInfo );
                     }

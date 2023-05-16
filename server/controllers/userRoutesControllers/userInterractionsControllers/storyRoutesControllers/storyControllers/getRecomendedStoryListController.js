@@ -1,6 +1,7 @@
 import User from "../../../../../models/User.js";
 import Story from "../../../../../models/Story.js";
 import Event from "../../../../../models/Event/Event.js";
+import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getRecomendedStoryListController = async ( req, res ) => {
     try{
@@ -69,24 +70,7 @@ const getRecomendedStoryListController = async ( req, res ) => {
         stories.forEach(
             async ( story ) => {
                 const sharedUser = await User.findById( story.userId.toString() );
-                const userInfo = {
-                        
-                    userId: sharedUser._id
-                                      .toString(),
-                    userProfileImg: sharedUser.profileImg
-                                              .imgUrl,
-                    username: sharedUser.userName,
-                    userFullName: `${
-                            sharedUser.identity
-                                      .firstName
-                        } ${
-                            sharedUser.identity
-                                      .middleName
-                        } ${
-                            sharedUser.identity
-                                      .lastName
-                        }`.replaceAll( "  ", " ")
-                }
+                const userInfo = getLightWeightUserInfoHelper( sharedUser );
 
                 story.user = userInfo;
                 delete story.userId;

@@ -2,7 +2,7 @@ import CareGive from "../../models/CareGive/CareGive.js";
 import User from "../../models/User.js";
 import Pet from "../../models/Pet.js";
 
-import sendNotification from "../../utils/sendNotification.js";
+import sendNotification from "../../utils/notification/sendNotification.js";
 import twilio from "twilio";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
@@ -220,6 +220,8 @@ const emergencyController = async (req, res) => {
                     .toString(),
             "emergency",
             careGiveId.toString(),
+            null,
+            null,
             null,
             null,
             null,

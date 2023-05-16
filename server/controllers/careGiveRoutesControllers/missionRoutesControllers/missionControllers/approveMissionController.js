@@ -1,6 +1,6 @@
 import CareGive from "../../../../models/CareGive/CareGive.js";
 
-import sendNotification from "../../../../utils/sendNotification.js";
+import sendNotification from "../../../../utils/notification/sendNotification.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -89,6 +89,8 @@ const approveMissionController = async (req, res) => {
                     "careGive",
                     savedCareGive._id
                                  .toString(),
+                    null,
+                    null,
                     null,
                     null
                 );

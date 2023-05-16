@@ -1,6 +1,6 @@
 import Pet from "../../../models/Pet.js";
 import { petImageCommentValidation } from "../../../utils/bodyValidation/pets/petImageCommentsValidationSchemas.js";
-import sendNotification from "../../../utils/sendNotification.js";
+import sendNotification from "../../../utils/notification/sendNotification.js";
 
 const petImageCreateCommentOrReplyCommentController = async (req, res) => {
     try{
@@ -34,10 +34,12 @@ const petImageCreateCommentOrReplyCommentController = async (req, res) => {
             
         if(image){
             if(isReply){
-                image.comments.find(
+                const comment = image.comments.find(
                     comment =>
                         comment._id.toString() === req.body.commentId.toString()
-                ).replies.push(
+                );
+                
+                comment.replies.push(
                     {
                         userId: req.user._id,
                         reply: req.body.comment
@@ -54,14 +56,24 @@ const petImageCreateCommentOrReplyCommentController = async (req, res) => {
                 );
 
                 await sendNotification(
-                    req.user._id.toString(),
-                    pet.primaryOwner.toString(),
+                    req.user
+                       ._id
+                       .toString(),
+                    comment.userId
+                           .toString(),
                     "petImageReply",
-                    insertedReply._id.toString(),
+                    insertedReply._id
+                                 .toString(),
                     "petImageComment",
-                    req.body.commentId.toString(),
+                    req.body
+                       .commentId
+                       .toString(),
                     "petImage",
-                    image._id.toString()
+                    image._id
+                         .toString(),
+                    "pet",
+                    pet._id
+                       .toString()
                 );
             }else{
                 image.comments.push(
@@ -84,6 +96,8 @@ const petImageCreateCommentOrReplyCommentController = async (req, res) => {
                     insertedComment._id.toString(),
                     "petImage",
                     image._id.toString(),
+                    "pet",
+                    pet._id.toString(),
                     null,
                     null
                 );

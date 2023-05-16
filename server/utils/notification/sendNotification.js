@@ -1,4 +1,4 @@
-import Notification from "../models/Notification.js";
+import Notification from "../../models/Notification.js";
 
 const sendNotification = async ( 
     fromUserId, 
@@ -8,14 +8,15 @@ const sendNotification = async (
     parentContentType, 
     parentContentId,
     secondParentContentType, 
-    secondParentContentId
+    secondParentContentId,
+    thirdParentContentType,
+    thirdParentContentId
 ) => {
     try{
         let notificationData;
         if( 
             contentType === "petImageComment"
             || contentType === "storyComment"
-            || contentType === "eventComment"
             || contentType === "newMission"
             || contentType === "missionUpload"
             || contentType === "missionAprove"
@@ -45,8 +46,42 @@ const sendNotification = async (
             }
         }else if(
             contentType === "petImageReply"
-            || contentType === "storyReply"
             || contentType === "eventReply"
+        ){
+            if( 
+                !thirdParentContentType
+                || !thirdParentContentId 
+            ){
+                return data = {
+                    error: true,
+                    errorStatusCode: 400,
+                    message: "Missing Param"
+                }
+            }
+
+            notificationData = {
+                from: fromUserId.toString(),
+                to: [ toUserId.toString() ],
+                releatedContent: {
+                    id: releatedContentId,
+                    contentType: contentType
+                },
+                parentContent: {
+                    id: parentContentId,
+                    contentType: parentContentType
+                },
+                secondParentContent: {
+                    id: secondParentContentId,
+                    contentType: secondParentContentType
+                },
+                thirdParentContent: {
+                    id: thirdParentContentId,
+                    contentType: thirdParentContentType
+                }
+            }
+        }else if(
+            contentType === "storyReply"
+            || contentType === "eventComment"
         ){
             if(
                 !parentContentId
@@ -103,6 +138,10 @@ const sendNotification = async (
                 releatedContent: {
                     id: releatedContentId,
                     contentType: contentType
+                },
+                parentContent:{
+                    id: parentContentId,
+                    contentType: parentContentType
                 }
             }
         }
@@ -112,7 +151,7 @@ const sendNotification = async (
                 (notification) => {
 
                     //send responseChat data to socket server
-                    if( contentType != "message" ){
+                    if( contentType !== "message" ){
                         socket.emit(
                             "sendNotification",
                             {

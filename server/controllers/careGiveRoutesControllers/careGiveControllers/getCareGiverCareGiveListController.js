@@ -1,6 +1,8 @@
 import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
+import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
+import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
 const getCareGiverCareGiveListController = async ( req, res ) => {
     try{
@@ -36,54 +38,13 @@ const getCareGiverCareGiveListController = async ( req, res ) => {
         careGives.forEach(
             async ( careGive ) => {
                 const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );
-                const careGiverInfo = {
-                    userId: careGiver._id
-                                     .toString(),
-                    userProfileImg: careGiver.profileImg
-                                             .imgUrl,
-                    username: careGiver.userName,
-                    userFullName: `${
-                            careGiver.identity
-                                     .firstName
-                        } ${
-                            careGiver.identity
-                                     .middleName
-                        } ${
-                            careGiver.identity
-                                     .lastName
-                        }`.replaceAll( "  ", " ")
-                }
+                const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
 
                 const petOwner = await User.findById( careGive.petOwner.petOwnerId.toString() );
-                const petOwnerInfo = {
-                    userId: petOwner._id
-                                    .toString(),
-                    userProfileImg: petOwner.profileImg
-                                            .imgUrl,
-                    username: petOwner.userName,
-                    userFullName: `${
-                            petOwner.identity
-                                    .firstName
-                        } ${
-                            petOwner.identity
-                                    .middleName
-                        } ${
-                            petOwner.identity
-                                    .lastName
-                        }`.replaceAll( "  ", " ")
-                }
+                const petOwnerInfo = getLightWeightUserInfoHelper( petOwner );
 
                 const pet = await Pet.findById( careGive.petId.toString() );
-                const petInfo = {
-                    petId: pet._id.toString(),
-                    petProfileImgUrl: pet.petProfileImg.imgUrl,
-                    petName: pet.name,
-                    sex: pet.sex,
-                    birthDay: pet.birthDay,
-                    kind: pet.kind,
-                    species: pet.species,
-                    handoverCount: pet.handOverRecord.length
-                }
+                const petInfo = getLightWeightPetInfoHelper( pet );
 
                 let careGiveRoleId;
                 if( userId === petOwner._id.toString() ){

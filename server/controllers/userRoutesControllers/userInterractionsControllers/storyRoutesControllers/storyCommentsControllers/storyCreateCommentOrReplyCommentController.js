@@ -1,6 +1,6 @@
 import Story from "../../../../../models/Story.js";
 
-import sendNotification from "../../../../../utils/sendNotification.js";
+import sendNotification from "../../../../../utils/notification/sendNotification.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -68,13 +68,15 @@ const storyCreateCommentOrReplyCommentController = async (req, res) => {
 
             await sendNotification(
                 req.user._id.toString(),
-                story.userId.toString(),
+                comment.userId.toString(),
                 "storyReply",
                 insertedReply._id.toString(),
                 "storyComment",
                 req.body.commentId.toString(),
                 "story",
-                storyId.toString()
+                storyId.toString(),
+                null,
+                null
             );
         }else{
             story.comments.push(
@@ -97,6 +99,8 @@ const storyCreateCommentOrReplyCommentController = async (req, res) => {
                 insertedComment._id.toString(),
                 "story",
                 storyId.toString(),
+                null,
+                null,
                 null,
                 null
             );

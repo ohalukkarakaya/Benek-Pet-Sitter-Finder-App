@@ -87,9 +87,7 @@ const StorySchema = new schema(
     }
 );
 
-const Story = mongoose.model(
+export default mongoose.model(
     "Story",
     StorySchema
 );
-
-export default Story;

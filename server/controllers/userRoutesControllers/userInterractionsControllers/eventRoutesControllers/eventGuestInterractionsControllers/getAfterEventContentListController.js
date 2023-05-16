@@ -1,5 +1,6 @@
 import Event from "../../../../../models/Event/Event.js";
 import User from "../../../../../models/User.js";
+import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getAfterEventContentListController = async ( req, res ) => {
     try{
@@ -101,48 +102,14 @@ const getAfterEventContentListController = async ( req, res ) => {
                 delete afterEventObject.comments;
 
                 const sharedUser = await User.findById( afterEventObject.userId );
-                const sharedUserInfo = {
-                    
-                    userId: sharedUser._id
-                                      .toString(),
-                    userProfileImg: sharedUser.profileImg
-                                              .imgUrl,
-                    username: sharedUser.userName,
-                    userFullName: `${
-                            sharedUser.identity
-                                      .firstName
-                        } ${
-                            sharedUser.identity
-                                      .middleName
-                        } ${
-                            sharedUser.identity
-                                      .lastName
-                        }`.replaceAll( "  ", " ")
-                }
+                const sharedUserInfo = getLightWeightUserInfoHelper( sharedUser );
 
                 afterEventObject.user = sharedUserInfo;
                 delete afterEventObject.userId;
 
                 for( let i = 0; i <= 5; i++ ){
                     const likedUser = await User.findById( afterEventObject.likes[ i ].toString() );
-                    const likedUserInfo = {
-                    
-                        userId: likedUser._id
-                                         .toString(),
-                        userProfileImg: likedUser.profileImg
-                                                 .imgUrl,
-                        username: likedUser.userName,
-                        userFullName: `${
-                                likedUser.identity
-                                         .firstName
-                            } ${
-                                likedUser.identity
-                                         .middleName
-                            } ${
-                                likedUser.identity
-                                         .lastName
-                            }`.replaceAll( "  ", " ")
-                        }
+                    const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
 
                     afterEventObject.firstFiveLikedUser.push( likedUserInfo );
                 }

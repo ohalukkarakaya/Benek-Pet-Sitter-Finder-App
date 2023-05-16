@@ -1,5 +1,6 @@
 import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
+import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
 const getCareGiversByLocationController = async ( req, res ) => {
     try{
@@ -138,24 +139,8 @@ const getCareGiversByLocationController = async ( req, res ) => {
                     item.dependedUsers.forEach(
                         async ( dependedId ) => {
                             const depended = await User.findById( dependedId );
-                            const dependedInfo = {
-                        
-                                userId: depended._id
-                                                .toString(),
-                                userProfileImg: depended.profileImg
-                                                        .imgUrl,
-                                username: depended.userName,
-                                userFullName: `${
-                                        depended.identity
-                                                .firstName
-                                    } ${
-                                        depended.identity
-                                                .middleName
-                                    } ${
-                                        depended.identity
-                                                .lastName
-                                    }`.replaceAll( "  ", " ")
-                            }
+                            const dependedInfo = getLightWeightUserInfoHelper( depended );
+                            
                             dependedId = dependedInfo;
                         }
                     );

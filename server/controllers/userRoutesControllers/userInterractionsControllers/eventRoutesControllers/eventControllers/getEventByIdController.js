@@ -1,5 +1,6 @@
 import Event from "../../../../../models/Event/Event.js";
 import User from "../../../../../models/User.js";
+import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getEventByIdController = async ( req, res ) => {
     try{
@@ -37,21 +38,7 @@ const getEventByIdController = async ( req, res ) => {
         searchedEvent.willJoin.forEach(
             async ( willJoinUserId ) => {
                 const willJoinUser = await User.findById( willJoinUserId );
-                const willJoinUserInfo = {
-                    userId: willJoinUser._id.toString(),
-                    userProfileImg: willJoinUser.profileImg.imgUrl,
-                    username: willJoinUser.userName,
-                    userFullName: `${
-                            willJoinUser.identity
-                                        .firstName
-                        } ${
-                            willJoinUser.identity
-                                        .middleName
-                        } ${
-                            willJoinUser.identity
-                                        .lastName
-                        }`.replaceAll( "  ", " ")
-                }
+                const willJoinUserInfo = getLightWeightUserInfoHelper( willJoinUser );
 
                 searchedEvent.willJoinUserList.push( willJoinUserInfo );
             }
@@ -68,21 +55,7 @@ const getEventByIdController = async ( req, res ) => {
         searchedEvent.joined.forEach(
             async ( joinedUserId ) => {
                 const joinedUser = await User.findById( joinedUserId );
-                const joinedUserInfo = {
-                    userId: joinedUser._id.toString(),
-                    userProfileImg: joinedUser.profileImg.imgUrl,
-                    username: joinedUser.userName,
-                    userFullName: `${
-                            joinedUser.identity
-                                    .firstName
-                        } ${
-                            joinedUser.identity
-                                    .middleName
-                        } ${
-                            joinedUser.identity
-                                    .lastName
-                        }`.replaceAll( "  ", " ")
-                }
+                const joinedUserInfo = getLightWeightUserInfoHelper( joinedUser );
 
                 searchedEvent.joinedUserList.push( joinedUserInfo );
             }
@@ -109,48 +82,14 @@ const getEventByIdController = async ( req, res ) => {
             );
         }
 
-        const eventAdminUserInfo = {
-            userId: eventAdmin._id.toString(),
-            userProfileImg: eventAdmin.profileImg.imgUrl,
-            username: eventAdmin.userName,
-            userFullName: `${
-                    eventAdmin.identity
-                              .firstName
-                } ${
-                    eventAdmin.identity
-                              .middleName
-                } ${
-                    eventAdmin.identity
-                              .lastName
-                }`.replaceAll( "  ", " ")
-        }
+        const eventAdminUserInfo = getLightWeightUserInfoHelper( eventAdmin );
 
         searchedEvent.eventAdmin = eventAdminUserInfo;
 
         searchedEvent.eventOrganizers.forEach(
             async ( organizerId ) => {
                 const organizer = await User.findById( organizerId );
-                const organizerInfo = {
-
-                    userId: organizer._id
-                                     .toString(),
-
-                    userProfileImg: organizer.profileImg
-                                             .imgUrl,
-
-                    username: organizer.userName,
-
-                    userFullName: `${
-                            organizer.identity
-                                     .firstName
-                        } ${
-                            organizer.identity
-                                     .middleName
-                        } ${
-                            organizer.identity
-                                     .lastName
-                        }`.replaceAll( "  ", " ")
-                }
+                const organizerInfo = getLightWeightUserInfoHelper( organizer );
 
                 searchedEvent.organizerList.push( organizerInfo );
             }
@@ -167,27 +106,7 @@ const getEventByIdController = async ( req, res ) => {
             lastAfterEventObject.likes.forEach(
                 async ( likedUserId ) => {
                     const likedUser = await User.findById( likedUserId.toString() );
-                    const likedUserInfo = {
-
-                        userId: likedUser._id
-                                         .toString(),
-    
-                        userProfileImg: likedUser.profileImg
-                                                 .imgUrl,
-    
-                        username: likedUser.userName,
-    
-                        userFullName: `${
-                                likedUser.identity
-                                         .firstName
-                            } ${
-                                likedUser.identity
-                                         .middleName
-                            } ${
-                                likedUser.identity
-                                         .lastName
-                            }`.replaceAll( "  ", " ")
-                    }
+                    const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
 
                     lastAfterEventObject.likedUsers.push( likedUserInfo );
                 }

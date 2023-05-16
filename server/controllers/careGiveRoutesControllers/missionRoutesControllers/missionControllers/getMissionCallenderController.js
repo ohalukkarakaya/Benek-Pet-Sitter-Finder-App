@@ -1,6 +1,8 @@
 import CareGive from "../../../../models/CareGive/CareGive.js";
 import Pet from "../../../../models/Pet.js";
 import User from "../../../../models/User.js";
+import getLightWeightPetInfoHelper from "../../../../utils/getLightWeightPetInfoHelper.js";
+import getLightWeightUserInfoHelper from "../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getMissionCallenderController = async ( req, res ) => {
     try{
@@ -45,18 +47,7 @@ const getMissionCallenderController = async ( req, res ) => {
 
                         const pet = await Pet.findById( careGive.petId.toString() );
 
-                        const petInfo = {
-                            petId: pet._id.toString(),
-                            petProfileImgUrl: pet.petProfileImg
-                                                 .imgUrl,
-                            petName: pet.name,
-                            sex: pet.sex,
-                            birthDay: pet.birthDay,
-                            kind: pet.kind,
-                            species: pet.species,
-                            handoverCount: pet.handOverRecord
-                                              .length
-                        }
+                        const petInfo = getLightWeightPetInfoHelper( pet );
                 
                         const petOwner = await User.findById( 
                                                         careGive.petOwner
@@ -70,67 +61,33 @@ const getMissionCallenderController = async ( req, res ) => {
                                                                 .toString()
                                                     );
                 
-                        const petOwnerInfo = {
-                
-                            userId: petOwner._id
-                                            .toString(),
-                            userProfileImg: petOwner.profileImg
-                                                    .imgUrl,
-                            username: petOwner.userName,
-                            userFullName: `${
-                                    petOwner.identity
-                                            .firstName
-                                } ${
-                                    petOwner.identity
-                                            .middleName
-                                } ${
-                                    petOwner.identity
-                                            .lastName
-                                }`.replaceAll( "  ", " "),
-                            contact: careGive.petOwner.petOwnerContact
-                        }
-                
-                        const careGiverInfo = {
-                
-                            userId: careGiver._id
-                                            .toString(),
-                            userProfileImg: careGiver.profileImg
-                                                     .imgUrl,
-                            username: careGiver.userName,
-                            userFullName: `${
-                                    careGiver.identity
-                                             .firstName
-                                } ${
-                                    careGiver.identity
-                                             .middleName
-                                } ${
-                                    careGiver.identity
-                                             .lastName
-                                }`.replaceAll( "  ", " "),
-                            contact: careGive.careGiver.careGiverContact
-                        }
+                        const petOwnerInfo = getLightWeightUserInfoHelper( petOwner );
+                        const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
 
                         let careGiveRoleId;
                         if(
                             pet.allOwners
-                            .includes( userId )
+                               .includes( userId )
                         ){
                             careGiveRoleId = 1;
-                        }else if( userId === careGiver._id.toString() ){
+                        }else if( 
+                            userId === careGiver._id
+                                                .toString() 
+                        ){
                             careGiveRoleId = 2;
                         }
 
                         let missionContent;
                         if( 
                             mission.missionContent
-                                .videoUrl
+                                   .videoUrl
                         ){
                             missionContent = {
                                 videoUrl: mission.missionContent
-                                                .videoUrl,
+                                                 .videoUrl,
                                 timeCode: mission.missionContent
-                                                    .timeSignature
-                                                    .timePassword,
+                                                 .timeSignature
+                                                 .timePassword,
                             }
                         }
 
