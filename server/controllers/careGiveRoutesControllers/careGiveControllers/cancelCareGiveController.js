@@ -2,7 +2,9 @@ import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
 
-const cancelCareGiveController = async (req, res) => {
+import recordLog from "../../../utils/logs/recordLog.js";
+
+const cancelCareGiveController = async (req, res, next) => {
     try{
         const careGiveId = req.params.careGiveId.toString();
         if(!careGiveId){
@@ -136,30 +138,56 @@ const cancelCareGiveController = async (req, res) => {
               }
         );
 
-        careGive.deleteOne().then(
-            (_) => {
-                return res.status(200).json(
-                    {
-                        error: false,
-                        message: "careGive canceled succesfully"
+        careGive.deleteOne()
+                .then(
+                    async (_) => {
+                        await recordLog(
+                            req.user._id.toString(),
+                            false,
+                            null,
+                            "cancelCareGiveController",
+                            next
+                        );
+                        return res.status(200).json(
+                            {
+                                error: false,
+                                message: "careGive canceled succesfully"
+                            }
+                        );
+                    }
+                ).catch(
+                    async ( error ) => {
+                        if(error){
+                            console.log(error);
+                            
+                            await recordLog(
+                                req.user._id.toString(),
+                                true,
+                                error.message,
+                                "cancelCareGiveController",
+                                next
+                            );
+
+                            return res.status(500).json(
+                                {
+                                    error: true,
+                                    message: "Internal server error"
+                                }
+                            );
+                        }
                     }
                 );
-            }
-        ).catch(
-            (error) => {
-                if(error){
-                    console.log(error);
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                    );
-                }
-            }
-        );
-    }catch(err){
+    }catch( err ){
         console.log("ERROR: cancel care give", err);
+        
+        await recordLog(
+            req.user._id.toString(),
+            true,
+            err.message,
+            "cancelCareGiveController",
+            next
+        );
+
         return res.status(500).json(
             {
                 error: true,

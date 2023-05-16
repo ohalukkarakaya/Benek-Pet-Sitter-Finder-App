@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const resendOtpCodeController = async (req, res) => {
+const resendOtpCodeController = async (req, res, next) => {
     try{
         let { userId, email } = req.body;
         if(!userId || !email){

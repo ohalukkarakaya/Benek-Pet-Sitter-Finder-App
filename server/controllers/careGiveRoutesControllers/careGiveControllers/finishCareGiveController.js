@@ -1,6 +1,9 @@
 import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
+
+import recordLog from "../../../utils/logs/recordLog.js";
+
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 
@@ -171,13 +174,22 @@ const finishCareGiveController = async (req, res) => {
         careGive.markModified( "finishProcess" );
 
         careGive.save().then(
-            (_) => {
-                return res.status( 200 ).json(
-                    {
-                        error: false,
-                        message: "Care give finished succesfully"
-                    }
+            async (_) => {
+                await recordLog(
+                    req.user._id.toString(),
+                    false,
+                    null,
+                    "finishCareGiveController",
+                    next
                 );
+
+                return res.status( 200 )
+                          .json(
+                               {
+                                   error: false,
+                                   message: "Care give finished succesfully"
+                               }
+                           );
             }
         ).catch(
             ( error ) => {
@@ -195,12 +207,22 @@ const finishCareGiveController = async (req, res) => {
 
     }catch(err){
         console.log( "ERROR: finish care give", err );
-        return res.status( 500 ).json(
-            {
-                error: true,
-                message: "Internal server error"
-            }
+
+        await recordLog(
+            req.user._id.toString(),
+            true,
+            err.message,
+            "finishCareGiveController",
+            next
         );
+
+        return res.status( 500 )
+                  .json(
+                      {
+                          error: true,
+                          message: "Internal server error"
+                      }
+                  );
     }
 }
 

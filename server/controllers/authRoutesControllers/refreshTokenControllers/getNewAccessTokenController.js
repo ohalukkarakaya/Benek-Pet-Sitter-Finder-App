@@ -33,7 +33,7 @@ const getNewAccessTokenController = async (req, res) => {
                 (err) => res.status(400).json(err)
             );
         }
-    }catch(err){
+    }catch( err ){
         console.log(err);
         res.status(500).json(
             {

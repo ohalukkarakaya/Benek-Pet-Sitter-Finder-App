@@ -4,6 +4,7 @@ import CareGive from "../../../models/CareGive/CareGive.js";
 import dotenv from "dotenv";
 import { createRequire } from "module";
 
+import recordLog from "../../../utils/logs/recordLog.js";
 import sendNotification from "../../../utils/notification/sendNotification.js";
 
 const require = createRequire(import.meta.url);
@@ -14,7 +15,7 @@ const pricingDataset = JSON.parse(
 
 dotenv.config();
 
-const careGiveInvitationController = async (req, res) => {
+const careGiveInvitationController = async (req, res, next) => {
     try{
         const petId = req.body.petId;
         const startDate = req.body.startDate;
@@ -201,12 +202,21 @@ const careGiveInvitationController = async (req, res) => {
                         null,
                         null
                     );
-                    return res.status(200).json(
-                        {
-                            error: false,
-                            message: `user with the id "${req.body.ownerId}" invented to careGive`
-                        }
+
+                    await recordLog(
+                        req.user._id.toString(),
+                        false,
+                        null,
+                        "careGiveInvitationController",
+                        next
                     );
+                    return res.status( 200 )
+                              .json(
+                                   {
+                                       error: false,
+                                       message: `user with the id "${req.body.ownerId}" invented to careGive`
+                                   }
+                               );
                 }
             ).catch(
                 (error) => {
@@ -224,6 +234,15 @@ const careGiveInvitationController = async (req, res) => {
         }
     }catch(err){
         console.log("Error: care give", err);
+
+        await recordLog(
+            req.user._id.toString(),
+            true,
+            err.message,
+            "careGiveInvitationController",
+            next
+        );
+
         return res.status(500).json(
             {
                 error: true,

@@ -4,7 +4,7 @@ import CareGive from "../../../models/CareGive/CareGive.js";
 import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
 import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
-const getCareGiveController = async ( req, res ) => {
+const getCareGiveController = async ( req, res, next ) => {
     try{
         const userId = req.user._id.toString();
         const careGiveId = req.params.caraGiveId;
@@ -125,22 +125,41 @@ const getCareGiveController = async ( req, res ) => {
 
         careGive = careGiveInfo;
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "CareGive List Prepared Succesfully",
-                totalCareGiveCount: totalCareGiveCount,
-                careGiveList: careGives,
-            }
+        await recordLog(
+            req.user._id.toString(),
+            false,
+            null,
+            "getCareGiveController",
+            next
         );
+
+        return res.status( 200 )
+                  .json(
+                      {
+                          error: false,
+                          message: "CareGive List Prepared Succesfully",
+                          totalCareGiveCount: totalCareGiveCount,
+                          careGive: careGiveInfo,
+                      }
+                  );
     }catch( err ){
         console.log("ERROR: getCareGiveController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
+
+        await recordLog(
+            req.user._id.toString(),
+            false,
+            null,
+            "getCareGiveController",
+            next
         );
+
+        res.status( 500 )
+           .json(
+                {
+                    error: true,
+                    message: "Internal Server Error"
+                }
+            );
     }
 } 
 

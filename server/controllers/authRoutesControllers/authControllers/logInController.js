@@ -10,7 +10,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const logInController = async (req, res) => {
+const logInController = async ( req, res, next ) => {
     try{
       const user = await User.findOne(
         {
@@ -62,7 +62,14 @@ const logInController = async (req, res) => {
               }
             );
           }else{
-            if(!user.trustedIps.includes(req.body.ip) || !user.isLoggedInIpTrusted){
+            if(
+              !user.trustedIps
+                   .includes(
+                        req.body
+                           .ip
+                    ) 
+              || !user.isLoggedInIpTrusted
+            ){
               await UserOTPVerification.deleteMany({ userId: user._id });
               await User.updateOne({_id: user._id}, {isLoggedInIpTrusted: false});
               await sendOTPVerificationEmail(
@@ -80,20 +87,30 @@ const logInController = async (req, res) => {
                 }
               );
             }else{
-              if(user.deactivation.isDeactive){
-                user.deactivation.isDeactive = false;
-                user.deactivation.deactivationDate = null;
+              if( 
+                user.deactivation
+                    .isDeactive 
+              ){
+                user.deactivation
+                    .isDeactive = false;
+
+                user.deactivation
+                    .deactivationDate = null;
+
                 user.isAboutToDelete = false;
-                user.deactivation.markModified("deactivation");
+
+                user.deactivation
+                    .markModified( "deactivation" );
+
                 user.save(
-                  function (err) {
-                    if(err) {
+                  ( err ) => {
+                    if( err ) {
                         console.error('ERROR: While Update!');
                     }
                   }
                 );
               }
-              const { accessToken, refreshToken } = await generateTokens(user);
+              const { accessToken, refreshToken } = await generateTokens( user );
               return res.status(200).json(
                 {
                   error: false,
@@ -109,7 +126,7 @@ const logInController = async (req, res) => {
         }
       }
     }catch(err){
-      console.log(err);
+      console.log( err );
       return res.status(500).json(
         {
           error: true,
