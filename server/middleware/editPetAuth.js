@@ -12,23 +12,28 @@ const editPetAuth = async (req, res, next) => {
         );
     }
     const petOwner = await User.findById(pet.primaryOwner.toString());
-    if(!petOwner || petOwner.deactivation.isDeactive){
-        return res.status(404).json(
-            {
-                error: true,
-                message: "Pet not found"
-            }
-        );
+    if(
+        !petOwner 
+        || petOwner.deactivation.isDeactive
+    ){
+        return res.status( 404 )
+                  .json(
+                        {
+                            error: true,
+                            message: "Pet not found"
+                        }
+                   );
     }
-    petOwner.done();
+    petOwner.save();
 
     if(pet.primaryOwner !== req.user._id){
-        return res.status(403).json(
-            {
-                error: true,
-                message: "You can't edit this pet"
-            }
-        );
+        return res.status( 403 )
+                  .json(
+                      {
+                          error: true,
+                          message: "You can't edit this pet"
+                      }
+                   );
     }
     req.pet = pet;
     next();

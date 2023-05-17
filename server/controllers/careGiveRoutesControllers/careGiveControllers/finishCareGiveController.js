@@ -2,14 +2,12 @@ import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
 
-import recordLog from "../../../utils/logs/recordLog.js";
-
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 
 dotenv.config();
 
-const finishCareGiveController = async (req, res) => {
+const finishCareGiveController = async ( req, res ) => {
     try{
         const careGiveId = req.params.careGiveId;
         const actionCodePassword = req.body.actionCodePassword;
@@ -26,31 +24,34 @@ const finishCareGiveController = async (req, res) => {
             || !careGiverIdFromCode
             || !codeType
         ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "missing params"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                           {
+                               error: true,
+                               message: "missing params"
+                           }
+                       );
         }
 
         if( codeType !== "finish" ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "This is not a finish code"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                           {
+                               error: true,
+                               message: "This is not a finish code"
+                           }
+                       );
         }
 
         const careGive = await CareGive.findById( careGiveId );
         if( !careGive ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "Care give not found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                           {
+                               error: true,
+                               message: "Care give not found"
+                           }
+                       );
         }
 
         if( 
@@ -58,22 +59,24 @@ const finishCareGiveController = async (req, res) => {
                                .petOwnerId
                                .toString() 
         ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "care giver should scan this code"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                           {
+                               error: true,
+                               message: "care giver should scan this code"
+                           }
+                       );
         }
 
         const pet = await Pet.findById( careGive.petId.toString() );
         if( !pet ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "Pet not found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                           {
+                               error: true,
+                               message: "Pet not found"
+                           }
+                       );
         }
 
         const careGiver = await User.findById( userId );
@@ -90,12 +93,13 @@ const finishCareGiveController = async (req, res) => {
                                     .toString() 
                         )
         ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "Care giver not found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                           {
+                               error: true,
+                               message: "Care giver not found"
+                           }
+                       );
         }
 
         const petOwner = await User.findById(
@@ -112,25 +116,33 @@ const finishCareGiveController = async (req, res) => {
             || petOwner.blockedUsers
                        .includes( userId )
         ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "pet owner not found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                           {
+                               error: true,
+                               message: "pet owner not found"
+                           }
+                       );
         }
 
         if(
-            pet._id.toString() !== petIdFromCode
-            || careGiver._id.toString() !== careGiverIdFromCode
-            || req.user._id.toString() !== petOwnerIdFromCode
+            pet._id
+               .toString() !== petIdFromCode
+
+            || careGiver._id
+                        .toString() !== careGiverIdFromCode
+
+            || req.user
+                  ._id
+                  .toString() !== petOwnerIdFromCode
         ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "data in code is invalid"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                           {
+                               error: true,
+                               message: "data in code is invalid"
+                           }
+                       );
         }
 
         const verifiedPassword = await bcrypt.compare(
@@ -143,12 +155,13 @@ const finishCareGiveController = async (req, res) => {
 
         );
         if( !verifiedPassword ){
-            return res.status( 403 ).json(
-                {
-                    error: true,
-                    message: "Invalid password"
-                }
-            );
+            return res.status( 403 )
+                      .json(
+                           {
+                               error: true,
+                               message: "Invalid password"
+                           }
+                       );
         }
 
         careGive.invitation
@@ -173,49 +186,34 @@ const finishCareGiveController = async (req, res) => {
 
         careGive.markModified( "finishProcess" );
 
-        careGive.save().then(
-            async (_) => {
-                await recordLog(
-                    req.user._id.toString(),
-                    false,
-                    null,
-                    "finishCareGiveController",
-                    next
-                );
-
-                return res.status( 200 )
-                          .json(
-                               {
-                                   error: false,
-                                   message: "Care give finished succesfully"
-                               }
-                           );
-            }
-        ).catch(
-            ( error ) => {
-                if( error ){
-                    console.log( error );
-                    return res.statu( 500 ).json(
-                        {
-                            error: true,
-                            message: "Internal server error"
+        careGive.save()
+                .then(
+                    async (_) => {
+                        return res.status( 200 )
+                                  .json(
+                                       {
+                                           error: false,
+                                           message: "Care give finished succesfully"
+                                       }
+                                   );
+                    }
+                ).catch(
+                    ( error ) => {
+                        if( error ){
+                            console.log( error );
+                            return res.statu( 500 )
+                                      .json(
+                                           {
+                                               error: true,
+                                               message: "Internal server error"
+                                           }
+                                       );
                         }
-                    );
-                }
-            }
-        );
+                    }
+                );
 
     }catch(err){
         console.log( "ERROR: finish care give", err );
-
-        await recordLog(
-            req.user._id.toString(),
-            true,
-            err.message,
-            "finishCareGiveController",
-            next
-        );
-
         return res.status( 500 )
                   .json(
                       {

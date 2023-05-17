@@ -29,7 +29,7 @@ const deletePetController = async (req, res) => {
                 );
               }
             }
-          );
+          ).clone();
     
           await ReportMission.findOne(
             { petId: petId },
@@ -43,7 +43,7 @@ const deletePetController = async (req, res) => {
                 );
               }
             }
-          );
+          ).clone();
     
           //clean followers follow event
           for(var i = 0; i < petFollowers.length; i ++){
@@ -124,59 +124,76 @@ const deletePetController = async (req, res) => {
           }
     
           //delete images of pet
-          async function emptyS3Directory(bucket, dir){
+          const emptyS3Directory = async ( bucket, dir ) => {
             const listParams = {
               Bucket: bucket,
               Prefix: dir
             };
-            const listedObjects = await s3.listObjectsV2(listParams);
-            if (listedObjects.Contents.length === 0) return;
+            const listedObjects = await s3.listObjectsV2( listParams );
+            if (
+              !( listedObjects.Contents )
+              || listedObjects.Contents
+                              .length === 0
+            ) return;
             const deleteParams = {
               Bucket: bucket,
               Delete: { Objects: [] }
             };
     
-            listedObjects.Contents.forEach(({ Key }) => {
-              deleteParams.Delete.Objects.push({ Key });
-            });
-            await s3.deleteObjects(deleteParams);
-              if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
-            }
+            listedObjects.Contents
+                         .forEach(
+                            ({ Key }) => {
+                              deleteParams.Delete.Objects.push({ Key });
+                            }
+                          );
+            await s3.deleteObjects( deleteParams );
+            if ( listedObjects.IsTruncated ) await emptyS3Directory(bucket, dir);
+          }
           
-            emptyS3Directory(process.env.BUCKET_NAME, `pets/${petId}/`).then(
-            (_) => {
-              //delete pet
-              req.pet.deleteOne().then(
-                (_) => {
-                  return res.status(200).json(
-                    {
-                      error: false,
-                      message: "Pet deleted succesfully"
-                    }
-                  );
-                }
-              ).catch(
-                (error) => {
-                  console.log(error);
-                    return res.status(500).json(
-                      {
-                        error: true,
-                        message: "An error occured while deleting",
-                        error: error
+            emptyS3Directory( 
+                  process.env
+                         .BUCKET_NAME, 
+                  
+                  `pets/${petId}/`
+            ).then(
+              (_) => {
+                //delete pet
+                req.pet
+                   .deleteOne()
+                   .then(
+                      (_) => {
+                        return res.status( 200 )
+                                  .json(
+                                    {
+                                      error: false,
+                                      message: "Pet deleted succesfully"
+                                    }
+                                  );
+                      }
+                    ).catch(
+                      ( error ) => {
+                        console.log( error );
+                          return res.status( 500 )
+                                    .json(
+                                      {
+                                        error: true,
+                                        message: "An error occured while deleting",
+                                        error: error
+                                      }
+                                    );
                       }
                     );
-                }
-              );
-            }
+              }
           );
-    }catch(err){
-        console.log(err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+    }catch( err ){
+        console.log( err );
+        res.status( 500 )
+           .json(
+                {
+                    error: true,
+                    message: "Internal Server Error"
+                }
+            );
     }
 }
 

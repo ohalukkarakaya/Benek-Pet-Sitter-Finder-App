@@ -25,6 +25,8 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import morgan from "morgan";
+import jwt from "jsonwebtoken";
 
 import authRoutes from './routes/auth/auth.js';
 import refreshTokenRoutes from './routes/auth/refreshToken.js';
@@ -70,9 +72,26 @@ const connect = () => {
 const server = http.createServer( app );
 initMeetingServer( server );
 
+//record log data
+morgan.token(
+  "userId",
+  ( req, res ) => {
+    const token = req.header("x-access-token");
+    if( !token ){
+      return "No Token Provided";
+    }
+    const tokenDetails = jwt.verify(
+      token,
+      process.env.ACCESS_TOKEN_PRIVATE_KEY
+    );
+    return tokenDetails._id.toString();
+  }
+);
+app.use( morgan( ':method :url :status :res[content-length] - :response-time ms :date[web] :userId' ) );
+
 app.use(express.static('src'));
 
-app.use(express.json());
+app.use( express.json() );
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ type: 'application/*+json' }));
 
