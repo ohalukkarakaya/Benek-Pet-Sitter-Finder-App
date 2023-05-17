@@ -1,6 +1,10 @@
 import User from "../../../models/User.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
 import UserToken from "../../../models/UserToken.js";
+import Notification from "../../../models/Notification.js";
+import InviteEvent from "../../../models/Event/Invitations/InviteEvent.js";
+import SecondaryOwnerInvitation from "../../../models/ownerOperations/SecondaryOwnerInvitation.js";
+import PetHandOverInvitation from "../../../models/ownerOperations/PetHandOverInvitation.js";
 
 import dotenv from "dotenv";
 
@@ -42,6 +46,150 @@ const deleteUserController = async (req, res) => {
             }
           );
         }
+
+        //delete notifications
+        await Notification.deleteMany(
+                                {
+                                  from: userId
+                                }
+                           );
+
+        const receivedNotifications = await Notification.find(
+                                                            {
+                                                                to: { $in: { userId } }
+                                                            }
+                                                       );
+
+        receivedNotifications.forEach(
+            ( notification ) => {
+                if( 
+                    notification.to
+                                .length >= 1
+                ){
+                    notification.deleteOne()
+                                .then()
+                                .catch(
+                                    async ( error ) => {
+                                        if( error ){
+                                            console.log( error );
+                                        }
+                                    }
+                                );
+                }else{
+                    notification.to = notification.to
+                                                  .filter(
+                                                    notificationUserId =>
+                                                        notificationUserId.toString() !== userId
+                                                  );
+
+                    notification.seenBy = notification.seenBy
+                                                      .filter(
+                                                        notificationUserId =>
+                                                             notificationUserId.toString() !== userId
+                                                       );
+
+                    notification.openedBy = notification.openedBy
+                                                        .filter(
+                                                          notificationUserId =>
+                                                             notificationUserId.toString() !== userId
+                                                       );
+
+                    notification.markModified( "to" );
+                    notification.markModified( "seenBy" );
+                    notification.markModified( "openedBy" );
+                    notification.save(
+                        ( err ) => {
+                            if( err ) {
+                                console.error('ERROR: While Update!');
+                            }
+                          }
+                    );
+                }
+            }
+        );
+
+        // get out of chat groups
+        const releatedChats = await Chat.find(
+                                            {
+                                              "members.userId": { 
+                                                                  $in: { 
+                                                                        userId 
+                                                                       } 
+                                                                } 
+                                            }
+                                        );
+
+        releatedChats.forEach(
+            ( chat ) => {
+                chat.members = chat.members
+                                   .filter(
+                                        chatMember =>
+                                            chatMember.userId
+                                                      .toString() !== userId
+                                    );
+            }
+        );
+
+        //delete invitations
+        //delete event invitations
+        await InviteEvent.deleteMany(
+            {
+              $or: [
+                  {
+                      $and: [
+                          { eventAdmin: userId },
+                          { invitedId: blockingUserId }
+                      ]
+                  },
+                  {
+                      $and: [
+                          { eventAdmin: blockingUserId },
+                          { invitedId: userId }
+                      ]
+                  }
+              ]
+            }
+         );
+
+        //delete secondaryOwner invitations
+        await SecondaryOwnerInvitation.deleteMany(
+            {
+              $or: [
+                  {
+                      $and: [
+                          { from: userId },
+                          { to: blockingUserId }
+                      ]
+                  },
+                  {
+                      $and: [
+                          { from: blockingUserId },
+                          { to: userId }
+                      ]
+                  }
+              ]
+            }
+        );
+
+        //delete petHandOver invitations
+        await PetHandOverInvitation.deleteMany(
+            {
+              $or: [
+                  {
+                      $and: [
+                          { from: userId },
+                          { to: blockingUserId }
+                      ]
+                  },
+                  {
+                      $and: [
+                          { from: blockingUserId },
+                          { to: userId }
+                      ]
+                  }
+              ]
+            }
+        );
   
         const userToken = await UserToken.findOne(
           {
