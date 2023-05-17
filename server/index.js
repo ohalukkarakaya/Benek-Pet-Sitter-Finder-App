@@ -48,9 +48,8 @@ import expireUser from './cron_jobs/deleteExpiredUser.js';
 import http from 'http';
 import initMeetingServer from './utils/meetingServices/meeting-server.js';
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import parseLogData from './utils/log/parseLog.js';
+import saveLogHelper from './utils/log/saveLogHelper.js';
 
 const app = express();
 dotenv.config();
@@ -76,17 +75,6 @@ const connect = () => {
 const server = http.createServer( app );
 initMeetingServer( server );
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-//record log data
-const requestLogStream = fs.createWriteStream( 
-                                  path.join( __dirname, 'request.log' ),
-                                  {
-                                    flags: 'a'
-                                  }
-                            );
-                            
 morgan.token(
   "userId",
   ( req, res ) => {
@@ -99,7 +87,7 @@ morgan.token(
         return "No Token Provided";
       }
       
-      return "Refresh Token Request";
+      return `RefreshToken: ${refreshToken}`;
     }
     
     const tokenDetails = jwt.verify(
@@ -114,7 +102,17 @@ app.use(
     morgan( 
       ':userId | :method :url - :status - :res[content-length] - :response-time ms - :date[web]',
       {
-        stream: requestLogStream
+        stream: {
+          write: async ( log ) => {
+            try{
+              // Log işleme kodlarını burada gerçekleştirin
+              const logData = await parseLogData( log );
+              saveLogHelper( logData );
+            }catch( err ){
+              console.log( err );
+            }
+          },
+        }
       }
     ) 
 );
