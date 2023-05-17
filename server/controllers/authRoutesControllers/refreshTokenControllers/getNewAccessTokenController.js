@@ -5,7 +5,7 @@ import { refreshTokenBodyValidation } from "../../../utils/bodyValidation/user/s
 const getNewAccessTokenController = async ( req, res ) => {
     try{
         const { error } = refreshTokenBodyValidation( req.body );
-        if(error){
+        if( error ){
             return res.status( 400 )
                       .json(
                            {
@@ -14,36 +14,35 @@ const getNewAccessTokenController = async ( req, res ) => {
                                              .message
                            }
                        );
-        }else{
-            verifyRefreshToken(
-                            req.body
-                               .refreshToken
-            ).then(
-                ({ tokenDetails }) => {
-                    const payload = { 
-                                    _id: tokenDetails._id, 
-                                    roles: tokenDetails.roles
-                    };
-                    const accessToken = jwt.sign(
-                        payload,
-                        process.env
-                               .ACCESS_TOKEN_PRIVATE_KEY,
-                        { expiresIn: "14m" }
-                    );
-                    res.status( 200 )
-                       .json(
-                           {
-                               error: false,
-                               accessToken,
-                               message: "Access token created successfully"
-                           }
-                        );
-                }
-            ).catch(
-                ( err ) => res.status( 400 )
-                              .json( err )
-            );
         }
+        verifyRefreshToken(
+                        req.body
+                            .refreshToken
+        ).then(
+            ({ tokenDetails }) => {
+                const payload = { 
+                                _id: tokenDetails._id, 
+                                roles: tokenDetails.roles
+                };
+                const accessToken = jwt.sign(
+                    payload,
+                    process.env
+                           .ACCESS_TOKEN_PRIVATE_KEY,
+                    { expiresIn: "14m" }
+                );
+                res.status( 200 )
+                   .json(
+                       {
+                           error: false,
+                            accessToken,
+                           message: "Access token created successfully"
+                       }
+                    );
+            }
+        ).catch(
+            ( err ) => res.status( 400 )
+                          .json( err )
+        );
     }catch( err ){
         console.log( err );
         res.status( 500 )

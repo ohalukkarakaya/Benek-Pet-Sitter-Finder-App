@@ -11,113 +11,203 @@ dotenv.config();
 const deletePetController = async (req, res) => {
     try{
         //clean depandancies
-          const primaryOwner = await User.findById(req.pet.primaryOwner.toString());
-          const allOwners = req.pet.allOwners.filter(owner => owner.toString() !== req.pet.primaryOwner.toString());
-          const petId = req.pet._id.toString();
-          const petFollowers = req.pet.followers;
+          const primaryOwner = await User.findById(
+                                                req.pet
+                                                   .primaryOwner
+                                                   .toString()
+                                          );
+          const allOwners = req.pet
+                               .allOwners
+                               .filter(
+                                    owner => 
+                                        owner.toString() !== req.pet
+                                                                .primaryOwner
+                                                                .toString()
+                                );
+          const petId = req.pet
+                           ._id
+                           .toString();
+                           
+          const petFollowers = req.pet
+                                  .followers;
     
           //check if pet is on care give
           await CareGive.findOne(
             { petId: petId },
-            (err, careGive) => {
-              if( careGive && !careGive.finishProcess.isFinished ){
-                return res.status(400).json(
-                  {
-                    error: true,
-                    message: "Pet is on care give"
-                  }
-                );
+            ( err, careGive ) => {
+              if( 
+                careGive 
+                && !careGive.finishProcess
+                            .isFinished 
+              ){
+                return res.status( 400 )
+                          .json(
+                             {
+                               error: true,
+                               message: "Pet is on care give"
+                             }
+                           );
               }
             }
           ).clone();
     
           await ReportMission.findOne(
             { petId: petId },
-            (err, report) => {
+            ( err, report ) => {
               if( report ){
-                return res.status(400).json(
-                  {
-                    error: true,
-                    message: "There is reported mission about this pet"
-                  }
-                );
+                return res.status( 400 )
+                          .json(
+                            {
+                              error: true,
+                              message: "There is reported mission about this pet"
+                            }
+                          );
               }
             }
           ).clone();
     
           //clean followers follow event
-          for(var i = 0; i < petFollowers.length; i ++){
-            follower = await User.findById(petFollowers[i]);
-            follower.followingUsersOrPets = follower.followingUsersOrPets.filter(
-              followingObject =>
-                followingObject.followingId.toString() !== petId
-            );
-            follower.markModified("followingUsersOrPets");
+          for( var i = 0; i < petFollowers.length; i ++ ){
+            follower = await User.findById( petFollowers[i] );
+            follower.followingUsersOrPets = follower.followingUsersOrPets
+                                                    .filter(
+                                                       followingObject =>
+                                                           followingObject.followingId
+                                                                          .toString() !== petId
+                                                     );
+            follower.markModified( "followingUsersOrPets" );
             follower.save(
-              (err) => {
-                if(err){
-                    console.error('ERROR: While deleting follow event of follower');
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: 'ERROR: While deleting follow event of follower'
-                        }
-                    );
+              ( err ) => {
+                if( err ){
+                    console.error( 'ERROR: While deleting follow event of follower' );
+                    return res.status( 500 )
+                              .json(
+                                   {
+                                      error: true,
+                                      message: 'ERROR: While deleting follow event of follower'
+                                   }
+                               );
                 }
               }
             );
           }
     
           //clean dependecy of primary owner
-          primaryOwner.pets = primaryOwner.pets.filter(pet => pet.toString() !== req.pet._id.toString());
+          primaryOwner.pets = primaryOwner.pets
+                                          .filter(
+                                              pet => pet.toString() !== req.pet
+                                                                           ._id
+                                                                           .toString()
+                                           );
           
-          for(var i = 0; i < allOwners.length; i ++){
-            for(var indx = 0; indx < primaryOwner.dependedUsers.length; indx ++){
+          for( 
+            var i = 0; 
+            i < allOwners.length; 
+            i ++ 
+          ){
+            for(
+              var indx = 0; 
+              indx < primaryOwner.dependedUsers
+                                 .length; 
+              indx ++
+            ){
               const dep = primaryOwner.dependedUsers[indx];
               const secondaryOwner = allOwners[i];
     
-              if(dep.user.toString() === secondaryOwner.toString()){
-                if(dep.linkedPets.length > 1){
-                  primaryOwner.dependedUsers[indx].linkedPets = primaryOwner.dependedUsers[indx].linkedPets.filter(pets => pets.toString() !== req.pet._id);
+              if(
+                dep.user
+                   .toString() === secondaryOwner.toString()
+              ){
+                if(
+                  dep.linkedPets
+                     .length > 1
+                ){
+                  primaryOwner.dependedUsers[indx]
+                              .linkedPets = primaryOwner.dependedUsers[indx]
+                                                        .linkedPets
+                                                        .filter(
+                                                              pets => pets.toString() !== req.pet
+                                                                                             ._id
+                                                                                             .toString()
+                                                         );
                 }else{
-                  primaryOwner.dependedUsers = primaryOwner.dependedUsers.filter(depUser => depUser.user.toString() !== secondaryOwner.toString());
+                  primaryOwner.dependedUsers = primaryOwner.dependedUsers
+                                                           .filter(
+                                                              depUser => depUser.user
+                                                                                .toString() !== secondaryOwner.toString()
+                                                            );
                 }
               }
             }
           }
     
-          primaryOwner.markModified("pets");
-          primaryOwner.markModified("dependedUsers");
+          primaryOwner.markModified( "pets" );
+          primaryOwner.markModified( "dependedUsers" );
           primaryOwner.save(
             function (err) {
               if(err) {
-                console.error(`ERROR: While Updating Owner "${primaryOwner._id.toString()}"!`);
+                console.error( 
+                          `ERROR: While Updating Owner "${
+                                                        primaryOwner._id
+                                                                    .toString()
+                                                       }"!` 
+                        );
               }
             }
           );
     
           //clean dependency of secondary owners
-          for(var i = 0; i < allOwners.length; i ++){
+          for(
+            var i = 0; 
+            i < allOwners.length; 
+            i ++
+          ){
             const ownerId = allOwners[i].toString();
-            const owner = await User.findById(ownerId);
+            const owner = await User.findById( ownerId );
             const deps = owner.dependedUsers;
     
-            for(var indx = 0; indx < deps.length; indx ++){
-              if(deps[indx].user.toString() === req.pet.primaryOwner.toString()){
+            for(
+              var indx = 0; 
+              indx < deps.length; 
+              indx ++
+            ){
+              if(
+                deps[indx].user
+                          .toString() === req.pet
+                                             .primaryOwner
+                                             .toString()
+              ){
                 const linkedPets = deps[indx].linkedPets;
-                if(linkedPets.length > 1){
-                  owner.dependedUsers[indx].linkedPets = owner.dependedUsers[indx].linkedPets.filter(pets => pets.toString() !== req.pet._id);
+                if( linkedPets.length > 1 ){
+                  owner.dependedUsers[indx]
+                       .linkedPets = owner.dependedUsers[indx]
+                                          .linkedPets
+                                          .filter(
+                                            pets => 
+                                                pets.toString() !== req.pet
+                                                                       ._id
+                                                                       .toString()
+                                          );
                 }else{
-                  owner.dependedUsers = owner.dependedUsers.filter(dependeds => dependeds !== deps[indx]);
+                  owner.dependedUsers = owner.dependedUsers
+                                             .filter(
+                                                dependeds => 
+                                                    dependeds !== deps[indx]
+                                              );
                 }
               }
             }
     
-            owner.markModified("dependedUser");
+            owner.markModified( "dependedUser" );
             owner.save(
-              function (err) {
-                if(err) {
-                  console.error(`ERROR: While Updating Secondary Owner "${owner._id.toString()}"!`);
+              ( err ) => {
+                if( err ) {
+                  console.error( 
+                            `ERROR: While Updating Secondary Owner "${
+                                                                    owner._id
+                                                                         .toString()
+                                                                    }"!`
+                          );
                 }
               }
             );

@@ -48,6 +48,10 @@ import expireUser from './cron_jobs/deleteExpiredUser.js';
 import http from 'http';
 import initMeetingServer from './utils/meetingServices/meeting-server.js';
 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 const app = express();
 dotenv.config();
 
@@ -72,14 +76,32 @@ const connect = () => {
 const server = http.createServer( app );
 initMeetingServer( server );
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 //record log data
+const requestLogStream = fs.createWriteStream( 
+                                  path.join( __dirname, 'request.log' ),
+                                  {
+                                    flags: 'a'
+                                  }
+                            );
+                            
 morgan.token(
   "userId",
   ( req, res ) => {
     const token = req.header("x-access-token");
     if( !token ){
-      return "No Token Provided";
+
+      const refreshToken = req.body
+                              .refreshToken;
+      if( !refreshToken ){
+        return "No Token Provided";
+      }
+      
+      return "Refresh Token Request";
     }
+    
     const tokenDetails = jwt.verify(
       token,
       process.env.ACCESS_TOKEN_PRIVATE_KEY
@@ -87,7 +109,15 @@ morgan.token(
     return tokenDetails._id.toString();
   }
 );
-app.use( morgan( ':method :url :status :res[content-length] - :response-time ms :date[web] :userId' ) );
+
+app.use( 
+    morgan( 
+      ':userId | :method :url - :status - :res[content-length] - :response-time ms - :date[web]',
+      {
+        stream: requestLogStream
+      }
+    ) 
+);
 
 app.use(express.static('src'));
 
