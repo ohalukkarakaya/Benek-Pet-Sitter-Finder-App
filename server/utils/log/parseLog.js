@@ -11,7 +11,7 @@ const parseLogData = async ( log ) => {
     ){
         const refreshToken = userId.replaceAll( "RefreshToken: ", "" );
         const userToken = await UserToken.findOne( { token: refreshToken } );
-        console.log( refreshToken );
+        
         if( userToken ){
             userId = userToken.userId.toString();
         }else{
@@ -27,9 +27,11 @@ const parseLogData = async ( log ) => {
     
     const status = logDataParts[1];
     const contentLength = logDataParts[2];
-    const responseTime = logDataParts[3].split(' ')[0];
-    const date = logDataParts[4];
-  
+    const responseTime = `${ logDataParts[3].split( " ")[0] } ${ 
+                                                            logDataParts[3].split( " ")[1]
+                                                                           .trim()
+                                                              }`;
+
     return {
       userId,
       method,
@@ -37,7 +39,6 @@ const parseLogData = async ( log ) => {
       status,
       contentLength,
       responseTime,
-      date,
     };
 }
 

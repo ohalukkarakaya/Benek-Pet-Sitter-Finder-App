@@ -7,6 +7,11 @@ const UserSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
+        authRole: {
+            type: Number,
+            enum: [ 0, 1, 2 ],
+            default: 0,
+        },
         identity: {
             "description": "idetitiy informations of the user",
             "type": "object",

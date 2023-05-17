@@ -6,7 +6,7 @@ const saveLogHelper = ( logData ) => {
     log.save(
         ( err ) => {
             if ( err ) {
-                console.error( 'Log kaydı kaydedilirken bir hata oluştu:', err );
+                console.error( 'Log kaydı kaydedilirken bir hata oluştu: ', err );
             }
         }
     );

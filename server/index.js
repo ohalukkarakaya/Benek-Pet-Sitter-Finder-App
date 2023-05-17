@@ -37,6 +37,7 @@ import careGiveRoutes from './routes/cere_give/careGive.js';
 import animalKeywordRoutes from './routes/key_words/animalCategory.js';
 import chatRoutes from './routes/chat/chat.js';
 import notificationRoutes from './routes/notification/notification.js';
+import logRoutes from './routes/log/log.js';
 
 import bodyParser from 'body-parser';
 
@@ -100,7 +101,7 @@ morgan.token(
 
 app.use( 
     morgan( 
-      ':userId | :method :url - :status - :res[content-length] - :response-time ms - :date[web]',
+      ':userId | :method :url - :status - :res[content-length] - :response-time ms',
       {
         stream: {
           write: async ( log ) => {
@@ -124,6 +125,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ type: 'application/*+json' }));
 
 app.use("/auth", authRoutes);
+app.use("/log", logRoutes);
 app.use("/api/refreshToken", refreshTokenRoutes);
 app.use("/api/user", editUserRoutes);
 app.use("/api/pet", petRoutes);
