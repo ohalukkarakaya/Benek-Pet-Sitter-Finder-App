@@ -9,7 +9,8 @@ const insertKeyWordsController = async (req, res) => {
                       .json(
                             {
                                 error: true,
-                                message: error.details[0].message
+                                message: error.details[ 0 ]
+                                              .message
                             }
                        );
         }

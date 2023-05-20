@@ -61,7 +61,9 @@ const getTimeCodeForUploadMissionController = async (req, res) => {
             );
         }
 
-        let password = crypto.randomBytes(3).toString('hex').toUpperCase();
+        let password = crypto.randomBytes( 3 )
+                             .toString( 'hex' )
+                             .toUpperCase();
 
         if(password !== ""){
             mission.missionContent.timeSignature.timePassword = password;

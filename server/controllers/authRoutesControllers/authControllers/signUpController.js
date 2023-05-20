@@ -8,28 +8,46 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const signUpController = async (req, res) => {
+const signUpController = async ( req, res ) => {
     try{
-      const { error } = signUpBodyValidation(req.body);
-      if(error)
-        return res.status(400).json(
-          {
-            error: true,
-            message: error.details[0].message
-          }
-        );
+      const { error } = signUpBodyValidation( req.body );
+      if( error )
+        return res.status( 400 )
+                  .json(
+                    {
+                      error: true,
+                      message: error.details[ 0 ]
+                                    .message
+                    }
+                  );
   
-      const user = await User.findOne({ email: req.body.email });
-      if(user)
-        return res.status(400).json(
-          {
-            error: true,
-            message: "User Allready Exists"
-          }
-        );
+      const user = await User.findOne(
+                                {
+                                  email: req.body
+                                            .email 
+                                }
+                              );
+      if( user )
+        return res.status( 400 )
+                  .json(
+                    {
+                      error: true,
+                      message: "User Allready Exists"
+                    }
+                  );
   
-      const salt = await bcrypt.genSalt(Number(process.env.SALT));
-      const hashPassword = await bcrypt.hash(req.body.password, salt);
+      const salt = await bcrypt.genSalt(
+                                    Number(
+                                        process.env
+                                               .SALT
+                                    )
+                                );
+
+      const hashPassword = await bcrypt.hash(
+                                          req.body
+                                             .password, 
+                                          salt
+                                        );
   
       await new User(
         {
@@ -38,30 +56,32 @@ const signUpController = async (req, res) => {
           identity: req.body.identity,
           location: req.body.location,
           password: hashPassword,
-          trustedIps: [req.body.ip]
+          trustedIps: [ req.body.ip ]
         }
-      ).save().then(
-        (result) => {
-          // Handle account verification
-          // Send verification code
-          sendOTPVerificationEmail(
-            {
-              _id: result._id,
-              email: result.email
-            },
-            res
-          );
-        }
-      );
+      ).save()
+       .then(
+          ( result ) => {
+            // Handle account verification
+            // Send verification code
+            sendOTPVerificationEmail(
+              {
+                _id: result._id,
+                email: result.email
+              },
+              res
+            );
+          }
+        );
   
     }catch(err){
-      console.log(err);
-      res.status(500).json(
-        {
-          error: true,
-          message: "Internal Server Error"
-        }
-      );
+      console.log( "ERROR: signUpController - ", err );
+      res.status( 500 )
+         .json(
+            {
+              error: true,
+              message: "Internal Server Error"
+            }
+          );
     }
 }
 

@@ -24,7 +24,14 @@ let transporter = nodemailer.createTransport(
   );
 
  //send OTP verification
- const sendOneTimePassword = async ({newPassword, email}, res, next) => {
+ const sendOneTimePassword = async ( 
+  {
+    newPassword, 
+    email
+  }, 
+  res, 
+  next 
+) => {
     try {
 
       //mail options
@@ -39,13 +46,17 @@ let transporter = nodemailer.createTransport(
       await transporter.sendMail(mailOptions);
       
       next();
-    }catch(e){
-      res.status(500).json(
-        {
-          error: true,
-          message: e.message,
-        }
-      )
+    }catch( e ){
+      console.log( "ERROR: sendOneTimePassword - ", e );
+      if( res ){
+        return res.status( 500 )
+                  .json(
+                    {
+                      error: true,
+                      message: e.message,
+                    }
+                  );
+      }
     }
   }
 

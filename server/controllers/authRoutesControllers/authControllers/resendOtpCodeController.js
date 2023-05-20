@@ -24,8 +24,8 @@ const resendOtpCodeController = async (req, res, next) => {
               _id: userId,
               email
             },
-            null,
-            next
+            res,
+            null
           );
         }
       }catch(err){
