@@ -1,6 +1,7 @@
 import User from "../../../models/User.js";
 import UserOTPVerification from "../../../models/UserOtpVerification.js";
 import UserToken from "../../../models/UserToken.js";
+import TempPassword from "../../../models/TempPassword.js";
 
 import sendOTPVerificationEmail from "../../../utils/sendValidationEmail.js";
 import generateTokens from "../../../utils/bodyValidation/user/generateTokens.js";
@@ -36,19 +37,59 @@ const logInController = async ( req, res, next ) => {
       if( userToken ){
         await userToken.remove();
       }
+
       const verifiedPassword = await bcrypt.compare(
         req.body.password,
         user.password
       );
 
       if( !verifiedPassword ){
-        return res.status( 401 )
-                  .json(
-                    {
-                      error: true,
-                      message: "Invalid email or password"
-                    }
-                  );
+
+        const tempPasswordObject = await TempPassword.findOne(
+          {
+            userId: user._id.toString()
+          }
+        );
+
+        const verifiedTempPass = await bcrypt.compare(
+          req.body.password,
+          tempPasswordObject.tempPassword
+        );
+
+        if(
+          !tempPasswordObject
+          || !verifiedTempPass
+        ){
+          return res.status( 401 )
+                    .json(
+                      {
+                        error: true,
+                        message: "Invalid email or password"
+                      }
+                    );
+        }
+
+        user.password = tempPasswordObject.tempPassword;
+        user.markModified( "password" );
+
+        await tempPasswordObject.deleteOne()
+                                .then()
+                                .catch(
+                                  async ( error ) => {
+                                      if( error ){
+                                          console.log( error );
+
+                                          return res.status( 500 )
+                                                    .json(
+                                                        {
+                                                            error: true,
+                                                            message: "Internal server error"
+                                                        }
+                                                    );
+                                      }
+                                  }
+                                );
+
       }
       if( !user.isEmailVerified ){
           await UserOTPVerification.deleteMany({ userId: user._id });
@@ -67,68 +108,88 @@ const logInController = async ( req, res, next ) => {
                         message: "Email verification is required please check your inbox"
                       }
                     );
-        }
-        if(
-          !user.trustedIps
-               .includes(
-                    req.body
-                       .ip
-                ) 
-          || !user.isLoggedInIpTrusted
-        ){
-          await UserOTPVerification.deleteMany({ userId: user._id });
-          await User.updateOne({_id: user._id}, {isLoggedInIpTrusted: false});
-          await sendOTPVerificationEmail(
-            {
-              _id: user._id,
-              email: user.email,
-            },
-            null,
-            next
-          );
-          return res.status( 401 )
-                    .json(
-                      {
-                        error: true,
-                        message: "Ip is not trusted, therefore verification code send to your email"
-                      }
-                    );
-        }
-          if( 
-            user.deactivation
-                .isDeactive 
-          ){
-            user.deactivation
-                .isDeactive = false;
+      }
 
-            user.deactivation
-                .deactivationDate = null;
+      if(
+        !user.trustedIps
+             .includes(
+                  req.body
+                     .ip
+              ) 
+        || !user.isLoggedInIpTrusted
+      ){
+        await UserOTPVerification.deleteMany({ userId: user._id });
+        await User.updateOne({_id: user._id}, {isLoggedInIpTrusted: false});
+        await sendOTPVerificationEmail(
+          {
+            _id: user._id,
+            email: user.email,
+          },
+          null,
+          next
+        );
+        return res.status( 401 )
+                  .json(
+                    {
+                      error: true,
+                      message: "Ip is not trusted, therefore verification code send to your email"
+                    }
+                  );
+      }
 
-            user.isAboutToDelete = false;
+      if( 
+        user.deactivation
+            .isDeactive 
+      ){
+        user.deactivation
+            .isDeactive = false;
 
-            user.deactivation
-                .markModified( "deactivation" );
+        user.deactivation
+            .deactivationDate = null;
 
-            user.save(
-              ( err ) => {
-                if( err ) {
-                    console.error('ERROR: While Update!');
-                }
-              }
-            );
+        user.isAboutToDelete = false;
+
+        user.deactivation
+            .markModified( "deactivation" );
+
+        user.save(
+          ( err ) => {
+            if( err ) {
+                console.error('ERROR: While Update!');
+            }
           }
-          const { accessToken, refreshToken } = await generateTokens( user );
-          return res.status( 200 )
-                    .json(
-                      {
-                        error: false,
-                        isLoggedInIpTrusted: user.isLoggedInIpTrusted,
-                        isEmailVerified: user.isEmailVerified,
-                        accessToken,
-                        refreshToken,
-                        message: "Logged In Successfully"
-                      }
-                    );
+        );
+      }
+      
+      const { accessToken, refreshToken } = await generateTokens( user );
+
+      user.save(
+        ( err ) => {
+            if( err ){
+                return res.status( 500 )
+                          .json(
+                              {
+                                  error: true,
+                                  message: "ERROR: while saving one time password"
+                              }
+                          );
+            }
+        }
+      );
+
+      await TempPassword.deleteMany({ userId: user._id.toString() });
+      
+      return res.status( 200 )
+                .json(
+                  {
+                    error: false,
+                    isLoggedInIpTrusted: user.isLoggedInIpTrusted,
+                    isEmailVerified: user.isEmailVerified,
+                    accessToken,
+                    refreshToken,
+                    message: "Logged In Successfully"
+                  }
+                );
     }catch(err){
       console.log( err );
       return res.status( 500 )

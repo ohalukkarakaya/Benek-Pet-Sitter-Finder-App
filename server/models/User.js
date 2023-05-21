@@ -126,13 +126,10 @@ const UserSchema = new mongoose.Schema(
         cardGuidies: [
             {
                 cardName: {
-                    type: String,
-                    required: true,
-                    unique: true
+                    type: String
                 },
                 cardGuid: {
-                    type: String,
-                    required: true
+                    type: String
                 }
             }
         ],

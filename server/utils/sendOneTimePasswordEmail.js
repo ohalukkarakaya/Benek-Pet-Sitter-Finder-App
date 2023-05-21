@@ -13,8 +13,8 @@ let transporter = nodemailer.createTransport(
         domainName: process.env.DKIM_DOMAIN,
         keySelector: process.env.DKIM_SELECTOR,
         privateKey: fs.readFileSync(process.env.DKIM_PRIVATE_KEY_FILE_PATH, "utf8"),
-        cacheDir: '/tmp',
-        cacheTreshold: 2048,
+        // cacheDir: '/tmp',
+        // cacheTreshold: 2048,
       },
       auth: {
         user: process.env.AUTH_EMAIL,
@@ -43,7 +43,7 @@ let transporter = nodemailer.createTransport(
         <p>We forcely reccomend you to <b>set a new password as soon as possible</b> in the app</p>`,
 
       };
-      await transporter.sendMail(mailOptions);
+      await transporter.sendMail( mailOptions );
       
       next();
     }catch( e ){

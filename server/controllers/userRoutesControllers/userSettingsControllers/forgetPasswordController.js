@@ -1,4 +1,5 @@
 import User from "../../../models/User.js";
+import TempPassword from "../../../models/TempPassword.js";
 
 import sendOneTimePassword from "../../../utils/sendOneTimePasswordEmail.js";
 
@@ -65,31 +66,39 @@ const forgetPasswordController = async ( req, res, next ) => {
                             next
         );
 
-        user.password = hashedOneTimePassword;
-        user.markModified( "password" );
-        user.save(
-            ( err ) => {
-                if( err ){
-                    return res.status( 500 )
-                              .json(
-                                  {
-                                      error: true,
-                                      message: "ERROR: while saving one time password"
-                                  }
-                              );
-                }
+        await new TempPassword(
+            {
+                userId: user._id.toString(),
+                email: user.email,
+                tempPassword: hashedOneTimePassword
             }
-        );
-
-        return res.status( 200 )
+        ).save()
+         .then(
+            ( tempPassword ) => {
+                return res.status( 200 )
                   .json(
                       {
                           error: false,
                           message: "New password send to your email"
                       }
                   );
+            }
+         ).catch(
+            ( error ) => {
+                if( error ){
+                    return res.status( 500 )
+                              .json(
+                                {
+                                    error: true,
+                                    message: "Internal Server Error"
+                                }
+                              );
+                }
+            }
+         );
+        
     }catch( err ){
-        console.log( "error - forget my password", err );
+        console.log( "ERROR: forgetPasswordController - ", err );
         return res.status( 500 )
                   .json(
                       {

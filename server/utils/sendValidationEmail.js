@@ -51,7 +51,7 @@ let transporter = nodemailer.createTransport(
 
       //save otp record
       await newOtpVerification.save();
-      await transporter.sendMail(mailOptions);
+      await transporter.sendMail( mailOptions );
       if( res !== null ){
         res.json(
           {
