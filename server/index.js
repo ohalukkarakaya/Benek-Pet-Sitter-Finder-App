@@ -90,12 +90,22 @@ morgan.token(
       
       return `RefreshToken: ${refreshToken}`;
     }
-    
-    const tokenDetails = jwt.verify(
-      token,
-      process.env.ACCESS_TOKEN_PRIVATE_KEY
-    );
-    return tokenDetails._id.toString();
+
+    try{
+      const tokenDetails = jwt.verify(
+        token,
+        process.env.ACCESS_TOKEN_PRIVATE_KEY
+      );
+      return tokenDetails._id.toString();
+    }catch( err ){
+      if( err.name === 'TokenExpiredError' ) {
+        // Token süresi dolmuşsa
+        return "Expired Token";
+      } else {
+        // Diğer hatalar
+        return "Invalid Token";
+      }
+    }
   }
 );
 

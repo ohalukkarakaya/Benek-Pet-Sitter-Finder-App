@@ -132,6 +132,7 @@ const logInController = async ( req, res, next ) => {
                   .json(
                     {
                       error: true,
+                      isLoggedInIpTrusted: false,
                       message: "Ip is not trusted, therefore verification code send to your email"
                     }
                   );

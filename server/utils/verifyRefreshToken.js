@@ -5,36 +5,25 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const verifyRefreshToken = ( refreshToken ) => {
-    const privateKey = process.env.REFRESH_TOKEN_PRIVATE_KEY;
+    try{
+        const privateKey = process.env.REFRESH_TOKEN_PRIVATE_KEY;
 
-    return new Promise((resolve, reject) => {
-        UserToken.findOne(
-            { token: refreshToken }, 
-            (err, doc) => {
-                if( err ){
-                    console.log( err );
-                    return reject(
-                              {
-                                error: true, 
-                                message: "Internal server error"
-                              }
-                    );
-                }
-
-                if( !doc ){
-                    return reject(
-                              {
-                                error: true, 
-                                message: "Invalid Refresh Token"
-                              }
-                    );
-                }
-
-                jwt.verify(
-                    refreshToken, 
-                    privateKey, 
-                    ( err, tokenDetails ) => {
+        return new Promise(
+            ( resolve, reject ) => {
+                UserToken.findOne(
+                    { token: refreshToken }, 
+                    ( err, doc ) => {
                         if( err ){
+                            console.log( err );
+                            return reject(
+                                    {
+                                        error: true, 
+                                        message: "Internal server error"
+                                    }
+                            );
+                        }
+
+                        if( !doc ){
                             return reject(
                                     {
                                         error: true, 
@@ -42,6 +31,11 @@ const verifyRefreshToken = ( refreshToken ) => {
                                     }
                             );
                         }
+
+                        const tokenDetails = jwt.verify(
+                                                refreshToken, 
+                                                privateKey
+                                             );
                         resolve(
                             {
                                 tokenDetails,
@@ -53,7 +47,27 @@ const verifyRefreshToken = ( refreshToken ) => {
                 );
             }
         );
-    });
+    }catch( err ){
+        if( err.name === 'TokenExpiredError' ) {
+            // Token süresi dolmuşsa 
+            return res.status( 403 )
+                      .json(
+                          {
+                             error: true,
+                             message: "Access Denied: token expired"
+                          }
+                       );
+          } else {
+            // Diğer hatalar
+            return res.status( 403 )
+                      .json(
+                              {
+                                error: true,
+                                message: "Access Denied: No token provided"
+                              }
+                      );
+          }
+    }
 };
 
 export default verifyRefreshToken;

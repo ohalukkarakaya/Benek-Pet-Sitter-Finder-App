@@ -17,7 +17,7 @@ const getNewAccessTokenController = async ( req, res ) => {
         }
         verifyRefreshToken(
                         req.body
-                            .refreshToken
+                           .refreshToken
         ).then(
             ({ tokenDetails }) => {
                 const payload = { 
@@ -40,8 +40,21 @@ const getNewAccessTokenController = async ( req, res ) => {
                     );
             }
         ).catch(
-            ( err ) => res.status( 400 )
-                          .json( err )
+            ( err ) => {
+                if( err.name === 'TokenExpiredError' ) {
+                    // Token süresi dolmuşsa 
+                    return res.status( 403 )
+                              .json(
+                                  {
+                                     error: true,
+                                     message: "Access Denied: token expired"
+                                  }
+                               );
+                  }else{
+                    return res.status( 400 )
+                              .json( err );
+                }
+            }
         );
     }catch( err ){
         console.log( err );
