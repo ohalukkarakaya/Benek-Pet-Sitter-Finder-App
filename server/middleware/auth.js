@@ -24,7 +24,7 @@ const auth = async (req, res, next) => {
         next();
     }catch( err ){
         if( err.name === 'TokenExpiredError' ) {
-            // Token süresi dolmuşsa burada işlemlerinizi yapabilirsiniz
+            // Token süresi dolmuşsa 
             return res.status( 403 )
                       .json(
                           {
@@ -33,7 +33,7 @@ const auth = async (req, res, next) => {
                           }
                        );
           } else {
-            // Diğer hatalar için burada işlemlerinizi yapabilirsiniz
+            // Diğer hatalar
             return res.status( 403 )
                       .json(
                               {
