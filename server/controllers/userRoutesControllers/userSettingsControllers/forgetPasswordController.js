@@ -12,7 +12,7 @@ dotenv.config();
 const forgetPasswordController = async ( req, res, next ) => {
     try{
         const email = req.body.email;
-        if(!email){
+        if( !email ){
             return res.status( 400 )
                       .json(
                            {

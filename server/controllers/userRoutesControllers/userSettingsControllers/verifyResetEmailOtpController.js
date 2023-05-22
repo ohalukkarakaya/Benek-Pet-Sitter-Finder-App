@@ -7,108 +7,166 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const verifyResetEmailOtpController = async (req, res) => {
+const verifyResetEmailOtpController = async ( req, res ) => {
     try{
+        const email = req.body.email
         const otp = req.body.otp;
-        if( !otp ){
-          req.status(400).json(
-            {
-              error: true,
-              message: "Empty otp details are not allowed"
-            }
-          );
-        }else{
-          const ChangeEmailOTPVerificationRecords = await ChangeEmailOTP.find(
-            {
-              userId : req.user._id.toString()
-            }
-          );
-          if(UserOTPVerificationRecords.length <= 0){
-            //no record found
-            req.status(404).json(
-              {
-                error: true,
-                message: "Account record doesn't exist or has been verified already"
-              }
-            );
-          }else{
-            //user otp record exists
-            const { expiresAt } = ChangeEmailOTPVerificationRecords[0];
-            const hashedOTP = ChangeEmailOTPVerificationRecords[0].otp;
-  
-            if( expiresAt < Date.now()){
-              //user Otp record has expired
-              await ChangeEmailOTPVerificationRecords.deleteMany({ userId: req.user._id.toString() });
-              res.status(405).json(
-                {
-                  error: true,
-                  message: "Code has expired. Please request again"
-                }
-              );
-            }else{
-              const validOTP = await bcrypt.compare(otp, hashedOTP);
-  
-              if(!validOTP){
-                //supplied OTP is wrong
-                req.status(406).json(
-                  {
-                    error: true,
-                    message: "Invalid code passed. Check your inbox"
-                  }
-                );
-              }else{
-                User.findOne(
-                  { _id: req.user._id.toString() },
-                  async (err, user) => {
-                    if(err){
-                      res.status(404).json(
+        if( 
+          !otp
+          || !email 
+        ){
+          return res.status( 400 )
+                    .json(
                         {
-                            error: true,
-                            message: "User not found"
+                          error: true,
+                          message: "Empty otp details are not allowed"
                         }
-                      );
-                    }else{
-                      if(user.deactivation.isDeactive){
-                        return res.status(404).json(
+                    );
+        }
+
+        const changeEmailOTPVerificationRecords = await ChangeEmailOTP.find(
+                                                                          {
+                                                                            userId : req.user
+                                                                                        ._id
+                                                                                        .toString(),
+                                                                            newEmail: email
+                                                                          }
+                                                                       );
+
+        if( changeEmailOTPVerificationRecords.length <= 0 ){
+          //no record found
+          return res.status( 404 )
+                    .json(
+                        {
+                          error: true,
+                          message: "Account record doesn't exist or has been verified already"
+                        }
+                    );
+        }
+        //user otp record exists
+        const { expiresAt } = changeEmailOTPVerificationRecords[ 0 ];
+        const hashedOTP = changeEmailOTPVerificationRecords[ 0 ].otp;
+
+        if( 
+          expiresAt < Date.now()
+        ){
+          //user Otp record has expired
+          await ChangeEmailOTP.deleteMany(
+                                      { 
+                                        userId: req.user
+                                                   ._id
+                                                   .toString()
+                                      }
+                               );
+          return res.status( 405 )
+                    .json(
+                        {
+                          error: true,
+                          message: "Code has expired. Please request again"
+                        }
+                    );
+
+        }
+
+        const validOTP = await bcrypt.compare(
+                                            otp, 
+                                            hashedOTP
+                                      );
+
+        if( !validOTP ){
+            //supplied OTP is wrong
+            return res.status( 406 )
+                      .json(
                           {
                             error: true,
-                            message: "User not found"
+                            message: "Invalid code passed. Check your inbox"
                           }
-                        );
-                      }
-                      //success
-                      await user.updateOne(
-                        {
-                            _id: req.user._id.toString()
-                        },
-                        {
-                            email: ChangeEmailOTPVerificationRecords[0].newEmail
-                        }
                       );
-                      await UserOtpVerification.deleteMany(
-                        {
-                            userId: req.user._id.toString()
-                        }
-                      );
-                      res.status(200).json(
+        }
+        const user =  await User.findOne(
+            { 
+              _id: req.user
+                      ._id
+                      .toString() 
+            }
+        );
+
+        if( 
+          !user 
+          || user.deactivation
+                 .isDeactive
+        ){
+          res.status( 404 )
+             .json(
+                {
+                    error: true,
+                    message: "User not found"
+                }
+             );
+        }
+
+        //success
+        await User.updateOne(
+          {
+              _id: req.user
+                      ._id
+                      .toString()
+          },
+          {
+              email: changeEmailOTPVerificationRecords[ 0 ].newEmail
+          }
+        ).then(
+          async ( updatedUser ) => {
+
+            await ChangeEmailOTP.deleteMany(
+              {
+                  userId: req.user
+                             ._id
+                             .toString()
+              }
+            ).then(
+              (_) => {
+                return res.status( 200 )
+                      .json(
                         {
                           message: "Email updated succesfuly"
                         }
                       );
-                    }
-                  }
-                );
               }
-            }
-          }
-        }
-    }catch(err){
-        res.status(500).json(
-          {
-            error: true,
-            message: "Internal server error"
+            ).catch(
+              ( err ) => {
+                console.log( "ERROR: verifyResetEmailOtpController - ", err );
+                return res.status( 500 )
+                          .json(
+                            {
+                              error: true,
+                              message: "Internal Server Error"
+                            }
+                          );
+              }
+            );
+          } 
+        ).catch(
+          ( err ) => {
+            console.log( "ERROR: verifyResetEmailOtpController - ", err );
+            return res.status( 500 )
+                      .json(
+                        {
+                          error: true,
+                          message: "Internal Server Error"
+                        }
+                      );
           }
         );
+    }catch( err ){
+        console.log( "ERROR: verifyResetEmailOtpController - ", err );
+        return res.status( 500 )
+                  .json(
+                      {
+                        error: true,
+                        message: "Internal server error"
+                      }
+                  );
     }
 }
 
