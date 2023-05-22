@@ -115,8 +115,7 @@ const logInController = async ( req, res, next ) => {
              .includes(
                   req.body
                      .ip
-              ) 
-        || !user.isLoggedInIpTrusted
+              )
       ){
         await UserOTPVerification.deleteMany({ userId: user._id });
         await User.updateOne({_id: user._id}, {isLoggedInIpTrusted: false});
@@ -136,6 +135,19 @@ const logInController = async ( req, res, next ) => {
                       message: "Ip is not trusted, therefore verification code send to your email"
                     }
                   );
+      }
+
+      if(
+        user.trustedIps
+            .includes(
+                req.body
+                   .ip
+            )
+        && user.isEmailVerified
+        && !( user.isLoggedInIpTrusted )
+      ){
+        await User.updateOne({_id: user._id}, {isLoggedInIpTrusted: true});
+        await UserOTPVerification.deleteMany({ userId: user._id });
       }
 
       if( 
