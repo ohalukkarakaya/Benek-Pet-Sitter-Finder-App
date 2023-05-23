@@ -45,11 +45,12 @@ router.get(
 
 //get user by id
 router.get(
-  "getUserById/:userId",
+  "/getUserById/:userId",
   auth,
   getUserByIdController
 );
 
+// To Do: Test
 //get users and events by location data
 router.post(
   "/getUsersAndEventsByLocation/:skip/:limit", 
@@ -57,6 +58,7 @@ router.post(
   getUsersAndEventsByLocationController
 );
 
+// To Do: Test
 //get users and events with search value
 router.post(
   "/getUsersAndEventsBySearchValue/:skip/:limit", 
@@ -64,6 +66,7 @@ router.post(
   getUsersAndEventsBySearchValueController
 );
 
+// To Do: Test
 //get careGivers by location
 router.post(
   "/getCareGiversByLocation/:skip/:limit",
@@ -71,6 +74,7 @@ router.post(
   getCareGiversByLocationController
 );
 
+// To Do: Test
 //get careGiver by search value
 router.post(
   "/getCareGiversBySearchValue/:skip/:limit",

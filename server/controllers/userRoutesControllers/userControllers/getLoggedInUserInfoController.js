@@ -4,9 +4,9 @@ import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoH
 
 const getLoggedInUserInfoController = async ( req, res ) => {
     try{
-        const userId = req.user_id.toString();
+        const userId = req.user._id.toString();
 
-        const user = await User.findById( userId );
+        const user = await User.findById( userId ).lean();
         if( !user ){
             return res.status( 404 ).json(
                 {
@@ -15,38 +15,48 @@ const getLoggedInUserInfoController = async ( req, res ) => {
                 }
             );
         }
-        user.pets.forEach(
-            async ( petId ) => {
-                const pet = await Pet.findById( petId.toString() );
-                const petInfo = {
-                    petId: petId.toString(),
-                    petProfileImgUrl: pet.petProfileImg.imgUrl,
-                    petName: pet.name
-                }
-                petId = petInfo;
+
+        let petList = [];
+        for(
+            var petId
+            of user.pets
+        ){
+            const pet = await Pet.findById( petId.toString() );
+            const petInfo = {
+                petId: petId.toString(),
+                petProfileImgUrl: pet.petProfileImg.imgUrl,
+                petName: pet.name
             }
-        );
+            petList.push( petInfo );
+        }
+
+        user.pets = petList;
 
         delete user.password;
         delete user.iban;
         delete user.cardGuidies;
         delete user.trustedIps;
+        delete user.updatedAt;
+        
+        let dependedUserList = [];
+        for(
+            var dependedId
+            of user.dependedUsers
+        ){
+            const depended = await User.findById( dependedId );
+            const dependedInfo = getLightWeightUserInfoHelper( depended );
                 
-        user.dependedUsers.forEach(
-            async ( dependedId ) => {
-                const depended = await User.findById( dependedId );
-                const dependedInfo = getLightWeightUserInfoHelper( depended );
-                
-                dependedId = dependedInfo;
-            }
-        );
+            dependedUserList.push( dependedInfo );
+        }
+
+        user.dependedUsers = dependedUserList;
 
         const starValues = user.stars.map( starObject => starObject.star );
         const totalStarValue = starValues.reduce(
             ( acc, curr ) =>
                     acc + curr, 0
         );
-        const starCount = user.stasr.length;
+        const starCount = user.stars.length;
         const starAvarage = totalStarValue / starCount;
 
         user.totalStar = starCount;
