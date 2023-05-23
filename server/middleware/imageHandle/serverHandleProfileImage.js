@@ -28,7 +28,7 @@ const storage = multerS3(
                               ._id;
 
             const splitedOriginalName = originalname.split(".");
-            const randId = crypto.randomBytes( 3 )
+            const randId = crypto.randomBytes( 6 )
                                  .toString( 'hex' );
 
             if( file.fieldname === "profileImg" ){

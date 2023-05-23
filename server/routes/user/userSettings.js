@@ -30,6 +30,7 @@ dotenv.config();
 
 const router = express.Router();
 
+// - tested
 //reset user name
 router.put(
   "/resetUsername",
@@ -37,6 +38,7 @@ router.put(
   resetUserNameController
 );
 
+// - tested
 //reset email
 router.post(
   "/resetEmail",
@@ -44,6 +46,7 @@ router.post(
   resetEmailController
 );
 
+// - tested
 //verify reset email OTP
 router.post(
   "/verifyResetEmailOTP",
@@ -51,6 +54,7 @@ router.post(
   verifyResetEmailOtpController
 );
 
+// - tested
 //reset password
 router.put(
   "/resetPassword",
@@ -58,12 +62,14 @@ router.put(
   resetPasswordController
 );
 
+// - tested
 //forget password
 router.put(
   "/forgetMyPassword",
   forgetPasswordController
 );
 
+// - tested
 //insert phone number
 router.post(
   "/addPhoneNumber",
@@ -71,6 +77,7 @@ router.post(
   insertPhoneNumberController
 );
 
+// - tested
 //verify phone number
 router.post(
   "/verifyPhoneNumber",
@@ -78,12 +85,14 @@ router.post(
   verifyPhoneNumberController
 );
 
+// - tested
 //add ID Number
 router.put(
   "/addIdNo",
   auth,
   addIdNumberController
 );
+
 
 //add adress
 router.put(

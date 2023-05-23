@@ -21,6 +21,7 @@ import getLightWeightUserInfoController from "../../controllers/userRoutesContro
 dotenv.config();
 const router = express.Router();
 
+// - tested 
 //Get More Info Of The User After First Login
 router.post(
   "/moreUserInfo",
@@ -29,6 +30,7 @@ router.post(
   userGetMoreInfoController
 );
 
+// - tested
 //update birthday
 router.put(
   "/birthday",
@@ -36,6 +38,7 @@ router.put(
   userUpdateBirthDayController
 );
 
+// - tested
 //get user by jwt
 router.get(
   "/getLoggedInUserInfo",
@@ -43,6 +46,7 @@ router.get(
   getLoggedInUserInfoController
 );
 
+// - tested
 //get user by id
 router.get(
   "/getUserById/:userId",
@@ -50,7 +54,6 @@ router.get(
   getUserByIdController
 );
 
-// To Do: Test
 //get users and events by location data
 router.post(
   "/getUsersAndEventsByLocation/:skip/:limit", 
@@ -58,7 +61,6 @@ router.post(
   getUsersAndEventsByLocationController
 );
 
-// To Do: Test
 //get users and events with search value
 router.post(
   "/getUsersAndEventsBySearchValue/:skip/:limit", 
@@ -66,7 +68,6 @@ router.post(
   getUsersAndEventsBySearchValueController
 );
 
-// To Do: Test
 //get careGivers by location
 router.post(
   "/getCareGiversByLocation/:skip/:limit",
@@ -82,6 +83,7 @@ router.post(
   getCareGiversBySearchValueController
 );
 
+// - tested
 //get light weight user id with user id list
 router.post(
   "/getLightWeightUserInfo",

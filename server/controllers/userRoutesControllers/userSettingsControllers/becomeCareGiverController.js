@@ -56,12 +56,16 @@ const becomeCareGiverController = async (req, res) => {
             );
           }
   
-          const iv = Buffer.from(recordedIv, 'hex');
+          const iv = Buffer.from( recordedIv, 'hex' );
           const decipher = crypto.createDecipheriv(
-            process.env.NATIONAL_ID_CRYPTO_ALGORITHM, 
-            Buffer.from( process.env.NATIONAL_ID_CRYPTO_KEY ), 
-            iv
-          );
+                                                process.env
+                                                       .NATIONAL_ID_CRYPTO_ALGORITHM, 
+                                                Buffer.from( 
+                                                          process.env
+                                                                 .NATIONAL_ID_CRYPTO_KEY 
+                                                       ), 
+                                                iv
+                                  );
   
           let nationalIdNo = decipher.update( cryptedNationalId, 'hex', 'utf8');
           nationalIdNo += decipher.final('utf8');
