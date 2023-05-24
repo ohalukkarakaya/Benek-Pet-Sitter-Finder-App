@@ -36,7 +36,7 @@ const verifyOtpController = async (req, res) => {
         UserOTPVerificationRecords.length <= 0
       ){
         //no record found
-        return res.status (404 )
+        return res.status(404 )
                   .json(
                     {
                       error: true,

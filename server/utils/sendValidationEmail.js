@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import fs from "fs";
 import UserOTPVerification from "../models/UserOtpVerification.js";
-import { nextTick } from "process";
 
 dotenv.config();
 
@@ -34,7 +33,7 @@ let transporter = nodemailer.createTransport(
                      .AUTH_PASS,
       }
     }
-  );
+);
 
  //send OTP verification
  const sendOTPVerificationEmail = async (
@@ -52,7 +51,7 @@ let transporter = nodemailer.createTransport(
                               + Math.random() 
                               * 900000
                            )
-                   }`
+                   }`;
 
       //mail options
       const mailOptions = {
@@ -79,11 +78,11 @@ let transporter = nodemailer.createTransport(
                                      );
 
       const newOtpVerification = await new UserOTPVerification(
-                                                                {
-                                                                  userId: _id,
-                                                                  otp: hashedOtp,
-                                                                }
-                                                              );
+                                              {
+                                                userId: _id,
+                                                otp: hashedOtp,
+                                              }
+                                           );
 
       //save otp record
       await newOtpVerification.save();

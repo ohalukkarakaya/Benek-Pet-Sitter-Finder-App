@@ -1,7 +1,7 @@
 import User from "../../../models/User.js";
 
 import validateTcNo from "../../../utils/tcNoValidate.js";
-import validatePassportNo from "../../../utils/passportNoValidate.js";
+import validator from "validator";
 
 import crypto from "crypto";
 import dotenv from "dotenv";
@@ -10,12 +10,25 @@ dotenv.config();
 
 const addIdNumberController = async ( req, res ) => {
     try{
-        const userId = req.user._id.toString();
-        const isCitizenOfTurkey = req.body.isTCCitizen;
-        const idNo = req.body.idNo;
+        const userId = req.user
+                          ._id
+                          .toString();
+
+        const isCitizenOfTurkey = req.body
+                                     .isTCCitizen;
+
+        const idNo = req.body
+                        .idNo;
+
+        const passportCountryCode = req.body 
+                                       .countryCode
         if(
           !idNo 
           || !isCitizenOfTurkey
+          || (
+            isCitizenOfTurkey === "false"
+            && !passportCountryCode
+          )
         ){
           return res.status( 400 )
                     .json(
@@ -32,8 +45,19 @@ const addIdNumberController = async ( req, res ) => {
                                .replaceAll( " ", "" )
                                .toUpperCase();
 
+                               
         const isTcNo = validateTcNo( trimedIdNo );
-        const isPassportNo = validatePassportNo( trimedIdNo );
+        let isPassportNo = false;
+        if(
+          !isTCCitizen
+          && passportCountryCode
+        ){
+          isPassportNo = validator.isPassportNumber(
+                                              trimedIdNo, 
+                                              passportCountryCode
+                                   );
+        }
+        
   
         const nationalIdCryptoKey = process.env
                                            .NATIONAL_ID_CRYPTO_KEY;
@@ -56,7 +80,7 @@ const addIdNumberController = async ( req, res ) => {
                                   'hex'
                                );
 
-        encrypted += cipher.final('hex');
+        encrypted += cipher.final( 'hex' );
   
         if(
           !isTcNo 
@@ -136,7 +160,7 @@ const addIdNumberController = async ( req, res ) => {
             .nationalId
             .idNumber = encrypted;
 
-        user.markModified("identity");
+        user.markModified( "identity" );
         user.save(
           ( err ) => {
             if( err ){
@@ -159,7 +183,11 @@ const addIdNumberController = async ( req, res ) => {
                     {
                       error: false,
                       message: `Id number inserted succesfully`,
-                      idNumber: `${firstSplicedId}...${lastSplicedId}`
+                      idNumber: `${
+                                    firstSplicedId
+                                 }...${
+                                        lastSplicedId
+                                     }`
                     }
                   );
   

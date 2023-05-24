@@ -2,13 +2,17 @@ import mongoose from "mongoose";
 
 const schema = mongoose.Schema;
 
-const PhonetpVerificationSchema = new schema(
+const PhoneOtpVerificationSchema = new schema(
     {
         userId: {
             type: String,
             required: true
         },
         phoneNumber: {
+            type: String,
+            required: true
+        },
+        otp: {
             type: String,
             required: true
         },
@@ -25,7 +29,7 @@ const PhonetpVerificationSchema = new schema(
 
 const PhoneOtpVerification = mongoose.model(
     "phoneOtpVerification",
-    PhonetpVerificationSchema
+    PhoneOtpVerificationSchema
 );
 
 export default PhoneOtpVerification;

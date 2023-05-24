@@ -71,7 +71,7 @@ const paramDeleteSubSellerRequest = async (
         }
     ).catch(
         error => {
-            console.log(err);
+            console.log( err );
 
             const response = {
                 error: true,
@@ -79,6 +79,8 @@ const paramDeleteSubSellerRequest = async (
                     sonucStr: "function error",
                 }
             }
+
+            return response;
         }
     );
 }
