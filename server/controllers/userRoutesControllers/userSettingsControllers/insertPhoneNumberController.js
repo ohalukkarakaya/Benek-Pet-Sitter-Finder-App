@@ -4,6 +4,7 @@ import PhoneOtpVerification from "../../../models/UserSettings/PhoneOTPVerificat
 import { sendOTPVerificationSMS } from "../../../utils/sendValidationSMS.js";
 import { addPhoneBodyValidation } from "../../../utils/bodyValidation/user/addPhoneNumberValidationSchema.js";
 import { vatanSmsSendValidationOtp } from "../../../utils/vatan_sms/vatanSmsOtpValidation.js";
+import vatanSmsBalanceQueryApiRequest from "../../../utils/vatan_sms/vatanSmsBalanceQueryApiRequest.js";
 
 import dotenv from "dotenv";
 
@@ -26,33 +27,6 @@ const insertPhoneNumberController = async (req, res) => {
         let phoneNumber = req.body
                              .phoneNumber;
 
-        let isTurkishNumber = false;
-        if( phoneNumber.includes( "+9" ) ){
-          isTurkishNumber = true;
-        }
-
-        if(
-          isTurkishNumber
-          && phoneNumber.includes( "05" )
-          && phoneNumber.length >= 10 
-        ){
-
-          var startIndex = phoneNumber.indexOf( "5" );
-          phoneNumber = "0" + phoneNumber.slice( startIndex );
-
-        }else if(
-          isTurkishNumber
-        ){
-          console.log( "Hata: İfade içerisinde '05' bulunamadı." );
-          return res.status( 400 )
-                    .json(
-                      {
-                        error: true,
-                        message: "Invalid Phone Number"
-                      }
-                    );
-        }
-
         const isPhoneAlreadyUsed = await User.findOne(
                                                 {
                                                   phone: phoneNumber
@@ -64,6 +38,50 @@ const insertPhoneNumberController = async (req, res) => {
                       {
                         error: true,
                         message: "This number already used"
+                      }
+                    );
+        }
+
+        let isTurkishNumber = false;
+        if( phoneNumber.includes( "+9" ) ){
+          isTurkishNumber = true;
+        }
+
+        let areThereEnoughVatanSmsBalance = false;
+        if( isTurkishNumber ){
+          const vatanSmsBalance = await vatanSmsBalanceQueryApiRequest();
+          areThereEnoughVatanSmsBalance = (
+                    vatanSmsBalance.kalanBakiye >= vatanSmsBalance.smsBirimFiyat
+                    && vatanSmsBalance.smsBirimFiyat > 0
+          );
+        }
+
+        if(
+          isTurkishNumber
+          && areThereEnoughVatanSmsBalance
+          && phoneNumber.includes( "05" )
+          && phoneNumber.length >= 10 
+        ){
+
+          var startIndex = phoneNumber.indexOf( "5" );
+          phoneNumber = "0" + phoneNumber.slice( startIndex );
+
+        }else if(
+          isTurkishNumber
+          && !areThereEnoughVatanSmsBalance
+          && phoneNumber.includes( "05" )
+          && phoneNumber.length >= 10 
+        ){
+          phoneNumber = phoneNumber.replaceAll( "+", "" );
+        }else if(
+          isTurkishNumber
+        ){
+          console.log( "Hata: İfade içerisinde '05' bulunamadı." );
+          return res.status( 400 )
+                    .json(
+                      {
+                        error: true,
+                        message: "Invalid Phone Number"
                       }
                     );
         }
@@ -87,7 +105,10 @@ const insertPhoneNumberController = async (req, res) => {
         await PhoneOtpVerification.deleteMany({ phoneNumber: phoneNumber });
 
         
-        if( isTurkishNumber ){
+        if( 
+          isTurkishNumber
+          && areThereEnoughVatanSmsBalance
+        ){
           vatanSmsSendValidationOtp(
             res,
             phoneNumber,

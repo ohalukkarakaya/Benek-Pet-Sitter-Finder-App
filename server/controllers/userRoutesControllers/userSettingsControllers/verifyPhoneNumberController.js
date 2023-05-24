@@ -35,8 +35,19 @@ const verifyPhoneNumberController = async (req, res) => {
           isTurkishNumber = true;
         }
 
+        const verificationObjectForServiceCheck = await PhoneOtpVerification.find(
+          {
+            userId: req.user
+                       ._id
+                       .toString()
+          }
+        );
+
+        const isForegnSmsService = verificationObjectForServiceCheck[ 0 ].otp === "Foreign Sms Service";
+
         if(
           isTurkishNumber
+          && !isForegnSmsService
           && phoneNumber.includes( "05" )
           && phoneNumber.length >= 10 
         ){
@@ -46,6 +57,7 @@ const verifyPhoneNumberController = async (req, res) => {
 
         }else if(
           isTurkishNumber
+          && !isForegnSmsService
         ){
           console.log( "Hata: İfade içerisinde '05' bulunamadı." );
           return res.status( 400 )
@@ -90,7 +102,10 @@ const verifyPhoneNumberController = async (req, res) => {
                     );
         }
   
-        if( isTurkishNumber ){
+        if( 
+          isTurkishNumber
+          && !isForegnSmsService
+        ){
           vatanSmsVerifyOtp(
             res,
             phoneNumber,

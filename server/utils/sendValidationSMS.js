@@ -38,6 +38,7 @@ const twilioClient = twilio(
                                        {
                                            userId: _id,
                                            phoneNumber: `+${phone}`,
+                                           otp: "Foreign Sms Service"
                                        }
                                    ).save().then(
                                        (result) => {
@@ -67,6 +68,7 @@ const verifyOTPVerificationSMS = async (
   next
 ) => {
     try {
+      const editedPhone = phone.replaceAll( "+", "" );
         await twilioClient.verify
                     .services(
                         process.env
@@ -74,7 +76,7 @@ const verifyOTPVerificationSMS = async (
                     ).verificationChecks
                      .create(
                         {
-                            to: `+${phone}`,
+                            to: `+${editedPhone}`,
                             code: otp
                         }
                      ).then(
@@ -84,7 +86,7 @@ const verifyOTPVerificationSMS = async (
                                 User.findByIdAndUpdate(
                                     _id,
                                     {
-                                        phone: `+${phone}`,
+                                        phone: `+${editedPhone}`,
                                         isPhoneVerified: true
                                     }
                                 ).then(
@@ -101,8 +103,11 @@ const verifyOTPVerificationSMS = async (
                                                     }
                                                   );
                                       }
-                                      PhoneOtpVerification.deleteOne()
-                                                          .then(
+                                      PhoneOtpVerification.deleteMany(
+                                                            {
+                                                              userId: _id
+                                                            }
+                                                          ).then(
                                                             (_) => {
                                                               if( user.careGiveGUID ){
                                                                 const paramRequest = paramUpdateSubSellerRequest(
@@ -152,7 +157,7 @@ const verifyOTPVerificationSMS = async (
                                                                           {
                                                                             error: false,
                                                                             message: "phone verified succesfully",
-                                                                            phoneNumber: user.phone
+                                                                            phoneNumber: "+" + editedPhone
                                                                           }
                                                                         );
                                                             }
@@ -197,6 +202,34 @@ const verifyOTPVerificationSMS = async (
                      );
     }catch( err ){
       console.log( err );
+      if( err.status === 404 ){
+        PhoneOtpVerification.deleteMany(
+                              {
+                                userId: _id,
+                              }
+                            ).then(
+                              (_) => {
+                                return res.status( 400 )
+                                          .json(
+                                            {
+                                              error: true,
+                                              message: "Code Expired"
+                                            }
+                                          );
+                              }
+                            ).catch(
+                              ( error ) => {
+                                return res.status( 500 )
+                                          .json(
+                                            {
+                                              error: true,
+                                              message: "Internal Server Error"
+                                            }
+                                          );
+                              }
+                            );
+      }
+
     }
 }
 
