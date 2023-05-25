@@ -42,13 +42,13 @@ const vatanSmsBalanceQueryApiRequest = async() => {
                                                 ? parseFloat(
                                                     smsBirimFiyatMatch[ 1 ]
                                                   ) 
-                                                : null;
+                                                : -1;
 
                 const kalanBakiye = kalanBakiyeMatch 
                                                 ? parseFloat(
                                                     kalanBakiyeMatch[ 1 ]
                                                   ) 
-                                                : null;
+                                                : -1;
 
                 resolve(
                     {

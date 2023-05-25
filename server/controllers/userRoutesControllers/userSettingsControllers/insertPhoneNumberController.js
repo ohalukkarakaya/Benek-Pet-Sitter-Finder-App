@@ -52,6 +52,8 @@ const insertPhoneNumberController = async (req, res) => {
           const vatanSmsBalance = await vatanSmsBalanceQueryApiRequest();
           areThereEnoughVatanSmsBalance = (
                     vatanSmsBalance.kalanBakiye >= vatanSmsBalance.smsBirimFiyat
+                    && vatanSmsBalance.smsBirimFiyat !== -1
+                    && vatanSmsBalance.kalanBakiye !== -1
                     && vatanSmsBalance.smsBirimFiyat > 0
           );
         }

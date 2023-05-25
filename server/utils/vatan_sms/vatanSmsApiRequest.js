@@ -69,7 +69,8 @@ const vatanSmsApiRequest = async (
             let config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: process.env.VATAN_SMS_TEST_API_URL,
+                url: process.env
+                            .VATAN_SMS_TEST_API_URL,
                 headers: { 
                     'Content-Type': 'text/plain'
                 },

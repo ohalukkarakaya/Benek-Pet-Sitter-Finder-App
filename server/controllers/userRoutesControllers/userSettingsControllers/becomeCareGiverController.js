@@ -10,11 +10,11 @@ dotenv.config();
 
 const becomeCareGiverController = async ( req, res ) => {
     try{
-        const user = await User.findById( 
-                                      req.user
-                                          ._id
-                                          .toString() 
-                                );
+        const userId = req.user
+                          ._id
+                          .toString();
+
+        const user = await User.findById( userId );
 
         if(
           !user 
@@ -34,8 +34,7 @@ const becomeCareGiverController = async ( req, res ) => {
   
         if( !isCareGiver ){
   
-          const iban = user.iban
-                           .ibanNo;
+          const iban = user.iban;
           if( !iban ){
             return res.status( 400 )
                       .json(
@@ -205,7 +204,9 @@ const becomeCareGiverController = async ( req, res ) => {
                       );
           }
   
-          if( paramRequest.sonuc !== "1" ){
+          if( 
+            paramRequest.data.sonuc !== "1" 
+          ){
 
             return res.status( 500 )
                       .json(
@@ -228,6 +229,20 @@ const becomeCareGiverController = async ( req, res ) => {
 
           const careGiverGUID = user.careGiveGUID;
           if( !careGiverGUID ){
+            user.isCareGiver = false;
+            user.markModified( "isCareGiver" );
+            user.save(
+              ( err ) => {
+                console.log( "ERROR: Save User - ", err );
+                return res.status( 500 )
+                          .json(
+                            {
+                              error: true,
+                              message: "Internal Server Error"
+                            }
+                          );
+              }
+            );
             console.log(
                       `user with id ${
                                       user._id
@@ -267,7 +282,10 @@ const becomeCareGiverController = async ( req, res ) => {
                       );
           }
   
-          if( paramRequest.sonuc !== "1" ){
+          if( 
+              paramRequest.data
+                          .sonuc !== "1" 
+          ){
             return res.status( 500 )
                       .json(
                         {
@@ -279,11 +297,29 @@ const becomeCareGiverController = async ( req, res ) => {
                       );
           }
   
-          user.careGiveGUID.deleteOne();
-          user.markModified("careGiveGUID");
-  
+          await User.updateOne(
+            {
+              _id: userId
+            },
+            {
+              $unset: {
+                careGiveGUID: 1
+              }
+            },
+            ( err ) => {
+              if( err ){
+                return res.status( 500 )
+                          .json(
+                              {
+                                  error: true,
+                                  message: "ERROR: while saving user"
+                              }
+                          );
+              }
+            }
+          ).clone();
         }
-  
+
         user.isCareGiver = !isCareGiver;
         user.markModified("isCareGiver");
         user.save(

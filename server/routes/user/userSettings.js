@@ -93,7 +93,7 @@ router.put(
   addIdNumberController
 );
 
-
+// - tested
 //add adress
 router.put(
   "/addAdress",
@@ -123,6 +123,7 @@ router.delete(
   deleteCareGiveCertificateController
 );
 
+// - tested
 //update careGiver Payment Info
 router.put(
   "/careGiverPaymentInfo",
