@@ -27,7 +27,9 @@ const paramRegisterSubSellerRequest = async (
                 lastName,
             ];
 
-            const fullName = name.join(" ");
+            const fullName = name.join(" ")
+                                 .replaceAll("undefined", "")
+                                 .replaceAll("  ", " ");
 
             const nationalIdNoLength = 10;
             const paddedNationalIdNo = nationalIdNo.padStart(
@@ -44,23 +46,23 @@ const paramRegisterSubSellerRequest = async (
                 <soap:Body>
                     <Pazaryeri_TP_AltUyeIsyeri_Ekleme xmlns="https://turkpos.com.tr/">
                         <G>
-                            <CLIENT_CODE>${process.env.PARAM_CLIENT_CODE}</CLIENT_CODE>
-                            <CLIENT_USERNAME>${process.env.PARAM_CLIENT_USERNAME}</CLIENT_USERNAME>
-                            <CLIENT_PASSWORD>${process.env.PARAM_CLIENT_PASSWORD}</CLIENT_PASSWORD>
+                            <CLIENT_CODE>${ process.env.PARAM_CLIENT_CODE }</CLIENT_CODE>
+                            <CLIENT_USERNAME>${ process.env.PARAM_CLIENT_USERNAME }</CLIENT_USERNAME>
+                            <CLIENT_PASSWORD>${ process.env.PARAM_CLIENT_PASSWORD }</CLIENT_PASSWORD>
                         </G> 
-                        <ETS_GUID>${process.env.PARAM_GUID}</ETS_GUID>
+                        <ETS_GUID>${ process.env.PARAM_GUID }</ETS_GUID>
                         <Tip>1</Tip>
-                        <Ad_Soyad>${fullName}</Ad_Soyad>
+                        <Ad_Soyad>${ fullName }</Ad_Soyad>
                         <Unvan>Benek Bakıcı</Unvan>
-                        <TC_VN>${paddedNationalIdNo}</TC_VN>
-                        <Kisi_DogumTarihi>${birthday}</Kisi_DogumTarihi>
-                        <GSM_No>${phoneNumber}</GSM_No>
-                        <IBAN_No>${iban}</IBAN_No>
-                        <IBAN_Unvan>${fullName}</IBAN_Unvan>
-                        <Adres>${openAdress}</Adres>
-                        <Il>${process.env.MERSIS_IL_KOD}</Il>
-                        <Ilce>${process.env.MERSIS_ILCE_KOD}</Ilce>
-                        <Vergi_Daire>${process.env.VERGI_DAIRE_KOD}</Vergi_Daire>
+                        <TC_VN>${ paddedNationalIdNo }</TC_VN>
+                        <Kisi_DogumTarihi>${ birthday }</Kisi_DogumTarihi>
+                        <GSM_No>${ phoneNumber }</GSM_No>
+                        <IBAN_No>${ iban }</IBAN_No>
+                        <IBAN_Unvan>${ fullName }</IBAN_Unvan>
+                        <Adres>${ openAdress }</Adres>
+                        <Il>${ process.env.MERSIS_IL_KOD }</Il>
+                        <Ilce>${ process.env.MERSIS_ILCE_KOD }</Ilce>
+                        <Vergi_Daire>${ process.env.VERGI_DAIRE_KOD }</Vergi_Daire>
                     </Pazaryeri_TP_AltUyeIsyeri_Ekleme>
                 </soap:Body>
                 </soap:Envelope>`;
@@ -71,7 +73,7 @@ const paramRegisterSubSellerRequest = async (
                 url: process.env.PARAM_TEST_URL,
                 headers: {
                   'Content-Type': 'text/xml;charset=UTF-8',
-                  'SOAPAction': 'https://turkpos.com.tr/Pazaryeri_TP_AltUyeIsyeri_Ekleme',
+                  'SOAPAction': process.env.PARAM_ADD_SUBSELLER_SOAP_ACTION_URL,
                 },
                 data: soapRequest
             };
@@ -104,12 +106,14 @@ const paramRegisterSubSellerRequest = async (
     
                             reject( response );
                         } else {
-                            const routePath = result[ "soap:Envelope" ][ "soap:Body" ]
-                                                                       [ 0 ]
-                                                                       [ "Pazaryeri_TP_AltUyeIsyeri_EklemeResponse" ]
-                                                                       [ 0 ]
-                                                                       [ "Pazaryeri_TP_AltUyeIsyeri_EklemeResult" ]
-                                                                       [ 0 ]
+                            const routePath = result[ "soap:Envelope" ]
+                                                    [ "soap:Body" ]
+                                                    [ 0 ]
+                                                    [ "Pazaryeri_TP_AltUyeIsyeri_EklemeResponse" ]
+                                                    [ 0 ]
+                                                    [ "Pazaryeri_TP_AltUyeIsyeri_EklemeResult" ]
+                                                    [ 0 ];
+
                             let sonuc = routePath[ "Sonuc" ]
                                                  [ 0 ]
                                                  [ "_" ];
@@ -119,6 +123,7 @@ const paramRegisterSubSellerRequest = async (
                                                     [ "_" ];
 
                             let guidAltUyeIsyeri = routePath[ "GUID_AltUyeIsyeri" ]
+
                                                     ? routePath[ "GUID_AltUyeIsyeri" ]
                                                                [ 0 ]
                                                                [ "_" ]

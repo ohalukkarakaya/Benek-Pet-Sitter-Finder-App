@@ -65,19 +65,21 @@ const paramDeleteSubSellerRequest = async (
     
                             reject( response );
                         } else {
-                            const routePath = result[ "soap:Envelope" ][ "soap:Body" ]
-                                                                         [ 0 ]
-                                                                         [ "Pazaryeri_TP_AltUyeIsyeri_SilmeResponse" ]
-                                                                         [ 0 ]
-                                                                         [ "Pazaryeri_TP_AltUyeIsyeri_SilmeResult" ]
-                                                                         [ 0 ]
+                            const routePath = result[ "soap:Envelope" ]
+                                                      [ "soap:Body" ]
+                                                      [ 0 ]
+                                                      [ "Pazaryeri_TP_AltUyeIsyeri_SilmeResponse" ]
+                                                      [ 0 ]
+                                                      [ "Pazaryeri_TP_AltUyeIsyeri_SilmeResult" ]
+                                                      [ 0 ];
+                                                      
                             let sonuc = routePath[ "Sonuc" ]
-                                                 [ 0 ]
-                                                 [ "_" ];
+                                                   [ 0 ]
+                                                   [ "_" ];
 
                             let sonucStr = routePath[ "Sonuc_Str" ]
-                                                    [ 0 ]
-                                                    [ "_" ];
+                                                      [ 0 ]
+                                                      [ "_" ];
 
                             let response = {
                                 error: false,
