@@ -1,3 +1,6 @@
+import addDetailToOrderXmlModel from "../xml_data_models/payment_requests_xml_models/add_detail_to_order_xml_model.js";
+
+import * as https from "https";
 import axios from "axios";
 import xml2js from "xml2js";
 import dotenv from "dotenv";
@@ -32,23 +35,12 @@ const paramAddDetailToOrder = async (
                                                                 }
                                                             );
 
-            let data = `<?xml version="1.0" encoding="utf-8"?>
-                        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">\n
-                            <soap:Body>\n
-                                <Pazaryeri_TP_Siparis_Detay_Ekle xmlns="https://turkpos.com.tr/">\n
-                                    <G>\n
-                                        <CLIENT_CODE>${ process.env.PARAM_CLIENT_CODE }</CLIENT_CODE>\n
-                                        <CLIENT_USERNAME>${ process.env.PARAM_CLIENT_USERNAME }</CLIENT_USERNAME>\n
-                                        <CLIENT_PASSWORD>${ process.env.PARAM_CLIENT_PASSWORD }</CLIENT_PASSWORD>\n
-                                    </G>\n
-                                    <GUID>${ process.env.PARAM_GUID }</GUID>\n
-                                    <Tutar_Urun>${ formatedPrice }</Tutar_Urun>\n
-                                    <Tutar_Odenecek>${ formatedSubsellersShare }</Tutar_Odenecek>\n
-                                    <SanalPOS_Islem_ID>${ orderId }</SanalPOS_Islem_ID>\n
-                                    <GUID_AltUyeIsyeri>${ subSellerGuid }</GUID_AltUyeIsyeri>\n
-                                </Pazaryeri_TP_Siparis_Detay_Ekle>\n
-                            </soap:Body>\n
-                        </soap:Envelope>`;
+            let data = addDetailToOrderXmlModel(
+                formatedPrice,
+                formatedSubsellersShare,
+                orderId,
+                subSellerGuid
+            );
 
             if(
                 process.env

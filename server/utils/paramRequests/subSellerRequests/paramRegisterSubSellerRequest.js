@@ -1,9 +1,12 @@
+import registerSubsellerXmlModel from "../xml_data_models/subseller_requests_xml_models/register_subseller_xml_model.js";
+
 import axios from "axios";
 import xml2js from "xml2js";
 import * as https from "https";
 import dotenv from "dotenv";
 
 dotenv.config();
+const env = process.env;
 
 const paramRegisterSubSellerRequest = async (
     firstName,
@@ -41,46 +44,27 @@ const paramRegisterSubSellerRequest = async (
                                                       );
 
             //send xml soap request to param
-            const soapRequest = `<?xml version="1.0" encoding="utf-8"?>
-                <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"> 
-                <soap:Body>
-                    <Pazaryeri_TP_AltUyeIsyeri_Ekleme xmlns="https://turkpos.com.tr/">
-                        <G>
-                            <CLIENT_CODE>${ process.env.PARAM_CLIENT_CODE }</CLIENT_CODE>
-                            <CLIENT_USERNAME>${ process.env.PARAM_CLIENT_USERNAME }</CLIENT_USERNAME>
-                            <CLIENT_PASSWORD>${ process.env.PARAM_CLIENT_PASSWORD }</CLIENT_PASSWORD>
-                        </G> 
-                        <ETS_GUID>${ process.env.PARAM_GUID }</ETS_GUID>
-                        <Tip>1</Tip>
-                        <Ad_Soyad>${ fullName }</Ad_Soyad>
-                        <Unvan>Benek Bakıcı</Unvan>
-                        <TC_VN>${ paddedNationalIdNo }</TC_VN>
-                        <Kisi_DogumTarihi>${ birthday }</Kisi_DogumTarihi>
-                        <GSM_No>${ phoneNumber }</GSM_No>
-                        <IBAN_No>${ iban }</IBAN_No>
-                        <IBAN_Unvan>${ fullName }</IBAN_Unvan>
-                        <Adres>${ openAdress }</Adres>
-                        <Il>${ process.env.MERSIS_IL_KOD }</Il>
-                        <Ilce>${ process.env.MERSIS_ILCE_KOD }</Ilce>
-                        <Vergi_Daire>${ process.env.VERGI_DAIRE_KOD }</Vergi_Daire>
-                    </Pazaryeri_TP_AltUyeIsyeri_Ekleme>
-                </soap:Body>
-                </soap:Envelope>`;
+            const data = registerSubsellerXmlModel(
+                fullName,
+                paddedNationalIdNo,
+                birthday,
+                phoneNumber,
+                iban,
+                openAdress
+            );
 
             const config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: process.env.PARAM_TEST_URL,
+                url: env.PARAM_TEST_URL,
                 headers: {
                   'Content-Type': 'text/xml;charset=UTF-8',
-                  'SOAPAction': process.env.PARAM_ADD_SUBSELLER_SOAP_ACTION_URL,
+                  'SOAPAction': env.PARAM_ADD_SUBSELLER_SOAP_ACTION_URL,
                 },
-                data: soapRequest
+                data: data
             };
 
-            if(
-                process.env.ENVIROMENT === 'TEST'
-            ){
+            if( env.ENVIROMENT === 'TEST' ){
                 //To Do: remove this on prod env
                 const httpsAgent = new https.Agent(
                     {
@@ -96,7 +80,7 @@ const paramRegisterSubSellerRequest = async (
                 const responseData = await axios.request( config );
                 xml2js.parseString(
                     responseData.data,
-                    (err, result) => {
+                    ( err, result ) => {
     
                         if( err ){
                             console.log( err );

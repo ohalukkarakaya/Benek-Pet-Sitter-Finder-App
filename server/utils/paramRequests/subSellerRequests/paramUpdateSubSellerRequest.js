@@ -1,8 +1,12 @@
+import updateSubsellerXmlModel from "../xml_data_models/subseller_requests_xml_models/update_subseller_xml_model.js";
+
+import * as https from "https";
 import axios from "axios";
 import xml2js from "xml2js";
 import dotenv from "dotenv";
 
 dotenv.config();
+const env = process.env;
 
 const paramUpdateSubSellerRequest = async (
     guid,
@@ -31,48 +35,26 @@ const paramUpdateSubSellerRequest = async (
                                 .replaceAll("  ", " ");
 
             //send xml soap request to param
-            const soapRequest = `<?xml version="1.0" encoding="utf-8"?> <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <Pazaryeri_TP_AltUyeIsyeri_Guncelleme xmlns="https://turkpos.com.tr/">
-                        <G>
-                            <CLIENT_CODE>${ process.env.PARAM_CLIENT_CODE }</CLIENT_CODE>
-                            <CLIENT_USERNAME>${ process.env.PARAM_CLIENT_USERNAME }</CLIENT_USERNAME>
-                            <CLIENT_PASSWORD>${ process.env.PARAM_CLIENT_PASSWORD }</CLIENT_PASSWORD>
-                        </G> 
-                        <GUID_AltUyeIsyeri>${ guid }</GUID_AltUyeIsyeri>`
-                        + ( fullName.replace(/\s+/g, '') !== ' ' ) 
-                                ? `<Ad_Soyad>${ fullName }</Ad_Soyad>` 
-                                : "" 
-                        + ( phoneNumber.replace(/\s+/g, '') !== ' ' ) 
-                                ? `<GSM_No>${ phoneNumber }</GSM_No>` 
-                                : ""
-                        + ( iban.replace(/\s+/g, '') !== ' ' ) 
-                                ? `<IBAN_No>${ iban }</IBAN_No>` 
-                                : ""
-                        + ( openAdress.replace(/\s+/g, '') !== ' ' ) 
-                                ? `<Adres>${ openAdress }</Adres>` 
-                                : ""
-                        + ( email.replace(/\s+/g, '') !== ' ' ) 
-                                ? `<EPosta>${ email }</EPosta>` 
-                                : ""
-                    + `</Pazaryeri_TP_AltUyeIsyeri_Guncelleme>
-                </soap:Body>
-            </soap:Envelope>`;
+            const data = updateSubsellerXmlModel(
+                guid,
+                fullName,
+                phoneNumber,
+                iban,
+                openAdress,
+                email
+            );
 
             const config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: process.env
-                            .PARAM_TEST_URL,
+                url: env.PARAM_TEST_URL,
                 headers: {
                   'Content-Type': 'text/xml;charset=UTF-8',
                 },
-                data: soapRequest
+                data: data
             };
 
-            if(
-                process.env.ENVIROMENT === 'TEST'
-            ){
+            if( env.ENVIROMENT === 'TEST' ){
                 //To Do: remove this on prod env
                 const httpsAgent = new https.Agent(
                     {

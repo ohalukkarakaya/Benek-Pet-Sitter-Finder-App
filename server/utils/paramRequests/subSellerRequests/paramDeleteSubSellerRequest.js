@@ -1,9 +1,13 @@
+import deleteSubsellerXmlModel from "../xml_data_models/subseller_requests_xml_models/delete_subseller_xml_model.js";
+
 import axios from "axios";
 import xml2js from "xml2js";
 import * as https from "https";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+const env = process.env;
 
 const paramDeleteSubSellerRequest = async (
     careGiverGUID
@@ -14,32 +18,9 @@ const paramDeleteSubSellerRequest = async (
             reject
         ) => {
             //send xml soap request to param
-            const soapRequest = `<?xml version="1.0" encoding="utf-8"?> <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                <Pazaryeri_TP_AltUyeIsyeri_Silme xmlns="https://turkpos.com.tr/">
-                    <G>
-                        <CLIENT_CODE>${process.env.PARAM_CLIENT_CODE}</CLIENT_CODE>
-                        <CLIENT_USERNAME>${process.env.PARAM_CLIENT_USERNAME}</CLIENT_USERNAME>
-                        <CLIENT_PASSWORD>${process.env.PARAM_CLIENT_PASSWORD}</CLIENT_PASSWORD>
-                    </G> 
-                    <GUID_AltUyeIsyeri>${careGiverGUID}</GUID_AltUyeIsyeri>
-                </Pazaryeri_TP_AltUyeIsyeri_Silme>
-                </soap:Body>
-            </soap:Envelope>`;
+            const data = deleteSubsellerXmlModel( careGiverGUID );
 
-            const config = {
-                method: 'post',
-                maxBodyLength: Infinity,
-                url: process.env.PARAM_TEST_URL,
-                headers: {
-                  'Content-Type': 'text/xml;charset=UTF-8',
-                },
-                data: soapRequest
-            };
-
-            if(
-                process.env.ENVIROMENT === 'TEST'
-            ){
+            if( env.ENVIROMENT === 'TEST' ){
                 //To Do: remove this on prod env
                 const httpsAgent = new https.Agent(
                     {
@@ -51,15 +32,26 @@ const paramDeleteSubSellerRequest = async (
                      .httpsAgent = httpsAgent;
             }
 
+            const config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: env.PARAM_TEST_URL,
+                headers: {
+                  'Content-Type': 'text/xml;charset=UTF-8',
+                },
+                data: data
+            };
+
             try{
+                let response;
                 const responseData = await axios.request( config );
                 xml2js.parseString(
                     responseData.data,
-                    (err, result) => {
+                    ( err, result ) => {
     
                         if( err ){
                             console.log( err );
-                            let response = {
+                            response = {
                                 error: true,
                             };
     
@@ -81,7 +73,7 @@ const paramDeleteSubSellerRequest = async (
                                                       [ 0 ]
                                                       [ "_" ];
 
-                            let response = {
+                            response = {
                                 error: false,
                                 data: {
                                     sonuc: sonuc,
