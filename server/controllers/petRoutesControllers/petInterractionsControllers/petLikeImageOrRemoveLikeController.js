@@ -4,7 +4,7 @@ import { petImageLikeValidation } from "../../../utils/bodyValidation/pets/petIm
 const petLikeImageOrRemoveLikeController = async (req, res) => {
     try{
         const { error } = petImageLikeValidation( req.body );
-        if(error){
+        if( error ){
             return res.status(400).json(
                 {
                     error: true,

@@ -11,7 +11,8 @@ import io from "socket.io-client";
 import sendNotification from "../../../utils/notification/sendNotification.js";
 
 dotenv.config();
-const socket = io(process.env.SOCKET_URL);
+
+const socket = io( process.env.SOCKET_URL );
 
 
 const sendMessageController = async (req, res) => {

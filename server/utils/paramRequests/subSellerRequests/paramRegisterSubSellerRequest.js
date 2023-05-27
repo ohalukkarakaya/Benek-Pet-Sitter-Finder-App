@@ -77,7 +77,22 @@ const paramRegisterSubSellerRequest = async (
             }
 
             try{
+                let response
                 const responseData = await axios.request( config );
+
+                if(
+                    !responseData
+                    || responseData.status !== 200
+                ){
+                    reject(
+                        {
+                            error: true,
+                            serverStatus: -1,
+                            message: `Api error: ${ responseData.status }`,
+                        }
+                    );
+                }
+
                 xml2js.parseString(
                     responseData.data,
                     ( err, result ) => {
@@ -89,45 +104,44 @@ const paramRegisterSubSellerRequest = async (
                             };
     
                             reject( response );
-                        } else {
-                            const routePath = result[ "soap:Envelope" ]
-                                                    [ "soap:Body" ]
-                                                    [ 0 ]
-                                                    [ "Pazaryeri_TP_AltUyeIsyeri_EklemeResponse" ]
-                                                    [ 0 ]
-                                                    [ "Pazaryeri_TP_AltUyeIsyeri_EklemeResult" ]
-                                                    [ 0 ];
-
-                            let sonuc = routePath[ "Sonuc" ]
-                                                 [ 0 ]
-                                                 [ "_" ];
-
-                            let sonucStr = routePath[ "Sonuc_Str" ]
-                                                    [ 0 ]
-                                                    [ "_" ];
-
-                            let guidAltUyeIsyeri = routePath[ "GUID_AltUyeIsyeri" ]
-
-                                                    ? routePath[ "GUID_AltUyeIsyeri" ]
-                                                               [ 0 ]
-                                                               [ "_" ]
-                                                    : null;
-                            
-                            let response = {
-                                error: false,
-                                data: {
-                                    sonuc: sonuc,
-                                    sonucStr: sonucStr,
-                                    guidAltUyeIsyeri: guidAltUyeIsyeri
-                                }
-                            }
-    
-                            if( sonuc !== "1" ){
-                                response.error = true;
-                            }
-                            
-                            resolve( response );
                         }
+                        const routePath = result[ "soap:Envelope" ]
+                                                [ "soap:Body" ]
+                                                [ 0 ]
+                                                [ "Pazaryeri_TP_AltUyeIsyeri_EklemeResponse" ]
+                                                [ 0 ]
+                                                [ "Pazaryeri_TP_AltUyeIsyeri_EklemeResult" ]
+                                                [ 0 ];
+
+                        let sonuc = routePath[ "Sonuc" ]
+                                             [ 0 ]
+                                             [ "_" ];
+
+                        let sonucStr = routePath[ "Sonuc_Str" ]
+                                                [ 0 ]
+                                                [ "_" ];
+
+                        let guidAltUyeIsyeri = routePath[ "GUID_AltUyeIsyeri" ]
+
+                                                ? routePath[ "GUID_AltUyeIsyeri" ]
+                                                           [ 0 ]
+                                                           [ "_" ]
+                                                : null;
+                            
+                        response = {
+                            error: false,
+                            data: {
+                                sonuc: sonuc,
+                                sonucStr: sonucStr,
+                                guidAltUyeIsyeri: guidAltUyeIsyeri
+                            }
+                        }
+    
+                        if( sonuc !== "1" ){
+                            response.error = true;
+                        }
+                            
+                        resolve( response );
                     }
                 );
             }catch( err ){

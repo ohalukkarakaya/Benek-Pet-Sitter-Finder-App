@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const editPetProfileImageAndCoverImageController = async (req, res) => {
+const editPetProfileImageAndCoverImageController = async (req, res,) => {
     try{
         let petProfileImageSucces;
         let petCoverImageSucces;
@@ -38,7 +38,6 @@ const editPetProfileImageAndCoverImageController = async (req, res) => {
             //if there is only cover image
             petCoverImageSucces = uploadedCoverImgImage;
           }
-          next();
         }
   
         //check what did updated
@@ -51,7 +50,6 @@ const editPetProfileImageAndCoverImageController = async (req, res) => {
             profileImageUrl: petProfileImageSucces,
             coverImageUrl: petCoverImageSucces
           };
-          next();
         }
   
         if(successResponse !== null){

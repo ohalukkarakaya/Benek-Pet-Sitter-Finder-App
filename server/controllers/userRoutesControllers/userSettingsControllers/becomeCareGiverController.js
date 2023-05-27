@@ -340,7 +340,7 @@ const becomeCareGiverController = async ( req, res ) => {
                   .json(
                     {
                       error: false,
-                      message: "became caregiver succesfully"
+                      message: "became caregiver operation successful"
                     }
                   );
     }catch( err ){

@@ -1,5 +1,6 @@
 import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
+import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
 const getPetByIdController = async ( req, res ) => {
     try{
@@ -13,63 +14,59 @@ const getPetByIdController = async ( req, res ) => {
             );
         }
 
-        const pet = await Pet.findById( petId );
-        const owner = await User.findById( pet.primaryOwner.toString() );
+        const pet = await Pet.findById( petId )
+                             .lean();
+
+        const owner = await User.findById( 
+                                        pet.primaryOwner
+                                           .toString() 
+                                );
+
         if( 
             !pet
             || !owner
-            || owner.deactivation.isDeactive
-            || owner.blockedUsers.includes( req.user._id.toString() )
+            || owner.deactivation
+                    .isDeactive
+            || owner.blockedUsers
+                    .includes( 
+                                req.user
+                                   ._id
+                                   .toString() 
+                             )
         ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "Pet not found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                        {
+                            error: true,
+                            message: "Pet not found"
+                        }
+                      );
         }
 
-        const primaryOwnerInfo = {
-            userId: owner._id.toString(),
-            userProfileImg: owner.profileImg.imgUrl,
-            username: owner.userName,
-            usersFullName: `${
-                    owner.identity
-                         .firstName
-                } ${
-                    owner.identity
-                         .middleName
-                } ${
-                    owner.identity
-                         .lastName
-                }`.replaceAll( "  ", " ")
-        }
+        const primaryOwnerInfo = getLightWeightUserInfoHelper( owner );
 
         pet.primaryOwner = primaryOwnerInfo;
 
-        pet.allOwners.forEach(
-            async( ownerId ) => {
-                const secondaryOwner = await User.findById( ownerId.toString() );
-                const secondaryOwnerInfo = {
-                    userId: secondaryOwner._id.toString(),
-                    userProfileImg: secondaryOwner.profileImg.imgUrl,
-                    username: secondaryOwner.userName,
-                    usersFullName: `${
-                            secondaryOwner.identity
-                                          .firstName
-                        } ${
-                            secondaryOwner.identity
-                                          .middleName
-                        } ${
-                            secondaryOwner.identity
-                                          .lastName
-                        }`.replaceAll( "  ", " ")
-                }
-                pet.allOwnerInfoList.push( secondaryOwnerInfo );
-            }
-        );
+        pet.allOwnerInfoList = [];
+        for(
+            let ownerId
+            of pet.allOwners
+        ){
+            const secondaryOwner = await User.findById( 
+                                                    ownerId.toString() 
+                                              );
+                                              
+            const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
+                
+            pet.allOwnerInfoList
+               .push( secondaryOwnerInfo );
+        };
 
-        if( pet.allOwnerInfoList.length === pet.allOwners.length ){
+        if( 
+            pet.allOwnerInfoList
+               .length === pet.allOwners
+                              .length 
+        ){
             delete pet.allOwners
         }
 

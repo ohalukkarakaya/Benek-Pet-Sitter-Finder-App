@@ -1,5 +1,12 @@
 import Notification from "../../models/Notification.js";
 
+import dotenv from "dotenv";
+import io from "socket.io-client";
+
+dotenv.config();
+
+const socket = io(process.env.SOCKET_URL);
+
 import prepareNotificationHelper from "./prepareNotificationHelper.js";
 
 const sendNotification = async ( 
@@ -17,8 +24,7 @@ const sendNotification = async (
     try{
         let notificationData;
         if( 
-            contentType === "petImageComment"
-            || contentType === "storyComment"
+            contentType === "storyComment"
             || contentType === "newMission"
             || contentType === "missionUpload"
             || contentType === "missionAprove"
@@ -82,7 +88,8 @@ const sendNotification = async (
                 }
             }
         }else if(
-            contentType === "storyReply"
+            contentType === "petImageComment"
+            || contentType === "storyReply"
             || contentType === "eventComment"
         ){
             if(
@@ -149,7 +156,7 @@ const sendNotification = async (
         }
 
         if( notificationData ){
-            await new Notification( notificationData ).then(
+            await new Notification( notificationData ).save().then(
                 async ( notification ) => {
 
                     //prepare Notification to send socket
@@ -173,7 +180,7 @@ const sendNotification = async (
             ).catch(
                 (error) => {
                     if(error){
-                        console.log("Error: while creating CareGiveObject - ", error);
+                        console.log("Error: sendNotification - ", error);
                         return data = {
                             error: true,
                             errorStatusCode: 500,

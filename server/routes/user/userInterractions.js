@@ -11,6 +11,7 @@ dotenv.config();
 
 const router = express.Router();
 
+// - tested
 //follow user
 router.put(
     "/followUser/:followingUserId",

@@ -13,6 +13,7 @@ import petImageDeleteCommentOrReplyController from "../../controllers/petRoutesC
 
 const router = express.Router();
 
+// - tested
 //follow pet
 router.put(
     "/followPet/:petId",
@@ -20,6 +21,7 @@ router.put(
     followPetController
 )
 
+// - tested
 //like image or remove like
 router.put(
     "/likeImage",
@@ -27,6 +29,7 @@ router.put(
     petLikeImageOrRemoveLikeController
 );
 
+// - tested
 //like comment or reply
 router.put(
     "/likeComment",
@@ -34,6 +37,7 @@ router.put(
     petLikeImageCommentController
 );
 
+// - tested
 //pet image leave comments and reply comment
 router.put(
     "/petImageComment",
@@ -41,6 +45,7 @@ router.put(
     petImageCreateCommentOrReplyCommentController
 );
 
+// - tested
 //edit comment and reply
 router.put(
     "/petEditImageComment",
@@ -48,6 +53,7 @@ router.put(
     petImageEditCommentOrReplyController
 );
 
+// - tested
 //delete pet image comment and replies
 router.delete(
     "/petImageComment",

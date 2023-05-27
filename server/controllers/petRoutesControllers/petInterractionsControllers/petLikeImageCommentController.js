@@ -41,6 +41,16 @@ const petLikeImageCommentController = async (req, res) => {
                 commentObject._id.toString() === req.body.commentId.toString()
         );
 
+        if( !comment ){
+            return res.status( 404 )
+                      .json(
+                        {
+                            error: true,
+                            message: "Comment not found"
+                        }
+                      );
+        }
+
         const isReply = req.body.replyId !== undefined && req.body.replyId !== null;
 
         if(isReply){
@@ -48,6 +58,16 @@ const petLikeImageCommentController = async (req, res) => {
                 replyObject =>
                     replyObject._id.toString() === req.body.replyId.toString()
             );
+
+            if( !reply ){
+                return res.status( 404 )
+                          .json(
+                            {
+                                error: true,
+                                message: "Reply Not Found"
+                            }
+                          );
+            }
             
             const isAlreadyLiked = reply.likes.find(
                 likedUserId =>

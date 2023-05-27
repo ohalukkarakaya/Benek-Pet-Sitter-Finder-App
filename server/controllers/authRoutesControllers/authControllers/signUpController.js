@@ -23,8 +23,16 @@ const signUpController = async ( req, res ) => {
   
       const user = await User.findOne(
                                 {
-                                  email: req.body
-                                            .email 
+                                  $or: [
+                                    {
+                                      userName: req.body
+                                                   .userName,
+                                    },
+                                    {
+                                      email: req.body
+                                                .email 
+                                    }
+                                  ]
                                 }
                               );
       if( user )

@@ -20,7 +20,7 @@ const editCareGiveCertificateDescController = async ( req, res ) => {
         const user = await User.findById( userId );
         const certificate = user.identity
                                 .certificates
-                                .filter(
+                                .find(
                                     certificateObject =>
                                         certificateObject.fileUrl === certificateUrl
                                 );

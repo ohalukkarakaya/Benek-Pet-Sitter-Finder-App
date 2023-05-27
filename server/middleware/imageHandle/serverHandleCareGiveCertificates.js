@@ -65,13 +65,13 @@ const upload = multer(
 );
 
 //Upload File
-const uploadCareGiverCertificate = async (req, res, next) => {
+const uploadCareGiverCertificate = async ( req, res, next ) => {
     try{
         upload.single( 'file' )(
             req,
             {},
-            (error) => {
-                if(error){
+            ( error ) => {
+                if( error ){
                     console.log("error", error);
                     return res.status(500).json(
                         {

@@ -9,6 +9,7 @@ const signUpBodyValidation = (body) => {
           identity: Joi.object().required().label("identity").keys(
             {
               firstName: Joi.string(),
+              middleName: Joi.string(),
               lastName: Joi.string()
             }
           ),

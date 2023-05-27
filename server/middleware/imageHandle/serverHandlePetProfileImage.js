@@ -3,56 +3,118 @@ import multerS3 from "multer-s3";
 import dotenv from "dotenv";
 import Pet from "../../models/Pet.js";
 import s3 from "../../utils/s3Service.js";
+import crypto from "crypto";
 
 dotenv.config();
+const env = process.env;
 
 //Storage
 const storage = multerS3(
     {
         s3,
-        bucket: process.env.BUCKET_NAME,
+        bucket: env.BUCKET_NAME,
         acl: 'public-read',
-        contentType: ( req, file, cb ) => {
+        contentType: ( 
+            req, 
+            file, 
+            cb 
+        ) => {
             try{
+
                 const fileType = file.mimetype;
-                cb(null, fileType);
-            }catch(err){
-                console.log(err);
+
+                cb(
+                    null, 
+                    fileType
+                );
+
+            }catch( err ){
+                console.log( err );
             }
         },
-        key: (req, file, cb) => {
+        key: (
+            req, 
+            file, 
+            cb
+        ) => {
             try{
                 const { originalname } = file;
-                const petId = req.pet._id;
 
-                const splitedOriginalName = originalname.split(".");
+                const petId = req.pet
+                                 ._id;
 
-                if(file.fieldname === "petProfileImg"){
-                    const newFileName = `${petId}_petProfileImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
+                const splitedOriginalName = originalname.split( "." );
+
+                const randPass = crypto.randomBytes( 6 )
+                                       .toString( 'hex' );
+
+                if(
+                    file.fieldname === "petProfileImg"
+                ){
+                    const newFileName = petId 
+                                         + "_petProfileImg_"
+                                         + randPass
+                                         +"."
+                                         + splitedOriginalName[
+                                                splitedOriginalName.length - 1
+                                           ];
+
                     req.petProfileImgNewFileName = newFileName;
                 
-                    cb(null, "pets/"+petId+"/petProfileAssets/"+newFileName);
+                    cb(
+                        null, 
+                        "pets/" + petId
+                                + "/petProfileAssets/"
+                                + newFileName
+                    );
 
-                }else if(file.fieldname === "petCoverImg"){
-                    const newFileName = `${petId}_petCoverImg.${splitedOriginalName[splitedOriginalName.length - 1]}`;
+                }else if(
+                    file.fieldname === "petCoverImg"
+                ){
+                    const newFileName = petId
+                                        + "_petCoverImg_"
+                                        + randPass
+                                        + "."
+                                        + splitedOriginalName[
+                                                    splitedOriginalName.length - 1
+                                          ];
+
                     req.petCoverImgNewFileName = newFileName;
                 
-                    cb(null, "pets/"+petId+"/petProfileAssets/"+newFileName);
+                    cb(
+                        null, 
+                        "pets/" + petId
+                                + "/petProfileAssets/"
+                                + newFileName
+                    );
                 }
-            }catch(err){
-                console.log(err);
+            }catch( err ){
+                console.log( err );
             }
         }
     }
 );
 
 //File Filter
-const fileFilter = (req, file, cb) => {
-    if(file){
-        if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg'){
-            cb( null, true );
+const fileFilter = (
+    req, 
+    file, 
+    cb
+) => {
+    if( file ){
+        if(
+            file.mimetype === 'image/jpeg' 
+            || file.mimetype === 'image/jpg'
+        ){
+            cb( 
+                null, 
+                true 
+            );
         }else{
-            cb( new Error("You can just upload '.jpg"), false );
+            cb( 
+                new Error( "You can just upload '.jpg" ), 
+                false 
+            );
         }
     }
 };
@@ -66,17 +128,22 @@ const upload = multer(
     }
 );
 
-const deleteImg = async (req, file, deleteParams) => {
+const deleteImg = async (
+    deleteParams
+) => {
     try {
-        fileFilter.then(
-            (_) => {
-                s3.deleteObject(deleteParams).promise();
-                console.log("Success", data);
-                return data;
+        s3.deleteObject( 
+            deleteParams,
+            ( error, data ) => {
+                if( error ){
+                    console.log( "ERROR: deleteImg - ", error );
+                }else{
+                    return data
+                }
             }
-        );
-    } catch (err) {
-        console.log("Error", err);
+          )
+    } catch ( err ) {
+        console.log( "Error", err );
     }
   };
 
@@ -85,42 +152,69 @@ const ValidateAndCleanBucket = async (
     pet,
     isDefaultProfileImg,
     isDefaultCoverImg,
-    recordedImgName
+    recordedProfileImgName,
+    recordedCoverImageName
 ) => {
-    if(!isDefaultProfileImg && pet.petProfileImg !== undefined && pet.petProfileImg.recordedImgName !== undefined){
+    if(
+        !isDefaultProfileImg
+        && recordedProfileImgName
+        && pet.petProfileImg !== undefined 
+
+        && pet.petProfileImg
+              .recordedImgName !== undefined
+    ){
         const deleteProfileImageParams = {
-            Bucket: process.env.BUCKET_NAME,
-            Key: `petProfileAssets/${pet._id}/${recordedImgName}`
+            Bucket: env.BUCKET_NAME,
+            Key: "pets/" + pet._id
+                              .toString()
+                         + "/petProfileAssets/"
+                         + pet.petProfileImg
+                              .recordedImgName
         };
-        await deleteImg(deleteProfileImageParams);
+        await deleteImg( deleteProfileImageParams );
     }
-    if(!isDefaultCoverImg && pet.petCoverImg !== undefined && pet.petCoverImg.recordedImgName !== undefined){
+
+    if(
+        !isDefaultCoverImg 
+        && recordedCoverImageName
+        && pet.petCoverImg !== undefined 
+        && pet.petCoverImg
+              .recordedImgName !== undefined
+    ){
         const deleteCoverImageParams = {
-            Bucket: process.env.BUCKET_NAME,
-            Key: `Pets/${pet._id}/${recordedImgName}`
+            Bucket: env.BUCKET_NAME,
+            Key: "pets/" + pet._id
+                              .toString()
+                         + "/petProfileAssets/"
+                         + pet.petCoverImg
+                              .recordedImgName
         };
-        await deleteImg(deleteCoverImageParams);
+        await deleteImg( deleteCoverImageParams );
     }
+    return true;
 }
 
-const updatePetProfileImg = async (req, res, next) => {
+const updatePetProfileImg = async (
+    req, 
+    res, 
+    next
+) => {
     try{
-        const petId = req.params.petId;
+        const petId = req.params
+                         .petId
+                         .toString();
+
             await Pet.findOne(
-                { _id: petId},
-                (err, pet) => {
+                { _id: petId },
+                ( err, pet ) => {
                     req.pet = pet;
-                    const isDefaultProfileImg = pet.petProfileImg.isDefaultImg;
-                    const isDefaultCoverImg = pet.petCoverImg.isDefaultImg;
-                    ValidateAndCleanBucket(
-                        req,
-                        isDefaultProfileImg,
-                        isDefaultCoverImg,
-                        pet.petProfileImg.recordedImgName,
-                        pet.petCoverImg.recordedImgName
-                    ).then(
-                        (_) => {
-                            upload.fields(
+                    const isDefaultProfileImg = pet.petProfileImg
+                                                   .isDefaultImg;
+
+                    const isDefaultCoverImg = pet.petCoverImg
+                                                 .isDefaultImg;
+
+                    upload.fields(
                                 [
                                     {
                                         name: "petProfileImg",
@@ -134,53 +228,134 @@ const updatePetProfileImg = async (req, res, next) => {
                             )(
                                 req,
                                 {},
-                                (err) => {
-                                    if(req.files !== undefined && req.files.petProfileImg || req.files !== undefined && req.files.petCoverImg){
-                                        let updateParams;
-                                        req.petProfilePath = `${process.env.CDN_SUBDOMAIN}pets/${petId}/petProfileAssets/${req.petProfileImgNewFileName}`;
-                                        req.petCoverPath = `${process.env.CDN_SUBDOMAIN}pets/${petId}/petProfileAssets/${req.petCoverImgNewFileName}`;
-                                        if(req.files.petProfileImg && req.files.petCoverImg){
-                                                //if there is profile image and cover image both
-                                                req.pet.petProfileImg.imgUrl = req.petProfilePath;
-                                                req.pet.petProfileImg.recordedImgName = req.petProfileImgNewFileName;
-                                                req.pet.petProfileImg.isDefaultImg = false;
-                                                req.pet.petCoverImg.imgUrl = req.petCoverPath;
-                                                req.pet.petCoverImg.recordedImgName = req.petCoverImgNewFileName;
-                                                req.pet.petCoverImg.isDefaultImg = false;
+                                ( err ) => {
+                                    if(
+                                        req.files !== undefined
+                                        && req.files
+                                              .petProfileImg 
 
-                                        }else if(req.files.petProfileImg && !req.files.petCoverImg){
-                                                //if there is only profile image
-                                                req.pet.petProfileImg.imgUrl = req.petProfilePath;
-                                                req.pet.petProfileImg.recordedImgName = req.petProfileImgNewFileName;
-                                                req.pet.petProfileImg.isDefaultImg = false;
+                                        || req.files !== undefined
+                                        && req.files
+                                              .petCoverImg
+                                    ){
+                                        ValidateAndCleanBucket(
+                                            req,
+                                            pet,
+                                            isDefaultProfileImg,
+                                            isDefaultCoverImg,
+                                            req.petProfileImgNewFileName,
+                                            req.petCoverImgNewFileName
+                                        ).then(
+                                            (_) => {
+                                                req.petProfilePath = env.CDN_SUBDOMAIN
+                                                                      + "pets/"
+                                                                      + petId
+                                                                      + "/petProfileAssets/"
+                                                                      + req.petProfileImgNewFileName;
 
-                                        }else if(!req.files.petProfileImg && req.files.petCcoverImg){
-                                                //if there is only cover image
-                                                req.pet.petCoverImg.imgUrl= req.petCoverPath;
-                                                req.pet.petCoverImg.recordedImgName = req.petCoverImgNewFileName;
-                                                req.pet.petCoverImg.isDefaultImg = false;
-                                        }
-                                        next();
-                                    }else{
-                                        return res.status(500).json(
-                                            {
-                                                error: true,
-                                                message: "Internal Server Error"
+                                                req.petCoverPath = env.CDN_SUBDOMAIN
+                                                                    + "pets/"
+                                                                    + petId
+                                                                    + "/petProfileAssets/"
+                                                                    + req.petCoverImgNewFileName;
+
+                                                if(
+                                                    req.files
+                                                       .petProfileImg 
+
+                                                    && req.files
+                                                          .petCoverImg
+                                                ){
+                                                    //if there is profile image and cover image both
+                                                    req.pet
+                                                       .petProfileImg
+                                                       .imgUrl = req.petProfilePath;
+
+                                                    req.pet
+                                                       .petProfileImg
+                                                       .recordedImgName = req.petProfileImgNewFileName;
+
+                                                    req.pet
+                                                       .petProfileImg
+                                                       .isDefaultImg = false;
+
+                                                    req.pet
+                                                       .petCoverImg
+                                                       .imgUrl = req.petCoverPath;
+
+                                                    req.pet
+                                                       .petCoverImg
+                                                       .recordedImgName = req.petCoverImgNewFileName;
+
+                                                    req.pet
+                                                       .petCoverImg
+                                                       .isDefaultImg = false;
+
+                                                }else if(
+                                                    req.files
+                                                       .petProfileImg
+
+                                                    && !req.files
+                                                           .petCoverImg
+                                                ){
+                                                    //if there is only profile image
+                                                    req.pet
+                                                       .petProfileImg
+                                                       .imgUrl = req.petProfilePath;
+
+                                                    req.pet
+                                                       .petProfileImg
+                                                       .recordedImgName = req.petProfileImgNewFileName;
+
+                                                    req.pet
+                                                       .petProfileImg
+                                                       .isDefaultImg = false;
+
+                                                }else if(
+                                                    !req.files
+                                                        .petProfileImg 
+                                                    
+                                                    && req.files
+                                                          .petCoverImg
+                                                ){
+                    
+                                                    //if there is only cover image
+                                                    req.pet
+                                                       .petCoverImg
+                                                       .imgUrl= req.petCoverPath;
+
+                                                    req.pet
+                                                       .petCoverImg
+                                                       .recordedImgName = req.petCoverImgNewFileName;
+
+                                                    req.pet
+                                                       .petCoverImg
+                                                       .isDefaultImg = false;
+                                                }
+                                                next();
                                             }
                                         );
+                                    }else{
+                                        return res.status( 500 )
+                                                  .json(
+                                                        {
+                                                            error: true,
+                                                            message: "Internal Server Error"
+                                                        }
+                                                  );
                                     }
-                                });
-                            }
-                        )
-                    }
-                ).clone();
+                                }
+                            );
+                }
+            ).clone();
     }catch(err){
-        return res.status(500).json(
-            {
-                error: true,
-                message: err.message
-            }
-        )
+        return res.status( 500 )
+                  .json(
+                    {
+                        error: true,
+                        message: err.message
+                    }
+                  )
     }
 } 
 

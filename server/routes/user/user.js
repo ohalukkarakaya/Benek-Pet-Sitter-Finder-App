@@ -84,7 +84,7 @@ router.post(
 );
 
 // - tested
-//get light weight user id with user id list
+//get light weight user info with user id list
 router.post(
   "/getLightWeightUserInfo",
   auth,

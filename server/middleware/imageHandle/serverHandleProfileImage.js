@@ -7,75 +7,86 @@ import crypto from "crypto";
 import s3 from "../../utils/s3Service.js";
 dotenv.config();
 
+const env = process.env;
 //Storage
 const storage = multerS3(
     {
         s3,
-        bucket: process.env.BUCKET_NAME,
+        bucket: env.BUCKET_NAME,
         acl: 'public-read',
-        contentType: ( req, file, cb ) => {
+        contentType: ( 
+            req, 
+            file, 
+            cb 
+        ) => {
             try{
                 const fileType = file.mimetype;
-                cb(null, fileType);
+                cb(
+                    null, 
+                    fileType
+                );
             }catch( err ){
                 console.log( err );
             }
         },
-        key: (req, file, cb) => {
+        key: (
+            req, 
+            file, 
+            cb
+        ) => {
 
             const { originalname } = file;
             const userId = req.user
-                              ._id;
+                              ._id
+                              .toString();
 
             const splitedOriginalName = originalname.split(".");
             const randId = crypto.randomBytes( 6 )
                                  .toString( 'hex' );
 
-            if( file.fieldname === "profileImg" ){
-                const newFileName = `${ 
-                                        userId 
-                                    }_${ 
-                                        randId 
-                                      }_profileImg.${ 
-                                                     splitedOriginalName[
-                                                                splitedOriginalName.length - 1
-                                                     ] 
-                                                   }`;
+            if( 
+                file.fieldname === "profileImg" 
+            ){
+                const newFileName = userId + "_" 
+                                           + randId 
+                                           + "_profileImg." 
+                                           + splitedOriginalName[
+                                                    splitedOriginalName.length - 1
+                                             ];
 
                 req.profileImgNewFileName = newFileName;
-                req.profileCdnPath = `${
-                                         process.env
-                                                .CDN_SUBDOMAIN
-                                      }profileAssets/${
-                                                        userId
-                                                     }/${
-                                                            newFileName
-                                                       }`;
+                req.profileCdnPath = env.CDN_SUBDOMAIN + "profileAssets/"
+                                                        + userId
+                                                        + "/"
+                                                        + newFileName;
                 
-                cb( null, "profileAssets/"+userId+"/"+newFileName );
+                cb( 
+                    null, 
+                    "profileAssets/" + userId
+                                     + "/"
+                                     + newFileName 
+                );
 
             }else if( file.fieldname === "coverImg" ){
-                const newFileName = `${
-                                        userId 
-                                    }_${
-                                        randId 
-                                      }_coverImg.${
-                                                    splitedOriginalName[
-                                                            splitedOriginalName.length - 1
-                                                    ]
-                                                 }`;
+                const newFileName = userId + "_"
+                                            + randId 
+                                            + "_coverImg."
+                                            + splitedOriginalName[
+                                                    splitedOriginalName.length - 1
+                                              ];
                                                  
                 req.coverImgNewFileName = newFileName;
-                req.coverCdnPath = `${
-                                        process.env
-                                               .CDN_SUBDOMAIN
-                                    }profileAssets/${
-                                                     userId
-                                                   }/${
-                                                        newFileName
-                                                     }`;
+                req.coverCdnPath = env.CDN_SUBDOMAIN + "profileAssets/"
+                                                     + userId
+                                                     + "/"
+                                                     + newFileName;
                 
-                cb( null, "profileAssets/"+userId+"/"+newFileName );
+                cb( 
+                    null, 
+                    "profileAssets/" + userId
+                                     + "/" 
+                                     + newFileName 
+                );
             }
         }
     }
@@ -147,12 +158,10 @@ const ValidateAndCleanBucket = async (
         const deleteProfileImageParams = {
             Bucket: process.env
                            .BUCKET_NAME,
-            Key: `profileAssets/${
-                                   user._id
+            Key: "profileAssets/"+ user._id
                                        .toString()
-                                }/${
-                                    recordedProileImgName
-                                  }`
+                                 + "/"
+                                 + recordedProileImgName
         };
         await deleteImg( deleteProfileImageParams );
     }

@@ -7,11 +7,11 @@ const getPetImageCommentsController = async ( req, res ) => {
         const userId = req.user._id.toString();
         const petId = req.params.petId.toString();
         const imageId = req.params.imageId.toString();
-        const skip = parseInt( req.params.skip ) || 0;
-        const limit = parseInt( req.params.limit ) || 15;
+        let skip = parseInt( req.params.skip ) || 0;
+        let limit = parseInt( req.params.limit ) || 15;
         if(
             !petId
-            || imageId
+            || !imageId
         ){
             return res.status( 400 ).json(
                 {
@@ -21,7 +21,8 @@ const getPetImageCommentsController = async ( req, res ) => {
             );
         }
 
-        const pet = await Pet.findById( petId );
+        const pet = await Pet.findById( petId )
+                             .lean();
         if( !pet ){
             return res.status( 404 ).json(
                 {
@@ -33,15 +34,35 @@ const getPetImageCommentsController = async ( req, res ) => {
         const image = pet.images
                          .find(
                             imageObject =>
-                                imageObject._id.toString() === imageId
+                                imageObject._id
+                                           .toString() === imageId
                          );
 
-        let comments;
-        if( skip = 0 ){
-            const usersComments = image.comments.filter(
-                commentObject =>
-                    commentObject.userId.toString() === userId
-            );
+        let comments = [];
+
+        let usersComments = image.comments
+                                     .filter(
+                                        commentObject =>
+                                            commentObject.userId.toString() === userId
+                                     );
+
+        if( 
+            skip === 0
+            || usersComments.length > skip
+        ){
+            if( usersComments.length > limit ){
+
+                const startIndex = skip > 0
+                                   && usersComments.length > skip
+                                    ? skip - 1
+                                    : 0;
+
+                const endIndex = ( startIndex + limit ) > ( usersComments.length -1 )
+                                    ? usersComments.length -1
+                                    : startIndex + ( limit - 1 );
+
+                usersComments = usersComments.slice( startIndex, endIndex );
+            }
 
             limit = limit - usersComments.length;
             comments = usersComments;
@@ -54,66 +75,116 @@ const getPetImageCommentsController = async ( req, res ) => {
                                         commentObject =>
                                             commentObject.userId.toString() !== userId
                                       );
-            const startIndex = commentList.length - skip - 1;
-            const endIndex = startIndex + limit;
+
+            const startIndex = skip > 0
+                               && commentList.length > skip
+                                ? skip - 1
+                                : 0;
+
+            const endIndex = ( startIndex + limit ) > ( commentList.length -1 )
+                                ? commentList.length - 1
+                                : startIndex + ( limit - 1 );
 
             const limitedComments = commentList.slice( startIndex, endIndex );
-
-            comments.push( limitedComments );
+            
+            if(
+                limitedComments .length > 0
+            ){
+                comments.push( ...limitedComments );
+            }
+            
         }
 
         if( comments.length > 0 ){
-            comments.forEach(
-                async ( commentObject) => {
-                    const commentedUser = await User.findById( commentObject.userId.toString() );
-                    const commentedUserInfo = getLightWeightUserInfoHelper( commentedUser );
-                    commentObject.user = commentedUserInfo;
-                    delete commentObject.userId;
+            for(
+                let commentObject
+                of comments
+            ){
+                const commentedUser = await User.findById( 
+                                                    commentObject.userId
+                                                                 .toString() 
+                                                 );
+                                                 
+                const commentedUserInfo = getLightWeightUserInfoHelper( commentedUser );
 
-                    let firstFiveOfLikeLimit = 5;
-                    
-                    if( replyObject.likes.length < 5 ){
-                        firstFiveOfLikeLimit = replyObject.likes.length;
-                    }
+                commentObject.user = commentedUserInfo;
 
-                    for( let i = 0; i <= firstFiveOfLikeLimit; i++ ){
-                        const likedUser = await User.findById( commentObject.likes[ i ].toString() );
-                        const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
-    
-                        commentObject.firstFiveLikedUser.push( likedUserInfo );
-                    }
+                delete commentObject.userId;
 
-                    const replyCount = commentObject.replies.length;
-                    const lastReply = commentObject.replies.pop();
-                    
-                    commentObject.lastReply = lastReply;
-                    commentObject.replyCount = replyCount;
-                    delete commentObject.replies;
+                let firstFiveOfLikeLimit = 5;
+
+                if( 
+                    commentObject.likes
+                                 .length < 5
+                ){
+                    firstFiveOfLikeLimit = commentObject.likes
+                                                        .length;
                 }
-            );
+
+                if(
+                    firstFiveOfLikeLimit > 0
+                ){
+                    for(
+                        let i = 0; 
+                        i <= firstFiveOfLikeLimit - 1; 
+                        i++ 
+                    ){
+                        const likedUser = await User.findById( 
+                                                        commentObject.likes[ i ]
+                                                                     .toString() 
+                                                    );
+
+                        const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
+                        
+                        commentObject.firstFiveLikedUser = [];
+
+                        commentObject.firstFiveLikedUser
+                                     .push( likedUserInfo );
+                    }
+
+                    const likeCount = commentObject.likes
+                                                   .length;
+
+                    commentObject.likeCount = likeCount;
+                }
+                
+
+                const replyCount = commentObject.replies
+                                                .length;
+
+                const lastReply = commentObject.replies
+                                               .pop();
+
+                commentObject.lastReply = lastReply;
+                commentObject.replyCount = replyCount;
+                delete commentObject.replies;
+            }
 
             const usersComments = comments.filter(
-                commentObject =>
-                    commentObject.user.userId === userId
-            ).sort(
-                ( a, b ) => 
-                    b.createdAt - a.createdAt
-            );
+                                                commentObject =>
+                                                    commentObject.user
+                                                                 .userId === userId
+                                           ).sort(
+                                                ( a, b ) => 
+                                                    b.createdAt - a.createdAt
+                                           );
 
             const otherComments = comments.filter(
-                commentObject =>
-                    commentObject.user.userId !== userId
-            ).sort(
-                ( a, b ) => 
-                    b.createdAt - a.createdAt
-            );
+                                                commentObject =>
+                                                    commentObject.user
+                                                                 .userId !== userId
+                                           ).sort(
+                                                ( a, b ) => 
+                                                    b.createdAt - a.createdAt
+                                           );
 
             const resultCommentData = [...usersComments, ...otherComments];
             return res.status( 200 ).json(
                 {
                     error: false,
                     message: "Comments Prepared succesfully",
-                    commentCount: comments.length,
+                    totalCommentCount: image.comments
+                                       .length,
                     comments: resultCommentData
                 }
             );
@@ -127,13 +198,14 @@ const getPetImageCommentsController = async ( req, res ) => {
         }
 
     }catch( err ){
-        console.log("ERROR: getPetByIdController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+        console.log("ERROR: getPetImageCommentsController - ", err);
+        res.status( 500 )
+           .json(
+                {
+                    error: true,
+                    message: "Internal Server Error"
+                }
+           );
     }
 }
 

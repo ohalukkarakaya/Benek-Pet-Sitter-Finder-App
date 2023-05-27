@@ -101,6 +101,7 @@ router.put(
   addAdressController
 );
 
+// - tested
 //upload user careGiver certificate
 router.post(
   "/certificate",
@@ -109,13 +110,15 @@ router.post(
   insertCareGiverCertificateController
 );
 
-//edt careGiver certificate desc
+// - tested
+//edit careGiver certificate desc
 router.put(
   "/editCertificate",
   auth,
   editCareGiveCertificateDescController
 );
 
+// - tested
 //delete careGiver certificate desc
 router.delete(
   "/certificate",
@@ -131,6 +134,7 @@ router.put(
   updateCareGiverPaymentInfoController
 );
 
+// - tested
 //become care giver
 router.put(
   "/becomeCareGiver",
@@ -138,6 +142,7 @@ router.put(
   becomeCareGiverController
 );
 
+// TO DO
 //block a user
 router.put(
   "block/:userId",

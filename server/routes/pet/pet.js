@@ -30,6 +30,7 @@ dotenv.config();
 
 const router = express.Router();
 
+// - tested
 //Create Pet
 router.post(
   "/createPet", 
@@ -37,6 +38,7 @@ router.post(
   createPetController
 );
 
+// - tested
 //Edit Profile Image and Cover Image of the Pet
 router.put(
   "/petProfileImage/:petId", 
@@ -45,6 +47,7 @@ router.put(
   editPetProfileImageAndCoverImageController
 );
 
+// - tested
 //Edit Pet Bio
 router.put(
   "/editPetBioCertificate/:petId",
@@ -53,6 +56,7 @@ router.put(
   editPetBioController
 );
 
+// - tested
 //Insert Images of the pet
 router.put(
   "/petsImages/:petId", 
@@ -62,6 +66,7 @@ router.put(
   insertPetsImagesController
 );
 
+// - tested
 //Delete Images of the pet
 router.delete(
   "/petsImages/:petId", 
@@ -70,6 +75,7 @@ router.delete(
   deletePetsImagesController
 );
 
+// - tested
 //Insert Vaccination Certificate of the Pet
 router.put(
   "/petsVaccinationCertificate/:petId", 
@@ -79,6 +85,7 @@ router.put(
   insertPetVaccinationCertificateController
 );
 
+// - tested
 //Edit Certificate desc
 router.put(
   "/editVaccinationCertificate/:petId",
@@ -87,6 +94,7 @@ router.put(
   editPetVaccinationCertificateDescController
 );
 
+// - tested
 //Delete Vaccination Certificate of the Pet
 router.delete(
   "/petsVaccinationCertificate/:petId",
@@ -95,6 +103,7 @@ router.delete(
   deletePetVaccinationCertificateController
 );
 
+// TO DO
 //Delete Pet and Clean Dependency
 router.delete(
   "/deletePet/:petId",
@@ -103,6 +112,7 @@ router.delete(
   deletePetController
 );
 
+// - tested
 //get pet by pet id
 router.get(
   "/getPetById/:petId",
@@ -110,6 +120,7 @@ router.get(
   getPetByIdController
 );
 
+// - tested
 //get pets by jwt token
 router.get(
   "/getPets",
@@ -117,6 +128,7 @@ router.get(
   getPetsByJwtController
 );
 
+// - tested
 //get pets by userId
 router.get(
   "/getPetsByUserId/:userId",
@@ -124,16 +136,18 @@ router.get(
   getPetsByUserIdController
 );
 
+// - tested
 //get image comments
 router.get(
-  "/getImageComments/:petId/:imageId",
+  "/getImageComments/:petId/:imageId/:skip/:limit",
   auth,
   getPetImageCommentsController
 );
 
+// - tested
 //get image comment replies
 router.get(
-  "/getImageCommentsReplies/:petId/:imageId/:commentId",
+  "/getImageCommentsReplies/:petId/:imageId/:commentId/:skip/:limit",
   auth,
   getPetImageCommentsRepliesController
 );

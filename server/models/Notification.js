@@ -48,7 +48,6 @@ const NotificationSchema = new schema(
         parentContent: {
             id: {
                 type: String,
-                required: true
             },
             contentType:{
                 type: String,
@@ -62,35 +61,31 @@ const NotificationSchema = new schema(
                     "careGive",
                     "pet"
                 ],
-                required: true
             }
         },
         secondParentContent: {
             id: {
                 type: String,
-                required: true
             },
             contentType:{
                 type: String,
                 enum: [ 
+                    "pet",
                     "petImage",
                     "story",
                     "event"
                 ],
-                required: true
             }
         },
         thirdParentContent: {
             id: {
                 type: String,
-                required: true
             },
             contentType:{
                 type: String,
                 enum: [ 
                     "pet"
                 ],
-                required: true
             }
         },
         date: {
