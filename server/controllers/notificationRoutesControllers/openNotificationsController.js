@@ -5,7 +5,7 @@ const openNotificationsController = async ( req, res ) => {
         const userId = req.user
                           ._id
                           .toString();
-        const notificationIdList = [...new Set( req.user._id.toString() )];
+        const notificationIdList = [...new Set( req.body.notificationIdList )];
         if( 
             !notificationIdList 
             || notificationIdList.length <= 0
@@ -19,11 +19,14 @@ const openNotificationsController = async ( req, res ) => {
                       );
         }
 
-        notificationIdList.forEach(
-            async ( notificationId ) => {
-                const notification = await Notification.findById( 
+        for(
+            let notificationId
+            of notificationIdList
+        ){
+            const notification = await Notification.findById( 
                                                             notificationId.toString() 
                                                         );
+            if( notification ){
 
                 notification.openedBy
                             .push( userId );
@@ -35,26 +38,19 @@ const openNotificationsController = async ( req, res ) => {
                                 .length === notification.to
                                                         .length
                 ){
-                    notification.deleteOne().then(
-                        (_) => {
-                            return res.status(200).json(
-                                {
-                                    error: false,
-                                    message: "notification opened succesfully"
-                                }
-                            );
-                        }
-                    ).catch(
-                        (error) => {
-                            console.log(error);
-                            return res.status(500).json(
-                                {
-                                    error: true,
-                                    message: "Internal server error"
-                                }
-                            );
-                        }
-                    );
+                    notification.deleteOne().then()
+                                            .catch(
+                                                (error) => {
+                                                    console.log( error );
+                                                    return res.status( 500 )
+                                                            .json(
+                                                                    {
+                                                                        error: true,
+                                                                        message: "Internal server error"
+                                                                    }
+                                                            );
+                                                }
+                                            );
                 }else{
                     notification.markModified( "openedBy" );
                     notification.save(
@@ -65,8 +61,10 @@ const openNotificationsController = async ( req, res ) => {
                         }
                     );
                 }
+                
             }
-        );
+
+        }
 
         return res.status( 200 )
                   .json(

@@ -13,6 +13,13 @@ const prepareMissionUploadNotificationDataHelper = async ( notification ) => {
                                                         .toString()
                                         );
 
+        if( !careGive ){
+            return {
+                error: true,
+                message: "caregive not found"
+            }
+        }
+
         const mission = careGive.missionCallender
                                 .find(
                                     missionObject =>
@@ -22,21 +29,43 @@ const prepareMissionUploadNotificationDataHelper = async ( notification ) => {
                                                                                      .toString()
                                 );
 
+        if( !mission ){
+            return {
+                error: true,
+                message: "mission not found"
+            }
+        }
+
         const careGiver = await User.findById(
                                         careGive.careGiver
                                                 .careGiverId
                                                 .toString()
                                     );
 
+        if( !careGiver ){
+            return {
+                error: true,
+                message: "caregiver not found"
+            }
+        }
+
         const pet = await Pet.findById(
                                     careGive.petId
                                             .toString()
                               );
 
+        if( !pet ){
+            return {
+                error: true,
+                message: "pet not found"
+            }
+        }
+
         const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
         const petInfo = getLightWeightPetInfoHelper( pet );
 
         const notificationData = {
+            error: false,
             contentType: "missionUpload",
             notificationId: notification._id.toString(),
             careGiveId: careGive._id.toString(),

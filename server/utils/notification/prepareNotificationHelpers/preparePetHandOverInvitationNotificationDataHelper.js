@@ -13,20 +13,42 @@ const preparePetHandOverInvitationNotificationDataHelper = async ( notification 
                                                                         .toString()
                                                        );
 
+        if( !invitation ){
+            return {
+                error: true,
+                message: "invitation not found"
+            }
+        }
+
         const invitedUser = await User.findById(
                                             invitation.from
                                                       .toString()
                                        );
+
+        if( !invitedUser ){
+            return {
+                error: true,
+                message: "user not found"
+            }
+        }
 
         const pet = await Pet.findById(
                                    invitation.petId
                                              .toString()
                               );
 
+        if( !pet ){
+            return {
+                error: true,
+                message: "pet not found"
+            }
+        }
+
         invitedUserInfo = getLightWeightUserInfoHelper( invitedUser );
         petInfo = getLightWeightPetInfoHelper( pet );
 
         const notificationData = {
+            error: false,
             contentType: "petHandOverInvitation",
             notificationId: notification._id.toString(),
             invitedUser: invitedUserInfo,

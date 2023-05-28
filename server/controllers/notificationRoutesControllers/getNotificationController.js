@@ -36,7 +36,8 @@ const getNotificationController = async ( req, res ) => {
 
         const notifications = await Notification.find( notificationQuery )
                                                 .skip( skip )
-                                                .limit( limit );
+                                                .limit( limit )
+                                                .lean();
 
          const totalNotificationCount= await Notification.countDocuments( notificationQuery );
 
@@ -54,6 +55,17 @@ const getNotificationController = async ( req, res ) => {
         }
 
         const preparedNotificationData = await prepareNotificationHelper( notifications );
+        if( 
+            preparedNotificationData.error
+        ){
+            return res.status( 500 )
+                      .json(
+                        {
+                            error: true,
+                            message: "Internal Server Error"
+                        }
+                      );
+        }
 
         return res.status( 200 )
                   .json(

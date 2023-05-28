@@ -12,6 +12,13 @@ const preparePetImageReplyNotificationDataHelper = async ( notification ) => {
                                             .toString()
                               );
 
+        if( !Pet ){
+            return {
+                error: true,
+                message: "Pet Not Found"
+            }
+        }
+
         const image = pet.images
                          .find(
                             imageObject =>
@@ -20,6 +27,13 @@ const preparePetImageReplyNotificationDataHelper = async ( notification ) => {
                                                                            .id
                                                                            .toString()
                           );
+
+        if( !image ){
+            return {
+                error: true,
+                message: "image Not Found"
+            }
+        }
 
         const comment = image.comments
                              .find(
@@ -30,6 +44,13 @@ const preparePetImageReplyNotificationDataHelper = async ( notification ) => {
                                                                                  .toString()
                               );
 
+        if( !comment ){
+            return {
+                error: true,
+                message: "comment Not Found"
+            }
+        }
+
         const reply = comment.replies
                              .find(
                                 replyObject =>
@@ -39,14 +60,29 @@ const preparePetImageReplyNotificationDataHelper = async ( notification ) => {
                                                                            .toString()
                              );
 
+        if( !reply ){
+            return {
+                error: true,
+                message: "reply Not Found"
+            }
+        }
+
         const commentUser = await User.findById(
                                             notification.from
                                                         .toString()
                                        );
 
+        if( !commentUser ){
+            return {
+                error: true,
+                message: "commentUser Not Found"
+            }
+        }
+
         const commentUserInfo = getLightWeightUserInfoHelper( commentUser );
         const petInfo = getLightWeightPetInfoHelper( pet );
         const notificationData = {
+            error: false,
             contentType: "petImageReply",
             notificationId: notification._id.toString(),
             user: commentUserInfo,

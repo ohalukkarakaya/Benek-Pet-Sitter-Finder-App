@@ -7,8 +7,17 @@ const prepareFollowNotificationDataHelper = async ( notification ) => {
                                             notification.from
                                                         .toString()
                                         );
+
+        if( !followedUser ){
+            return {
+                error: true,
+                message: "user not found"
+            }
+        };
+
         const followedUserInfo = getLightWeightUserInfoHelper( followedUser );
         const notificationData = {
+            error: false,
             contentType: "follow",
             notificationId: notification._id.toString(),
             user: followedUserInfo,

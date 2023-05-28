@@ -12,6 +12,13 @@ const preparePetImageCommentNotificationDataHelper = async ( notification ) => {
                                             .toString()
                               );
 
+        if( !pet ){
+            return {
+                error: true,
+                message: "pet not found"
+            }
+        }
+
         const image = pet.images
                          .find(
                             imageObject =>
@@ -20,6 +27,13 @@ const preparePetImageCommentNotificationDataHelper = async ( notification ) => {
                                                                            .id
                                                                            .toString()
                           );
+
+        if( !image ){
+            return {
+                error: true,
+                message: "image not found"
+            }
+        }
 
         const comment = image.comments
                              .find(
@@ -30,14 +44,29 @@ const preparePetImageCommentNotificationDataHelper = async ( notification ) => {
                                                                                  .toString()
                               );
 
+        if( !comment ){
+            return {
+                error: true,
+                message: "comment not found"
+            }
+        }
+
         const commentUser = await User.findById(
                                             notification.from
                                                         .toString()
                                        );
 
+        if( !commentUser ){
+            return {
+                error: true,
+                message: "user not found"
+            }
+        }
+
         const commentUserInfo = getLightWeightUserInfoHelper( commentUser );
         const petInfo = getLightWeightPetInfoHelper( pet );
         const notificationData = {
+            error: false,
             contentType: "petImageComment",
             notificationId: notification._id.toString(),
             user: commentUserInfo,

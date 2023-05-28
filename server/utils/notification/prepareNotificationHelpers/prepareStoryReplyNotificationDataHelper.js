@@ -9,7 +9,15 @@ const prepareStoryReplyNotificationDataHelper = async ( notification ) => {
                                         notification.secondParentContent
                                                     .id
                                                     .toString()
-                                          );
+                                  );
+
+        if( !story ){
+            return {
+                error: true,
+                message: "story not found"
+            }
+        }
+
         const comment = story.comments
                              .find(
                                 commentObject =>
@@ -18,6 +26,13 @@ const prepareStoryReplyNotificationDataHelper = async ( notification ) => {
                                                                              .id
                                                                              .toString()
                              );
+
+        if( !comment ){
+            return {
+                error: true,
+                message: "comment not found"
+            }
+        }
 
         const reply = comment.replies
                              .find(
@@ -28,14 +43,29 @@ const prepareStoryReplyNotificationDataHelper = async ( notification ) => {
                                                                            .toString()
                              );
 
+        if( !reply ){
+            return {
+                error: true,
+                message: "reply not found"
+            }
+        }
+
         const repliedUser = await User.findById(
                                             reply.userId
                                                    .toString()
                                        );
 
+        if( !repliedUser ){
+            return {
+                error: true,
+                message: "repliedUser not found"
+            }
+        }
+
         const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
 
         const notificationData = {
+            error: false,
             contentType: "storyComment",
             notificationId: notification._id.toString(),
             user: repliedUserInfo,

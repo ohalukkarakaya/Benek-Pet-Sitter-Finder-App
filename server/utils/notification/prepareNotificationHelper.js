@@ -19,191 +19,338 @@ import preparePetHandOverInvitationNotificationDataHelper from "./prepareNotific
 import prepareNewMissionNotificationDataHelper from "./prepareNotificationHelpers/prepareNewMissionNotificationDataHelper.js";
 import prepareMissionUploadNotificationDataHelper from "./prepareNotificationHelpers/prepareMissionUploadNotificationDataHelper.js";
 import prepareMissionAproveNotificationDataHelper from "./prepareNotificationHelpers/prepareMissionAproveNotificationDataHelper.js";
+import prepareEmergencyNotificationDataHelper from "./prepareNotificationHelpers/prepareEmergencyNotificationDataHelper.js";
 
 const prepareNotificationHelper = async( notificationList ) => {
     try{
-        notificationList.forEach(
-            async ( notification ) => {
-                switch (
-                    notification.releatedContent
-                                .contentType
-                ){
-                    case "follow":
-                        try{
-                            const notificationData = await prepareFollowNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare follow notification data - ", err );
-                            return err;
+        let newNotificationList = [];
+        for(
+            let notification
+            of notificationList
+        ){
+            switch (
+                notification.releatedContent
+                            .contentType
+            ){
+                case "follow":
+                    try{
+                        const notificationData = await prepareFollowNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare follow notification data - ", err );
+                        return err;
+                    }
+                break;
 
 
-                    case "message":
-                        try{
-                            const notificationData = await prepareMessageNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare message notification data - ", err );
-                            return err;
+                case "message":
+                    try{
+                        const notificationData = await prepareMessageNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                     break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare message notification data - ", err );
+                        return err;
+                    }
+                 break;
 
 
-                    case "star":
-                        try{
-                            const notificationData = await prepareStarNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare star notification data - ", err );
-                            return err;
+                case "star":
+                    try{
+                        const notificationData = await prepareStarNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare star notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "petImageComment":
-                        try{
-                            const notificationData = await preparePetImageCommentNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log("ERROR: prepare petImageComment notification data - ", err);
-                            return err;
+                case "petImageComment":
+                    try{
+                        const notificationData = await preparePetImageCommentNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log("ERROR: prepare petImageComment notification data - ", err);
+                        return err;
+                    }
+                break;
 
-                    case "petImageReply":
-                        try{
-                            const notificationData = await preparePetImageReplyNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare petImageComment notification data - ", err );
-                            return err;
-                        }
-                    break;
+                case "petImageReply":
+                    try{
+                        const notificationData = await preparePetImageReplyNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
 
-                    case "storyComment":
-                        try{
-                            const notificationData = await prepareStoryCommentNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare story comment notification data - ", err );
-                            return err;
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare petImageComment notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "storyReply":
-                        try{
-                            const notificationData = await prepareStoryReplyNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare story reply notification data - ", err );
-                            return err;
+                case "storyComment":
+                    try{
+                        const notificationData = await prepareStoryCommentNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare story comment notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "eventComment":
-                        try{
-                            const notificationData = await prepareEventCommentNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare event comment notification data - ", err );
-                            return err;
+                case "storyReply":
+                    try{
+                        const notificationData = await prepareStoryReplyNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare story reply notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "eventReply":
-                        try{
-                            const notificationData = await prepareEventReplyNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare event reply notification data - ", err );
-                            return err;
+                case "eventComment":
+                    try{
+                        const notificationData = await prepareEventCommentNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare event comment notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "eventInvitation":
-                        try{
-                            const notificationData = await prepareEventInvitationNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare event invitation notification data - ", err );
-                            return err;
+                case "eventReply":
+                    try{
+                        const notificationData = await prepareEventReplyNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare event reply notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "careGiveInvitation":
-                        try{
-                            const notificationData = await prepareCareGiveInvitationNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare careGive invitation notification data - ", err );
-                            return err;
+                case "eventInvitation":
+                    try{
+                        const notificationData = await prepareEventInvitationNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare event invitation notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "secondaryPetOwnerInvitation":
-                        try{
-                            const notificationData = await prepareSecondaryPetOwnerInvitationNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare secondary petOwner invitation notification data - ", err );
-                            return err;
+                case "careGiveInvitation":
+                    try{
+                        const notificationData = await prepareCareGiveInvitationNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare careGive invitation notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "petHandOverInvitation":
-                        try{
-                            const notificationData = await preparePetHandOverInvitationNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare pet handOver invitation notification data - ", err );
-                            return err;
+                case "secondaryPetOwnerInvitation":
+                    try{
+                        const notificationData = await prepareSecondaryPetOwnerInvitationNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare secondary petOwner invitation notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "newMission":
-                        try{
-                            const notificationData = await prepareNewMissionNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare new mission notification data - ", err );
-                            return err;
+                case "petHandOverInvitation":
+                    try{
+                        const notificationData = await preparePetHandOverInvitationNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare pet handOver invitation notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "missionUpload":
-                        try{
-                            const notificationData = await prepareMissionUploadNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare mission uploaded notification data - ", err );
-                            return err;
+                case "newMission":
+                    try{
+                        const notificationData = await prepareNewMissionNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare new mission notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "missionAprove":
-                        try{
-                            const notificationData = await prepareMissionAproveNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare mission aproved notification data - ", err );
-                            return err;
+                case "missionUpload":
+                    try{
+                        const notificationData = await prepareMissionUploadNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
+                    }catch( err ){
+                        console.log( "ERROR: prepare mission uploaded notification data - ", err );
+                        return err;
+                    }
+                break;
 
-                    case "emergency":
-                        try{
-                            const notificationData = await prepareEmergencyNotificationDataHelper( notification );
-                            notification = notificationData;
-                        }catch( err ){
-                            console.log( "ERROR: prepare emergency notification data - ", err );
-                            return err;
+                case "missionAprove":
+                    try{
+                        const notificationData = await prepareMissionAproveNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
                         }
-                    break;
-                }
+                    }catch( err ){
+                        console.log( "ERROR: prepare mission aproved notification data - ", err );
+                        return err;
+                    }
+                break;
+
+                case "emergency":
+                    try{
+                        const notificationData = await prepareEmergencyNotificationDataHelper( notification );
+                        if( 
+                            !( notificationData.error ) 
+                        ){
+                            delete notificationData.error;
+                            
+                            newNotificationList.push( notificationData );
+                        }else{
+                            break;
+                        }
+                    }catch( err ){
+                        console.log( "ERROR: prepare emergency notification data - ", err );
+                        return err;
+                    }
+                break;
             }
-        );
-
-        return notificationList;
+        }
+        if( 
+            newNotificationList.length > 0
+        ){
+            return newNotificationList;
+        }else{
+            return {
+                error: true,
+                message: "Internal Server Error"
+            }
+        }
     }catch( err ){
         console.log( "ERROR: prepareNotificationHelper - ", err );
         return err

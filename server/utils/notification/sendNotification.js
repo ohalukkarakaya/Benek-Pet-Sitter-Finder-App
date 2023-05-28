@@ -163,12 +163,16 @@ const sendNotification = async (
                     const preparedNotificationData = await prepareNotificationHelper( [ notification ] );
                     
                     //send responseChat data to socket server
-                    if( contentType !== "message" ){
+                    if( 
+                        contentType !== "message" 
+                        && !( preparedNotificationData.error )
+                    ){
                         socket.emit(
                             "sendNotification",
                             {
-                                to: notification.to[0].toString(),
-                                notification: preparedNotificationData[0]
+                                to: notification.to[ 0 ]
+                                                .toString(),
+                                notification: preparedNotificationData[ 0 ]
                             }
                         );
                     }

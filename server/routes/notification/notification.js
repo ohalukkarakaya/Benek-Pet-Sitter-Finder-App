@@ -9,6 +9,7 @@ import openNotificationsController from "../../controllers/notificationRoutesCon
 
 const router = express.Router();
 
+// - tested
 //Get Notifications
 router.get(
     "/:skip/:limit",
@@ -16,6 +17,7 @@ router.get(
     getNotificationController
 );
 
+// - tested
 //get unseen notification count
 router.get(
   "/unSeenCount",
@@ -23,6 +25,7 @@ router.get(
   getUnseenNotificationCountController
 );
 
+// - tested
 //see notification
 router.post(
   "/seen",
@@ -30,6 +33,7 @@ router.post(
   seeNotificationsController
 ); 
 
+// - tested
 //open notification
 router.post(
   "/opened",

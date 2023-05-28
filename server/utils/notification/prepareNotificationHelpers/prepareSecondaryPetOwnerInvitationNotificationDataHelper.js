@@ -13,20 +13,42 @@ const prepareSecondaryPetOwnerInvitationNotificationDataHelper = async ( notific
                                                                             .toString()
                                                           );
 
+        if( !invitation ){
+            return {
+                error: true,
+                message: "invitation not found"
+            }
+        }
+
         const pet = await Pet.findById(
                                     invitation.petId
                                               .toString()
                               );
+
+        if( !pet ){
+            return {
+                error: true,
+                message: "pet not found"
+            }
+        }
 
         const petOwner = await User.findById(
                                         invitation.from
                                                   .toString()
                                     );
 
+        if( !petOwner ){
+            return {
+                error: true,
+                message: "petOwner not found"
+            }
+        }
+
         const petInfo = getLightWeightPetInfoHelper( pet );
         const petOwnerInfo = getLightWeightUserInfoHelper( petOwner );
 
         const notificationData = {
+            error: false,
             contentType: "secondaryPetOwnerInvitation",
             notificationId: notification._id.toString(),
             petOwner: petOwnerInfo,

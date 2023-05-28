@@ -14,6 +14,7 @@ import getSendedSecondaryOwnerInvitationsController from "../../controllers/petR
 
 const router = express.Router();
 
+// - tested
 //send secondary owner invite
 router.post(
   "/inviteSecondaryOwner/:petId/:secondaryOwnerId",
@@ -21,6 +22,7 @@ router.post(
   inviteSecondaryOwnerController
 );
 
+// - 
 //accept or reject secondary owner invitation
 router.put(
   "/secondaryOwnerInvitation/:invitationId/:usersResponse",

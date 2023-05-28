@@ -13,10 +13,24 @@ const prepareEmergencyNotificationDataHelper = async ( notification ) => {
                                                         .toString()
                                         );
 
+        if( !careGive ){
+            return {
+                error: true,
+                message: "careGive not found"
+            }
+        }
+
         const pet = await Pet.findById(
                                  careGive.petId
                                          .toString()
                               );
+
+        if( !pet ){
+            return {
+                error: true,
+                message: "pet not found"
+            }
+        }
 
         const careGiver = await User.findById(
                                         careGive.careGiver
@@ -28,6 +42,7 @@ const prepareEmergencyNotificationDataHelper = async ( notification ) => {
         const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
 
         const notificationData = {
+            error: false,
             contentType: "emergency",
             notificationId: notification._id.toString(),
             careGiveId: careGive._id.toString(),
@@ -36,7 +51,7 @@ const prepareEmergencyNotificationDataHelper = async ( notification ) => {
             date: notification.date
         }
 
-        return notification;
+        return notificationData;
     }catch( err ){
         console.log( "ERROR: prepareEmergencyNotificationDataHelper - ", err );
         return err;

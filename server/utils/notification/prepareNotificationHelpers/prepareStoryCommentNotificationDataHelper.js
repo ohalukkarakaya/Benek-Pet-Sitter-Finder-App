@@ -9,6 +9,14 @@ const prepareStoryCommentNotificationDataHelper = async ( notification ) => {
                                                     .id
                                                     .toString()
                                           );
+
+        if( !story ){
+            return {
+                error: true,
+                message: "story not found"
+            }
+        }
+        
         const comment = story.comments
                              .find(
                                 commentObject =>
@@ -18,14 +26,29 @@ const prepareStoryCommentNotificationDataHelper = async ( notification ) => {
                                                                              .toString()
                              );
 
+        if( !comment ){
+            return {
+                error: true,
+                message: "comment not found"
+            }
+        }
+
         const commentUser = await User.findById(
                                             comment.userId
                                                    .toString()
                                        );
 
+        if( !commentUser ){
+            return {
+                error: true,
+                message: "commentUser not found"
+            }
+        }
+
         const commentUserInfo = getLightWeightUserInfoHelper( commentUser );
 
         const notificationData = {
+            error: false,
             contentType: "storyComment",
             notificationId: notification._id.toString(),
             user: commentUserInfo,

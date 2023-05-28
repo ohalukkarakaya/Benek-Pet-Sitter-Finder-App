@@ -11,6 +11,13 @@ const prepareEventCommentNotificationDataHelper = async ( notification ) => {
                                                           .toString()
                                           );
 
+        if( !releatedEvent ){
+            return {
+                error: true,
+                message: "releated event not found"
+            }
+        }
+
         const afterEvent = releatedEvent.afterEvent
                                         .find(
                                             afterEventObject =>
@@ -19,6 +26,13 @@ const prepareEventCommentNotificationDataHelper = async ( notification ) => {
                                                                                             .id
                                                                                             .toString()
                                         );
+
+        if( !afterEvent ){
+            return {
+                error: true,
+                message: "after event not found"
+            }
+        }
 
         const comment = afterEvent.comments
                                   .find(
@@ -29,14 +43,29 @@ const prepareEventCommentNotificationDataHelper = async ( notification ) => {
                                                                                    .toString()
                                    );
 
+        if( !comment ){
+            return {
+                error: true,
+                message: "comment not found"
+            }
+        }
+
         const commentUser = await User.findById(
                                             comment.userId
                                                    .toString()
                                        );
 
+        if( !commentUser ){
+            return {
+                error: true,
+                message: "commentUser not found"
+            }
+        }
+
         const commentUserInfo = getLightWeightUserInfoHelper( commentUser );
 
         const notificationData = {
+            error: false,
             contentType: "eventComment",
             notificationId: notification._id.toString(),
             user: commentUserInfo,

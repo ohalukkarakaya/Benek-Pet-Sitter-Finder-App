@@ -5,9 +5,16 @@ import getLightWeightUserInfoHelper from "../../getLightWeightUserInfoHelper.js"
 const prepareMessageNotificationDataHelper = async ( notification ) => {
     try{
         const sendedUser = await User.findById( 
-            notification.from
-                        .toString()
-          );
+                                        notification.from
+                                                    .toString()
+                                      );
+
+        if( !sendedUser ){
+            return {
+                error: true,
+                message: "user not found"
+            }
+        }
 
         const sendedUserInfo = getLightWeightUserInfoHelper( sendedUser );
 
@@ -15,7 +22,14 @@ const prepareMessageNotificationDataHelper = async ( notification ) => {
                                     notification.parentContent
                                                 .id
                                                 .toString()
-                                );
+                                ).lean();
+
+        if( !chat ){
+            return {
+                error: true,
+                message: "chat not found"
+            }
+        }
 
         const message = chat.messages
                             .find(
@@ -25,6 +39,12 @@ const prepareMessageNotificationDataHelper = async ( notification ) => {
                                                                     .id 
                                                                     .toString()
                             );
+        if( !message ){
+            return {
+                error: true,
+                message: "message not found"
+            }
+        }
 
         switch( message.messageType ){
             case "Text":
@@ -89,6 +109,7 @@ const prepareMessageNotificationDataHelper = async ( notification ) => {
         }
 
         const notificationData = {
+            error: false,
             contentType: "message",
             notificationId: notification._id.toString(),
             user: sendedUserInfo,

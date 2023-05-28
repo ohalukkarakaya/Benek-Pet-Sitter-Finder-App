@@ -13,6 +13,13 @@ const prepareNewMissionNotificationDataHelper = async ( notification ) => {
                                                         .toString()
                                         );
 
+        if( !careGive ){
+            return {
+                error: true,
+                message: "careGive not found"
+            }
+        }
+
         const mission = careGive.missionCallender
                                 .find(
                                     missionObject =>
@@ -22,21 +29,43 @@ const prepareNewMissionNotificationDataHelper = async ( notification ) => {
                                                                                      .toString()
                                 );
 
+        if( !mission ){
+            return {
+                error: true,
+                message: "mission not found"
+            }
+        }
+
         const petOwner = await User.findById(
                                         careGive.petOwner
                                                 .petOwnerId
                                                 .toString()
                                     );
 
+        if( !petOwner ){
+            return {
+                error: true,
+                message: "petowner not found"
+            }
+        }
+
         const pet = await Pet.findById(
                                     careGive.petId
                                             .toString()
                               );
 
+        if( !pet ){
+            return {
+                error: true,
+                message: "pet not found"
+            }
+        }
+
         const petOwnerInfo = getLightWeightUserInfoHelper( petOwner );
         const petInfo = getLightWeightPetInfoHelper( pet );
 
         const notificationData = {
+            error: false,
             contentType: "newMission",
             notificationId: notification._id.toString(),
             careGiveId: careGive._id.toString(),

@@ -13,11 +13,25 @@ const prepareCareGiveInvitationNotificationDataHelper = async ( notification ) =
                                                                 .toString()
                                                );
 
+        if( !invitedCareGive ){
+            return {
+                error: true,
+                message: "invitedCareGive not found"
+            }
+        }
+
         const careGiver = await User.findById(
                                         invitedCareGive.careGiver
                                                        .careGiverId
                                                        .toString()
                                     );
+
+        if( !careGiver ){
+            return {
+                error: true,
+                message: "careGiver not found"
+            }
+        }
 
         const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
 
@@ -25,6 +39,13 @@ const prepareCareGiveInvitationNotificationDataHelper = async ( notification ) =
                                     invitedCareGive.petId
                                                    .toString()
                               );
+
+        if( !pet ){
+            return {
+                error: true,
+                message: "pet not found"
+            }
+        }
 
         const petInfo = getLightWeightPetInfoHelper( pet );
 
@@ -34,6 +55,7 @@ const prepareCareGiveInvitationNotificationDataHelper = async ( notification ) =
         };
 
         const notificationData = {
+            error: false,
             contentType: "careGiveInvitation",
             notificationId: notification._id.toString(),
             careGiveId: invitedCareGive._id.toString(),

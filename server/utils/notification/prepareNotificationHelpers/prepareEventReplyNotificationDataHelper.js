@@ -11,6 +11,13 @@ const prepareEventReplyNotificationDataHelper = async ( notification ) => {
                                                           .toString()
                                           );
 
+        if( !releatedEvent ){
+            return {
+                error: true,
+                message: "releatedEvent not found"
+            }
+        }
+
         const afterEvent = releatedEvent.afterEvent
                                         .find(
                                             afterEventObject =>
@@ -19,6 +26,13 @@ const prepareEventReplyNotificationDataHelper = async ( notification ) => {
                                                                                             .id
                                                                                             .toString()
                                         );
+
+        if( !afterEvent ){
+            return {
+                error: true,
+                message: "afterEvent not found"
+            }
+        }
 
         const comment = afterEvent.comments
                                   .find(
@@ -29,6 +43,13 @@ const prepareEventReplyNotificationDataHelper = async ( notification ) => {
                                                                                    .toString()
                                    );
 
+        if( !comment ){
+            return {
+                error: true,
+                message: "comment not found"
+            }
+        }
+
         const reply = comment.replies
                              .find(
                                 replyObject =>
@@ -38,14 +59,29 @@ const prepareEventReplyNotificationDataHelper = async ( notification ) => {
                                                                            .toString()
                              );
 
+        if( !reply ){
+            return {
+                error: true,
+                message: "reply not found"
+            }
+        }
+
         const repliedUser = await User.findById(
                                             reply.userId
                                                  .toString()
                                        );
 
+        if( !repliedUser ){
+            return {
+                error: true,
+                message: "repliedUser not found"
+            }
+        }
+
         const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
 
         const notificationData = {
+            error: false,
             contentType: "eventComment",
             notificationId: notification._id.toString(),
             user: repliedUserInfo,

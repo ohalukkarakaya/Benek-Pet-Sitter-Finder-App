@@ -10,10 +10,24 @@ const prepareStarNotificationDataHelper = async ( notification ) => {
                                                     .toString()
                                      );
 
+        if( !votedUser ){
+            return {
+                error: true,
+                message: "user not found"
+            }
+        }
+
         const user = await User.findById( 
                                     notification.to[0]
                                                 .toString()
                                 );
+
+        if( !user ){
+            return {
+                error: true,
+                message: "user not found"
+            }
+        }
                         
         const votedUserInfo = getLightWeightUserInfoHelper( votedUser );
 
@@ -26,10 +40,24 @@ const prepareStarNotificationDataHelper = async ( notification ) => {
                                                                               .toString()
                                 );
 
+        if( !user ){
+            return {
+                error: true,
+                message: "star Object not found"
+            }
+        }
+
         const pet = await Pet.findById(
                                 starObject.petId
                                             .toString()
                                 );
+
+        if( !pet ){
+            return {
+                error: true,
+                message: "pet not found"
+            }
+        }
 
         const petInfo = getLightWeightPetInfoHelper( pet );
                         

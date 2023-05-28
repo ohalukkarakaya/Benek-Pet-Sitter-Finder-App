@@ -5,7 +5,8 @@ const seeNotificationsController = async ( req, res ) => {
         const userId = req.user
                           ._id
                           .toString();
-        const notificationIdList = [...new Set( req.user._id.toString() )];
+
+        const notificationIdList = [...new Set( req.body.notificationIdList )];
         if( 
             !notificationIdList 
             || notificationIdList.length <= 0
@@ -19,27 +20,28 @@ const seeNotificationsController = async ( req, res ) => {
                       );
         }
 
-        notificationIdList.forEach(
-            async ( notificationId ) => {
-                const notification = await Notification.findById( 
+        for(
+            let notificationId
+            of notificationIdList
+        ){
+            const notification = await Notification.findById( 
                                                             notificationId.toString() 
                                                         );
 
-                notification.seenBy
-                            .push( userId );
+            notification.seenBy
+                        .push( userId );
 
-                notification.seenBy = [...new Set( notification.seenBy )];
+            notification.seenBy = [...new Set( notification.seenBy )];
 
-                notification.markModified( "seenBy" );
-                notification.save(
-                    ( err ) => {
-                        if(err) {
-                            console.error('ERROR: While Update notification seenBy!');
-                        }
+            notification.markModified( "seenBy" );
+            notification.save(
+                ( err ) => {
+                    if(err) {
+                        console.error('ERROR: While Update notification seenBy!');
                     }
-                );
-            }
-        );
+                }
+            );
+        }
 
         return res.status( 200 )
                   .json(
@@ -48,6 +50,7 @@ const seeNotificationsController = async ( req, res ) => {
                         message: "Notifications seen succesfully"
                     }
                   );
+                  
     }catch( err ){
         console.log("ERROR: seeNotificationsController - ", err);
         res.status( 500 )

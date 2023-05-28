@@ -11,22 +11,42 @@ const prepareEventInvitationNotificationDataHelper = async ( notification ) => {
                                                                 .id
                                                                 .toString()
                                                  );
+                                                
+        if( !invitation ){
+            return {
+                error: true,
+                message: "invitation not found"
+            }
+        }
 
         const eventAdmin = await User.findById( 
                                             invitation.eventAdminId
                                                       .toString() 
                                       );
 
+        if( !eventAdmin ){
+            return {
+                error: true,
+                message: "event admin not found"
+            }
+        }
+
         const invitedEvent = await Event.findById(
                                             invitation.eventId
                                                       .toString()
                                          );
 
-        
+        if( !invitedEvent ){
+            return {
+                error: true,
+                message: "invitedEvent not found"
+            }
+        }
 
         const eventAdminInfo = getLightWeightUserInfoHelper( eventAdmin );
 
         const notificationData = {
+            error: false,
             contentType: "eventInvitation",
             notificationId: notification._id.toString(),
             invitationId: invitation._id.toString(),
