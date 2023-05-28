@@ -13,56 +13,67 @@ const getSecondaryOwnerInvitationsController = async ( req, res ) => {
         const invitationQuery = { to: userId };
         const invitations = await SecondaryOwnerInvitation.find( invitationQuery )
                                                           .skip( skip )
-                                                          .limit( limit );
+                                                          .limit( limit )
+                                                          .lean();
 
         const totalInvitationCount = await SecondaryOwnerInvitation.countDocuments( invitationQuery );
 
         if( invitations.length <= 0 ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "No Invitation Found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "No Invitation Found"
+                            }
+                      );
         }
 
-        invitations.forEach(
-            async ( invitation ) => {
-                const primaryOwner = await User.findById( 
-                                                    invitation.from
-                                                              .toString() 
-                                                );
+        let newInvitationList = [];
+        for(
+            let invitation
+            of invitations
+        ){
+            const primaryOwner = await User.findById( 
+                                                invitation.from
+                                                          .toString() 
+                                            );
 
-                const primaryOwnerInfo = getLightWeightUserInfoHelper( primaryOwner );
+            const primaryOwnerInfo = getLightWeightUserInfoHelper( primaryOwner );
 
-                invitation.from = primaryOwnerInfo;
-                delete invitation.from;
+            invitation.from = primaryOwnerInfo;
+            delete invitation.from;
 
-                const pet = await Pet.findById( invitation.petId.toString() );
+            const pet = await Pet.findById( 
+                                        invitation.petId
+                                                  .toString() 
+                                  );
 
-                const petInfo = getLightWeightPetInfoHelper( pet );
+            const petInfo = getLightWeightPetInfoHelper( pet );
 
-                invitation.pet = petInfo;
-                delete invitation.petId;
-            }
-        );
+            invitation.pet = petInfo;
+            delete invitation.petId;
 
-        return res.status( 200 ).json(
-            {
-                error: true,
-                message: "Releated Invitation List Prepared Succesfully",
-                totalInvitationCount: totalInvitationCount,
-                invitations: invitations
-            }
-        );
+            newInvitationList.push( invitation );
+        }
+
+        return res.status( 200 )
+                  .json(
+                        {
+                            error: true,
+                            message: "Releated Invitation List Prepared Succesfully",
+                            totalInvitationCount: totalInvitationCount,
+                            invitations: invitations
+                        }
+                  );
     }catch( err ){
-        console.log("ERROR: getSecondaryOwnerInvitationsController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+        console.log( "ERROR: getSecondaryOwnerInvitationsController - ", err );
+        res.status( 500 )
+           .json(
+                {
+                    error: true,
+                    message: "Internal Server Error"
+                }
+            );
     }
 }
 

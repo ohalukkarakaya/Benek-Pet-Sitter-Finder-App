@@ -13,7 +13,8 @@ const getPetHandOverInvitationsController = async ( req, res ) => {
         const invitationQuery = { to: userId };
         const invitations = await PetHandOverInvitation.find( invitationQuery )
                                                        .skip( skip )
-                                                       .limit( limit );
+                                                       .limit( limit )
+                                                       .lean();
 
         const totalInvitationQuery = await PetHandOverInvitation.countDocuments( invitationQuery );
 
@@ -26,8 +27,11 @@ const getPetHandOverInvitationsController = async ( req, res ) => {
             );
         }
 
-        invitations.forEach(
-            async ( invitation ) => {
+        let newInvitationList = [];
+        for(
+            let invitation
+            of invitations
+        ){
                 const primaryOwner = await User.findById( 
                                                     invitation.from
                                                               .toString() 
@@ -43,17 +47,19 @@ const getPetHandOverInvitationsController = async ( req, res ) => {
 
                 invitation.pet = petInfo;
                 delete invitation.petId;
-            }
-        );
 
-        return res.status( 200 ).json(
-            {
-                error: true,
-                message: "Releated Invitation List Prepared Succesfully",
-                totalInvitationQuery: totalInvitationQuery,
-                invitations: invitations
-            }
-        );
+                newInvitationList.push( invitation );
+        }
+
+        return res.status( 200 )
+                  .json(
+                        {
+                            error: true,
+                            message: "Releated Invitation List Prepared Succesfully",
+                            totalInvitationQuery: totalInvitationQuery,
+                            invitations: newInvitationList
+                        }
+                  );
     }catch( err ){
         console.log("ERROR: getSecondaryOwnerInvitationsController - ", err);
         res.status(500).json(

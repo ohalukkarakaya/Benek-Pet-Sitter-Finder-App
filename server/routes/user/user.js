@@ -17,7 +17,7 @@ import getUsersAndEventsBySearchValueController from "../../controllers/userRout
 import getCareGiversByLocationController from "../../controllers/userRoutesControllers/userControllers/getCareGiversByLocationController.js";
 import getCareGiversBySearchValueController from "../../controllers/userRoutesControllers/userControllers/getCareGiversBySearchValueController.js";
 import getLightWeightUserInfoController from "../../controllers/userRoutesControllers/userControllers/getLightWeightUserInfoController.js";
-
+import getAllInvitationsController from "../../controllers/userRoutesControllers/userControllers/getAllInvitationsController.js";
 dotenv.config();
 const router = express.Router();
 
@@ -52,6 +52,13 @@ router.get(
   "/getUserById/:userId",
   auth,
   getUserByIdController
+);
+
+// get invitations
+router.get(
+  "/allInvitations/:skip/:limit",
+  auth,
+  getAllInvitationsController
 );
 
 //get users and events by location data

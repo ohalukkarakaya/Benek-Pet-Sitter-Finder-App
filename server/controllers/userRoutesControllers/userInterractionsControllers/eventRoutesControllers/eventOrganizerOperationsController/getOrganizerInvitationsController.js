@@ -1,5 +1,6 @@
 import Event from "../../../../../models/Event/Event.js";
 import OrganizerInvitation from "../../../../../models/Event/Invitations/InviteOrganizer.js";
+import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getOrganizerInvitationsController = async ( req, res ) => {
     try{
@@ -10,7 +11,8 @@ const getOrganizerInvitationsController = async ( req, res ) => {
         const invitationQuery = { invitedId: userId };
         const organizerInvitations = await OrganizerInvitation.find( invitationQuery )
                                                               .skip( skip )
-                                                              .limit( limit );
+                                                              .limit( limit )
+                                                              .lean();
 
         const totalInvitationCount = await OrganizerInvitation.countDocuments( invitationQuery );
         if( organizerInvitations.length <= 0 ){
@@ -22,72 +24,60 @@ const getOrganizerInvitationsController = async ( req, res ) => {
             );
         }
 
-        organizerInvitations.forEach(
-            async ( invitation ) => {
-                const invitedEvent = await Event.findById( invitation.eventId.toString() );
+        let newInvitationList = [];
+        for(
+            let invitation
+            of organizerInvitations
+        ){
+            const invitedEvent = await Event.findById( invitation.eventId.toString() );
 
-                var eventDate = new Date( invitedEvent.date );
-                var now = new Date(); 
-                const didPast = eventDate < now;
+            var eventDate = new Date( invitedEvent.date );
+            var now = new Date(); 
+            const didPast = eventDate < now;
 
-                const eventQuota = didPast 
-                                   || invitedEvent.maxGuests === -1
-                                        ? -1
-                                        : invitedEvent.maxGuests - invitedEvent.willJoin
-                                                                               .length
+            const eventQuota = didPast 
+                               || invitedEvent.maxGuests === -1
+                                    ? -1
+                                    : invitedEvent.maxGuests - invitedEvent.willJoin
+                                                                           .length
 
-                const eventInfo = {
-                    eventId: invitedEvent._id.toString(),
-                    eventDesc: invitedEvent.desc,
-                    eventImage: invitedEvent.imgUrl,
-                    adress: invitedEvent.adress,
-                    date: invitedEvent.date,
-                    maxGuests: invitedEvent.maxGuests,
-                    willJoinCount: invitedEvent.willJoin.length,
-                    joinedCount: invitedEvent.joined.length,
-                    didpast: didPast,
-                    quota: eventQuota,
-                    isPrivate: invitedEvent.isPrivate
-                };
+            const eventInfo = {
+                eventId: invitedEvent._id.toString(),
+                eventDesc: invitedEvent.desc,
+                eventImage: invitedEvent.imgUrl,
+                adress: invitedEvent.adress,
+                date: invitedEvent.date,
+                maxGuests: invitedEvent.maxGuests,
+                willJoinCount: invitedEvent.willJoin.length,
+                joinedCount: invitedEvent.joined.length,
+                didpast: didPast,
+                quota: eventQuota,
+                isPrivate: invitedEvent.isPrivate
+            };
 
-                const eventAdmin = await User.findById( invitedEvent.eventAdmin.toString() );
-                const eventAdminInfo = {
+            const eventAdmin = await User.findById( 
+                                                invitedEvent.eventAdmin
+                                                            .toString() 
+                                          );
+            const eventAdminInfo = getLightWeightUserInfoHelper( eventAdmin );
 
-                    userId: eventAdmin._id
-                                      .toString(),
-    
-                    userProfileImg: eventAdmin.profileImg
-                                              .imgUrl,
-    
-                    username: eventAdmin.userName,
-    
-                    userFullName: `${
-                            eventAdmin.identity
-                                      .firstName
-                        } ${
-                            eventAdmin.identity
-                                      .middleName
-                        } ${
-                            eventAdmin.identity
-                                      .lastName
-                        }`.replaceAll( "  ", " ")
-                };
+            invitation.event = eventInfo;
+            invitation.admin = eventAdminInfo;
+            delete invitation.eventId;
+            delete invitation.eventAdminId;
 
-                invitation.event = eventInfo;
-                invitation.admin = eventAdminInfo;
-                delete invitation.eventId;
-                delete invitation.eventAdminId;
-            }
-        );
+            newInvitationList.push( invitation );
+        }
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "Invitation list prepared succesfully",
-                totalInvitationCount: totalInvitationCount,
-                organizerInvitations: organizerInvitations
-            }
-        );
+        return res.status( 200 )
+                  .json(
+                        {
+                            error: false,
+                            message: "Invitation list prepared succesfully",
+                            totalInvitationCount: totalInvitationCount,
+                            organizerInvitations: newInvitationList
+                        }
+                  );
 
     }catch( err ){
         console.log("ERROR: getOrganizerInvitationsController - ", err);

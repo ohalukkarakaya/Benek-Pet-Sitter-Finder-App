@@ -33,54 +33,58 @@ const getCareGiveInvitationsController = async ( req, res ) => {
             );
         }
 
-        invitedCareGives.forEach(
-            async ( careGiveObject ) => {
-                const invitation = careGiveObject.invitation;
-                const sender = await User.findById( 
-                    invitation.from
-                              .toString() 
-                );
+        let newInvitationList = [];
+        for(
+            let careGiveObject
+            of invitedCareGives
+        ){
+            const invitation = careGiveObject.invitation;
+            const sender = await User.findById( 
+                invitation.from
+                          .toString() 
+            );
 
-                const senderInfo = getLightWeightUserInfoHelper( sender );
+            const senderInfo = getLightWeightUserInfoHelper( sender );
 
-                invitation.from = senderInfo;
+            invitation.from = senderInfo;
 
-                const price = careGiveObject.prices.priceType !== "Free" 
-                                    ? `${careGiveObject.prices.servicePrice} ${careGiveObject.prices.priceType}`
-                                    : `${careGiveObject.prices.priceType}`
+            const price = careGiveObject.prices.priceType !== "Free" 
+                                ? `${ careGiveObject.prices.servicePrice } ${ careGiveObject.prices.priceType }`
+                                : `${ careGiveObject.prices.priceType }`
 
-                invitation.price = price;
+            invitation.price = price;
 
-                const pet = await Pet.findById( careGiveObject.petId.toString() );
-                const petInfo = getLightWeightPetInfoHelper( pet );
-                
-                invitation.pet = petInfo;
+            const pet = await Pet.findById( careGiveObject.petId.toString() );
+            const petInfo = getLightWeightPetInfoHelper( pet );
+            
+            invitation.pet = petInfo;
 
-                delete invitation.actionCode;
-                delete invitation.careGiverParamGuid;
-                delete invitation.isAccepted;
+            delete invitation.actionCode;
+            delete invitation.careGiverParamGuid;
+            delete invitation.isAccepted;
 
-                careGiveObject = invitation;
-            }
-        );
+            newInvitationList.push( invitation );
+        }
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "Releated Care Give Inventations Listed",
-                totalInvitationCount: totalInvitationCount,
-                invitations: invitedCareGives
-            }
-        );
+        return res.status( 200 )
+                  .json(
+                    {
+                        error: false,
+                        message: "Releated Care Give Inventations Listed",
+                        totalInvitationCount: totalInvitationCount,
+                        invitations: newInvitationList
+                    }
+                  );
 
     }catch( err ){
-        console.log("ERROR: getCareGiveInvitationsController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+        console.log( "ERROR: getCareGiveInvitationsController - ", err );
+        res.status( 500 )
+           .json(
+                {
+                    error: true,
+                    message: "Internal Server Error"
+                }
+           );
     }
 }
 
