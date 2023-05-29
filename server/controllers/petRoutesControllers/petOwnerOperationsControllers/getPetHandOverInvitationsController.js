@@ -1,6 +1,9 @@
 import Pet from "../../../models/Pet.js";
 import User from "../../../models/User.js";
 import PetHandOverInvitation from "../../../models/ownerOperations/PetHandOverInvitation.js";
+
+import preparePetHandOverInvitationDataHelper from "../../../utils/invitations/invitationDataHelpers/preparePetHandOverInvitationDataHelper.js";
+
 import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
 import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
@@ -32,23 +35,23 @@ const getPetHandOverInvitationsController = async ( req, res ) => {
             let invitation
             of invitations
         ){
-                const primaryOwner = await User.findById( 
-                                                    invitation.from
-                                                              .toString() 
-                                                );
+            const preparedInvitationData = await preparePetHandOverInvitationDataHelper( invitation );
+            if(
+                !preparedInvitationData
+                || !( preparedInvitationData.data )
+                || preparedInvitationData.length <= 0
+                || preparedInvitationData.error
+            ){
+                return res.status( 500 )
+                          .json(
+                            {
+                                error: true,
+                                message: preparedInvitationData.message
+                            }
+                          );
+            }
 
-                const primaryOwnerInfo = getLightWeightUserInfoHelper( primaryOwner );
-
-                invitation.from = primaryOwnerInfo;
-
-                const pet = await Pet.findById( invitation.petId.toString() );
-
-                const petInfo = getLightWeightPetInfoHelper( pet );
-
-                invitation.pet = petInfo;
-                delete invitation.petId;
-
-                newInvitationList.push( invitation );
+            newInvitationList.push( preparedInvitationData.data );
         }
 
         return res.status( 200 )
@@ -62,12 +65,13 @@ const getPetHandOverInvitationsController = async ( req, res ) => {
                   );
     }catch( err ){
         console.log("ERROR: getSecondaryOwnerInvitationsController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+        res.status( 500 )
+           .json(
+                {
+                    error: true,
+                    message: "Internal Server Error"
+                }
+           );
     }
 }
 

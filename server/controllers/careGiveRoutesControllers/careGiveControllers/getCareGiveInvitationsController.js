@@ -1,8 +1,6 @@
-import User from "../../../models/User.js";
-import Pet from "../../../models/Pet.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
-import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
-import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
+
+import prepareCareGiveInvitationDataHelper from "../../../utils/invitations/invitationDataHelpers/prepareCareGiveInvitationDataHelper.js";
 
 const getCareGiveInvitationsController = async ( req, res ) => {
     try{
@@ -25,12 +23,13 @@ const getCareGiveInvitationsController = async ( req, res ) => {
             !invitedCareGives
             || invitedCareGives.length <= 0 
         ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "No Invitation Found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "No Invitation Found"
+                            }
+                      );
         }
 
         let newInvitationList = [];
@@ -38,32 +37,23 @@ const getCareGiveInvitationsController = async ( req, res ) => {
             let careGiveObject
             of invitedCareGives
         ){
-            const invitation = careGiveObject.invitation;
-            const sender = await User.findById( 
-                invitation.from
-                          .toString() 
-            );
+            const preparedInvitationData = await prepareCareGiveInvitationDataHelper( careGiveObject.toObject() );
+            if(
+                !preparedInvitationData
+                || !( preparedInvitationData.data )
+                || preparedInvitationData.length <= 0
+                || preparedInvitationData.error
+            ){
+                return res.status( 500 )
+                          .json(
+                            {
+                                error: true,
+                                message: preparedInvitationData.message
+                            }
+                          );
+            }
 
-            const senderInfo = getLightWeightUserInfoHelper( sender );
-
-            invitation.from = senderInfo;
-
-            const price = careGiveObject.prices.priceType !== "Free" 
-                                ? `${ careGiveObject.prices.servicePrice } ${ careGiveObject.prices.priceType }`
-                                : `${ careGiveObject.prices.priceType }`
-
-            invitation.price = price;
-
-            const pet = await Pet.findById( careGiveObject.petId.toString() );
-            const petInfo = getLightWeightPetInfoHelper( pet );
-            
-            invitation.pet = petInfo;
-
-            delete invitation.actionCode;
-            delete invitation.careGiverParamGuid;
-            delete invitation.isAccepted;
-
-            newInvitationList.push( invitation );
+            newInvitationList.push( preparedInvitationData.data );
         }
 
         return res.status( 200 )

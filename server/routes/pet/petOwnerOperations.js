@@ -22,7 +22,7 @@ router.post(
   inviteSecondaryOwnerController
 );
 
-// - 
+// - tested
 //accept or reject secondary owner invitation
 router.put(
   "/secondaryOwnerInvitation/:invitationId/:usersResponse",
@@ -30,6 +30,7 @@ router.put(
   replySecondaryOwnerInvitationController
 );
 
+// - tested
 //get secondary pet owner invitations
 router.get(
   "/secondaryOwnerInvitations/:skip/:limit",
@@ -37,6 +38,7 @@ router.get(
   getSecondaryOwnerInvitationsController
 );
 
+// - tested
 //get sended secondary pet owner invitations
 router.get(
   "/sendedSecondaryOwnerInvitations/:skip/:limit",
@@ -44,6 +46,7 @@ router.get(
   getSendedSecondaryOwnerInvitationsController
 );
   
+// - tested
 //Remove secondary owner of the pet
 router.put(
   "/removeSecondaryOwner/:petId/:secondaryOwnerId",
@@ -51,6 +54,7 @@ router.put(
   removeSecondaryOwnerController
 );
 
+// - TO DO
 //Pet Hand Over Invitation
 router.post(
   "/petHandOverInvitation/:petId/:invitedUserId",

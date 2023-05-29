@@ -1,6 +1,6 @@
-import Event from "../../../../../models/Event/Event.js";
 import OrganizerInvitation from "../../../../../models/Event/Invitations/InviteOrganizer.js";
-import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
+
+import prepareInviteOrganizerDataHelper from "../../../../../utils/invitations/invitationDataHelpers/prepareInviteOrganizerDataHelper.js";
 
 const getOrganizerInvitationsController = async ( req, res ) => {
     try{
@@ -29,44 +29,23 @@ const getOrganizerInvitationsController = async ( req, res ) => {
             let invitation
             of organizerInvitations
         ){
-            const invitedEvent = await Event.findById( invitation.eventId.toString() );
+            const preparedInvitationData = await prepareInviteOrganizerDataHelper( invitation );
+            if(
+                !preparedInvitationData
+                || !( preparedInvitationData.data )
+                || preparedInvitationData.length <= 0
+                || preparedInvitationData.error
+            ){
+                return res.status( 500 )
+                          .json(
+                            {
+                                error: true,
+                                message: preparedInvitationData.message
+                            }
+                          );
+            }
 
-            var eventDate = new Date( invitedEvent.date );
-            var now = new Date(); 
-            const didPast = eventDate < now;
-
-            const eventQuota = didPast 
-                               || invitedEvent.maxGuests === -1
-                                    ? -1
-                                    : invitedEvent.maxGuests - invitedEvent.willJoin
-                                                                           .length
-
-            const eventInfo = {
-                eventId: invitedEvent._id.toString(),
-                eventDesc: invitedEvent.desc,
-                eventImage: invitedEvent.imgUrl,
-                adress: invitedEvent.adress,
-                date: invitedEvent.date,
-                maxGuests: invitedEvent.maxGuests,
-                willJoinCount: invitedEvent.willJoin.length,
-                joinedCount: invitedEvent.joined.length,
-                didpast: didPast,
-                quota: eventQuota,
-                isPrivate: invitedEvent.isPrivate
-            };
-
-            const eventAdmin = await User.findById( 
-                                                invitedEvent.eventAdmin
-                                                            .toString() 
-                                          );
-            const eventAdminInfo = getLightWeightUserInfoHelper( eventAdmin );
-
-            invitation.event = eventInfo;
-            invitation.admin = eventAdminInfo;
-            delete invitation.eventId;
-            delete invitation.eventAdminId;
-
-            newInvitationList.push( invitation );
+            newInvitationList.push( preparedInvitationData.data );
         }
 
         return res.status( 200 )

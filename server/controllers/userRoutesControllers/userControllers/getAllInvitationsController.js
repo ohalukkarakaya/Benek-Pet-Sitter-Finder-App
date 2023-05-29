@@ -87,7 +87,7 @@ const getAllInvitationsController = async ( req, res ) => {
                         error: false,
                         message: "Invitations found succesfully",
                         totalCount: totalCount,
-                        invitations: preparedInvitationList,
+                        invitations: preparedInvitationList.data,
                     }
                   );
 

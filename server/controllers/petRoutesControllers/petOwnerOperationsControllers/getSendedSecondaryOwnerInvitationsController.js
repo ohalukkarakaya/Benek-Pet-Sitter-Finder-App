@@ -1,6 +1,7 @@
 import Pet from "../../../models/Pet.js";
 import User from "../../../models/User.js";
 import SecondaryOwnerInvitation from "../../../models/ownerOperations/SecondaryOwnerInvitation.js";
+
 import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
 import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
@@ -13,55 +14,65 @@ const getSendedSecondaryOwnerInvitationsController = async ( req, res ) => {
         const invitationQuery = { from: userId }
         const invitations = await SecondaryOwnerInvitation.find( invitationQuery )
                                                           .skip( skip )
-                                                          .limit( limit );
+                                                          .limit( limit )
+                                                          .lean();
                                                         
-        const totalInvitationCount = await SecondaryOwnerInvitation.countDocuments( query );
+        const totalInvitationCount = await SecondaryOwnerInvitation.countDocuments( invitationQuery );
 
         if( invitations.length <= 0 ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "No Invitation Found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "No Invitation Found"
+                            }
+                      );
         }
 
-        invitations.forEach(
-            async ( invitation ) => {
-                const secondaryOwner = await User.findById( 
-                                                    invitation.to
-                                                              .toString() 
-                                                  );
+        for(
+            let invitation
+            of invitations
+        ){
 
-                const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
-
-                invitation.to = secondaryOwnerInfo;
-
-                const pet = await Pet.findById( invitation.petId.toString() );
-
-                const petInfo = getLightWeightPetInfoHelper( pet );
-
-                invitation.pet = petInfo;
-                delete invitation.petId;
+            const secondaryOwner = await User.findById( 
+                                                invitation.to
+                                                          .toString() 
+                                              );
+            if( !secondaryOwner ){
+                continue;
             }
-        );
+            const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
+            invitation.to = secondaryOwnerInfo;
 
-        return res.status( 200 ).json(
-            {
-                error: true,
-                message: "Sended Invitation List Prepared Succesfully",
-                totalInvitationCount: totalInvitationCount,
-                invitations: invitations
+            const pet = await Pet.findById( invitation.petId.toString() );
+            if (!pet) {
+                continue; 
             }
-        );
+            const petInfo = getLightWeightPetInfoHelper( pet );
+            invitation.pet = petInfo;
+            delete invitation.petId;
+
+            delete invitation.__v;
+        }
+
+        return res.status( 200 )
+                  .json(
+                        {
+                            error: true,
+                            message: "Sended Invitation List Prepared Succesfully",
+                            totalInvitationCount: totalInvitationCount,
+                            invitations: invitations
+                        }
+                  );
     }catch( err ){
-        console.log("ERROR: getSendedSecondaryOwnerInvitationsController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+        console.log( "ERROR: getSendedSecondaryOwnerInvitationsController - ", err );
+        res.status( 500 )
+           .json(
+                {
+                    error: true,
+                    message: "Internal Server Error"
+                }
+            );
     }
 }
 
