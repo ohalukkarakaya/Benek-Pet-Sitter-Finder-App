@@ -51,6 +51,12 @@ const getPetHandOverInvitationsController = async ( req, res ) => {
                           );
             }
 
+            delete preparedInvitationData.data
+                                         .__v;
+
+            delete preparedInvitationData.data
+                                         .updatedAt
+
             newInvitationList.push( preparedInvitationData.data );
         }
 

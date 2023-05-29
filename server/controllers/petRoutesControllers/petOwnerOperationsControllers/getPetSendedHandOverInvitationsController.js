@@ -10,8 +10,11 @@ const getPetSendedHandOverInvitationsController = async ( req, res ) => {
         const skip = parseInt( req.params.skip ) || 0;
         const limit = parseInt( req.params.limit ) || 15;
 
-        invitationQuery = { from: userId };
-        const invitations = await PetHandOverInvitation.find( invitationQuery );
+        const invitationQuery = { from: userId };
+        const invitations = await PetHandOverInvitation.find( invitationQuery )
+                                                       .skip( skip )
+                                                       .limit( limit )
+                                                       .lean();
 
         const totalInvitationCount = await PetHandOverInvitation.countDocuments( invitationQuery );
         if( invitations.length <= 0 ){
@@ -23,23 +26,31 @@ const getPetSendedHandOverInvitationsController = async ( req, res ) => {
             );
         }
 
-        invitations.forEach(
-            async ( invitation ) => {
-                const secondaryOwner = await User.findById( 
-                                                    invitation.to
-                                                              .toString() 
-                                                );
-                const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
+        for(
+            let invitation
+            of invitations
+        ){
 
-                invitation.to = secondaryOwnerInfo;
-
-                const pet = await Pet.findById( invitation.petId.toString() );
-                const petInfo = getLightWeightPetInfoHelper( pet );
-
-                invitation.pet = petInfo;
-                delete invitation.petId;
+            const secondaryOwner = await User.findById( 
+                                                invitation.to
+                                                          .toString() 
+                                              );
+            if( !secondaryOwner ){
+                continue;
             }
-        );
+            const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
+            invitation.to = secondaryOwnerInfo;
+
+            const pet = await Pet.findById( invitation.petId.toString() );
+            if (!pet) {
+                continue; 
+            }
+            const petInfo = getLightWeightPetInfoHelper( pet );
+            invitation.pet = petInfo;
+            delete invitation.petId;
+
+            delete invitation.__v;
+        }
 
         return res.status( 200 ).json(
             {
