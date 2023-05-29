@@ -17,37 +17,92 @@ const prepareInvitationDataHelper = async ( invitationList ) => {
             let invitation
             of invitationList
         ){
-            let preparedInvitationData;
             switch ( invitation.constructor ) {
                 case SecondaryOwnerInvitation:
                     // SecondaryOwnerInvitation şemasına ait veri
                     // İşlemleri...
-                    preparedInvitationData = await prepareSecondaryOwnerInvitationDataHelper( invitation );
+                    try{
+                        const preparedInvitationData = await prepareSecondaryOwnerInvitationDataHelper( invitation.toObject() );
+                        if(
+                            !preparedInvitationData
+                            || !preparedInvitationData.data
+                            || preparedInvitationData.error
+                        ){
+                            break;
+                        }
+
+                        preparedInvitationList.push( preparedInvitationData.data );
+                    }catch( err ){
+                        console.log( "ERROR: prepareSecondaryOwnerInvitationDataHelper / case - ", err );
+                        break;
+                    }
                 break;
 
                 case PetHandOverInvitation:
                     // PetHandOverInvitation şemasına ait veri
                     // İşlemleri...
-                    preparedInvitationData = await preparePetHandOverInvitationDataHelper( invitation );
+                    try{
+                        const preparedInvitationData = await preparePetHandOverInvitationDataHelper( invitation.toObject() );
+                        if(
+                            !preparedInvitationData
+                            || !preparedInvitationData.data
+                            || preparedInvitationData.error
+                        ){
+                            break;
+                        }
+
+                        preparedInvitationList.push( preparedInvitationData.data );
+                    }catch( err ){
+                        console.log( "ERROR: prepareSecondaryOwnerInvitationDataHelper / case - ", err );
+                        break;
+                    }
                 break;
 
                 case InviteOrganizer:
                     // InviteOrganizer şemasına ait veri
                     // İşlemleri...
-                    preparedInvitationData = await prepareInviteOrganizerDataHelper( invitation );
+                    try{
+                        const preparedInvitationData = await prepareInviteOrganizerDataHelper( invitation.toObject() );
+                        if(
+                            !preparedInvitationData
+                            || !preparedInvitationData.data
+                            || preparedInvitationData.error
+                        ){
+                            break;
+                        }
+
+                        preparedInvitationList.push( preparedInvitationData.data );
+                    }catch( err ){
+                        console.log( "ERROR: prepareSecondaryOwnerInvitationDataHelper / case - ", err );
+                        break;
+                    }
                 break;
 
                 case EventInvitation:
                     // EventInvitation şemasına ait veri
                     // İşlemleri...
-                    const preparedInvitationData = await prepareEventInvitationDataHelper( invitation );
+                    try{
+                        const preparedInvitationData = await prepareEventInvitationDataHelper( invitation.toObject() );
+                        if(
+                            !preparedInvitationData
+                            || !preparedInvitationData.data
+                            || preparedInvitationData.error
+                        ){
+                            break;
+                        }
+
+                        preparedInvitationList.push( preparedInvitationData.data );
+                    }catch( err ){
+                        console.log( "ERROR: prepareSecondaryOwnerInvitationDataHelper / case - ", err );
+                        break;
+                    }
                 break;
 
                 case CareGive:
                     // CareGive şemasına ait veri
                     // İşlemleri...
                     try{
-                        const preparedInvitationData = await prepareCareGiveInvitationDataHelper( invitation );
+                        const preparedInvitationData = await prepareCareGiveInvitationDataHelper( invitation.toObject() );
                         if(
                             !preparedInvitationData
                             || !preparedInvitationData.data
@@ -67,14 +122,6 @@ const prepareInvitationDataHelper = async ( invitationList ) => {
                   // Beklenmedik durumlar
                 break;
             }
-
-            if(
-                preparedInvitationData
-                && preparedInvitationData.data
-                && !( preparedInvitationData.error )
-            ){
-                newInvitationList.push( preparedInvitationData.data );
-            }
         }
 
         // eğer liste eleman sayısında sorun varsa ( bazı gelen veriler eksik olabilir, 
@@ -82,7 +129,7 @@ const prepareInvitationDataHelper = async ( invitationList ) => {
         // sonuç eleman sayısına eşit olmayabilir
         if(
             !preparedInvitationList
-            || !preparedInvitationList.length <= 0
+            || preparedInvitationList.length <= 0
         ){
             return {
                 error: true,

@@ -73,10 +73,13 @@ const getAllInvitationsController = async ( req, res ) => {
                       );
         }
 
-        preparedInvitationList.sort(
+        if( preparedInvitationList.length > 1 ){
+            preparedInvitationList.sort(
                                     ( a, b ) => 
                                         a.createdAt - b.createdAt
                                );
+        }
+        
 
         return res.status( 200 )
                   .json(

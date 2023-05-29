@@ -54,6 +54,7 @@ router.get(
   getUserByIdController
 );
 
+// - tested
 // get invitations
 router.get(
   "/allInvitations/:skip/:limit",

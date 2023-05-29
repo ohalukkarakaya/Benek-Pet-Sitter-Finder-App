@@ -34,7 +34,7 @@ const prepareSecondaryOwnerInvitationDataHelper = async ( invitation ) => {
             }
         }
 
-        petInfo = getLightWeightPetInfoHelper( pet );
+        const petInfo = getLightWeightPetInfoHelper( pet );
 
         invitation.pet = petInfo;
         delete invitation.petId;
