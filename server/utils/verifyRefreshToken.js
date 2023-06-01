@@ -50,22 +50,16 @@ const verifyRefreshToken = ( refreshToken ) => {
     }catch( err ){
         if( err.name === 'TokenExpiredError' ) {
             // Token süresi dolmuşsa 
-            return res.status( 403 )
-                      .json(
-                          {
-                             error: true,
-                             message: "Access Denied: token expired"
-                          }
-                       );
+            return {
+                        error: true,
+                        message: "Access Denied: token expired"
+                   }
           } else {
             // Diğer hatalar
-            return res.status( 403 )
-                      .json(
-                              {
-                                error: true,
-                                message: "Access Denied: No token provided"
-                              }
-                      );
+            return {
+                        error: true,
+                        message: "Access Denied: No token provided"
+                   }
           }
     }
 };

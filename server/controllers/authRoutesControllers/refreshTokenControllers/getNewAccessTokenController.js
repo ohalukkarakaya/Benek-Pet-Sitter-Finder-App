@@ -1,61 +1,50 @@
-import jwt from "jsonwebtoken";
-import verifyRefreshToken from "../../../utils/verifyRefreshToken.js";
-import { refreshTokenBodyValidation } from "../../../utils/bodyValidation/user/signUpValidationSchema.js";
+import { Worker } from "worker_threads";
 
 const getNewAccessTokenController = async ( req, res ) => {
     try{
-        const { error } = refreshTokenBodyValidation( req.body );
-        if( error ){
+        const worker = new Worker( "./worker_threads/workerThreads.js" );
+
+        // cevap döndüğünde
+        worker.on(
+            "message", 
+            ( message ) => {
+            if( 
+                message.type === "success" 
+            ){
+              res.status( 200 )
+                 .json( 
+                    message.payload 
+                  );
+            }else if( 
+                message.type === "error" 
+            ){
+              res.status( 400 )
+                 .json( 
+                    message.payload 
+                 );
+            }
+          }
+        );
+
+        //  workera gönder
+        const { refreshToken } = req.body;
+        if( !refreshToken ){
             return res.status( 400 )
                       .json(
-                           {
-                               error: true,
-                               message: error.details[ 0 ]
-                                             .message
-                           }
-                       );
+                        {
+                            error: true,
+                            message: "Missing Params"
+                        }
+                      );
         }
-        verifyRefreshToken(
-                        req.body
-                           .refreshToken
-        ).then(
-            ({ tokenDetails }) => {
-                const payload = { 
-                                _id: tokenDetails._id, 
-                                roles: tokenDetails.roles
-                };
-                const accessToken = jwt.sign(
-                    payload,
-                    process.env
-                           .ACCESS_TOKEN_PRIVATE_KEY,
-                    { expiresIn: "14m" }
-                );
-                res.status( 200 )
-                   .json(
-                       {
-                           error: false,
-                            accessToken,
-                           message: "Access token created successfully"
-                       }
-                    );
-            }
-        ).catch(
-            ( err ) => {
-                if( err.name === 'TokenExpiredError' ) {
-                    // Token süresi dolmuşsa 
-                    return res.status( 403 )
-                              .json(
-                                  {
-                                     error: true,
-                                     message: "Access Denied: token expired"
-                                  }
-                               );
-                  }else{
-                    return res.status( 400 )
-                              .json( err );
-                }
+
+        worker.postMessage(
+            {
+                type: "processRefreshToken",
+                payload: { refreshToken }
             }
         );
+
     }catch( err ){
         console.log( err );
         res.status( 500 )

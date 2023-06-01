@@ -78,8 +78,8 @@ initMeetingServer( server );
 
 morgan.token(
   "userId",
-  ( req, res ) => {
-    const token = req.header("x-access-token");
+  ( req ) => {
+    const token = req.header( "x-access-token" );
     if( !token ){
 
       const refreshToken = req.body
@@ -88,17 +88,19 @@ morgan.token(
         return "No Token Provided";
       }
       
-      return `RefreshToken: ${refreshToken}`;
+      return `RefreshToken: ${ refreshToken }`;
     }
 
     try{
       const tokenDetails = jwt.verify(
-        token,
-        process.env.ACCESS_TOKEN_PRIVATE_KEY
-      );
-      return tokenDetails._id.toString();
+                                  token,
+                                  process.env
+                                         .ACCESS_TOKEN_PRIVATE_KEY
+                               );
+      return tokenDetails._id
+                         .toString();
     }catch( err ){
-      if( err.name === 'TokenExpiredError' ) {
+      if( err.name === 'TokenExpiredError' ){
         // Token süresi dolmuşsa
         return "Expired Token";
       } else {
