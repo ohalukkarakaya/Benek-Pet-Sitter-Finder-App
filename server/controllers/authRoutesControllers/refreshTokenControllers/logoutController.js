@@ -1,10 +1,9 @@
-import { Worker } from "worker_threads";
+import UserToken from "../../../models/UserToken.js";
+
 import { refreshTokenBodyValidation } from "../../../utils/bodyValidation/user/signUpValidationSchema.js";
 
 const logoutController = async ( req, res ) => {
     try{
-        const worker = new Worker( "./worker_threads/workerThreads.js" );
-
         const { error } = refreshTokenBodyValidation( req.body );
         if( error ){
             return res.status( 400 )
@@ -19,37 +18,27 @@ const logoutController = async ( req, res ) => {
 
         const { refreshToken } = req.body;
 
-        // cevap döndüğünde
-        worker.on(
-            "message", 
-            ( message ) => {
-            if( 
-                message.type === "success" 
-            ){
-              res.status( 200 )
-                 .json( 
-                    message.payload 
+        const userToken = await UserToken.findOne({ token: refreshToken });
+        if( !userToken ){
+            return res.status( 200 )
+                      .json(
+                        {
+                            error: false,
+                            message: "Logged Out Successfully"
+                        }
+                      );
+        }
+        await userToken.remove();
+        return res.status( 200 )
+                  .json(
+                        {
+                            error: false,
+                            message: "Logged Out Successfully"
+                        }
                   );
-            }else if( 
-                message.type === "error" 
-            ){
-              res.status( 400 )
-                 .json( 
-                    message.payload 
-                 );
-            }
-          }
-        );
-
-        worker.postMessage(
-                            { 
-                                type: "processLogout",
-                                payload: { refreshToken } 
-                            }
-               );
 
     }catch( err ){
-        console.log( err );
+        console.log( "ERROR: logoutController - ", err );
         return res.status( 500 )
                   .json(
                        {
