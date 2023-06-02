@@ -1,6 +1,9 @@
 import User from "../../../models/User.js";
 import Event from "../../../models/Event/Event.js";
 import Pet from "../../../models/Pet.js";
+
+
+import { Worker } from "worker_threads";
 import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
 const getUsersAndEventsBySearchValueController = async ( req, res ) => {
@@ -12,6 +15,8 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
         const searchTerm = req.body.searchValue.toString();
         const userId = req.user._id.toString();
         const filter = req.body.filter;
+
+        const worker = new Worker( "./worker_threads/workerThreads.js" );
 
         if(
             !lat
@@ -46,7 +51,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
         let userList;
         let eventList;
 
-        if( 
+        if(
             !filter
             || filter === "user" 
             || filter === "User"
@@ -240,177 +245,51 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
 
             eventList = sortedEvents;
         }
-        
-        
 
         const mergedList = [...userList, ...eventList];
 
-        mergedList.forEach(
-            async ( item ) => {
-                if(item instanceof User) {
-                    const { location } = item;
-                    const distance = Math.sqrt(
-                        Math.pow(
-                                location.lat - lat, 
-                                2
-                            ) 
-                        + Math.pow(
-                                location.lng - lng, 
-                                2
-                            )
-                    );
-                    item.distance = distance;
-                    
-                    item.pets.forEach(
-                        async ( petId ) => {
-                            const pet = await Pet.findById( petId.toString() );
-                            const petInfo = {
-                                petId: petId.toString(),
-                                petProfileImgUrl: pet.petProfileImg.imgUrl,
-                                petName: pet.name
-                            }
-                            petId = petInfo;
-                        }
-                    );
-                    delete item.password;
-                    delete item.iban;
-                    delete item.cardGuidies;
-                    delete item.trustedIps;
-                    delete item.blockedUsers;
-                    delete item.saved;
-                    delete item.identity.nationalId;
-                    delete item.identity.openAdress;
-                    delete item.phone;
-                    delete item.email;
-                    
-                    item.dependedUsers.forEach(
-                        async ( dependedId ) => {
-                            const depended = await User.findById( dependedId );
-                            const dependedInfo = getLightWeightUserInfoHelper( depended );
-                            dependedId = dependedInfo;
-                        }
-                    );
+        // cevap döndüğünde
+        worker.on(
+            "message", 
+            ( message ) => {
+            if( 
+                message.type === "success" 
+            ){
+              res.status( 200 )
+                 .json( 
+                    message.payload 
+                  );
+            }else if( 
+                message.type === "error" 
+            ){
+              res.status( 400 )
+                 .json( 
+                    message.payload 
+                 );
+            }
+          }
+        );
 
-                    const starValues = item.stars.map( starObject => starObject.star );
-                    const totalStarValue = starValues.reduce(
-                        ( acc, curr ) =>
-                                acc + curr, 0
-                    );
-                    const starCount = item.stasr.length;
-                    const starAvarage = totalStarValue / starCount;
-
-                    item.totalStar = starCount;
-                    item.stars = starAvarage;
-
-                }else if( item instanceof Event ) {
-                    const { adress } = item;
-                    const distance = Math.sqrt(
-                        Math.pow(
-                                adress.lat - lat, 
-                                2
-                            ) 
-                        + Math.pow(
-                                adress.long - lng, 
-                                2
-                            )
-                    );
-                    item.distance = distance;
-
-                    const eventAdmin = await User.findById( item.eventAdmin.toString() );
-                    const eventAdminInfo = {
-                        userId: eventAdmin._id.toString(),
-                        userProfileImg: eventAdmin.profileImg.imgUrl,
-                        username: eventAdmin.userName,
-                        userFullName: `${
-                                eventAdmin.identity
-                                            .firstName
-                            } ${
-                                eventAdmin.identity
-                                            .middleName
-                            } ${
-                                eventAdmin.identity
-                                            .lastName
-                            }`.replaceAll( "  ", " ")
-                    }
-                    item.eventAdmin = eventAdminInfo;
-
-                    item.eventOrganizers.forEach(
-                        async( organizerId ) => {
-                            const organizer = await User.finfById( organizerId.toString() );
-                            const organizerInfo = {
-                                userId: organizer._id.toString(),
-                                userProfileImg: organizer.profileImg.imgUrl,
-                                username: organizer.userName,
-                                userFullName: `${
-                                        organizer.identity
-                                                 .firstName
-                                    } ${
-                                        organizer.identity
-                                                 .middleName
-                                    } ${
-                                        organizer.identity
-                                                 .lastName
-                                    }`.replaceAll( "  ", " ")
-                            }
-                            item.organizers.push( organizerInfo );
-                        }
-                    )
-
-                    if( item.organizers.length === item.eventOrganizers.length ){
-                        delete item.eventOrganizers
-                    }
-
-                    item.willJoin.forEach(
-                        async ( joiningUserId ) => {
-                            const joiningUser = await User.findById( joiningUserId );
-                            const usersWhoWillJoinInfo = {
-                                userId: joiningUserId,
-                                userProfileImg: joiningUser.profileImg.imgUrl,
-                                username: joiningUser.userName,
-                                usersFullName: `${
-                                        joiningUser.identity
-                                                   .firstName
-                                    } ${
-                                        joiningUser.identity
-                                                   .middleName
-                                    } ${
-                                        joiningUser.identity
-                                                   .lastName
-                                    }`.replaceAll( "  ", " ")
-                            }
-                            item.usersWhoWillJoin.push( usersWhoWillJoinInfo );
-                        }
-                    );
-                    
-                    if( item.usersWhoWillJoin.length === item.willJoin.length ){
-                        delete item.willJoin;
-                    }
+        worker.postMessage(
+            {
+                type: "processGetUsersAndEventsBySearchValue",
+                payload: {
+                    skip: skip,
+                    limit: limit,
+                    list: mergedList
                 }
             }
         );
 
-        mergedList.sort(
-            ( a, b ) => 
-                a.distance - b.distance
-        );
-
-        const resultList = mergedList.slice(skip, skip + limit);
-
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "discover screen users and events list is prepared succesfully",
-                dataList: resultList
-            }
-        );
     }catch( err ){
-        console.log("ERROR: getUsersAndEventsBySearchValueController - ", err);
-        return res.status(500).json(
-            {
-                error: true,
-                message: "Internal server error"
-            }
-        );
+        console.log( "ERROR: getUsersAndEventsBySearchValueController - ", err );
+        return res.status( 500 )
+                  .json(
+                        {
+                            error: true,
+                            message: "Internal server error"
+                        }
+                  );
     }
 }
 
