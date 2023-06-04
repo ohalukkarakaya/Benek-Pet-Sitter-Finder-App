@@ -1,11 +1,13 @@
-import User from "../../../models/User";
-import Pet from "../../../models/Pet";
+import User from "../../../models/User.js";
+import Pet from "../../../models/Pet.js";
+import Event from "../../../models/Event/Event.js";
 
-import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
+import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper";
 
 import { parentPort } from "worker_threads";
 
-const getUsersAndEventsBySearchValueWorker = async ( message ) => {
+
+const getUsersAndEventsByLocationWorker = async( message ) => {
 
     const skip = message.payload
                         .skip;
@@ -21,22 +23,23 @@ const getUsersAndEventsBySearchValueWorker = async ( message ) => {
 
     const mergedList = message.payload
                               .list;
+
     for(
-        var item
+        let item
         of mergedList
     ){
         if( item instanceof User ) {
             const { location } = item;
             const distance = Math.sqrt(
-                                    Math.pow(
-                                            location.lat - lat, 
-                                            2
-                                        ) 
-                                    + Math.pow(
-                                            location.lng - lng, 
-                                            2
-                                          )
-                                  );
+                Math.pow(
+                        location.lat - lat, 
+                        2
+                    ) 
+                + Math.pow(
+                        location.lng - lng, 
+                        2
+                    )
+            );
             item.distance = distance;
             
             for(
@@ -46,8 +49,7 @@ const getUsersAndEventsBySearchValueWorker = async ( message ) => {
                 const pet = await Pet.findById( petId.toString() );
                 const petInfo = {
                     petId: petId.toString(),
-                    petProfileImgUrl: pet.petProfileImg
-                                         .imgUrl,
+                    petProfileImgUrl: pet.petProfileImg.imgUrl,
                     petName: pet.name
                 }
                 petId = petInfo;
@@ -59,13 +61,8 @@ const getUsersAndEventsBySearchValueWorker = async ( message ) => {
             delete item.trustedIps;
             delete item.blockedUsers;
             delete item.saved;
-            
-            delete item.identity
-                       .nationalId;
-
-            delete item.identity
-                       .openAdress;
-
+            delete item.identity.nationalId;
+            delete item.identity.openAdress;
             delete item.phone;
             delete item.email;
 
@@ -75,23 +72,17 @@ const getUsersAndEventsBySearchValueWorker = async ( message ) => {
             ){
                 const depended = await User.findById( dependedId );
                 const dependedInfo = getLightWeightUserInfoHelper( depended );
+                
                 dependedId = dependedInfo;
             }
 
-            const starValues = item.stars
-                                   .map(
-                                        starObject => 
-                                                starObject.star 
-                                    );
-
+            const starValues = item.stars.map( starObject => starObject.star );
             const totalStarValue = starValues.reduce(
-                                                ( acc, curr ) =>
-                                                            acc + curr, 
-                                                            0
-                                              );
+                ( acc, curr ) =>
+                        acc + curr, 0
+            );
             const starCount = item.stars
                                   .length;
-
             const starAvarage = totalStarValue / starCount;
 
             item.totalStar = starCount;
@@ -111,11 +102,7 @@ const getUsersAndEventsBySearchValueWorker = async ( message ) => {
             );
             item.distance = distance;
 
-            const eventAdmin = await User.findById( 
-                                                item.eventAdmin
-                                                    .toString() 
-                                          );
-
+            const eventAdmin = await User.findById( item.eventAdmin.toString() );
             const eventAdminInfo = {
                 userId: eventAdmin._id.toString(),
                 userProfileImg: eventAdmin.profileImg.imgUrl,
@@ -137,15 +124,10 @@ const getUsersAndEventsBySearchValueWorker = async ( message ) => {
                 let organizerId
                 of item.eventOrganizers
             ){
-                const organizer = await User.finfById( 
-                                                organizerId.toString() 
-                                             );
-
+                const organizer = await User.finfById( organizerId.toString() );
                 const organizerInfo = {
-                    userId: organizer._id
-                                     .toString(),
-                    userProfileImg: organizer.profileImg
-                                             .imgUrl,
+                    userId: organizer._id.toString(),
+                    userProfileImg: organizer.profileImg.imgUrl,
                     username: organizer.userName,
                     userFullName: `${
                             organizer.identity
@@ -158,7 +140,8 @@ const getUsersAndEventsBySearchValueWorker = async ( message ) => {
                                      .lastName
                         }`.replaceAll( "  ", " ")
                 }
-                item.organizers.push( organizerInfo );
+                item.organizers
+                    .push( organizerInfo );
             }
 
             if( 
@@ -176,21 +159,16 @@ const getUsersAndEventsBySearchValueWorker = async ( message ) => {
                 const joiningUser = await User.findById( joiningUserId );
                 const usersWhoWillJoinInfo = {
                     userId: joiningUserId,
-                    userProfileImg: joiningUser.profileImg
-                                               .imgUrl,
+                    userProfileImg: joiningUser.profileImg.imgUrl,
                     username: joiningUser.userName,
                     usersFullName: `${
-                            joiningUser.identity
-                                       .firstName
+                        joiningUser.identity.firstName
                         } ${
-                            joiningUser.identity
-                                       .middleName
+                            joiningUser.identity.middleName
                         } ${
-                            joiningUser.identity
-                                       .lastName
+                            joiningUser.identity.lastName
                         }`.replaceAll( "  ", " ")
                 }
-
                 item.usersWhoWillJoin
                     .push( usersWhoWillJoinInfo );
             }
@@ -206,9 +184,9 @@ const getUsersAndEventsBySearchValueWorker = async ( message ) => {
     }
 
     mergedList.sort(
-                    ( a, b ) => 
-                            a.distance - b.distance
-               );
+        ( a, b ) => 
+            a.distance - b.distance
+    );
 
     const resultList = mergedList.slice(
                                         skip, 
@@ -227,4 +205,4 @@ const getUsersAndEventsBySearchValueWorker = async ( message ) => {
                );
 }
 
-export default getUsersAndEventsBySearchValueWorker;
+export default getUsersAndEventsByLocationWorker;

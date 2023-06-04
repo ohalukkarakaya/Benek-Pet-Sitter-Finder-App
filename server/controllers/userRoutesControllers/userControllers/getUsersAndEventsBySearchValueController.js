@@ -1,10 +1,8 @@
 import User from "../../../models/User.js";
 import Event from "../../../models/Event/Event.js";
-import Pet from "../../../models/Pet.js";
 
 
 import { Worker } from "worker_threads";
-import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
 const getUsersAndEventsBySearchValueController = async ( req, res ) => {
     try{
@@ -18,17 +16,40 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
 
         const worker = new Worker( "./worker_threads/workerThreads.js" );
 
+        // cevap döndüğünde
+        worker.on(
+            "message", 
+            ( message ) => {
+            if( 
+                message.type === "success" 
+            ){
+              res.status( 200 )
+                 .json( 
+                    message.payload 
+                  );
+            }else if( 
+                message.type === "error" 
+            ){
+              res.status( 400 )
+                 .json( 
+                    message.payload 
+                 );
+            }
+          }
+        );
+
         if(
             !lat
             || !lng
             || !searchTerm
         ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "missing params"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "missing params"
+                            }
+                      );
         }
 
         if( 
@@ -248,34 +269,14 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
 
         const mergedList = [...userList, ...eventList];
 
-        // cevap döndüğünde
-        worker.on(
-            "message", 
-            ( message ) => {
-            if( 
-                message.type === "success" 
-            ){
-              res.status( 200 )
-                 .json( 
-                    message.payload 
-                  );
-            }else if( 
-                message.type === "error" 
-            ){
-              res.status( 400 )
-                 .json( 
-                    message.payload 
-                 );
-            }
-          }
-        );
-
         worker.postMessage(
             {
                 type: "processGetUsersAndEventsBySearchValue",
                 payload: {
                     skip: skip,
                     limit: limit,
+                    lat: lat,
+                    lng: lng,
                     list: mergedList
                 }
             }
