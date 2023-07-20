@@ -54,7 +54,7 @@ router.put(
   removeSecondaryOwnerController
 );
 
-// - tested
+// - TO DO
 //Pet Hand Over Invitation
 router.post(
   "/petHandOverInvitation/:petId/:invitedUserId",
@@ -62,7 +62,6 @@ router.post(
   petHandOverInvitationController
 );
 
-// - tested
 //Accept Or Reject Pet Hand Over Invitation
 router.put(
   "/petHandOverInvitation/:invitationId/:usersResponse",
@@ -70,7 +69,6 @@ router.put(
   replyPetHandOverInvitationController
 );
 
-// - tested
 //get hand over invitations
 router.get(
   "/petHandOverInvitations/:skip/:limit",
@@ -78,7 +76,6 @@ router.get(
   getPetHandOverInvitationsController
 );
 
-// - tested
 //get sended hand over invitations
 router.get(
   "/petSendedHandOverInvitations/:skip/:limit",
