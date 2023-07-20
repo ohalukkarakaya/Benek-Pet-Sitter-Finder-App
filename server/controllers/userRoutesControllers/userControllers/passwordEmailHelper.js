@@ -7,13 +7,13 @@ const passwordEmailHelper = (
     let warning;
 
     if( type === "otp" ){
-        title = "👋 &nbsp; Welcome To The BenekApp"
-        message = "Please enter 6 digit code below into The BenekApp <br> to verify your email address and complete the signup.";
-        warning = "This code <b>expires in 1 hour.</b> If you didn't try to create an account on BenekApp, you can ignore this email.";
+        title = "👋 &nbsp; Benek'e Hoş Geldiniz"
+        message = "Lütfen aşağıdaki altı haneli kodu BenekApp'te ilgili alana girerek <br> Eposta adresinizi onaylayıp, üyeliğinizi tamamlayın.";
+        warning = "Bu kodun <b>1 saat içerisinde süresi dolar.</b> Benek'te bir hesap oluşturmaya çalışmadıysanız, bu epostayı görmezden gelebilirsiniz. ";
     }else if( type === "tempPassWord" ){
         title = "Temporary Password"
-        message = "Please use password below as your new BenekApp password. "; 
-        warning = "We forcely reccomend you to <b>set a new password as soon as possible</b> in the app";
+        message = "Lütfen aşağıdaki şifreyi yeni Benek şifreniz olarak kullanın. "; 
+        warning = "Şiddetle, uygulama üzerinden <b>mümkün olan ilk fırsatta yeni bir şifre oluşturmanızı tavsiye ederiz.</b> ";
     }
 
     return `
