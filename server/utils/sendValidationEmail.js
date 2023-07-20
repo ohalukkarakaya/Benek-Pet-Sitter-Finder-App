@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import fs from "fs";
 import UserOTPVerification from "../models/UserOtpVerification.js";
+import passwordEmailHelper from "../controllers/userRoutesControllers/userControllers/passwordEmailHelper.js";
 
 dotenv.config();
 
@@ -53,14 +54,15 @@ let transporter = nodemailer.createTransport(
                            )
                    }`;
 
+      const htmlEmail = passwordEmailHelper( "otp", otp );
+
       //mail options
       const mailOptions = {
         from: process.env
                      .AUTH_EMAIL,
         to: email,
-        subject: "Verify your email",
-        html: `<p>Enter <b>${otp}</b> in the app to verify your email adress and complate the signup</p>
-        <p>This code <b>expires in 1 hour</b></p>`,
+        subject: `BenekApp Signup Code: ${otp}`,
+        html: htmlEmail,
 
       };
 
