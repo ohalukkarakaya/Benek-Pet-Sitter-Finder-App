@@ -10,8 +10,11 @@ const getPetSendedHandOverInvitationsController = async ( req, res ) => {
         const skip = parseInt( req.params.skip ) || 0;
         const limit = parseInt( req.params.limit ) || 15;
 
-        invitationQuery = { from: userId };
-        const invitations = await PetHandOverInvitation.find( invitationQuery );
+        const invitationQuery = { from: userId };
+        const invitations = await PetHandOverInvitation.find( invitationQuery )
+                                                       .skip( skip )
+                                                       .limit( limit )
+                                                       .lean();
 
         const totalInvitationCount = await PetHandOverInvitation.countDocuments( invitationQuery );
         if( invitations.length <= 0 ){
@@ -23,23 +26,25 @@ const getPetSendedHandOverInvitationsController = async ( req, res ) => {
             );
         }
 
-        invitations.forEach(
-            async ( invitation ) => {
-                const secondaryOwner = await User.findById( 
+        for(
+            let invitation
+            of invitations
+        ){
+            const secondaryOwner = await User.findById( 
                                                     invitation.to
                                                               .toString() 
-                                                );
-                const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
+                                              );
+            const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
 
-                invitation.to = secondaryOwnerInfo;
+            invitation.to = secondaryOwnerInfo;
 
-                const pet = await Pet.findById( invitation.petId.toString() );
-                const petInfo = getLightWeightPetInfoHelper( pet );
+            const pet = await Pet.findById( invitation.petId.toString() );
+            const petInfo = getLightWeightPetInfoHelper( pet );
 
-                invitation.pet = petInfo;
-                delete invitation.petId;
-            }
-        );
+            invitation.pet = petInfo;
+            delete invitation.petId;
+
+        }
 
         return res.status( 200 ).json(
             {

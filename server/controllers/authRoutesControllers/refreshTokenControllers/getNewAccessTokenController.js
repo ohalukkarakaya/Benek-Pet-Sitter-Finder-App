@@ -36,8 +36,8 @@ const getNewAccessTokenController = async ( req, res ) => {
         }
 
         const payload = { 
-                            _id: tokenDetails._id, 
-                            roles: tokenDetails.roles 
+                            _id: tokenDetails.tokenDetails._id, 
+                            roles: tokenDetails.tokenDetails.roles 
                         };
         const accessToken = jwt.sign(
                                     payload, 

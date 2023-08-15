@@ -5,7 +5,7 @@ import { Worker } from "worker_threads";
 const getCareGiversBySearchValueController = async ( req, res ) => {
     try{
         
-        const userId = req.user
+        const userId = req.user 
                           ._id
                           .toString();
 
@@ -17,30 +17,6 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
 
         const skip = req.body.skip;
         const limit = req.body.limit;
-
-        const worker = new Worker( "./worker_threads/workerThreads.js" );
-
-        // cevap döndüğünde
-        worker.on(
-            "message", 
-            ( message ) => {
-            if( 
-                message.type === "success" 
-            ){
-              return res.status( 200 )
-                        .json( 
-                            message.payload 
-                        );
-            }else if( 
-                message.type === "error" 
-            ){
-              return res.status( 400 )
-                        .json( 
-                            message.payload 
-                        );
-            }
-          }
-        );
 
         if( 
             !lat
@@ -168,17 +144,81 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
             ]
         );
 
-        worker.postMessage(
-            {
-                type: "processGetCareGiversBySearchValue",
-                payload: {
-                    lat: lat,
-                    lng: lng,
-                    users: users
+        for(
+            let item
+            of users
+        ){
+            const { location } = item;
+            const distance = Math.sqrt(
+                                    Math.pow(
+                                            location.lat - lat, 
+                                            2
+                                        ) 
+                                    + Math.pow(
+                                            location.lng - lng, 
+                                            2
+                                        )
+                                  );
+            item.distance = distance;
+    
+            for(
+                var petId
+                of item.pets
+            ){
+                const pet = await Pet.findById( petId.toString() );
+                const petInfo = {
+                    petId: petId.toString(),
+                    petProfileImgUrl: pet.petProfileImg
+                                         .imgUrl,
+                    petName: pet.name
                 }
+                petId = petInfo;
             }
-        );
+    
+            delete item.password;
+            delete item.iban;
+            delete item.cardGuidies;
+            delete item.trustedIps;
+            delete item.blockedUsers;
+            delete item.saved;
+            delete item.identity.nationalId;
+            delete item.identity.openAdress;
+            delete item.phone;
+            delete item.email;
+    
+            for(
+                let dependedId
+                of item.dependedUsers
+            ){
+                const depended = await User.findById( dependedId );
+                const dependedInfo = getLightWeightUserInfoHelper( depended );
+                
+                dependedId = dependedInfo;
+            }
+    
+            const starValues = item.stars
+                                   .map( starObject => starObject.star );
+    
+            const totalStarValue = starValues.reduce(
+                                                    ( acc, curr ) =>
+                                                            acc + curr, 0
+                                              );
+    
+            const starCount = item.stars.length;
+            const starAvarage = totalStarValue / starCount;
+    
+            item.totalStar = starCount;
+            item.stars = starAvarage;
+        }
 
+        return res.status( 200 )
+                  .json(
+                    {
+                        error: false,
+                        message: "careGiver list prepared succesfully",
+                        careGiverList: users
+                    }
+                  );
 
     }catch( err ){
         console.log( "ERROR: getCareGiversByLocationController - ", err );
