@@ -70,7 +70,7 @@ router.post(
   getUsersAndEventsByLocationController
 );
 
-
+// - tested
 //get users and events with search value
 router.post(
   "/getUsersAndEventsBySearchValue/:skip/:limit", 

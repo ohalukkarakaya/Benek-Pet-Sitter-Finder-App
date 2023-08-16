@@ -2,15 +2,12 @@ import User from "../../../models/User.js";
 import Event from "../../../models/Event/Event.js";
 import Pet from "../../../models/Pet.js";
 
-
-import { Worker } from "worker_threads";
-
 const getUsersAndEventsBySearchValueController = async ( req, res ) => {
     try{
         const limit = req.params.limit || 10;
         const skip = req.params.skip || 0;
-        const lat = req.body.lat;
-        const lng = req.body.lng;
+        const lat = parseFloat( req.body.lat );
+        const lng = parseFloat( req.body.lng );
         const searchTerm = req.body.searchValue.toString();
         const userId = req.user._id.toString();
         const filter = req.body.filter;
@@ -46,8 +43,8 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
             );
         }
 
-        let userList;
-        let eventList;
+        let userList = [];
+        let eventList = [];
 
         if(
             !filter
@@ -57,6 +54,56 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
         ){
             const users = await User.aggregate(
                 [
+                    {
+                        $addFields: {
+                            starsCount: { 
+                                $cond: [ 
+                                    { $isArray: "$stars.star" }, 
+                                    { $size: "$stars.star" }, 
+                                    0 
+                                ] 
+                            },
+                            followersCount: { 
+                                $cond: [ 
+                                    { $isArray: "$followers" }, 
+                                    { $size: "$followers" }, 
+                                    0 
+                                ] 
+                            },
+                            followingUsersOrPetsCount: { 
+                                $cond: [ 
+                                    { $isArray: "$followingUsersOrPets" }, 
+                                    { $size: "$followingUsersOrPets"  }, 
+                                    0 
+                                ] 
+                            },
+                            caregiverCareerCount: { 
+                                $cond: [ 
+                                    { $isArray: "$caregiverCareer" }, 
+                                    { $size: "$caregiverCareer" }, 
+                                    0 
+                                ] 
+                            },
+                            pastCaregiversCount: { 
+                                $cond: [ 
+                                    { $isArray: "$pastCaregivers" }, 
+                                    { $size: "$pastCaregivers" }, 
+                                    0 
+                                ] 
+                            },
+                        }
+                    },
+                    // Kullanıcıları stars, followers, followingUsersOrPets, caregiverCareer ve pastCaregivers
+                    // değerlerine göre tekrar sırala
+                    {
+                        $sort: {
+                            starsCount: -1,
+                            followersCount: -1,
+                            followingUsersOrPetsCount: 1,
+                            caregiverCareerCount: -1,
+                            pastCaregiversCount: -1,
+                        },
+                    },
                     {
                         // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
                         $addFields: {
@@ -97,17 +144,6 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                         $sort: { 
                             distance: 1 
                         } 
-                    },
-                    // Kullanıcıları stars, followers, followingUsersOrPets, caregiverCareer ve pastCaregivers
-                    // değerlerine göre tekrar sırala
-                    {
-                        $sort: {
-                            "stars.star": -1,
-                            followers: -1,
-                            followingUsersOrPets: 1,
-                            caregiverCareer: -1,
-                            pastCaregivers: -1,
-                        },
                     },
                     // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
                     {
@@ -175,7 +211,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
             // prepare events
             const events = await Event.find(
                 {
-                    isPrivate: isPrivate === "false",
+                    isPrivate: false,
                     "adress.lat": { 
                         $exists: true 
                     },
@@ -445,6 +481,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                     {
                         error: false,
                         message: "discover screen users and events list is prepared succesfully",
+                        totalDataCount: mergedList.length,
                         dataList: resultList,
                     }
                   );

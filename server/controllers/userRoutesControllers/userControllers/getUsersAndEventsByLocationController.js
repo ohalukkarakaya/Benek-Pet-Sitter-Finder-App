@@ -25,47 +25,6 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
         let users = await User.aggregate(
             [
                 {
-                    // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
-                    $addFields: {
-                        distance: {
-                            $sqrt: {
-                                $add: [
-                                    { 
-                                        $pow: [ 
-                                            { 
-                                                $subtract: 
-                                                    [
-                                                        lat, 
-                                                        "$location.lat"
-                                                    ] 
-                                            }, 
-                                            2 
-                                        ] 
-                                    },
-                                    {
-                                        $pow: [ 
-                                            { 
-                                                $subtract: 
-                                                    [
-                                                        lng, 
-                                                        "$location.lng"
-                                                    ] 
-                                            },
-                                            2 
-                                        ] 
-                                    },
-                                ],
-                            },
-                        },
-                    },
-                },
-                // En yakın kullanıcılara öncelik ver
-                { 
-                    $sort: { 
-                        distance: 1 
-                    } 
-                },
-                {
                     $addFields: {
                         starsCount: { 
                             $cond: [ 
@@ -114,6 +73,47 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                         caregiverCareerCount: -1,
                         pastCaregiversCount: -1,
                     },
+                },
+                {
+                    // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
+                    $addFields: {
+                        distance: {
+                            $sqrt: {
+                                $add: [
+                                    { 
+                                        $pow: [ 
+                                            { 
+                                                $subtract: 
+                                                    [
+                                                        lat, 
+                                                        "$location.lat"
+                                                    ] 
+                                            }, 
+                                            2 
+                                        ] 
+                                    },
+                                    {
+                                        $pow: [ 
+                                            { 
+                                                $subtract: 
+                                                    [
+                                                        lng, 
+                                                        "$location.lng"
+                                                    ] 
+                                            },
+                                            2 
+                                        ] 
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+                // En yakın kullanıcılara öncelik ver
+                { 
+                    $sort: { 
+                        distance: 1 
+                    } 
                 },
                 // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
                 {
@@ -366,7 +366,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                     {
                         error: false,
                         message: "discover screen users and events list is prepared succesfully",
-                        totalCounnt: mergedList.length,
+                        totalDataCount: mergedList.length,
                         dataList: resultList,
                     }
                   );
