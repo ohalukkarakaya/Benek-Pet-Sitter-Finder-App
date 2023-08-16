@@ -1,7 +1,5 @@
 import User from "../../../models/User.js";
 
-import { Worker } from "worker_threads";
-
 const getCareGiversBySearchValueController = async ( req, res ) => {
     try{
         
@@ -9,14 +7,14 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
                           ._id
                           .toString();
 
-        const lat = req.body.lat;
-        const lng = req.body.lng;
+        const lat = parseFloat( req.body.lat );
+        const lng = parseFloat( req.body.lng );
         const searchTerm = req.body
                               .searchValue
                               .toString();
 
-        const skip = req.body.skip;
-        const limit = req.body.limit;
+        const limit = req.params.limit || 15;
+        const skip = req.params.skip || 0;
 
         if( 
             !lat
@@ -31,8 +29,112 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
             );
         }
 
+        const totalCount = await User.countDocuments(
+            {
+                $and: [
+                    {
+                        "deactivation.isDeactive": false
+                    },
+                    {
+                        blockedUsers: {
+                            $nin: [
+                                userId
+                            ]
+                        }
+                    },
+                    {
+                        $or: [
+                            {
+                                "userName": {
+                                    $regex: searchTerm,
+                                    $options: "i"
+                                }
+                            },
+                            {
+                                "identity.firstName": {
+                                    $regex: searchTerm,
+                                    $options: "i"
+                                }
+                            },
+                            {
+                                "identity.middleName": {
+                                    $regex: searchTerm,
+                                    $options: "i"
+                                }
+                            },
+                            {
+                                "identity.lastName": {
+                                    $regex: searchTerm,
+                                    $options: "i"
+                                }
+                            },
+                            {
+                                "identity.openAdress": {
+                                    $regex: searchTerm,
+                                    $options: "i"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        isCareGiver: true
+                    }
+                ]
+            }
+        );
+
         const users = await User.aggregate(
             [
+                {
+                    $addFields: {
+                        starsCount: { 
+                            $cond: [ 
+                                { $isArray: "$stars.star" }, 
+                                { $size: "$stars.star" }, 
+                                0 
+                            ] 
+                        },
+                        followersCount: { 
+                            $cond: [ 
+                                { $isArray: "$followers" }, 
+                                { $size: "$followers" }, 
+                                0 
+                            ] 
+                        },
+                        followingUsersOrPetsCount: { 
+                            $cond: [ 
+                                { $isArray: "$followingUsersOrPets" }, 
+                                { $size: "$followingUsersOrPets"  }, 
+                                0 
+                            ] 
+                        },
+                        caregiverCareerCount: { 
+                            $cond: [ 
+                                { $isArray: "$caregiverCareer" }, 
+                                { $size: "$caregiverCareer" }, 
+                                0 
+                            ] 
+                        },
+                        pastCaregiversCount: { 
+                            $cond: [ 
+                                { $isArray: "$pastCaregivers" }, 
+                                { $size: "$pastCaregivers" }, 
+                                0 
+                            ] 
+                        },
+                    }
+                },
+                // Kullanıcıları stars, followers, followingUsersOrPets, caregiverCareer ve pastCaregivers
+                // değerlerine göre tekrar sırala
+                {
+                    $sort: {
+                        starsCount: -1,
+                        followersCount: -1,
+                        followingUsersOrPetsCount: 1,
+                        caregiverCareerCount: -1,
+                        pastCaregiversCount: -1,
+                    },
+                },
                 {
                     // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
                     $addFields: {
@@ -73,17 +175,6 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
                     $sort: { 
                         distance: 1 
                     } 
-                },
-                // Kullanıcıları stars, followers, followingUsersOrPets, caregiverCareer ve pastCaregivers
-                // değerlerine göre tekrar sırala
-                {
-                    $sort: {
-                        "stars.star": -1,
-                        followers: -1,
-                        followingUsersOrPets: 1,
-                        caregiverCareer: -1,
-                        pastCaregivers: -1,
-                    },
                 },
                 // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
                 {
@@ -216,6 +307,7 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
                     {
                         error: false,
                         message: "careGiver list prepared succesfully",
+                        totalCount: totalCount,
                         careGiverList: users
                     }
                   );
