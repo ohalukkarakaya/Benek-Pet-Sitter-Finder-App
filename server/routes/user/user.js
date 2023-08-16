@@ -62,12 +62,14 @@ router.get(
   getAllInvitationsController
 );
 
+// - tested
 //get users and events by location data
 router.post(
   "/getUsersAndEventsByLocation/:skip/:limit", 
   auth,
   getUsersAndEventsByLocationController
 );
+
 
 //get users and events with search value
 router.post(

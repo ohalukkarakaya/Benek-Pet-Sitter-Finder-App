@@ -42,11 +42,11 @@ const EventSchema = new mongoose.Schema(
             ],
         },
         lat: {
-            type: String,
+            type: Number,
             required: true,
         },
         long: {
-            type: String,
+            type: Number,
             required: true
         }
       },

@@ -111,7 +111,7 @@ const UserSchema = new mongoose.Schema(
                 required: true
             },
             city: {
-                type: String,
+                type: Number,
                 required: true
             },
             lat: {

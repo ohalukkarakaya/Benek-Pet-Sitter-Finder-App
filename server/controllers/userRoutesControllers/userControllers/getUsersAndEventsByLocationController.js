@@ -1,12 +1,10 @@
 import User from "../../../models/User.js";
 import Event from "../../../models/Event/Event.js";
 
-import { Worker } from "worker_threads";
-
 const getUsersAndEventsByLocationController = async ( req, res) => {
     try{
-        const lat = req.body.lat;
-        const lng = req.body.lng;
+        const lat = parseFloat( req.body.lat );
+        const lng = parseFloat( req.body.lng );
         const limit = req.params.limit || 10;
         const skip = req.params.skip || 0;
         const userId = req.user._id.toString();
@@ -24,42 +22,42 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                       );
         }
     
-        const users = await User.aggregate(
+        let users = await User.aggregate(
             [
                 {
-                // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
-                $addFields: {
-                    distance: {
-                    $sqrt: {
-                        $add: [
-                        { 
-                            $pow: [ 
-                                { 
-                                    $subtract: 
-                                        [
-                                            lat, 
-                                            "$location.lat"
+                    // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
+                    $addFields: {
+                        distance: {
+                            $sqrt: {
+                                $add: [
+                                    { 
+                                        $pow: [ 
+                                            { 
+                                                $subtract: 
+                                                    [
+                                                        lat, 
+                                                        "$location.lat"
+                                                    ] 
+                                            }, 
+                                            2 
                                         ] 
-                                }, 
-                                2 
-                            ] 
-                        },
-                        {
-                            $pow: [ 
-                                { 
-                                    $subtract: 
-                                        [
-                                            lng, 
-                                            "$location.lng"
+                                    },
+                                    {
+                                        $pow: [ 
+                                            { 
+                                                $subtract: 
+                                                    [
+                                                        lng, 
+                                                        "$location.lng"
+                                                    ] 
+                                            },
+                                            2 
                                         ] 
-                                },
-                                2 
-                            ] 
+                                    },
+                                ],
+                            },
                         },
-                        ],
                     },
-                    },
-                },
                 },
                 // En yakın kullanıcılara öncelik ver
                 { 
@@ -67,35 +65,80 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                         distance: 1 
                     } 
                 },
+                {
+                    $addFields: {
+                        starsCount: { 
+                            $cond: [ 
+                                { $isArray: "$stars.star" }, 
+                                { $size: "$stars.star" }, 
+                                0 
+                            ] 
+                        },
+                        followersCount: { 
+                            $cond: [ 
+                                { $isArray: "$followers" }, 
+                                { $size: "$followers" }, 
+                                0 
+                            ] 
+                        },
+                        followingUsersOrPetsCount: { 
+                            $cond: [ 
+                                { $isArray: "$followingUsersOrPets" }, 
+                                { $size: "$followingUsersOrPets"  }, 
+                                0 
+                            ] 
+                        },
+                        caregiverCareerCount: { 
+                            $cond: [ 
+                                { $isArray: "$caregiverCareer" }, 
+                                { $size: "$caregiverCareer" }, 
+                                0 
+                            ] 
+                        },
+                        pastCaregiversCount: { 
+                            $cond: [ 
+                                { $isArray: "$pastCaregivers" }, 
+                                { $size: "$pastCaregivers" }, 
+                                0 
+                            ] 
+                        },
+                    }
+                },
                 // Kullanıcıları stars, followers, followingUsersOrPets, caregiverCareer ve pastCaregivers
                 // değerlerine göre tekrar sırala
                 {
-                $sort: {
-                    "stars.star": -1,
-                    followers: -1,
-                    followingUsersOrPets: 1,
-                    caregiverCareer: -1,
-                    pastCaregivers: -1,
-                },
+                    $sort: {
+                        starsCount: -1,
+                        followersCount: -1,
+                        followingUsersOrPetsCount: 1,
+                        caregiverCareerCount: -1,
+                        pastCaregiversCount: -1,
+                    },
                 },
                 // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
                 {
-                $match: {
-                    "deactivation.isDeactive": false,
-                    blockedUsers: { 
-                        $nin: [
-                            userId
-                        ] 
+                    $match: {
+                        "deactivation.isDeactive": false,
+                        blockedUsers: { 
+                            $nin: [
+                                userId
+                            ] 
+                        },
                     },
                 },
-                },
             ]
+        );
+
+        users = users.filter(
+            ( user ) =>
+                user._id
+                    .toString() != userId
         );
         
         // prepare events
         const events = await Event.find(
             {
-                isPrivate: isPrivate === "false",
+                isPrivate: false,
                 "adress.lat": { 
                     $exists: true 
                 },
@@ -120,7 +163,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 if( event.maxGuests !== -1 ){
 
                     return event.maxGuests >= event.willJoin
-                                                .length;
+                                                   .length;
 
                 }else{
 
@@ -323,6 +366,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                     {
                         error: false,
                         message: "discover screen users and events list is prepared succesfully",
+                        totalCounnt: mergedList.length,
                         dataList: resultList,
                     }
                   );

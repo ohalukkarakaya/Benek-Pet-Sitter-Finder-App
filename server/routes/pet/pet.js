@@ -103,7 +103,7 @@ router.delete(
   deletePetVaccinationCertificateController
 );
 
-// TO DO
+// - tested
 //Delete Pet and Clean Dependency
 router.delete(
   "/deletePet/:petId",
