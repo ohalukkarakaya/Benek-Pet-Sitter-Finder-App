@@ -78,6 +78,7 @@ router.post(
   getUsersAndEventsBySearchValueController
 );
 
+// - tested
 //get careGivers by location
 router.post(
   "/getCareGiversByLocation/:skip/:limit",

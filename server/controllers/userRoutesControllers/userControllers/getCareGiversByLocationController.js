@@ -1,12 +1,13 @@
 import User from "../../../models/User.js";
-
-import { Worker } from "worker_threads";
+import mongoose from "mongoose";
 
 const getCareGiversByLocationController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const lat = req.body.lat;
-        const lng = req.body.lng;
+        const limit = req.params.limit || 10;
+        const skip = req.params.skip || 0;
+        const lat = parseFloat( req.body.lat );
+        const lng = parseFloat( req.body.lng );
 
         if( 
             !lat
@@ -19,9 +20,85 @@ const getCareGiversByLocationController = async ( req, res ) => {
                 }
             );
         }
+        
+        const totalCount = await User.countDocuments( 
+            {
+                $and: [
+                    {
+                        "_id": { 
+                            $ne: mongoose.Types
+                                         .ObjectId( userId ) 
+                        }
+                    },
+                    {
+                        "deactivation.isDeactive": false
+                    },
+                    {
+                        blockedUsers: {
+                            $nin: [
+                                userId
+                            ]
+                        }
+                    },
+                    {
+                        isCareGiver: true
+                    }
+                ]
+            }
+         );
 
         const users = await User.aggregate(
             [
+                {
+                    $addFields: {
+                        starsCount: { 
+                            $cond: [ 
+                                { $isArray: "$stars.star" }, 
+                                { $size: "$stars.star" }, 
+                                0 
+                            ] 
+                        },
+                        followersCount: { 
+                            $cond: [ 
+                                { $isArray: "$followers" }, 
+                                { $size: "$followers" }, 
+                                0 
+                            ] 
+                        },
+                        followingUsersOrPetsCount: { 
+                            $cond: [ 
+                                { $isArray: "$followingUsersOrPets" }, 
+                                { $size: "$followingUsersOrPets"  }, 
+                                0 
+                            ] 
+                        },
+                        caregiverCareerCount: { 
+                            $cond: [ 
+                                { $isArray: "$caregiverCareer" }, 
+                                { $size: "$caregiverCareer" }, 
+                                0 
+                            ] 
+                        },
+                        pastCaregiversCount: { 
+                            $cond: [ 
+                                { $isArray: "$pastCaregivers" }, 
+                                { $size: "$pastCaregivers" }, 
+                                0 
+                            ] 
+                        },
+                    }
+                },
+                // Kullanıcıları stars, followers, followingUsersOrPets, caregiverCareer ve pastCaregivers
+                // değerlerine göre tekrar sırala
+                {
+                    $sort: {
+                        starsCount: -1,
+                        followersCount: -1,
+                        followingUsersOrPetsCount: 1,
+                        caregiverCareerCount: -1,
+                        pastCaregiversCount: -1,
+                    },
+                },
                 {
                     // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
                     $addFields: {
@@ -63,21 +140,16 @@ const getCareGiversByLocationController = async ( req, res ) => {
                         distance: 1 
                     } 
                 },
-                // Kullanıcıları stars, followers, followingUsersOrPets, caregiverCareer ve pastCaregivers
-                // değerlerine göre tekrar sırala
-                {
-                    $sort: {
-                        "stars.star": -1,
-                        followers: -1,
-                        followingUsersOrPets: 1,
-                        caregiverCareer: -1,
-                        pastCaregivers: -1,
-                    },
-                },
                 // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
                 {
                     $match: {
                         $and: [
+                            {
+                                "_id": { 
+                                    $ne: mongoose.Types
+                                                 .ObjectId( userId ) 
+                                }
+                            },
                             {
                                 "deactivation.isDeactive": false
                             },
@@ -158,7 +230,7 @@ const getCareGiversByLocationController = async ( req, res ) => {
                                                 ( acc, curr ) =>
                                                             acc + curr, 0
                                               );
-            const starCount = item.stasr.length;
+            const starCount = item.stars.length;
             const starAvarage = totalStarValue / starCount;
 
             item.totalStar = starCount;
@@ -170,6 +242,7 @@ const getCareGiversByLocationController = async ( req, res ) => {
                     {
                         error: false,
                         message: "careGiver list prepared succesfully",
+                        totalDataCount: totalCount,
                         careGiverList: users
                     }
                   );
