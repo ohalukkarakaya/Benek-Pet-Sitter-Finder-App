@@ -150,6 +150,7 @@ router.put(
   blockUserController
 );
 
+
 //unblock a user
 router.put(
   "/unblock/:userId",

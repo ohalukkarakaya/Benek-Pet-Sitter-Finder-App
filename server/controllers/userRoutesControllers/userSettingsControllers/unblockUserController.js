@@ -4,7 +4,9 @@ const unblockUserController = async ( req, res ) => {
     try{
         
         const userId = req.user._id.toString();
-        const unblockingUserId = req.params.userId.tostring();
+        const unblockingUserId = req.params
+                                    .userId
+                                    .toString();
         if( !unblockingUserId ){
             return res.status( 400 ).json(
                 {
@@ -42,14 +44,15 @@ const unblockUserController = async ( req, res ) => {
             );
         }
 
-        user.blockedUsers = user.blockedUsers.filter(
-            blockedUser =>
-                blockedUser.toString() === unblockingUserId
-        );
-        user.markModified.apply( "blockedUsers" );
+        user.blockedUsers = user.blockedUsers
+                                .filter(
+                                    blockedUser =>
+                                        blockedUser.toString() !== unblockingUserId
+                                );
+        user.markModified( "blockedUsers" );
         user.save(
-            function (err) {
-                if(err) {
+            function ( err ){
+                if( err ){
                     console.error('ERROR: While Update!');
                 }
             }

@@ -1,4 +1,5 @@
 import User from "../../../models/User.js";
+import Pet from "../../../models/Pet.js";
 import Notification from "../../../models/Notification.js";
 import Chat from "../../../models/Chat/Chat.js";
 import InviteEvent from "../../../models/Event/Invitations/InviteEvent.js";
@@ -63,6 +64,129 @@ const blockUserController = async ( req, res ) => {
                           }
                       );
         }
+
+        for(
+            let blockingUsersPetsId
+            of blockingUser.pets
+        ){
+            let blockingUsersPet = await Pet.findById( blockingUsersPetsId.toString() );
+            if( usersPet ){
+                blockingUsersPet.followers = blockingUsersPet.followers
+                                             .filter(
+                                                petsFollower =>
+                                                    petsFollower !== userId
+                                             );
+
+                blockingUsersPet.allOwners = blockingUsersPet.allOwners
+                                                             .filter(
+                                                                blockingUsersPetsSecondaryOwner =>
+                                                                    blockingUsersPetsSecondaryOwner !== userId
+                                                             );
+
+                blockingUsersPet.markModified( "allOwners" );
+                blockingUsersPet.markModified( "followers" );
+                blockingUsersPet.save(
+                    function (err) {
+                        if(err) {
+                            console.error('ERROR: While Update!');
+                        }
+                    }
+                );
+            }
+
+            user.followingUsersOrPets = user.followingUsersOrPets
+                                            .filter(
+                                                usersFollowings =>
+                                                    usersFollowings.followingId !== blockingUsersPetsId
+                                            )
+        }
+
+        user.dependedUsers = user.dependedUsers
+                                 .filter(
+                                    usersDependedUsers =>
+                                        usersDependedUsers != blockingUserId
+                                 );
+
+        user.followers = user.followers
+                             .filter(
+                                follower =>
+                                    follower !== blockingUserId
+                             );
+        
+        user.followingUsersOrPets = user.followingUsersOrPets
+                                        .filter(
+                                            following =>
+                                                following.followingId != blockingUserId
+                                        );
+
+        user.markModified( "dependedUsers" );
+        user.markModified( "followers" );
+        user.markModified( "followingUsersOrPets" );
+
+        for(
+            let usersPetsId
+            of user.pets
+        ){
+            let usersPet = await Pet.findById( usersPetsId.toString() );
+            if( usersPet ){
+                usersPet.followers = usersPet.followers
+                                             .filter(
+                                                petsFollower =>
+                                                    petsFollower !== blockingUserId
+                                             );
+
+                usersPet.allOwners = usersPet.allOwners
+                                             .filter(
+                                                usersPetsSecondaryOwner =>
+                                                    usersPetsSecondaryOwner !== userId
+                                             );
+                                             
+                usersPet.markModified( "allOwners" );
+                usersPet.markModified( "followers" );
+                usersPet.save(
+                    function (err) {
+                        if(err) {
+                            console.error('ERROR: While Update!');
+                        }
+                    }
+                );
+            }
+
+            blockingUser.followingUsersOrPets = blockingUser.followingUsersOrPets
+                                                            .filter(
+                                                                blockingUsersFollowing =>
+                                                                    blockingUsersFollowing.followingId !== usersPetsId
+                                                            )
+        }
+
+        blockingUser.dependedUsers = blockingUser.dependedUsers
+                                                 .filter(
+                                                    blockingUsersDependedUsers =>
+                                                        blockingUsersDependedUsers != userId
+                                                 );
+
+        blockingUser.followingUsersOrPets = blockingUser.followingUsersOrPets
+                                                        .filter(
+                                                            blockingUsersFollowing =>
+                                                                blockingUsersFollowing.followingId !== userId
+                                                        )
+
+        blockingUser.followers = blockingUser.followers
+                                             .filter(
+                                                blockingUsersFollower =>
+                                                    blockingUsersFollower.toString() !== userId
+                                             );
+
+        blockingUser.markModified( "dependedUsers" );
+        blockingUser.markModified( "followingUsersOrPets" );
+        blockingUser.markModified( "followers" );
+        blockingUser.save(
+            function (err) {
+                if(err) {
+                    console.error('ERROR: While Update!');
+                }
+            }
+        );
 
         //delete notifications
         const sendedNotifications = await Notification.find(
