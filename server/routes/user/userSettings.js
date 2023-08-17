@@ -150,7 +150,7 @@ router.put(
   blockUserController
 );
 
-
+// - tested
 //unblock a user
 router.put(
   "/unblock/:userId",
@@ -158,6 +158,7 @@ router.put(
   unblockUserController
 );
 
+// To Do
 //deactivate user
 router.put(
   "/deactivate",
