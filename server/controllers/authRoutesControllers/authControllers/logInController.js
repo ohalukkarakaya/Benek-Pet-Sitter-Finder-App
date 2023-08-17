@@ -183,7 +183,8 @@ const logInController = async ( req, res, next ) => {
                           .json(
                               {
                                   error: true,
-                                  message: "ERROR: while saving one time password"
+                                  message: "ERROR: while saving one time password",
+                                  errorData: err
                               }
                           );
             }

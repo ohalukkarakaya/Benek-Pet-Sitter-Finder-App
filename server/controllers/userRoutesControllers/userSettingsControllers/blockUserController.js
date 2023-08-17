@@ -8,7 +8,9 @@ import PetHandOverInvitation from "../../../models/ownerOperations/PetHandOverIn
 const blockUserController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const blockingUserId = req.params.userId.tostring();
+        const blockingUserId = req.params
+                                  .userId
+                                  .toString();
         if( !blockingUserId ){
             return res.status( 400 )
                       .json(
@@ -66,12 +68,14 @@ const blockUserController = async ( req, res ) => {
         const sendedNotifications = await Notification.find(
                                                             {
                                                                 from: userId,
-                                                                to: { $in: { blockingUserId } }
+                                                                to: { $in: [ blockingUserId ] }
                                                             }
                                                        );
 
-        sendedNotifications.forEach(
-            ( notification ) => {
+        for(
+            let notification
+            of sendedNotifications
+        ){ 
                 if( 
                     notification.to
                                 .length >= 1
@@ -116,17 +120,17 @@ const blockUserController = async ( req, res ) => {
                     );
                 }
             }
-        );
 
         const receivedNotifications = await Notification.find(
                                                             {
                                                                 from: blockingUserId,
-                                                                to: { $in: { userId } }
+                                                                to: { $in: [ userId ] }
                                                             }
-                                                       );
-
-        receivedNotifications.forEach(
-            ( notification ) => {
+                                                         );
+        for(
+            let notification
+            of receivedNotifications
+        ){
                 if( 
                     notification.to
                                 .length >= 1
@@ -171,28 +175,28 @@ const blockUserController = async ( req, res ) => {
                     );
                 }
             }
-        );
 
         // get out of chat groups
         const releatedChats = await Chat.find(
                                             {
                                                 $and: [
-                                                    { "members.userId": { $in: { userId } } },
-                                                    { "members.userId": { $in: { blockingUser } } },
+                                                    { "members.userId": { $in: [ userId ] } },
+                                                    { "members.userId": { $in: [ blockingUserId ] } },
                                                 ]
                                             }
                                         );
 
-        releatedChats.forEach(
-            ( chat ) => {
+        for(
+            let chat
+            of releatedChats
+        ){
                 chat.members = chat.members
                                    .filter(
                                         chatMember =>
                                             chatMember.userId
                                                       .toString() !== userId
                                     );
-            }
-        );
+        }
 
         //delete event invitations
         await InviteEvent.deleteMany(
@@ -255,7 +259,7 @@ const blockUserController = async ( req, res ) => {
         );
 
         user.blockedUsers.push( blockingUserId );
-        user.markModified.apply( "blockedUsers" );
+        user.markModified( "blockedUsers" );
         user.save(
             function (err) {
                 if(err) {

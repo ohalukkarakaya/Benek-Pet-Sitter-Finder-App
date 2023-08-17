@@ -111,15 +111,15 @@ const UserSchema = new mongoose.Schema(
                 required: true
             },
             city: {
-                type: Number,
+                type: String,
                 required: true
             },
             lat: {
-                type: String,
+                type: Number,
                 required: true
             },
             lng: {
-                type: String,
+                type: Number,
                 required: true
             },
         },

@@ -142,17 +142,17 @@ router.put(
   becomeCareGiverController
 );
 
-// TO DO
+// - tested
 //block a user
 router.put(
-  "block/:userId",
+  "/block/:userId",
   auth,
   blockUserController
 );
 
 //unblock a user
 router.put(
-  "unblock/:userId",
+  "/unblock/:userId",
   auth,
   unblockUserController
 );
