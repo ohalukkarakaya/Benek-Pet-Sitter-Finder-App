@@ -5,6 +5,7 @@ import Notification from "../../../models/Notification.js";
 import InviteEvent from "../../../models/Event/Invitations/InviteEvent.js";
 import SecondaryOwnerInvitation from "../../../models/ownerOperations/SecondaryOwnerInvitation.js";
 import PetHandOverInvitation from "../../../models/ownerOperations/PetHandOverInvitation.js";
+import Chat from "../../../models/Chat/Chat.js";
 
 import dotenv from "dotenv";
 
@@ -15,13 +16,18 @@ const deactivateUserController = async (req, res) => {
         const userId = req.user._id.toString();
   
         const user = await User.findById(userId);
-        if(!user || user.deactivation.isDeactive){
-          return res.status(404).json(
-            {
-              error: true,
-              message: "user not found"
-            }
-          );
+        if(
+          !user 
+          || user.deactivation
+                 .isDeactive
+        ){
+          return res.status( 404 )
+                    .json(
+                      {
+                        error: true,
+                        message: "user not found"
+                      }
+                    );
         }
   
         const areThereAnyLinkedCareGive = await CareGive.findOne(
@@ -38,12 +44,13 @@ const deactivateUserController = async (req, res) => {
         );
   
         if( areThereAnyLinkedCareGive ){
-          return res.status(400).json(
-            {
-              error: true,
-              messaage: "You have a care give linked to you"
-            }
-          );
+          return res.status( 400 )
+                    .json(
+                      {
+                        error: true,
+                        messaage: "You have a care give linked to you"
+                      }
+                    );
         }
 
         //delete notifications
@@ -55,12 +62,14 @@ const deactivateUserController = async (req, res) => {
 
         const receivedNotifications = await Notification.find(
                                                             {
-                                                                to: { $in: { userId } }
+                                                                to: { $in: [ userId ] }
                                                             }
                                                        );
 
-        receivedNotifications.forEach(
-            ( notification ) => {
+        for(
+          let notification
+          of receivedNotifications
+        ){
                 if( 
                     notification.to
                                 .length >= 1
@@ -105,29 +114,29 @@ const deactivateUserController = async (req, res) => {
                     );
                 }
             }
-        );
 
         // get out of chat groups
         const releatedChats = await Chat.find(
                                             {
                                               "members.userId": { 
-                                                                  $in: { 
+                                                                  $in: [ 
                                                                         userId 
-                                                                       } 
+                                                                       ] 
                                                                 } 
                                             }
                                         );
 
-        releatedChats.forEach(
-            ( chat ) => {
+        for(
+          let chat
+          of releatedChats
+        ){
                 chat.members = chat.members
                                    .filter(
                                         chatMember =>
                                             chatMember.userId
                                                       .toString() !== userId
                                     );
-            }
-        );
+        }
 
         //delete invitations
         //delete event invitations
@@ -136,13 +145,11 @@ const deactivateUserController = async (req, res) => {
               $or: [
                   {
                       $and: [
-                          { eventAdmin: userId },
-                          { invitedId: blockingUserId }
+                          { eventAdmin: userId }
                       ]
                   },
                   {
                       $and: [
-                          { eventAdmin: blockingUserId },
                           { invitedId: userId }
                       ]
                   }
@@ -156,13 +163,11 @@ const deactivateUserController = async (req, res) => {
               $or: [
                   {
                       $and: [
-                          { from: userId },
-                          { to: blockingUserId }
+                          { from: userId }
                       ]
                   },
                   {
                       $and: [
-                          { from: blockingUserId },
                           { to: userId }
                       ]
                   }
@@ -176,13 +181,11 @@ const deactivateUserController = async (req, res) => {
               $or: [
                   {
                       $and: [
-                          { from: userId },
-                          { to: blockingUserId }
+                          { from: userId }
                       ]
                   },
                   {
                       $and: [
-                          { from: blockingUserId },
                           { to: userId }
                       ]
                   }
@@ -190,23 +193,23 @@ const deactivateUserController = async (req, res) => {
             }
         );
   
-        const userToken = await UserToken.findOne(
+        const userToken = await UserToken.deleteMany(
           {
-              token: req.body.refreshToken,
+              userId: userId
           }
         );
   
-        if(userToken){
-          await userToken.remove();
-        }
-  
-        if(user.deactive.isDeactive){
-          return res.status(400).json(
-            {
-              error: true,
-              message: "user is already deactive"
-            }
-          );
+        if(
+          user.deactivation
+              .isDeactive
+        ){
+          return res.status( 400 )
+                    .json(
+                      {
+                        error: true,
+                        message: "user is already deactive"
+                      }
+                    );
         }
   
         user.deactivation.isDeactive = true;
@@ -215,34 +218,37 @@ const deactivateUserController = async (req, res) => {
         user.markModified("deactivation");
         user.save().then(
           (_) => {
-            return res.status(200).json(
-              {
-                error: false,
-                message: "User deactivated"
-              }
-            );
+            return res.status( 200 )
+                      .json(
+                        {
+                          error: false,
+                          message: "User deactivated"
+                        }
+                      );
           }
         ).catch(
-          (err) => {
-            if(err){
-              console.log(err);
-              return res.status(500).json(
-                {
-                  error: true,
-                  message: "Internal server error"
-                }
-              );
+          ( err ) => {
+            if( err ){
+              console.log( err );
+              return res.status( 500 )
+                        .json(
+                          {
+                            error: true,
+                            message: "Internal server error"
+                          }
+                        );
             }
           }
         );
       }catch(err){
         console.log("Error: deactivate user", err);
-        return res.status(500).json(
-          {
-            error: true,
-            message: "Internal server error"
-          }
-        );
+        return res.status( 500 )
+                  .json(
+                    {
+                      error: true,
+                      message: "Internal server error"
+                    }
+                  );
       }
 }
 

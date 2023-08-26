@@ -158,7 +158,7 @@ router.put(
   unblockUserController
 );
 
-// To Do
+// - tested
 //deactivate user
 router.put(
   "/deactivate",
