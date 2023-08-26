@@ -166,6 +166,7 @@ router.put(
   deactivateUserController
 );
 
+// - tested
 //delete user
 router.delete(
   "/deleteUser",

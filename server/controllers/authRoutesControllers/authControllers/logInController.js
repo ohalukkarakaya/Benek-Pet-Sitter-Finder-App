@@ -160,7 +160,8 @@ const logInController = async ( req, res, next ) => {
         user.deactivation
             .deactivationDate = null;
 
-        user.isAboutToDelete = false;
+        user.deactivation
+            .isAboutToDelete = false;
 
         user.deactivation
             .markModified( "deactivation" );
