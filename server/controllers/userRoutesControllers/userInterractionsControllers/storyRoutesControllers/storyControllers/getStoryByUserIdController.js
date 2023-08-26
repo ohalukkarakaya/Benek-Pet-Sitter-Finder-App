@@ -108,7 +108,7 @@ const getStoryByUserIdController = async ( req, res ) => {
                     if( tagedEvent ){
                         const tagedEventInfo = getLightWeightEventInfoHelper( tagedEvent );
                         storyObject.about
-                                   .taged = tagedEvent;
+                                   .taged = tagedEventInfo;
 
                         delete storyObject.about
                                           .id;

@@ -78,10 +78,22 @@ const getLightWeightEventInfoHelper = async ( event ) => {
             delete lastAfterEventObject.userId;
         }
 
+        const remainedEventQuota = event.maxGuest - [...willJoinList, ...joinedList].length;
+        const ticketPrice = event.ticketPrice.priceType === "Free"
+                                ? event.ticketPrice.priceType
+                                : `${event.ticketPrice.price} ${event.ticketPrice.priceType}`;
+
         return {
             eventId: event._id.toString(),
+            eventImg: event.imgUrl,
+            isPrivate: event.isPrivate,
             eventAdmin: eventAdminInfo,
             organizers: organizersList,
+            ticketPrice: ticketPrice,
+            maxGuestLimit: event.maxGuest,
+            remainedGuestQuota: remainedEventQuota,
+            eventDate: event.date,
+            eventAdress: event.adress,
             willJoin: willJoinList,
             joined: joinedList,
             lastAfterEvent: lastAfterEventObject

@@ -1,7 +1,10 @@
 import User from "../../../../../models/User.js";
 import Story from "../../../../../models/Story.js";
 import Event from "../../../../../models/Event/Event.js";
+
 import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
+import getLightWeightPetInfoHelper from "../../../../../utils/getLightWeightPetInfoHelper.js";
+import getLightWeightEventInfoHelper from "../../../../../utils/getLightWeightEventInfoHelper.js";
 
 const getRecomendedStoryListController = async ( req, res ) => {
     try{
@@ -11,15 +14,17 @@ const getRecomendedStoryListController = async ( req, res ) => {
         const limit = parseInt( req.params.limit ) || 15;
 
         const user = await User.findById( userId );
-        const followingUsers = user.followingUsersOrPets.filter(
-            followingObject =>
-                followingObject.type === "user"
-        );
+        const followingUsers = user.followingUsersOrPets
+                                   .filter(
+                                        followingObject =>
+                                            followingObject.type === "user"
+                                    );
 
-        const followingPets = user.followingUsersOrPets.filter(
-            followingObject =>
-                followingObject.type === "pet"
-        );
+        const followingPets = user.followingUsersOrPets
+                                  .filter(
+                                        followingObject =>
+                                            followingObject.type === "pet"
+                                  );
 
         const relatedEvents = await Event.find(
             {
@@ -33,9 +38,23 @@ const getRecomendedStoryListController = async ( req, res ) => {
         );
 
         const combinedIds = [
-            ...followingUsers.map( obj => obj._id.toString() ),
-            ...followingPets.map( obj => obj._id.toString() ),
-            ...relatedEvents.map( obj => obj._id.toString() )
+            ...followingUsers.map( 
+                                obj => 
+                                    obj._id
+                                       .toString() 
+                              ),
+
+            ...followingPets.map( 
+                                obj => 
+                                    obj._id
+                                       .toString() 
+                            ),
+
+            ...relatedEvents.map( 
+                                obj => 
+                                    obj._id
+                                       .toString() 
+                             )
         ];
 
         const stories = await Story.find(
@@ -53,56 +72,130 @@ const getRecomendedStoryListController = async ( req, res ) => {
                 ]
             }
         ).skip( skip )
-         .limit( limit );
+         .limit( limit )
+         .lean();
 
         if( 
             !stories
             || stories.length <= 0
         ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "No Story Found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "No Story Found"
+                            }
+                      );
         }
 
-        stories.forEach(
-            async ( story ) => {
-                const sharedUser = await User.findById( story.userId.toString() );
-                const userInfo = getLightWeightUserInfoHelper( sharedUser );
+        for(
+            let storyObject
+            of stories
+        ){
+            const sharedUser = await User.findById( 
+                                                storyObject.userId
+                                                           .toString() 
+                                          );
 
-                story.user = userInfo;
-                delete story.userId;
+            const userInfo = getLightWeightUserInfoHelper( sharedUser );
+            storyObject.user = userInfo;
+            delete storyObject.userId;
 
-                story.likeCount = story.$assertPopulatedlikes.length;
-                delete story.likes;
+            switch(
+                storyObject.about
+                           .aboutType
+            ){
+                case "pet":
+                    const tagedPet = await Pet.findById(
+                                                    storyObject.about
+                                                               .id
+                                                               .toString()
+                                            );
 
-                const lastComment = story.comments.pop();
+                    if( tagedPet ){
+                        const petInfo = getLightWeightPetInfoHelper( tagedPet );
+                        storyObject.about
+                                   .taged = petInfo;
+
+                        delete storyObject.about
+                                          .id;
+                    }
+                break;
+
+                case "user":
+                    const tagedUser = await User.findById(
+                                                    storyObject.about
+                                                               .id
+                                                               .toString()
+                                                 );
+
+                    if( tagedUser ){
+                        const tagedUserInfo = getLightWeightUserInfoHelper( tagedUser );
+                        storyObject.about
+                                   .taged = tagedUserInfo;
+
+                        delete storyObject.about
+                                          .id;
+                    }
+                break;
+
+                case "event":
+                    const tagedEvent = await Event.findById(
+                                                      storyObject.about
+                                                                 .id
+                                                                 .toString()
+                                                  );
+
+                    if( tagedEvent ){
+                        const tagedEventInfo = getLightWeightEventInfoHelper( tagedEvent );
+                        storyObject.about
+                                   .taged = tagedEventInfo;
+
+                        delete storyObject.about
+                                          .id;
+                    }
+            }
+
+            storyObject.likeCount = storyObject.likes
+                                               .length;
+            delete storyObject.likes;
+
+            const lastComment = storyObject.comments
+                                           .pop();
+
+            if( lastComment ){
+                delete lastComment.replies;
                 delete lastComment.replies;
 
-                story.lastComment = lastComment;
-                story.commentCount = story.comments.length;
-                delete story.comments;
+                storyObject.lastComment = lastComment;
             }
-        );
+            
+            storyObject.commentCount = storyObject.comments
+                                                  .length;
+            delete storyObject.comments;
+            delete storyObject.__v;
+            delete storyObject.updatedAt;
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "Story List Prepared Succesfully",
-                stories: stories
-            }
-        );
+        }
+
+        return res.status( 200 )
+                  .json(
+                        {
+                            error: false,
+                            message: "Story List Prepared Succesfully",
+                            stories: stories
+                        }
+                  );
 
     }catch( err ){
-        console.log("ERROR: getStoryByUserIdController - ", err);
-        return res.status(500).json(
-            {
-                error: true,
-                message: "Internal server error"
-            }
-        );
+        console.log( "ERROR: getStoryByUserIdController - ", err );
+        return res.status( 500 )
+                  .json(
+                        {
+                            error: true,
+                            message: "Internal server error"
+                        }
+                  );
     }
 }
 
