@@ -5,11 +5,33 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// - tested
 const expireStories = cron.schedule(
     '0 0 */1 * * *',
+    // "* * * * *", // her dakika başı
     async () => {
         try{
-            const expiredStories = await Story.find().where('expiresAt').lte(Date.now());
+            const now = new Date();
+
+            const currentYear = now.getUTCFullYear();
+            const currentMonth = now.getUTCMonth();
+            const currentDate = now.getUTCDate();
+            const currentHour = now.getUTCHours();
+
+            const currentDateTime = new Date(
+                                            currentYear, 
+                                            currentMonth, 
+                                            currentDate, 
+                                            currentHour, 
+                                            0, 
+                                            0, 
+                                            0
+                                        );
+
+            const expiredStories = await Story.find()
+                                              .where('expiresAt')
+                                              .lte( currentDateTime );
+
             expiredStories.map(
                 (story) => {
                     const contentUrl = story.contentUrl;

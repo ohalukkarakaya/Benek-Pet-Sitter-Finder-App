@@ -1,5 +1,27 @@
 import mongoose from "mongoose";
 
+const now = new Date();
+
+const currentYear = now.getUTCFullYear();
+const currentMonth = now.getUTCMonth();
+const currentDate = now.getUTCDate();
+const currentHour = now.getUTCHours();
+
+const currentDateTime = new Date(
+                                currentYear, 
+                                currentMonth, 
+                                currentDate, 
+                                currentHour, 
+                                0, 
+                                0, 
+                                0
+                            );
+
+const nextDayDateTime = new Date(
+                                currentDateTime.getTime() 
+                                + 24 * 60 * 60 * 1000
+                            );
+
 const schema = mongoose.Schema;
 
 const StorySchema = new schema(
@@ -32,11 +54,11 @@ const StorySchema = new schema(
         },
         createdAt: {
             type: Date,
-            default: Date.now(),
+            default: currentDateTime,
         },
         expiresAt: {
             type: Date,
-            default: Date.now() + 86400000
+            default: nextDayDateTime,
         },
         likes: [ String ],
         comments: [

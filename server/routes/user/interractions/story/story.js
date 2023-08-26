@@ -15,6 +15,7 @@ dotenv.config();
 
 const router = express.Router();
 
+// - tested
 //create story
 router.post(
     "/",
@@ -23,6 +24,7 @@ router.post(
     createStoryController
 );
 
+// - tested
 //delete story
 router.delete(
     "/",
@@ -44,6 +46,7 @@ router.get(
     getStoryByUserIdController
 );
 
+//get recomended stories
 router.get(
     "/getRecomendedStoryList/:skip/:limit",
     auth,

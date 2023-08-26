@@ -55,9 +55,12 @@ import saveLogHelper from './utils/log/saveLogHelper.js';
 const app = express();
 dotenv.config();
 
+// - tested
 expireStories;
 expireEvents;
 expireCareGive;
+
+// - tested
 expireUser;
 
 const connect = () => {
