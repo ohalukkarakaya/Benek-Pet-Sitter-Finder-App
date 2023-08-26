@@ -1,17 +1,28 @@
 import User from "../../../../../models/User.js";
 import Story from "../../../../../models/Story.js";
+import Pet from "../../../../../models/Pet.js";
 import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
+import getLightWeightPetInfoHelper from "../../../../../utils/getLightWeightPetInfoHelper.js";
+import Event from "../../../../../models/Event/Event.js";
+import getLightWeightEventInfoHelper from "../../../../../utils/getLightWeightEventInfoHelper.js";
 
 const getStoryByUserIdController = async ( req, res ) => {
     try{
-        const userId = req.params.userId.toString() || req.user._id.toString();
+        const userId = req.params.userId.toString() != undefined
+                       && req.params.userId.toString() != null
+                       
+                            ? req.params.userId.toString()
+                            : req.user._id.toString();
+
 
         const user = await User.findById( userId );
         if(
             userId !== req.user._id.toString()
             && (
                 user.deactivation.isDeactive
-                || user.blockedUsers.includes( req.user._id.toString() )
+                || user.blockedUsers.includes( 
+                                        req.user._id.toString() 
+                                    )
             )
         ){
             return res.status( 404 ).json(
@@ -26,7 +37,8 @@ const getStoryByUserIdController = async ( req, res ) => {
             {
                 userId: userId
             }
-        );
+        ).lean();;
+        
         if( 
             !story
             || story.length <= 0
@@ -41,22 +53,89 @@ const getStoryByUserIdController = async ( req, res ) => {
 
         const userInfo = getLightWeightUserInfoHelper( user );
 
-        story.forEach(
-            ( storyObject ) => {
-                storyObject.user = userInfo;
-                delete storyObject.userId;
+        for(
+            let storyObject
+            of story
+        ){
+            storyObject.user = userInfo;
+            delete storyObject.userId;
 
-                storyObject.likeCount = storyObject.likes.length;
-                delete storyObject.likes;
+            switch(
+                storyObject.about
+                           .aboutType
+            ){
+                case "pet":
+                    const tagedPet = await Pet.findById(
+                                                    storyObject.about
+                                                               .id
+                                                               .toString()
+                                            );
 
-                const lastComment = storyObject.comments.pop();
+                    if( tagedPet ){
+                        const petInfo = getLightWeightPetInfoHelper( tagedPet );
+                        storyObject.about
+                                   .taged = petInfo;
+
+                        delete storyObject.about
+                                          .id;
+                    }
+                break;
+
+                case "user":
+                    const tagedUser = await User.findById(
+                                                    storyObject.about
+                                                               .id
+                                                               .toString()
+                                                 );
+
+                    if( tagedUser ){
+                        const tagedUserInfo = getLightWeightUserInfoHelper( tagedUser );
+                        storyObject.about
+                                   .taged = tagedUserInfo;
+
+                        delete storyObject.about
+                                          .id;
+                    }
+                break;
+
+                case "event":
+                    const tagedEvent = await Event.findById(
+                                                      storyObject.about
+                                                                 .id
+                                                                 .toString()
+                                                  );
+
+                    if( tagedEvent ){
+                        const tagedEventInfo = getLightWeightEventInfoHelper( tagedEvent );
+                        storyObject.about
+                                   .taged = tagedEvent;
+
+                        delete storyObject.about
+                                          .id;
+                    }
+            }
+
+            storyObject.likeCount = storyObject.likes
+                                               .length;
+            delete storyObject.likes;
+
+            const lastComment = storyObject.comments
+                                           .pop();
+
+            if( lastComment ){
+                delete lastComment.replies;
                 delete lastComment.replies;
 
                 storyObject.lastComment = lastComment;
-                storyObject.commentCount = storyObject.comments.length;
-                delete storyObject.comments;
             }
-        );
+            
+            storyObject.commentCount = storyObject.comments
+                                                  .length;
+            delete storyObject.comments;
+            delete storyObject.__v;
+            delete storyObject.updatedAt;
+
+        }
 
         return res.status( 200 ).json(
             {

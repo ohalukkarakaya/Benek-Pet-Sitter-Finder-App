@@ -7,49 +7,63 @@ const likeStoryController = async (req, res) => {
     try{
         const storyId = req.params.storyId;
         if(!storyId){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "storyId is required"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "storyId is required"
+                            }
+                      );
         }
 
-        const story = Story.findById(storyId);
-        if(!story){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "Story couldn't found"
-                }
-            );
+        const story = await Story.findById( storyId );
+        if( !story ){
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Story couldn't found"
+                            }
+                      );
         }
 
-        const likes = story.likes;
-
+        let likes = story.likes;
         const isAlreadyLiked = likes.find(
-            userId => userId === req.user._id.toString()
-        );
+                                       userId => 
+                                          userId === req.user
+                                                        ._id
+                                                        .toString()
+                                     );
 
-        if(isAlreadyLiked){
+        
+
+        if( isAlreadyLiked ){
             story.likes = likes.filter(
                 userId => userId !== req.user._id.toString()
             );
         }else{
-            story.likes.push(req.user._id.toString());
+            // story.likes = [...new Set( likes )];
+
+            story.likes
+                 .push(
+                    req.user
+                       ._id
+                       .toString()
+                 );
         }
 
-        story.markModified("likes");
+        story.markModified( 'likes' );
         story.save(
-            (err) => {
-                if(err){
-                  console.log("error", err);
-                  return res.status(500).json(
-                    {
-                      error: true,
-                      message: "An error occured while saving to database"
-                    }
-                  );
+            ( err ) => {
+                if( err ){
+                  console.log( "error", err );
+                  return res.status( 500 )
+                            .json(
+                                {
+                                error: true,
+                                message: "An error occured while saving to database"
+                                }
+                            );
                 }
               }
         );
@@ -60,7 +74,7 @@ const likeStoryController = async (req, res) => {
                 message: "Story liked or like removed succesfully"
             }
         );
-    }catch(err){
+    }catch( err ){
         console.log("ERROR: like story - ", err);
         return res.status(500).json(
             {

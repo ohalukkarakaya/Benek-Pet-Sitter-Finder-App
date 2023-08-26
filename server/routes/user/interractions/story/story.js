@@ -32,6 +32,7 @@ router.delete(
     deleteStoryController
 );
 
+// - tested
 //like story
 router.put(
     "/:storyId",
@@ -39,9 +40,10 @@ router.put(
     likeStoryController
 );
 
+// - tested
 //get story by user Id
 router.get(
-    "/:getStoryByUserId/:userId",
+    "/getStoryByUserId/:userId",
     auth,
     getStoryByUserIdController
 );
