@@ -22,8 +22,10 @@ import s3 from "../utils/s3Service.js";
 
 dotenv.config();
 
+// - tested
 const expireUser = cron.schedule(
-    '0 0 * * *',
+    '0 0 * * *', // hergün gece 12:00
+    // "* * * * *", // her dakika başı
     async () => {
         try{
             const users = await User.find(
@@ -381,46 +383,63 @@ const expireUser = cron.schedule(
                         }
 
                         //delete bought event tickets
-                        const ticket = await EventTicket.find(
-                            {
-                                userId: user._id.toString()
-                            }
-                        );
+                        const tickets = await EventTicket.find(
+                                                            {
+                                                                userId: user._id
+                                                                            .toString()
+                                                            }
+                                                         );
                         
-                        if(ticket){
-                            if(ticket.paidPrice.priceType !== "Free" && ticket.paidPrice.price > 0){
-                                //cancel payment
-                                const cancelPayment = await paramCancelOrderRequest(
-                                    ticket.orderInfo.pySiparisGuid,
-                                    "IPTAL",
-                                    ticket.orderId,
-                                    ticket.paidPrice
-                                );
-
+                        if( tickets.length > 0 ){
+                            for(
+                                let ticket
+                                of tickets
+                            ){
                                 if(
-                                    !cancelPayment 
-                                    || cancelPayment.error === true 
-                                    || !( cancelPayment.data )
+                                    ticket.paidPrice
+                                          .priceType !== "Free"
+    
+                                    && ticket.paidPrice
+                                             .price > 0
                                 ){
-                                    console.log( cancelPayment.data.sonucStr );
-                                } 
+                                    //cancel payment
+                                    const cancelPayment = await paramCancelOrderRequest(
+                                        ticket.orderInfo.pySiparisGuid,
+                                        "IPTAL",
+                                        ticket.orderId,
+                                        ticket.paidPrice
+                                    );
+    
+                                    if(
+                                        !cancelPayment 
+                                        || cancelPayment.error === true 
+                                        || !( cancelPayment.data )
+                                    ){
+                                        console.log( 
+                                                    cancelPayment.data
+                                                                 .sonucStr 
+                                                );
+                                    } 
+                                }
+
+                                ticket.deleteOne()
+                                      .then(
+                                        (_) => {
+                                            console.log( "an event ticket deleted because of user" )
+                                        }
+                                      ).catch(
+                                        ( error ) => {
+                                            console.log( error );
+                                        }
+                                      );
                             }
-                            ticket.deleteOne().then(
-                                (_) => {
-                                    console.log("an event ticket deleted because of user")
-                                }
-                            ).catch(
-                                (error) => {
-                                    console.log(error);
-                                }
-                            );
                         }
 
                         const eventInvitation = await EventInvitation.find(
                             {
                                 $or: [
-                                    {invitedId: user._id.toString()},
-                                    {eventAdminId: user._id.toString()}
+                                    { invitedId: user._id.toString() },
+                                    { eventAdminId: user._id.toString() }
                                 ]
                             }
                         );
