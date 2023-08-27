@@ -13,7 +13,8 @@ const getLightWeightUserInfoHelper = ( user ) => {
             } ${ 
                user.identity
                    .lastName 
-            }`.replaceAll( "  ", " ")
+            }`.replaceAll( 'undefined', '' )
+              .replaceAll( "  ", " ")
         };
     }catch( err ){
         console.log( "ERROR: user lightweight info - ", err );

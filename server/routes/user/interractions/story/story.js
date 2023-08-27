@@ -48,7 +48,7 @@ router.get(
     getStoryByUserIdController
 );
 
-// - To Do
+// - tested
 //get recomended stories
 router.get(
     "/getRecomendedStoryList/:skip/:limit",
@@ -56,6 +56,6 @@ router.get(
     getRecomendedStoryListController
 );
 
-router.use("comments", storyCommentEndpoints);
+router.use("/comments", storyCommentEndpoints);
 
 export default router;

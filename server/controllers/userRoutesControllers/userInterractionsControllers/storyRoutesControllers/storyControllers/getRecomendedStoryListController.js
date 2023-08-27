@@ -1,6 +1,7 @@
 import User from "../../../../../models/User.js";
 import Story from "../../../../../models/Story.js";
 import Event from "../../../../../models/Event/Event.js";
+import Pet from "../../../../../models/Pet.js";
 
 import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 import getLightWeightPetInfoHelper from "../../../../../utils/getLightWeightPetInfoHelper.js";
@@ -40,20 +41,17 @@ const getRecomendedStoryListController = async ( req, res ) => {
         const combinedIds = [
             ...followingUsers.map( 
                                 obj => 
-                                    obj._id
-                                       .toString() 
+                                    obj.followingId.toString() 
                               ),
 
             ...followingPets.map( 
                                 obj => 
-                                    obj._id
-                                       .toString() 
+                                    obj.followingId.toString() 
                             ),
 
             ...relatedEvents.map( 
                                 obj => 
-                                    obj._id
-                                       .toString() 
+                                    obj.followingId.toString() 
                              )
         ];
 

@@ -61,7 +61,7 @@ const storyEditCommentOrReplyController = async (req, res) => {
         const isReply = req.body.replyId;
         if(isReply){
             const reply = comment.replies.find(
-                replyObject => replyObject._id === req.body.replyId
+                replyObject => replyObject._id.toString() === req.body.replyId
             );
             if(!reply){
                 return res.status(404).json(

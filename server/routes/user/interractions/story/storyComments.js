@@ -11,6 +11,7 @@ import getStoryCommentRepliesController from "../../../../controllers/userRoutes
 
 const router = express.Router();
 
+// - tested
 //story leave comment or reply comment
 router.post(
     "/:storyId",
@@ -18,6 +19,7 @@ router.post(
     storyCreateCommentOrReplyCommentController
 );
 
+// - tested
 //story edit comment or reply
 router.put(
     "/:storyId",
@@ -25,6 +27,7 @@ router.put(
     storyEditCommentOrReplyController
 );
 
+// - tested
 //story delete comment or reply
 router.delete(
     "/:storyId",

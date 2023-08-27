@@ -31,7 +31,7 @@ const userFollowController = async (req, res) => {
         }
         const userFollowings = user.followingUsersOrPets;
 
-        const followingUser = await User.findById( followingUserId );
+        const followingUser = await User.findById( followingUserId.toString() );
         if(
             !followingUser 
             || followingUser.deactivation.isDeactive

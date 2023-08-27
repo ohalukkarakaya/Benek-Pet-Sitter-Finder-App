@@ -50,13 +50,20 @@ const storyDeleteCommentOrReplyController = async (req, res) => {
 
         const isReply = req.body.replyId;
         if(isReply){
-            comment.replies.filter(
-                replyObject => replyObject._id !== req.body.replyId
-            );
+            comment.replies = comment.replies
+                                     .filter(
+                                            replyObject => 
+                                                replyObject._id
+                                                           .toString() !== req.body
+                                                                              .replyId
+                                      );
         }else{
-            story.comments.filter(
-                commentObject => commentObject._id !== commentId
-            );
+            story.comments = story.comments
+                                  .filter(
+                                        commentObject => 
+                                            commentObject._id
+                                                         .toString() !== commentId
+                                   );
         }
 
         story.markModified("comments");
@@ -77,7 +84,7 @@ const storyDeleteCommentOrReplyController = async (req, res) => {
         return res.status(200).json(
             {
                 error: false,
-                message: "comment or reply inserted succesfully"
+                message: "comment or reply deleted succesfully"
             }
         );
     }catch(err){
