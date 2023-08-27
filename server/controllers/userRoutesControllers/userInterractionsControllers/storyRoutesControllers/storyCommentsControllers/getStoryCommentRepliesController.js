@@ -7,8 +7,8 @@ const getStoryCommentRepliesController = async ( req, res ) => {
         const userId = req.user._id.toString();
         const storyId = req.params.storyId.toString();
         const commentId = req.params.commentId.toString();
-        const skip = parseInt( req.params.skip ) || 0;
-        const limit = parseInt( req.params.limit ) || 15;
+        let skip = parseInt( req.params.skip ) || 0;
+        let limit = parseInt( req.params.limit ) || 15;
 
         if( 
             !storyId
@@ -22,7 +22,8 @@ const getStoryCommentRepliesController = async ( req, res ) => {
             );
         }
 
-        const story = await Story.findById( storyId );
+        const story = await Story.findById( storyId )
+                                 .lean();
         if( !story ){
             return res.status( 404 ).json(
                 {
@@ -32,7 +33,10 @@ const getStoryCommentRepliesController = async ( req, res ) => {
             );
         }
 
-        const storyOwner = await User.findById( story.userId.toString() );
+        const storyOwner = await User.findById( 
+                                            story.userId
+                                                 .toString() 
+                                      );
         if(
             !storyOwner
             || storyOwner.blockedUsers.includes( req.user._id.toString() )
@@ -61,7 +65,7 @@ const getStoryCommentRepliesController = async ( req, res ) => {
             );
         }
 
-        let replies;
+        let replies = [];
         if( skip === 0 ){
             const usersReplies = comment.replies.filter(
                 replyObject =>
@@ -69,7 +73,9 @@ const getStoryCommentRepliesController = async ( req, res ) => {
             );
 
             limit = limit - usersReplies.length;
-            replies = usersReplies;
+            if( usersReplies.length > 0 ){
+                replies = usersReplies;
+            }
         }
 
         if( limit >= 0 ){
@@ -84,51 +90,75 @@ const getStoryCommentRepliesController = async ( req, res ) => {
 
             const limitedReplies = replyList.slice( startIndex, endIndex );
 
-            replies.push( limitedReplies );
+            if( limitedReplies.length > 0 ){
+                replies.push( limitedReplies );
+            }
+            
         }
 
         if( replies.length > 0 ){
-            replies.forEach(
-                async ( replyObject) => {
-                    const repliedUser = await User.findById( replyObject.userId.toString() );
-                    const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
-                    replyObject.user = repliedUserInfo;
-                    delete replyObject.userId;
+            for(
+                let replyObject
+                of replies
+            ){
+                const repliedUser = await User.findById( 
+                                                    replyObject.userId
+                                                               .toString() 
+                                               );
+                const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
+                replyObject.user = repliedUserInfo;
+                delete replyObject.userId;
 
-                    let firstFiveOfLikeLimit = 5;
+                let firstFiveOfLikeLimit = 5;
 
-                    if( replyObject.likes.length < 5 ){
-                        firstFiveOfLikeLimit = replyObject.likes.length;
-                    }
-
-                    for( let i = 0; i <= firstFiveOfLikeLimit; i++ ){
-                        const likedUser = await User.findById( replyObject.likes[ i ].toString() );
-                        const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
-    
-                        replyObject.firstFiveLikedUser.push( likedUserInfo );
-                    }
-
-                    const replyCount = commentObject.replies.length;
-                    
-                    replyObject.replyCount = replyCount;
+                if( 
+                    replyObject.likes
+                               .length < 5 
+                ){
+                    firstFiveOfLikeLimit = replyObject.likes
+                                                      .length;
                 }
-            );
 
-            const usersReplies = replies.filter(
-                replyObject =>
-                    replyObject.user.userId === userId
-            ).sort(
-                ( a, b ) => 
-                    b.createdAt - a.createdAt
-            );
+                replyObject.firstFiveLikedUser = [];
+                for( 
+                    let i = 0; 
+                    i < firstFiveOfLikeLimit; 
+                    i++ 
+                ){
+                    const likedUser = await User.findById( 
+                                                    replyObject.likes[ i ]
+                                                               .toString() 
+                                                );
+                    const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
 
-            const otherReplies = replies.filter(
-                replyObject =>
-                    replyObject.user.userId !== userId
-            ).sort(
-                ( a, b ) => 
-                    b.createdAt - a.createdAt
-            );
+                    replyObject.firstFiveLikedUser.push( likedUserInfo );
+                }
+
+                replyObject.likeCount = replyObject.likes
+                                                   .length;
+
+                delete replyObject.likes;
+            }
+
+            let usersReplies;
+            let otherReplies;
+            if( replies.length > 0 ){
+                usersReplies = replies.filter(
+                    replyObject =>
+                        replyObject.user.userId === userId
+                ).sort(
+                    ( a, b ) => 
+                        b.createdAt - a.createdAt
+                );
+    
+                otherReplies = replies.filter(
+                    replyObject =>
+                        replyObject.user.userId !== userId
+                ).sort(
+                    ( a, b ) => 
+                        b.createdAt - a.createdAt
+                );
+            }
 
             const resultreplyData = [...usersReplies, ...otherReplies];
             return res.status( 200 ).json(

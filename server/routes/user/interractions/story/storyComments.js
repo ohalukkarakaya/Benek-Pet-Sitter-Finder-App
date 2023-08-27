@@ -43,6 +43,7 @@ router.get(
     getStoryCommentsController
 );
 
+// - tested
 //get replies
 router.get(
     "/getReplies/:storyId/:commentId/:skip/:limit",

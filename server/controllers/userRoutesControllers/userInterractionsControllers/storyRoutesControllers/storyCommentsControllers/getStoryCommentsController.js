@@ -113,12 +113,23 @@ const getStoryCommentsController = async ( req, res ) => {
                 }
 
                 const replyCount = commentObject.replies.length;
-                const lastReply = commentObject.replies.length > 0
+                let lastReply = commentObject.replies.length > 0
                                     ?   commentObject.replies.pop()
                                     : {};
+
+                if( lastReply .likes ){
+                    lastReply.likeCount = lastReply.likes
+                                                   .length;
+
+                    delete lastReply.likes;
+                }
+                
                 
                 commentObject.lastReply = lastReply;
                 commentObject.replyCount = replyCount;
+                commentObject.likeCount = commentObject.likes.length;
+
+                delete commentObject.likes;
                 delete commentObject.replies;
             }
 
