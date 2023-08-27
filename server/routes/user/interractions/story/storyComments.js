@@ -35,6 +35,7 @@ router.delete(
     storyDeleteCommentOrReplyController
 );
 
+// - tested
 //get comments
 router.get(
     "/:storyId/:skip/:limit",
