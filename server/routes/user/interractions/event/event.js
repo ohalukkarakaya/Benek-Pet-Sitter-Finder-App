@@ -22,6 +22,7 @@ dotenv.config();
 
 const router = express.Router();
 
+// - 
 //create event
 router.post(
     "/",
