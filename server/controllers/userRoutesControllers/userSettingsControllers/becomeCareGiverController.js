@@ -1,7 +1,6 @@
 import User from "../../../models/User.js";
 
-import paramRegisterSubSellerRequest from "../../../utils/paramRequests/subSellerRequests/paramRegisterSubSellerRequest.js";
-import paramDeleteSubSellerRequest from "../../../utils/paramRequests/subSellerRequests/paramDeleteSubSellerRequest.js";
+import mokaRegisterSubsellerRequest from "../../../utils/mokaPosRequests/mokaSubsellerRequests/mokaRegisterSubsellerRequest.js";
 
 import crypto from "crypto";
 import dotenv from "dotenv";
@@ -47,6 +46,17 @@ const becomeCareGiverController = async ( req, res ) => {
   
           
           //decrypt national id number
+          const recordedNationalId = user.identity
+                                         .nationalId;
+          if( !recordedNationalId ){
+            return res.status( 500 )
+                      .json(
+                        {
+                          error: true,
+                          message: "Insert National Id No First"
+                        }
+                      );
+          }
           const recordedIv = user.identity
                                  .nationalId
                                  .iv;
@@ -155,32 +165,18 @@ const becomeCareGiverController = async ( req, res ) => {
                       );
           }
   
-          const birthday = user.identity
-                               .birthday
-                               .toString();
-
-          if( !birthday ){
-            return res.status( 400 )
-                      .json(
-                        {
-                          error: true,
-                          message: "Insert birthday firstly"
-                        }
-                      );
-          }
-  
-          const paramRequest = await paramRegisterSubSellerRequest(
+          const mokaRequest = await mokaRegisterSubsellerRequest(
                                         firstName,
                                         middleName,
                                         lastName,
-                                        birthday,
+                                        email,
                                         nationalIdNo,
                                         phoneNumber,
                                         openAdress,
                                         iban
                                      );
   
-          if( !paramRequest ){
+          if( !mokaRequest ){
 
             return res.status( 500 )
                       .json(
@@ -192,20 +188,21 @@ const becomeCareGiverController = async ( req, res ) => {
 
           }
   
-          if( paramRequest.error ){
+          if( mokaRequest.error ){
 
             return res.status( 500 )
                       .json(
                         {
                           error: true,
-                          message: paramRequest.data
-                                               .sonucStr
+                          message: mokaRequest.data
+                                              .sonucStr
                         }
                       );
           }
   
           if( 
-            paramRequest.data.sonuc !== "1" 
+            mokaRequest.data
+                       .sonuc !== 1 
           ){
 
             return res.status( 500 )
@@ -213,15 +210,16 @@ const becomeCareGiverController = async ( req, res ) => {
                         {
                           error: true,
                           message: "Internal server error",
-                          data: paramRequest.data
-                                            .sonucStr
+                          data: mokaRequest.data
+                                           .sonucStr
                         }
                       );
           }
   
-          user.careGiveGUID = paramRequest.data
-                                          .guidAltUyeIsyeri
-                                          .toString();
+          user.careGiveGUID = mokaRequest.data
+                                         .altUyeIsyeriData
+                                         .DealerCode
+                                         .toString();
 
           user.markModified( "careGiveGUID" );
   
@@ -258,69 +256,16 @@ const becomeCareGiverController = async ( req, res ) => {
                       );
           }
   
-          const paramRequest = await paramDeleteSubSellerRequest( careGiverGUID );
-          if( !paramRequest ){
-
-            return res.status( 500 )
-                      .json(
-                        {
-                          error: true,
-                          message: "Internal server error"
-                        }
-                      );
-          }
-  
-          if( paramRequest.error ){
-
-            return res.status( 500 )
-                      .json(
-                        {
-                          error: true,
-                          message: paramRequest.data
-                                               .sonucStr
-                        }
-                      );
-          }
-  
-          if( 
-              paramRequest.data
-                          .sonuc !== "1" 
-          ){
-            return res.status( 500 )
-                      .json(
-                        {
-                          error: true,
-                          message: "Internal server error",
-                          data: paramRequest.data
-                                            .sonucStr
-                        }
-                      );
-          }
-  
-          await User.updateOne(
-            {
-              _id: userId
-            },
-            {
-              $unset: {
-                careGiveGUID: 1
-              }
-            },
-            ( err ) => {
-              if( err ){
-                return res.status( 500 )
-                          .json(
-                              {
-                                  error: true,
-                                  message: "ERROR: while saving user"
-                              }
-                          );
-              }
-            }
-          ).clone();
+          return res.status( 400 )
+                    .json(
+                      {
+                        error: true,
+                        message: "User Is Already CareGiver"
+                      }
+                    );
         }
 
-        user.isCareGiver = !isCareGiver;
+        user.isCareGiver = true;
         user.markModified("isCareGiver");
         user.save(
           ( err ) => {
@@ -340,7 +285,7 @@ const becomeCareGiverController = async ( req, res ) => {
                   .json(
                     {
                       error: false,
-                      message: "became caregiver operation successful"
+                      message: "Became Caregiver Operation Successful"
                     }
                   );
     }catch( err ){

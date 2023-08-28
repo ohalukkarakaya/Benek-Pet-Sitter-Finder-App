@@ -7,25 +7,32 @@ dotenv.config();
 const createEventController = async (req,res) => {
     try{
         const user = await User.findById( req.user._id );
-        if( !user || user.deactivation.isDeactive ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "User couldn't found"
-                }
-            );
+        if( 
+            !user 
+            || user.deactivation
+                   .isDeactive 
+        ){
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "User couldn't found"
+                            }
+                       );
         }
 
         if( !( user.careGiveGUID ) ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "You are not subseller"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "You are not subseller"
+                            }
+                      );
         }
 
-        const eventAdminParamGuid = user.careGiveGUID.toString()
+        const eventAdminCareGiveGuid = user.careGiveGUID
+                                           .toString()
 
         if(
             !req.body.desc
@@ -42,23 +49,38 @@ const createEventController = async (req,res) => {
         }
 
         if(
-            ( req.body.ticketPrice && !req.body.ticketPriceType )
-            || ( !req.body.ticketPrice && req.body.ticketPriceType )
+            ( 
+                req.body
+                   .ticketPrice 
+
+                && !req.body
+                       .ticketPriceType 
+            )
+            || ( 
+                !req.body
+                    .ticketPrice 
+                && req.body
+                      .ticketPriceType 
+            )
         ){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "Missing property for ticketprice"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Missing property for ticketprice"
+                            }
+                       );
         }
 
-        const eventDate = Date.parse(req.body.date);
+        const eventDate = Date.parse(
+                                 req.body
+                                    .date
+                               );
 
         await new Event(
             {
                 eventAdmin: user._id.toString(),
-                eventAdminsParamGuid: eventAdminParamGuid,
+                eventAdminCareGiveGuid: eventAdminCareGiveGuid,
                 eventOrganizers: [ req.user._id.toString() ],
                 desc: req.body.desc,
                 ticketPrice: {

@@ -6,7 +6,7 @@ const EventSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
-      eventAdminsParamGuid: {
+      eventAdminCareGiveGuid: {
         type: String,
         required: true
       },

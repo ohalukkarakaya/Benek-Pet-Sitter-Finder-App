@@ -82,10 +82,9 @@ const mokaRegisterSubsellerRequest = async (
                 let response
                 const responseData = await axios.request( config );
 
-                const returnedResponse = JSON.stringify( responseData.data );
+                const returnedResponse = responseData.data;
                 if(
-                    !responseData
-                    || responseData.status !== 200
+                    responseData.status !== 200
                     || returnedResponse.ResultCode !== "Success"
                 ){
                     reject(
@@ -97,9 +96,14 @@ const mokaRegisterSubsellerRequest = async (
                     );
                 }
 
-                let sonuc = returnedResponse.ResultCode === "Success"
-                                ? 1
-                                : -1;
+                let sonuc;
+                if( 
+                    returnedResponse.ResultCode === "Success"
+                ){
+                    sonuc = 1
+                }else{
+                    sonuc = -1
+                }
 
                 let sonucStr = returnedResponse.ResultCode;
                 let altUyeIsyeriData = returnedResponse.Data;
