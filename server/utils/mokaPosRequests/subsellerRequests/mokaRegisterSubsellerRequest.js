@@ -1,20 +1,11 @@
 import mokaCredentialsHelper from "../mokaHelpers/mokaCredentialsHelper.js";
+import truncateAdressForMoka from "../mokaHelpers/truncateAdressForMoka.js";
 
 import axios from "axios";
 import dotenv from "dotenv";
 
 dotenv.config();
 const env = process.env;
-
-
-function truncateString( str, maxLength ){
-    if(
-        str.length > maxLength
-    ){
-        return str.slice( 0, maxLength - 3 ) + "...";
-    }
-    return str;
-}
 
 const mokaRegisterSubsellerRequest = async (
     firstName,
@@ -50,13 +41,13 @@ const mokaRegisterSubsellerRequest = async (
                                                         /[^\d]/g,
                                                         '0'
                                                     ).toUpperCase();
-                                                    
+
             const ibanFinal = iban.toUpperCase()
                                   .replaceAll( " ", "" )
                                   .replaceAll( "TR", "" );
 
             let openAdressMaxLength = 50;
-            const openAdressFinal = truncateString( openAdress, openAdressMaxLength );
+            const openAdressFinal = truncateAdressForMoka( openAdress, openAdressMaxLength );
 
             const dealerRequest = {
                 "DealerType": 1,
@@ -111,14 +102,14 @@ const mokaRegisterSubsellerRequest = async (
                                 : -1;
 
                 let sonucStr = returnedResponse.ResultCode;
-                let guidAltUyeIsyeriData = returnedResponse.Data;
+                let altUyeIsyeriData = returnedResponse.Data;
 
                 response = {
                     error: false,
                     data: {
                         sonuc: sonuc,
                         sonucStr: sonucStr,
-                        guidAltUyeIsyeriData: guidAltUyeIsyeriData
+                        altUyeIsyeriData: altUyeIsyeriData
                     }
                 }
                 

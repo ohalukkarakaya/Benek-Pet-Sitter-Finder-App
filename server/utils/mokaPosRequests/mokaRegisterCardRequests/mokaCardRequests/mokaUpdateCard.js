@@ -6,8 +6,10 @@ import dotenv from "dotenv";
 dotenv.config();
 const env = process.env;
 
-
-const mokaGetSubsellerRequest = async ( mokaSubSellerCode ) => {
+const mokaUpdateCard = async (
+    cardToken,
+    newCardName
+) => {
     return new Promise(
         async (
             resolve,
@@ -15,19 +17,21 @@ const mokaGetSubsellerRequest = async ( mokaSubSellerCode ) => {
         ) => {
             const mokaCredentials = mokaCredentialsHelper();
 
-            const dealerRequest = { "SubDealerCode": mokaSubSellerCode };
+            const dealerCustomerRequest = { 
+                "CardToken": cardToken,
+                "CardName": newCardName
+            };
 
-            
             const data = {
-                "DealerAuthentication": mokaCredentials,
-                "DealerRequest": dealerRequest
+                "DealerCustomerAuthentication": mokaCredentials,
+                "DealerCustomerRequest": dealerCustomerRequest
 
             }
 
             const config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: `${ env.MOKA_TEST_URL_BASE }/Dealer/GetDealer`,
+                url: `${ env.MOKA_TEST_URL_BASE }/DealerCustomer/UpdateCard`,
                 headers: { 'Content-Type': 'application/json' },
                 data: data
             };
@@ -54,22 +58,22 @@ const mokaGetSubsellerRequest = async ( mokaSubSellerCode ) => {
                 let sonuc = returnedResponse.ResultCode === "Success"
                                 ? 1
                                 : -1;
-                                
+
                 let sonucStr = returnedResponse.ResultCode;
-                let altUyeIsyeriData = returnedResponse.Data;
+                let customerData = returnedResponse.Data;
 
                 response = {
                     error: false,
                     data: {
                         sonuc: sonuc,
                         sonucStr: sonucStr,
-                        altUyeIsyeriData: altUyeIsyeriData
+                        customerData: customerData
                     }
                 }
                 
                 resolve( response );
             }catch( err ){
-                console.log( "ERROR: mokaGetSubsellerRequest - ", err );
+                console.log( "ERROR: mokaUpdateCard - ", err );
                 reject(
                     {
                         error: true,
@@ -82,4 +86,4 @@ const mokaGetSubsellerRequest = async ( mokaSubSellerCode ) => {
     );
 }
 
-export default mokaGetSubsellerRequest;
+export default mokaUpdateCard;

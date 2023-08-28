@@ -1,3 +1,11 @@
+import mokaCredentialsHelper from "../mokaHelpers/mokaCredentialsHelper.js";
+
+import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
+const env = process.env;
+
 const mokaUpdateSubsellerRequest = async (
     mokaSubSellerCode,
     firstName,
@@ -43,68 +51,68 @@ const mokaUpdateSubsellerRequest = async (
 
             const phoneNumberFinal = phoneNumber.replaceAll( "+90", "" );
 
-            let dealerRequest;
+            let updateDealerRequest;
 
-            dealerRequest.SubDealerCode = mokaSubSellerCode;
+            updateDealerRequest.SubDealerCode = mokaSubSellerCode;
 
             if(
-            paddedNationalIdNo !== null
-            || paddedNationalIdNo !== undefined
-            || paddedNationalIdNo !== ""
-            || paddedNationalIdNo !== " "
+                paddedNationalIdNo !== null
+                && paddedNationalIdNo !== undefined
+                && paddedNationalIdNo !== ""
+                && paddedNationalIdNo !== " "
             ){
-                dealerRequest.TRIdentityNumber = paddedNationalIdNo;
+                updateDealerRequest.TRIdentityNumber = paddedNationalIdNo;
             }
             
             if(
                 fullName !== null
-                || fullName !== undefined
-                || fullName !== ""
-                || fullName !== " "
+                && fullName !== undefined
+                && fullName !== ""
+                && fullName !== " "
             ){
-                dealerRequest.IndividualName = fullName;
-                dealerRequest.IBanFullName = fullName;
+                updateDealerRequest.IndividualName = fullName;
+                updateDealerRequest.IBanFullName = fullName;
             }
 
             if(
                 email !== null
-                || email !== undefined
-                || email !== ""
-                || email !== " "
+                && email !== undefined
+                && email !== ""
+                && email !== " "
             ){
-                dealerRequest.Email = email;
+                updateDealerRequest.Email = email;
             }
 
             if(
                 phoneNumberFinal !== null
-                || phoneNumberFinal !== undefined
-                || phoneNumberFinal !== ""
-                || phoneNumberFinal !== " "
+                && phoneNumberFinal !== undefined
+                && phoneNumberFinal !== ""
+                && phoneNumberFinal !== " "
             ){   
-                dealerRequest.PhoneNumber = phoneNumberFinal;
+                updateDealerRequest.PhoneNumber = phoneNumberFinal;
             }
 
             if(
                 ibanFinal !== null
-                || ibanFinal !== undefined
-                || ibanFinal !== ""
-                || ibanFinal !== " "
+                && ibanFinal !== undefined
+                && ibanFinal !== ""
+                && ibanFinal !== " "
             ){   
-                dealerRequest.IBan = ibanFinal;
+                updateDealerRequest.IBan = ibanFinal;
             }
 
             if(
                 openAdressFinal !== null
-                || openAdressFinal !== undefined
-                || openAdressFinal !== ""
-                || openAdressFinal !== " "
+                && openAdressFinal !== undefined
+                && openAdressFinal !== ""
+                && openAdressFinal !== " "
             ){   
-                dealerRequest.Address = openAdressFinal;
+                updateDealerRequest.Address = openAdressFinal;
             }
             
             const data = {
                 "DealerAuthentication": mokaCredentials,
-                "DealerRequest": dealerRequest
+                "UpdateDealerRequest": updateDealerRequest
 
             }
 
@@ -140,14 +148,14 @@ const mokaUpdateSubsellerRequest = async (
                                 : -1;
 
                 let sonucStr = returnedResponse.ResultCode;
-                let guidAltUyeIsyeriData = returnedResponse.Data;
+                let altUyeIsyeriData = returnedResponse.Data;
 
                 response = {
                     error: false,
                     data: {
                         sonuc: sonuc,
                         sonucStr: sonucStr,
-                        guidAltUyeIsyeriData: guidAltUyeIsyeriData
+                        altUyeIsyeriData: altUyeIsyeriData
                     }
                 }
                 

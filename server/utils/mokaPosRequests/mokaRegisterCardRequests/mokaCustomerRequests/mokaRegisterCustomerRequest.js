@@ -1,4 +1,5 @@
 import mokaCredentialsHelper from "../mokaHelpers/mokaCredentialsHelper.js";
+import truncateAdressForMoka from "../../mokaHelpers/truncateAdressForMoka.js";
 
 import axios from "axios";
 import dotenv from "dotenv";
@@ -6,8 +7,14 @@ import dotenv from "dotenv";
 dotenv.config();
 const env = process.env;
 
-
-const mokaGetSubsellerRequest = async ( mokaSubSellerCode ) => {
+const mokaRegisterCustomerRequest = async (
+    userId,
+    firstName,
+    lastName,
+    phoneNumber,
+    email,
+    address
+) => {
     return new Promise(
         async (
             resolve,
@@ -15,19 +22,30 @@ const mokaGetSubsellerRequest = async ( mokaSubSellerCode ) => {
         ) => {
             const mokaCredentials = mokaCredentialsHelper();
 
-            const dealerRequest = { "SubDealerCode": mokaSubSellerCode };
+            let openAdressMaxLength = 50;
+            const openAdressFinal = truncateAdressForMoka( address, openAdressMaxLength );
+
+            const dealerCustomerRequest = {
+                "CustomerCode": userId,
+                "Password": userId,
+                "FirstName": firstName,
+                "LastName": lastName,
+                "GsmNumber": phoneNumber.replaceAll( "+90", "" ),
+                "Email": email,
+                "Address": openAdressFinal
+            }
 
             
             const data = {
-                "DealerAuthentication": mokaCredentials,
-                "DealerRequest": dealerRequest
+                "DealerCustomerAuthentication": mokaCredentials,
+                "DealerCustomerRequest": dealerCustomerRequest
 
             }
 
             const config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: `${ env.MOKA_TEST_URL_BASE }/Dealer/GetDealer`,
+                url: `${ env.MOKA_TEST_URL_BASE }/DealerCustomer/AddCustomer`,
                 headers: { 'Content-Type': 'application/json' },
                 data: data
             };
@@ -54,22 +72,22 @@ const mokaGetSubsellerRequest = async ( mokaSubSellerCode ) => {
                 let sonuc = returnedResponse.ResultCode === "Success"
                                 ? 1
                                 : -1;
-                                
+
                 let sonucStr = returnedResponse.ResultCode;
-                let altUyeIsyeriData = returnedResponse.Data;
+                let customerData = returnedResponse.Data;
 
                 response = {
                     error: false,
                     data: {
                         sonuc: sonuc,
                         sonucStr: sonucStr,
-                        altUyeIsyeriData: altUyeIsyeriData
+                        customerData: customerData
                     }
                 }
                 
                 resolve( response );
             }catch( err ){
-                console.log( "ERROR: mokaGetSubsellerRequest - ", err );
+                console.log( "ERROR: mokaRegisterCustomerRequest - ", err );
                 reject(
                     {
                         error: true,
@@ -82,4 +100,4 @@ const mokaGetSubsellerRequest = async ( mokaSubSellerCode ) => {
     );
 }
 
-export default mokaGetSubsellerRequest;
+export default mokaRegisterCustomerRequest;
