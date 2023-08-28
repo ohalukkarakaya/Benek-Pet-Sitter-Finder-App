@@ -7,7 +7,8 @@ import storyCreateCommentOrReplyCommentController from "../../../../controllers/
 import storyEditCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/storyEditCommentOrReplyController.js";
 import storyDeleteCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/storyDeleteCommentOrReplyController.js";
 import getStoryCommentsController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/getStoryCommentsController.js";
-import getStoryCommentRepliesController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/getStoryCommentRepliesController.js"
+import getStoryCommentRepliesController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/getStoryCommentRepliesController.js";
+import likeStoryCommentOrReplyController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyCommentsControllers/likeStoryCommentOrReplyController.js";
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.post(
 // - tested
 //story edit comment or reply
 router.put(
-    "/:storyId",
+    "/edit/:storyId",
     auth,
     storyEditCommentOrReplyController
 );
@@ -51,7 +52,12 @@ router.get(
     getStoryCommentRepliesController
 );
 
-// - TO DO
+// - tested
 //like comment && reply
+router.put(
+    "/likeCommentOrReply",
+    auth,
+    likeStoryCommentOrReplyController
+);
 
 export default router;
