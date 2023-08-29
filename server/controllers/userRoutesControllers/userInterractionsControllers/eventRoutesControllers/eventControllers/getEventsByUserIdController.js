@@ -61,6 +61,7 @@ const getEventsByUserIdController = async ( req, res ) => {
             {
                 error: false,
                 message: "List of Events Which Releated to You Had Prepared Successfully",
+                eventCount: preparedEventList.length,
                 events: preparedEventList
             }
         );

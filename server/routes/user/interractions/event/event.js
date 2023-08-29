@@ -71,9 +71,10 @@ router.get(
     getEventsByUserIdController
 );
 
+// - tested
 //get recomended events by user Id
 router.get(
-    "/getEvents",
+    "/getRecomendedEvents/:skip/:limit",
     auth,
     getRecomendedEventsByUserIdController
 );

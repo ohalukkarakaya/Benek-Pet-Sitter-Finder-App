@@ -2,87 +2,94 @@ import User from "../models/User.js";
 
 import getLightWeightUserInfoHelper from "./getLightWeightUserInfoHelper.js";
 
+async function processUserList( userIds ){
+    const userPromises = userIds.map(
+        async userId => {
+            const user = await User.findById( userId );
+            return getLightWeightUserInfoHelper( user );
+        }
+    );
+
+    return await Promise.all( userPromises );
+}
+
+const processAfterEventObject = async afterEventObject => {
+    // İlgili afterEventObject'un işlemleri burada gerçekleşecek
+
+    // Öncelikle, afterEventObject içindeki 'likes' alanındaki kullanıcıları işleyelim
+    const likedUsersPromises = afterEventObject.likes
+                                               .map(
+                                                    async likedUserId => {
+                                                        const likedUser = await User.findById(
+                                                                                        likedUserId.toString()
+                                                                                     );
+
+                                                        return getLightWeightUserInfoHelper( likedUser );
+                                                    }
+                                                );
+    
+    const likedUsers = await Promise.all( likedUsersPromises );
+
+    // 'comments' alanını temizleyelim
+    delete afterEventObject.comments;
+
+    // 'likedUsers' alanını güncelleyelim
+    afterEventObject.likedUsers = likedUsers;
+
+    // Eğer tüm beğenenler eklenmişse, 'likes' alanını temizleyelim
+    if(
+        likedUsers.length === afterEventObject.likes
+                                              .length
+    ){
+        delete afterEventObject.likes;
+    }
+
+    // 'userId' alanını kullanarak içerik oluşturan kullanıcıyı işleyelim
+    const contentCreator = await User.findById(
+                                        afterEventObject.userId
+                                                        .toString()
+                                      );
+
+    const contentCreatorInfo = getLightWeightUserInfoHelper( contentCreator );
+    afterEventObject.user = contentCreatorInfo;
+    delete afterEventObject.userId;
+
+    return afterEventObject;
+}
+
+const getRelevantUserInfo = async userId => {
+    const user = await User.findById( userId );
+    return getLightWeightUserInfoHelper( user );
+}
+
 const getLightWeightEventInfoHelper = async ( event ) => {
     try{
-        let willJoinList = [];
-        for(
-            let willJoinUserId
-            of event.willJoin
-        ){
-            const willJoinUser = await User.findById( willJoinUserId );
-            const willJoinUserInfo = getLightWeightUserInfoHelper( willJoinUser );
+        const willJoinList = await processUserList( event.willJoin );
+        const joinedList = await processUserList( event.joined );
+        const organizersList = await processUserList( event.eventOrganizers );
 
-            willJoinList.push( willJoinUserInfo );
-        }
+        const eventAdminInfo = await getRelevantUserInfo(
+                                                event.eventAdmin
+                                                     .toString()
+                                     );
 
-        let joinedList = [];
-        for(
-            let joinedUserId
-            of event.joined
-        ){
-            const joinedUser = await User.findById( joinedUserId );
-            const joinedUserInfo = getLightWeightUserInfoHelper( joinedUser );
-            joinedList.push( joinedUserInfo );
-        }
-
-        let organizersList = [];
-        for(
-            let organizerId
-            of event.eventOrganizers
-        ){
-            const organizer = await User.findById( organizerId );
-            const organizerInfo = getLightWeightUserInfoHelper( organizer );
-            organizersList.push( organizerInfo );
-        }
-
-        const eventAdmin = await User.findById( 
-                                        event.eventAdmin
-                                             .toString() 
-                                      );
-        const eventAdminInfo = getLightWeightUserInfoHelper( eventAdmin );
-
-        let lastAfterEventObject;
-        if( 
+        let lastAfterEventObject = null;
+        if (
             event.afterEvent
-                 .length > 0 
-        ){
-            lastAfterEventObject = event.afterEvent
-                                              .pop();
-                                    
-            delete lastAfterEventObject.comments;
-            for(
-                let likedUserId
-                of lastAfterEventObject.likes
-            ){
-
-                const likedUser = await User.findById( likedUserId.toString() );
-                const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
-
-                lastAfterEventObject.likedUsers
-                                    .push( likedUserInfo );
-            }
-
-            if( 
-                lastAfterEventObject.likedUsers
-                                    .length === lastAfterEventObject.likes
-                                                                    .length 
-            ){
-                delete lastAfterEventObject.likes;
-            }
-
-            const afterEventContentCreater = await User.findById( 
-                                                            lastAfterEventObject.userId
-                                                                                .toString() 
-                                                        );
-
-            const afterEventContentCreaterInfo = getLightWeightUserInfoHelper( afterEventContentCreater );
-            lastAfterEventObject.user = afterEventContentCreaterInfo;
-            delete lastAfterEventObject.userId;
+                 .length > 0
+        ) {
+            lastAfterEventObject = await processAfterEventObject(
+                                                    event.afterEvent[
+                                                                event.afterEvent
+                                                                     .length - 1
+                                                          ]
+                                         );
         }
 
         const remainedEventQuota = event.maxGuest
                                     ? event.maxGuest - [...willJoinList, ...joinedList].length
                                     : "No Quota";
+                                    
         const ticketPrice = event.ticketPrice.priceType === "Free"
                                 ? event.ticketPrice.priceType
                                 : `${event.ticketPrice.price} ${event.ticketPrice.priceType}`;
