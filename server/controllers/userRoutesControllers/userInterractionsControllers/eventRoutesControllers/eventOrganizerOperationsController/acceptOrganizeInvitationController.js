@@ -4,18 +4,22 @@ import OrganizerInvitation from "../../../../../models/Event/Invitations/InviteO
 const acceptOrganizeInvitationController = async (req,res) => {
     try{
         const invateId = req.params.invateId;
-        if(!invateId || req.params.response){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "Missing or wrong params"
-                }
-            );
+        if(
+            !invateId 
+            || !req.params.response
+        ){
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Missing or wrong params"
+                            }
+                      );
         }
 
         const response = req.params.response === "true";
 
-        const invitation = await OrganizerInvitation.findById(invateId);
+        const invitation = await OrganizerInvitation.findById( invateId );
         if(!invitation){
             return res.status(404).json(
                 {
@@ -78,8 +82,13 @@ const acceptOrganizeInvitationController = async (req,res) => {
             );
         }
 
-        if(response){
-            meetingEvent.eventOrganizers = meetingEvent.eventOrganizers.push(req.user._id.toString());
+        if( response ){
+
+            meetingEvent.eventOrganizers
+                        .push(
+                            req.user._id.toString()
+                        );
+
             meetingEvent.markModified("eventOrganizers");
             meetingEvent.save(
                 (error) => {
@@ -137,34 +146,6 @@ const acceptOrganizeInvitationController = async (req,res) => {
                 }
             );
         }
-            
-        await new OrganizerInvitation(
-            {
-                eventAdminId: req.user._id.toString(),
-                eventId: meetingEvent._id.toString(),
-                invitedId: organizer._id.toString(),
-                eventDate: meetingEvent.date,
-            }
-        ).save().then(
-            (invitation) => {
-                return res.status(200).json(
-                    {
-                        error: false,
-                        message: `You invited user "${organizer._id.toString()}" successfully`
-                    }
-                );
-            }
-        ).catch(
-            (error) => {
-                console.log(error);
-                return res.status(500).json(
-                    {
-                        error: true,
-                        message: "Internal server error"
-                    }
-                );
-            }
-        );
         
     }catch(err){
         console.log("ERROR: accept organizer invitation - ", err);

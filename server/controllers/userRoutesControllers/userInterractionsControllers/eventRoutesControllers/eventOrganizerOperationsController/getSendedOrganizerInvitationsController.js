@@ -1,6 +1,8 @@
+import User from "../../../../../models/User.js";
 import Event from "../../../../../models/Event/Event.js";
 import OrganizerInvitation from "../../../../../models/Event/Invitations/InviteOrganizer.js";
 import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
+import getLightWeightEventInfoHelper from "../../../../../utils/getLightWeightEventInfoHelper.js";
 
 const getSendedOrganizerInvitationsController = async ( req, res ) => {
     try{
@@ -8,10 +10,11 @@ const getSendedOrganizerInvitationsController = async ( req, res ) => {
         const skip = parseInt( req.params.skip ) || 0;
         const limit = parseInt( req.params.limit ) || 15;
 
-        const invitationQuery = { eventAdmin: userId };
+        const invitationQuery = { eventAdminId: userId };
         const organizerInvitations = await OrganizerInvitation.find( invitationQuery )
                                                               .skip( skip )
-                                                              .limit( limit );
+                                                              .limit( limit )
+                                                              .lean();
 
         const totalInvitationCount = await OrganizerInvitation.countDocuments( invitationQuery );
 
@@ -24,43 +27,35 @@ const getSendedOrganizerInvitationsController = async ( req, res ) => {
             );
         }
 
-        organizerInvitations.forEach(
-            async ( invitation ) => {
-                const invitedEvent = await Event.findById( invitation.eventId.toString() );
+        for(
+            let invitation
+            of organizerInvitations
+        ){
+            const invitedEvent = await Event.findById( invitation.eventId.toString() );
 
-                var eventDate = new Date( invitedEvent.date );
-                var now = new Date(); 
-                const didPast = eventDate < now;
+            const eventInfo = await getLightWeightEventInfoHelper( invitedEvent );
 
-                const eventQuota = didPast 
-                                   || invitedEvent.maxGuests === -1
-                                        ? -1
-                                        : invitedEvent.maxGuests - invitedEvent.willJoin
-                                                                               .length
+            var eventDate = new Date( invitedEvent.date );
+            var now = new Date(); 
+            const didPast = eventDate < now;
 
-                const eventInfo = {
-                    eventId: invitedEvent._id.toString(),
-                    eventDesc: invitedEvent.desc,
-                    eventImage: invitedEvent.imgUrl,
-                    adress: invitedEvent.adress,
-                    date: invitedEvent.date,
-                    maxGuests: invitedEvent.maxGuests,
-                    willJoinCount: invitedEvent.willJoin.length,
-                    joinedCount: invitedEvent.joined.length,
-                    didpast: didPast,
-                    quota: eventQuota,
-                    isPrivate: invitedEvent.isPrivate
-                };
+            const eventQuota = didPast 
+                                || invitedEvent.maxGuests === -1
+                                    ? -1
+                                    : invitedEvent.maxGuests - invitedEvent.willJoin
+                                                                            .length
 
-                const invitedUser = await User.findById( invitation.invitedId.toString() );
-                const invitedUserInfo = getLightWeightUserInfoHelper( invitedUser );
+            const invitedUser = await User.findById( invitation.invitedId.toString() );
+            const invitedUserInfo = await getLightWeightUserInfoHelper( invitedUser );
 
-                invitation.event = eventInfo;
-                invitation.invitedUser = eventAdminInfo;
-                delete invitation.eventId;
-                delete invitation.invitedId;
-            }
-        );
+            invitation.event = eventInfo;
+            invitation.invitedUser = invitedUserInfo;
+            invitation.eventAdmin = eventInfo.eventAdmin;
+            delete invitation.eventId;
+            delete invitation.eventAdminId;
+            delete invitation.invitedId;
+            delete invitation.__v;
+        }
 
         return res.status( 200 ).json(
             {

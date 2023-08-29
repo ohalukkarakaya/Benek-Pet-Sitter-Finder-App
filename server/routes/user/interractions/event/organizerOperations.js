@@ -10,6 +10,7 @@ import getSendedOrganizerInvitationsController from "../../../../controllers/use
 
 const router = express.Router();
 
+// - tested
 //add organizer
 router.post(
     "/:eventId",
@@ -17,6 +18,7 @@ router.post(
     addOrganizerController
 );
 
+// - tested
 //get organizer invitations by user Id
 router.get(
     "/getInvitations/:skip/:limit",
@@ -24,6 +26,7 @@ router.get(
     getOrganizerInvitationsController
 );
 
+// - tested
 //get sended organizer invitations by user id
 router.get(
     "/getSendedInvitations/:skip/:limit",
@@ -31,6 +34,7 @@ router.get(
     getSendedOrganizerInvitationsController
 );
 
+// - tested
 //accept organizer invitation
 router.delete(
     "/:invateId/:response",
@@ -38,6 +42,7 @@ router.delete(
     acceptOrganizeInvitationController
 );
 
+// - tested
 //cancel organizer status
 router.put(
     "/remove/:eventId",
