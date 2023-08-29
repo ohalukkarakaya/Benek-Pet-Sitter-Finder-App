@@ -22,15 +22,15 @@ dotenv.config();
 
 const router = express.Router();
 
-// - 
+// - tested
 //create event
 router.post(
     "/",
     auth,
-    uploadEventImage,
     createEventController
 );
 
+// - tested
 //upload event image
 router.put(
     "/image/:eventId",
@@ -39,6 +39,7 @@ router.put(
     uploadEventImageController
 );
 
+// - tested
 //edit event
 router.put(
     "/:eventId",
@@ -46,6 +47,7 @@ router.put(
     editEventController
 );
 
+// - tested
 //delete event
 router.delete(
     "/:eventId",

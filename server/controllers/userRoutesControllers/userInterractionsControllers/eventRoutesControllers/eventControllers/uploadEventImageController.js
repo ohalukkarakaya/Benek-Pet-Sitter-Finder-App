@@ -14,9 +14,10 @@ const uploadEventImageController = async (req, res) => {
             );
         }
         
-        req.meetingEvent.ımgUrl = contentUrl;
+        req.meetingEvent.imgUrl = contentUrl;
         req.meetingEvent.markModified("imgUrl");
-        req.save(
+        req.meetingEvent
+           .save(
             (err) => {
                 if(err){
                     console.log(err);

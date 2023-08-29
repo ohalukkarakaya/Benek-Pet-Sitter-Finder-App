@@ -62,13 +62,16 @@ const upload = multer(
     }
 );
 
-const deleteImg = async (req, file, deleteParams) => {
+const deleteImg = async ( deleteParams ) => {
     try {
-        fileFilter.then(
-            (_) => {
-                s3.deleteObject(deleteParams).promise();
-                console.log("Success", data);
-                return data;
+        s3.deleteObject(
+            deleteParams,
+            ( error, data ) => {
+                if ( error ) {
+                    console.log("Error", error);
+                  } else {
+                    return data;
+                  }
             }
         );
     } catch (err) {
@@ -125,9 +128,15 @@ const uploadEventImage = async (req, res, next) => {
         }
 
         const areThereImgAlready = req.meetingEvent.imgUrl;
+
+        let splitedImgUrl;
+        let ImgName;
+
+        if( areThereImgAlready ){
+            splitedImgUrl = req.meetingEvent.imgUrl.split( "/" );
+            ImgName = splitedImgUrl[ splitedImgUrl.length - 1 ];
+        }
         
-        const splitedImgUrl = req.meetingEvent.imgUrl.split("/");
-        const ImgName = splitedImgUrl[splitedImgUrl.length - 1];
 
         ValidateAndCleanBucket(
             req,
