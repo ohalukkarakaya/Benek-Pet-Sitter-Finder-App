@@ -63,7 +63,7 @@ router.get(
     getEventByIdController
 );
 
-// - 
+// - tested
 //get events by user Id
 router.get(
     "/getEvents",
