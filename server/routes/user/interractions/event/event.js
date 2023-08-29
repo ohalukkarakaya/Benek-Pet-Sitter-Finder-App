@@ -47,7 +47,7 @@ router.put(
     editEventController
 );
 
-// - tested
+// - tested : TO DO: Test after buy ticket endpoint
 //delete event
 router.delete(
     "/:eventId",
@@ -55,6 +55,7 @@ router.delete(
     deleteEventController
 );
 
+// - tested
 // get event by id
 router.get(
     "/getEvent/:eventId",
@@ -62,6 +63,7 @@ router.get(
     getEventByIdController
 );
 
+// - 
 //get events by user Id
 router.get(
     "/getEvents",

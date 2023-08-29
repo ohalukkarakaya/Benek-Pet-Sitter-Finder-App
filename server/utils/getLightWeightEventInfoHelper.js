@@ -1,3 +1,5 @@
+import User from "../models/User.js";
+
 import getLightWeightUserInfoHelper from "./getLightWeightUserInfoHelper.js";
 
 const getLightWeightEventInfoHelper = async ( event ) => {
@@ -78,7 +80,9 @@ const getLightWeightEventInfoHelper = async ( event ) => {
             delete lastAfterEventObject.userId;
         }
 
-        const remainedEventQuota = event.maxGuest - [...willJoinList, ...joinedList].length;
+        const remainedEventQuota = event.maxGuest
+                                    ? event.maxGuest - [...willJoinList, ...joinedList].length
+                                    : "No Quota";
         const ticketPrice = event.ticketPrice.priceType === "Free"
                                 ? event.ticketPrice.priceType
                                 : `${event.ticketPrice.price} ${event.ticketPrice.priceType}`;
