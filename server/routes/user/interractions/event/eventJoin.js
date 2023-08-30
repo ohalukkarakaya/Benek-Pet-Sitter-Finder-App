@@ -23,7 +23,7 @@ router.post(
     invitePrivateEventController
 );
 
-// - 
+// - pay 3d secure: tested | TO DO: accept free event
 //accept invitation
 router.put(
     "/invitation/:invitationId/:response",
