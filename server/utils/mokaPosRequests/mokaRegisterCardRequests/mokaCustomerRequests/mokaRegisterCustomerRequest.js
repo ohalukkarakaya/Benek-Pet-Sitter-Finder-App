@@ -1,4 +1,4 @@
-import mokaCredentialsHelper from "../mokaHelpers/mokaCredentialsHelper.js";
+import mokaCredentialsHelper from "../../mokaHelpers/mokaCredentialsHelper.js";
 import truncateAdressForMoka from "../../mokaHelpers/truncateAdressForMoka.js";
 
 import axios from "axios";
@@ -54,7 +54,7 @@ const mokaRegisterCustomerRequest = async (
                 let response
                 const responseData = await axios.request( config );
 
-                const returnedResponse = JSON.stringify( responseData.data );
+                const returnedResponse = responseData.data;
                 if(
                     !responseData
                     || responseData.status !== 200

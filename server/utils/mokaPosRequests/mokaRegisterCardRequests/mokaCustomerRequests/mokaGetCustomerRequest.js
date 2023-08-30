@@ -1,4 +1,4 @@
-import mokaCredentialsHelper from "../mokaHelpers/mokaCredentialsHelper.js";
+import mokaCredentialsHelper from "../../mokaHelpers/mokaCredentialsHelper.js";
 
 import axios from "axios";
 import dotenv from "dotenv";
@@ -35,12 +35,25 @@ const mokaGetCustomerRequest = async ( userId ) => {
                 let response
                 const responseData = await axios.request( config );
 
-                const returnedResponse = JSON.stringify( responseData.data );
+                const returnedResponse = responseData.data;
                 if(
                     !responseData
                     || responseData.status !== 200
                     || returnedResponse.ResultCode !== "Success"
                 ){
+                    if( 
+                        responseData.status === 200
+                        && returnedResponse.ResultCode === "DealerCustomer.GetCustomer.DealerCustomerNotFound" 
+                    ){
+                        resolve(
+                            {
+                                error: false,
+                                serverStatus: 0,
+                                message: "Customer Not Registered"
+                            }
+                        );
+                    }
+
                     reject(
                         {
                             error: true,

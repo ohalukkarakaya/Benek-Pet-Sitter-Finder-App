@@ -15,13 +15,15 @@ import getTicketsByEventIdController from "../../../../controllers/userRoutesCon
 
 const router = express.Router();
 
+// - tested
 //invite to private event
 router.post(
-    "invitation/:eventId/:invitedUserId",
+    "/invitation/:eventId/:invitedUserId",
     auth,
     invitePrivateEventController
 );
 
+// - 
 //accept invitation
 router.put(
     "/invitation/:invitationId/:response",
@@ -43,6 +45,7 @@ router.put(
     useTicketController
 );
 
+// - tested
 //get event invitations by user id
 router.get(
     "/getInvitationList/:skip/:limit",
@@ -50,9 +53,10 @@ router.get(
     getEventInvitationsController
 );
 
+// - tested
 //get sended event invitations by user id
 router.get(
-    "/getInvitationList/:skip/:limit",
+    "/getSendedInvitationList/:skip/:limit",
     auth,
     getSendedEventInvitationsController
 );

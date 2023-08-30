@@ -1,4 +1,5 @@
-import mokaCredentialsHelper from "../mokaHelpers/mokaCredentialsHelper.js";
+import mokaCredentialsHelper from "../../mokaHelpers/mokaCredentialsHelper.js";
+import mokaCheckifCardAlreadyRegisteredHelper from "../../mokaHelpers/mokaCheckifCardAlreadyRegisteredHelper.js";
 
 import axios from "axios";
 import dotenv from "dotenv";
@@ -21,6 +22,22 @@ const mokaRegisterCard = async (
             resolve,
             reject
         ) => {
+
+            const isCardAlreadyRegistered = await mokaCheckifCardAlreadyRegisteredHelper(
+                                                    userId,
+                                                    cardNo
+                                                  );
+
+            if( isCardAlreadyRegistered.isCardAlreadyRegistered ){
+                return reject(
+                    {
+                        error: true,
+                        serverStatus: 0,
+                        message: `Card Already Registered`
+                    }
+                );
+            }
+
             const mokaCredentials = mokaCredentialsHelper();
 
             const name = [
@@ -61,7 +78,7 @@ const mokaRegisterCard = async (
                 let response
                 const responseData = await axios.request( config );
 
-                const returnedResponse = JSON.stringify( responseData.data );
+                const returnedResponse = responseData.data;
                 if(
                     !responseData
                     || responseData.status !== 200

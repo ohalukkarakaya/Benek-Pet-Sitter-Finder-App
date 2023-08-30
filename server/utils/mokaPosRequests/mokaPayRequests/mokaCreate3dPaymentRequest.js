@@ -96,7 +96,7 @@ const mokaCreate3dPaymentRequest = async (
             
             const data = {
                 "PaymentDealerAuthentication": mokaCredentials,
-                "PaymentDealerRequest": dealerCustomerRequest
+                "PaymentDealerRequest": paymentDealerRequest
 
             }
 
@@ -112,12 +112,23 @@ const mokaCreate3dPaymentRequest = async (
                 let response
                 const responseData = await axios.request( config );
 
-                const returnedResponse = JSON.stringify( responseData.data );
+                const returnedResponse = responseData.data;
                 if(
                     !responseData
                     || responseData.status !== 200
                     || returnedResponse.ResultCode !== "Success"
                 ){
+                    if(
+                        returnedResponse.ResultCode === "PaymentDealer.CheckDealerPaymentLimits.DailyDealerLimitExceeded"
+                    ){
+                        return resolve(
+                            {
+                                error: false,
+                                serverStatus: 0,
+                                message: "Daily Limit Exceeded"
+                            }
+                        )
+                    }
                     reject(
                         {
                             error: true,

@@ -152,6 +152,7 @@ const getRecomendedStoryListController = async ( req, res ) => {
                         delete storyObject.about
                                           .id;
                     }
+                break;
             }
 
             storyObject.likeCount = storyObject.likes

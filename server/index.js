@@ -38,6 +38,7 @@ import animalKeywordRoutes from './routes/key_words/animalCategory.js';
 import chatRoutes from './routes/chat/chat.js';
 import notificationRoutes from './routes/notification/notification.js';
 import logRoutes from './routes/log/log.js';
+import paymentRedirectRoute from './routes/paymentRedirectRoute.js';
 
 import bodyParser from 'body-parser';
 
@@ -142,6 +143,7 @@ app.use(bodyParser.json({ type: 'application/*+json' }));
 app.use("/auth", authRoutes);
 app.use("/log", logRoutes);
 app.use("/api/refreshToken", refreshTokenRoutes);
+app.use("/api/paymentRedirect", paymentRedirectRoute);
 app.use("/api/user", editUserRoutes);
 app.use("/api/pet", petRoutes);
 app.use("/api/petOwner", petOwnerOperationsRoutes);

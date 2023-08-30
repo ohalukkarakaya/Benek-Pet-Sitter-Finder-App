@@ -3,11 +3,7 @@ import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
 import EventInvitation from "../../../../../models/Event/Invitations/InviteEvent.js";
 
-import paramPayWithRegisteredCard from "../../../../../utils/paramRequests/paymentRequests/paramPayWithRegisteredCard.js";
-import paramPayRequest from "../../../../../utils/paramRequests/paymentRequests/paramPayRequest.js";
-import paramRegisterCreditCardRequest from "../../../../../utils/paramRequests/registerCardRequests/paramRegisterCreditCardRequest.js";
-import paramAddDetailToOrder from "../../../../../utils/paramRequests/paymentRequests/paramAddDetailToOrder.js";
-import paramsha2b64Request from "../../../../../utils/paramRequests/paramsha2b64Request.js";
+import mokaCreatePaymentHelper from "../../../../../utils/mokaPosRequests/mokaHelpers/mokaCreatePaymentHelper.js";
 
 import bcrypt from "bcrypt";
 import crypto from "crypto";
@@ -16,314 +12,205 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const acceptEventInvitationController = async (req, res) => {
+const acceptEventInvitationController = async ( req, res ) => {
     try{
         const response = req.params.response === "true";
         let orderId;
+        
         if(
             !req.params.invitationId
-            || !req.params.response !== Boolean
+            || ( typeof response ) !== 'boolean'
         ){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "Missing or wrong parameter"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Missing or wrong parameter"
+                            }
+                      );
         }
 
-        const invitation = await EventInvitation.findById(req.params.invitationId);
-        if(!invitation){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "Invitation not found"
-                }
-            );
+        const invitation = await EventInvitation.findById(
+                                                    req.params
+                                                       .invitationId
+                                                 );
+
+        if( !invitation ){
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Invitation not found"
+                            }
+                      );
         }
 
-        if(invitation.invitedId !== req.user._id.toString()){
-            return res.status(401).json(
-                {
-                    error: true,
-                    message: "this is not your invitation"
-                }
-            );
+        if(
+            invitation.invitedId !== req.user
+                                        ._id
+                                        .toString()
+        ){
+            return res.status( 401 )
+                      .json(
+                            {
+                                error: true,
+                                message: "this is not your invitation"
+                            }
+                       );
         }
 
-        const event = await Event.findById(invitation.eventId);
-        const isAlreadyJoined = event.willJoin.find( userId => userId === req.user._id.toString() );
+        const event = await Event.findById( invitation.eventId );
+        const isAlreadyJoined = event.willJoin
+                                     .find( 
+                                        userId => 
+                                            userId === req.user
+                                                          ._id
+                                                          .toString() 
+                                     );
+
         if(
             isAlreadyJoined
             || !response
             || !event
             || event.date <= Date.now()
-            || event.maxGuests <= event.willJoin.length
+            || (
+                event.maxGuests !== -1
+                && event.maxGuests <= event.willJoin
+                                           .length
+            )
         ){
-            await invitation.deleteOne().then(
-                (_) => {
-                    if( !response ){
-                        return res.status(500).json(
-                            {
-                                error: true,
-                                message: "Invitation rejected succesfully"
-                            }
-                        );
-                    }else{
-                        if( isAlreadyJoined ){
-                            return res.status(400).json(
-                                {
-                                    error: true,
-                                    message: "You are already participant of the event"
+            await invitation.deleteOne()
+                            .then(
+                                (_) => {
+                                    if( !response ){
+                                        return res.status( 500 )
+                                                  .json(
+                                                        {
+                                                            error: true,
+                                                            message: "Invitation rejected succesfully"
+                                                        }
+                                                   );
+                                    }else{
+                                        if( isAlreadyJoined ){
+                                            return res.status( 400 )
+                                                      .json(
+                                                            {
+                                                                error: true,
+                                                                message: "You are already participant of the event"
+                                                            }
+                                                       );
+                                        }else{
+                                            return res.status( 500 )
+                                                      .json(
+                                                            {
+                                                                error: true,
+                                                                message: "Invitation is invalid"
+                                                            }
+                                                       );
+                                        }
+                                    }
+                                }
+                            ).catch(
+                                ( error ) => {
+                                    console.log( error );
+                                    return res.status( 500 )
+                                              .json(
+                                                    {
+                                                        error: true,
+                                                        message: "Internal server error"
+                                                    }
+                                              );
                                 }
                             );
-                        }else{
-                            return res.status(500).json(
-                                {
-                                    error: true,
-                                    message: "Invitation is invalid"
-                                }
-                            );
-                        }
-                    }
-                }
-            ).catch(
-                (error) => {
-                    console.log(error);
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                    );
-                }
-            );
         }
 
-        if(invitation.ticketPrice.priceType !== "Free" && invitation.ticketPrice.price !== 0){
-            var recordCard = true;
-
+        if(
+            invitation.ticketPrice
+                      .priceType !== "Free" 
+            
+            && invitation.ticketPrice
+                         .price !== 0
+        ){
+            let recordCard = true;
             let cardGuid;
 
-            cardGuid = req.body.cardGuid.toString();
+            cardGuid = req.body.cardGuid
+                        ? req.body.cardGuid.toString()
+                        : null;
             const cardNo = req.body.cardNo.toString();
-            const cvv = req.body.cvv.toString();
+            const cvc = req.body.cvc.toString();
             const cardExpiryDate = req.body.cardExpiryDate.toString();
-            const user = await User.findById( req.user._id.toString() );
+            const userId = req.user._id.toString();
 
-            const price = invitation.ticketPrice
-                                    .price
-                                    .toLocaleString( 'tr-TR' )
-                                    .replace( '.', '' );
-
-            const priceForEventOwner = (
-                                        invitation.ticketPrice
-                                                  .price - ( 
-                                                             invitation.ticketPrice
-                                                                       .price * 100 
-                                                           ) / 15
-                                       ).toLocaleString( 'tr-TR' )
-                                        .replace( '.', '' );
-
-            if( !user.phone ){
-                return res.status( 400 ).json(
-                    {
-                        error: true,
-                        message: "user doesn't have phone number inserted"
-                    }
-                );
-            }
-            var phoneNumberWithoutZero = user.phone.replace(/\D/g, '').slice(-10);
+            const price = parseFloat(
+                                invitation.ticketPrice
+                                          .price
+                          );
 
             //take payment
-            if( req.body.recordCard && req.body.recordCard === false ){
-                recordCard = false;
+            if( 
+                req.body.recordCard
+            ){
+                recordCard = req.body.recordCard === 'true';
             }
 
-            if( 
-                cardGuid 
-                || (
-                    recordCard
-                    && cardNo
-                    && cvv
-                    && cardExpiryDate
-                )
-            ){
-                if(
-                    !cardGuid
-                    && recordCard
-                    && cardNo
-                    && cvv
-                    && cardExpiryDate
-                ){
-                    const cardName = user.userName + crypto.randomBytes(6).toString('hex');
-                    //register card
-                    const registerCardRequest = await paramRegisterCreditCardRequest(
-                        user.identity.firstName, //firstname
-                        user.identity.middleName, //middlename
-                        user.identity.lastName, //lastname
-                        cardNo, //card no
-                        cardExpiryDate.split("/")[0], //expiry date month
-                        cardExpiryDate.split("/")[1], //expiry date year
-                        cardName // random card name to keep it
-                    );
-
-                    if( !registerCardRequest || registerCardRequest.error === true ){
-                        return res.status(500).json(
+            const eventAdmin = await User.findById( invitation.eventAdminId );
+            if( !eventAdmin ){
+                return res.status( 404 )
+                          .json(
                             {
                                 error: true,
-                                message: "error while registering card"
+                                message: "Event Admin Not Found!"
                             }
-                        );
-                    }
-
-                    cardGuid = registerCardRequest.data.ksGuid;
-
-                    user.cardGuidies.push(
-                        {
-                            cardName: cardName,
-                            cardGuid: cardGuid
-                        }
-                    );
-                    
-                    user.markModified("cardGuidies");
-                    user.save(
-                        (err) => {
-                            if(err){
-                                console.log(err);
-                            }
-                        }
-                    );
-                }
-
-                const payWithRegisteredCardRequest = await paramPayWithRegisteredCard(
-                    cardGuid, //kkGuid
-                    cvv, //cvv
-                    phoneNumberWithoutZero,//phone number
-                    "https://dev.param.com.tr/tr", //success url
-                    "https://dev.param.com.tr/tr", //error url
-                    invitation._id, //order Id
-                    event.desc, //order desc
-                    price,
-                    priceForEventOwner,
-                    'NS', //payment type
-                    'https://dev.param.com.tr/tr' // ref url
-                );
-                
-                if( !payWithRegisteredCardRequest || payWithRegisteredCardRequest.error === true ){
-                    // Check payment data
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: "error paying with registered card"
-                        }
-                    );
-                }
-                //set order id
-                orderId = payWithRegisteredCardRequest.data.islemID;
-            } else if(
-                !cardGuid 
-                && !recordCard
-                && cardNo
-                && cvv
-                && cardExpiryDate
-            ){
-                const shaData = process.env.PARAM_CLIENT_CODE 
-                                + process.env.PARAM_GUID 
-                                + 1 
-                                + price 
-                                + priceForEventOwner
-                                + invitation._id;
-
-                // take payment regularly
-                const sha2b64Request = await paramsha2b64Request( shaData );
-                if( 
-                    !sha2b64Request 
-                    || sha2b64Request.error === true 
-                    || !( sha2b64Request.data.sha2b64result ) 
-                ){
-                    return res.status( 500 ).json(
-                        {
-                            error: true,
-                            message: "error on sha2b64 crypto api"
-                        }
-                    );
-                } 
-
-                const paramRegularPayRequest = await paramPayRequest(
-                    user.identity.firstName, //firstname
-                    user.identity.middleName, //middlename
-                    user.identity.lastName, //lastname
-                    price,
-                    priceForEventOwner,
-                    cardNo,
-                    cardExpiryDate.split("/")[0],
-                    cardExpiryDate.split("/")[1],
-                    cvv,
-                    phoneNumberWithoutZero,
-                    "https://dev.param.com.tr/tr", //success url
-                    "https://dev.param.com.tr/tr", //error url
-                    invitation._id,
-                    event.desc, //order desc
-                    sha2b64Request.data.sha2b64result.toString(),
-                    "NS",
-                    'https://dev.param.com.tr/tr' // ref url
-                );
-
-                if( 
-                    !paramRegularPayRequest 
-                    || payRequest.error === true 
-                    || !( payRequest.data.islemId ) 
-                ){
-                    return res.status( 500 ).json(
-                        {
-                            error: true,
-                            message: "error on pay request"
-                        }
-                    );
-                }
-
-                orderId = payRequest.data.islemId;
-            }else{
-                return res.status( 400 ).json(
-                    {
-                        error: true,
-                        message: "Missing payment info"
-                    }
-                );
+                          );
             }
 
-            if( !orderId ){
-                return res.status( 500 ).json(
-                    {
-                        error: true,
-                        message: "Internal server error"
-                    }
-                );
-            }
+            const redirectUrl = process.env.BASE_URL + "/api/paymentRedirect";
 
-            //add order detail
-            const subsellerGuid = event.eventAdminsParamGuid;
-            const paramAddDetailToOrderRequest = await paramAddDetailToOrder(
-                price,
-                priceForEventOwner,
-                orderId,
-                subsellerGuid
-            );
+            const paymentData = await mokaCreatePaymentHelper(
+                                    userId, //customer user id
+                                    cardGuid,//card guid
+                                    cardNo, //card number
+                                    cardExpiryDate.split("/")[0], //card expiry month
+                                    cardExpiryDate.split("/")[1], //card expiry year
+                                    cvc, //card cvc
+                                    invitation._id.toString(),//parent id
+                                    "EventTicket", //payment type
+                                    invitation.eventAdminId, //caregiver id
+                                    eventAdmin.careGiveGUID, //caregiver guid
+                                    price, // amount
+                                    redirectUrl,
+                                    recordCard,
+                                    true, // is from invitation
+                                );
 
             if( 
-                !paramAddDetailToOrderRequest 
-                || !paramAddDetailToOrderRequest
-                || paramAddDetailToOrderRequest.error === true 
+                !paymentData
+                || paymentData.error
+                || paymentData.serverStatus !== 1
+                || !paymentData.payData
+                || paymentData.payData === null
+                || paymentData.payData === undefined
             ){
-                return res.status( 500 ).json(
-                    {
-                        error: true,
-                        message: "Internal server error"
-                    }
-                );
+                return res.status( 500 )
+                          .json(
+                            {
+                                error: true,
+                                message: "Error While Payment",
+                                payError: paymentData
+                            }
+                          );
             }
 
+            return res.status( 200 )
+                      .json(
+                        {
+                            error: false,
+                            message: "Waiting for 3d payment approve",
+                            payData: paymentData.payData,
+                            ticket: null
+                        }
+                      );
         }
 
         const randPassword = crypto.randomBytes(10).toString('hex');
@@ -353,8 +240,9 @@ const acceptEventInvitationController = async (req, res) => {
                 expiryDate: event.expiryDate,
                 isPrivate: event.isPrivate
             }
-        ).save().then(
-            (ticket) => {
+        ).save()
+         .then(
+            ( ticket ) => {
                 const data = {
                     ticketId: ticket._id.toString(),
                     userId: req.user._id.toString(),
@@ -395,54 +283,60 @@ const acceptEventInvitationController = async (req, res) => {
                                         }
                                     }
                                 );
-                                invitation.deleteOne().then(
-                                    (_) => {
-                                        return res.status(200).json(
-                                            {
-                                                error: false,
-                                                message: `You accepted the invitation for event with "${event._id}" id succesfully`,
-                                                ticket: code.ticketUrl
+                                invitation.deleteOne()
+                                          .then(
+                                            (_) => {
+                                                return res.status( 200 )
+                                                          .json(
+                                                                {
+                                                                    error: false,
+                                                                    message: `You accepted the invitation for event with "${event._id}" id succesfully`,
+                                                                    payData: null,
+                                                                    ticket: code.ticketUrl
+                                                                }
+                                                          );
                                             }
-                                        );
-                                    }
-                                ).catch(
-                                    (error) => {
-                                        console.log(error);
-                                        return res.status(500).json(
-                                            {
-                                                error: true,
-                                                message: "Internal server error"
-                                            }
-                                        );
-                                    }
-                                );
+                                          ).catch(
+                                                ( error ) => {
+                                                    console.log( error );
+                                                    return res.status( 500 )
+                                                              .json(
+                                                                    {
+                                                                        error: true,
+                                                                        message: "Internal server error"
+                                                                    }
+                                                              );
+                                                }
+                                          );
                             }
                         ).catch(
-                            (error) => {
-                                console.log(error);
-                                return res.status(500).json(
-                                    {
-                                        error: true,
-                                        message: "Internal server error"
-                                    }
-                                );
+                            ( error ) => {
+                                console.log( error );
+                                return res.status( 500 )
+                                          .json(
+                                                {
+                                                    error: true,
+                                                    message: "Internal server error"
+                                                }
+                                          );
                             }
                         );
                     }
                 );
             }
         ).catch(
-            (err) => {
-                console.log(err);
-                return res.status(500).json(
-                    {
-                        error: true,
-                        message: "Internal server error"
-                    }
-                );
+            ( err ) => {
+                console.log( err) ;
+                return res.status( 500 )
+                          .json(
+                                {
+                                    error: true,
+                                    message: "Internal server error"
+                                }
+                          );
             }
         );
-    }catch(err){
+    }catch( err ){
         console.log("ERROR: accept invitation - ", err);
         return res.status(500).json(
             {

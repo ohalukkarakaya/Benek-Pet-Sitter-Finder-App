@@ -37,7 +37,7 @@ const mokaGetCard = async ( cardToken ) => {
                 let response
                 const responseData = await axios.request( config );
 
-                const returnedResponse = JSON.stringify( responseData.data );
+                const returnedResponse = responseData.data;
                 if(
                     !responseData
                     || responseData.status !== 200

@@ -1,6 +1,9 @@
 import EventInvitation from "../../../../../models/Event/Invitations/InviteEvent.js";
+import User from "../../../../../models/User.js";
+import Event from "../../../../../models/Event/Event.js";
 
-import prepareEventInvitationDataHelper from "../../../../../utils/invitations/invitationDataHelpers/prepareEventInvitationDataHelper.js";
+import getLightWeightEventInfoHelper from "../../../../../utils/getLightWeightEventInfoHelper.js";
+import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
 const getEventInvitationsController = async ( req, res ) => {
     try{
@@ -9,10 +12,12 @@ const getEventInvitationsController = async ( req, res ) => {
         const limit = parseInt( req.params.limit ) || 15;
 
         const invitationQuery = { invitedId: userId };
+
         const invitations = await EventInvitation.find(
-            invitationQuery
-        ).skip( skip )
-         .limit( limit );
+                                                        invitationQuery
+                                                  ).skip( skip )
+                                                   .limit( limit )
+                                                   .lean(); 
 
         const totalInvitationCount = await EventInvitation.countDocuments( invitationQuery );
 
@@ -25,28 +30,32 @@ const getEventInvitationsController = async ( req, res ) => {
             );
         }
 
-        let newInvitationList = [];
         for(
             let invitation
             of invitations
         ){
-            const preparedInvitationData = await prepareEventInvitationDataHelper( invitation );
-            if(
-                !preparedInvitationData
-                || !( preparedInvitationData.data )
-                || preparedInvitationData.length <= 0
-                || preparedInvitationData.error
-            ){
-                return res.status( 500 )
-                          .json(
-                            {
-                                error: true,
-                                message: preparedInvitationData.message
-                            }
-                          );
-            }
+            const eventAdmin = await User.findById( 
+                                                invitation.eventAdminId
+                                                          .toString() 
+                                          );
 
-            newInvitationList.push( preparedInvitationData.data );
+            const eventAdminInfo = getLightWeightUserInfoHelper( eventAdmin );
+
+            invitation.admin = eventAdminInfo;
+            delete invitation.invitedId;
+
+            const invitedEvent = await Event.findById( invitation.eventId );
+
+            const eventInfo = await getLightWeightEventInfoHelper( invitedEvent );
+
+            invitation.event = eventInfo;
+            invitation.ticketPrice = eventInfo.ticketPrice;
+
+            delete invitation.eventId;
+            delete invitation.eventAdminId;
+            delete invitation.__v;
+            delete invitation.createdAt;
+            delete invitation.updatedAt;
         }
 
         return res.status( 200 )
@@ -55,7 +64,7 @@ const getEventInvitationsController = async ( req, res ) => {
                             error: true,
                             message: "Releated Invitation List Prepared Succesfully",
                             totalInvitationCount: totalInvitationCount,
-                            invitations: newInvitationList
+                            invitations: invitations
                         }
                   );
         
