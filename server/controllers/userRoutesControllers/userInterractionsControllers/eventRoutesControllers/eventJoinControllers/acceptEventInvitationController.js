@@ -2,6 +2,7 @@ import User from "../../../../../models/User.js";
 import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
 import EventInvitation from "../../../../../models/Event/Invitations/InviteEvent.js";
+import PaymentData from "../../../../../models/PaymentData/PaymentData.js";
 
 import mokaCreatePaymentHelper from "../../../../../utils/mokaPosRequests/mokaHelpers/mokaCreatePaymentHelper.js";
 
@@ -9,6 +10,7 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import QRCode from "qrcode";
 import dotenv from "dotenv";
+
 
 dotenv.config();
 
@@ -122,6 +124,30 @@ const acceptEventInvitationController = async ( req, res ) => {
                                               );
                                 }
                             );
+        }
+
+        const didAlreadyPaid = await PaymentData.findOne( 
+                                                    { 
+                                                        parentContentId: req.params
+                                                                            .invitationId
+                                                                            .toString()
+                                                    } 
+                                                );
+
+        if( didAlreadyPaid ){
+            return res.status( 200 )
+                      .json(
+                        {
+                            error: false,
+                            message: "Already Paid",
+                            payData: {
+                                paymentDataId: didAlreadyPaid._id.toString(),
+                                paymentUniqueCode: didAlreadyPaid.paymentUniqueCode,
+                                threeDUrl: didAlreadyPaid.threeDUrl,
+                            },
+                            ticket: null
+                        }
+                      );
         }
 
         if(
