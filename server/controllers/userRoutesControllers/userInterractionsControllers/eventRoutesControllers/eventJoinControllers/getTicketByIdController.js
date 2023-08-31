@@ -1,5 +1,6 @@
 import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
+
 import getTicketInfoHelper from "../../../../../utils/getInfoOfEventTicketHelper.js";
 
 const getTicketByIdController = async ( req, res ) => {

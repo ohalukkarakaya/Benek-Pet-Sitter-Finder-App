@@ -2,24 +2,30 @@ import User from "../../../../../models/User.js";
 import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
 
+import getTicketInfoHelper from "../../../../../utils/getInfoOfEventTicketHelper.js";
+
 const getTicketsByEventIdController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
         const eventId = req.params.eventId.toString();
+        const skip = parseInt( req.params.skip ) || 0;
+        const limit = parseInt( req.params.limit ) || 15;
         if( !eventId ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "Missing Params"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Missing Params"
+                            }
+                      );
         }
 
-        const eventTickets = await  EventTicket.find(
-            {
-                eventId: eventId
-            }
-        );
+        const query = { eventId: eventId };
+        const eventTickets = await  EventTicket.find( query )
+                                               .skip( skip )
+                                               .limit( limit );
+
+        const totalTickets = await EventTicket.countDocuments( query );
         
         if( eventTickets.length <= 0 ){
             return res.status( 404 ).json(
@@ -30,95 +36,44 @@ const getTicketsByEventIdController = async ( req, res ) => {
             );
         }
 
-        eventTickets.forEach(
-            async ( ticket ) => {
-                if(
-                    userId === ticket.userId
-                    || ticket.eventOrganizers.includes( userId ) 
-                ){
-                    const eventOfTicket = await Event.findById( ticket.eventId.toString() );
-                    const eventAdmin = await User.findById( eventOfTicket.eventAdmin.toString() );
-                    const eventAdminInfo = {
+        const eventOfTicket = await Event.findById( eventId.toString() );
+        const isOrganizerOrAdmin = eventOfTicket.eventOrganizers
+                                                .find(
+                                                    organizerId =>
+                                                        organizerId.toString() === userId
+                                                );
 
-                        userId: eventAdmin._id
-                                        .toString(),
-        
-                        userProfileImg: eventAdmin.profileImg
-                                                .imgUrl,
-        
-                        username: eventAdmin.userName,
-        
-                        userFullName: `${
-                                eventAdmin.identity
-                                        .firstName
-                            } ${
-                                eventAdmin.identity
-                                        .middleName
-                            } ${
-                                eventAdmin.identity
-                                        .lastName
-                            }`.replaceAll( "  ", " ")
-                    };
-
-                    eventOfTicket.eventOrganizers.forEach(
-                        async ( organizerId ) => {
-                            const organizer = await User.findById( organizerId.toString() );
-                            const organizerObject = {
-
-                                userId: organizer._id
-                                                .toString(),
-                
-                                userProfileImg: organizer.profileImg
-                                                        .imgUrl,
-                
-                                username: organizer.userName,
-                
-                                userFullName: `${
-                                        organizer.identity
-                                                .firstName
-                                    } ${
-                                        organizer.identity
-                                                .middleName
-                                    } ${
-                                        organizer.identity
-                                                .lastName
-                                    }`.replaceAll( "  ", " ")
-                            };
-
-                            organizerId = organizerObject;
+        if(
+            !isOrganizerOrAdmin
+        ){
+            return res.status( 401 )
+                      .json(
+                        {
+                            error: true,
+                            message: "You are not authorized to see all tickets"
                         }
-                    );
+                      );
+        }
 
-                    const ticketInfo = {
-                        ticketId: ticket._id.toString(),
-                        eventId: eventOfTicket._id.toString(),
-                        eventImage: eventOfTicket.imgUrl,
-                        eventDesc: eventOfTicket.desc,
-                        eventAdmin: eventAdminInfo,
-                        eventOrganizers: eventOfTicket.eventOrganizers,
-                        eventAdress: eventOfTicket.adress,
-                        ticketPrice: ticket.paidPrice,
-                        boughtAt: ticket.boughtAt,
-                        isPrivate: ticket.isPrivate,
-                        eventDate: ticket.eventDate,
-                        orderId: ticket.orderId,
-                        ticketUrl: ticket.ticketUrl
-                    };
+        let tickets = [];
+        for(
+            let ticket
+            of eventTickets
+        ){
 
-                    ticket = ticketInfo
-                }else{
-                    ticket = null;
-                }
-            }
-        );
+            const ticketInfo = await getTicketInfoHelper( ticket, eventOfTicket );
+            tickets.push( ticketInfo );
+        }
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "Ticket List Prepared Succesfully",
-                tickets: eventTickets
-            }
-        );
+        return res.status( 200 )
+                  .json(
+                        {
+                            error: false,
+                            message: "Ticket List Prepared Succesfully",
+                            totalTicketCount: totalTickets,
+                            tickets: tickets
+                        }
+                  );
     }catch( err ){
         console.log("ERROR: getTicketsByEventIdController - ", err);
         res.status(500).json(

@@ -81,9 +81,10 @@ router.get(
     getTicketByIdController
 );
 
+// - tested
 //get tickets by eventId
 router.get(
-    "/getTicketsByEventId/:EventId",
+    "/getTicketsByEventId/:eventId/:skip/:limit",
     auth,
     getTicketsByEventIdController
 );
