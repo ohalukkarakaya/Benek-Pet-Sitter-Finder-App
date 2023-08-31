@@ -36,8 +36,11 @@ router.post(
 
         const paymentData = await PaymentData.findOne({ paymentUniqueCode: paymentUniqueId });
 
-        if( !paymentData ){
-            return res.redirect( `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=false` );
+        if( 
+            !paymentData
+            || paymentData.isPaid
+        ){
+            return res.redirect( `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=false&alreadyPaid=true` );
         }
 
         const codeForHash = paymentData.codeForHash
@@ -102,7 +105,10 @@ router.get(
     "/",
     async ( req, res ) => {
         const isSuccess = req.query.isSuccess === 'true';
+        const alreadyPaid = req.query.alreadyPaid === 'true';
         const ticketId = req.query.ticketId;
+        
+        const alreadyPaidMessage = "işlem zaten gerçekleşti,"
 
         if( isSuccess ){
             return res.status( 200 )
@@ -118,7 +124,7 @@ router.get(
                       .json(
                             {
                                 error: true,
-                                message: "İşlem Başarısız, Yönlendiriliyorsunuz",
+                                message: `İşlem ${ alreadyPaid ? alreadyPaidMessage : "Başarısız" }, Yönlendiriliyorsunuz`,
                                 ticketId: null
                             }
                       );

@@ -8,9 +8,7 @@ const mokaAfter3dPaySuccesHelper = async (virtualPosOrderId, paymentData) => {
         if (
             paymentData.type === "EventTicket"
         ) {
-            const parentId = paymentData.isFromInvitation
-                ? paymentData.parentContentId
-                : null;
+            const parentId = paymentData.parentContentId;
 
             const careGiver = await User.findById( paymentData.subSellerId );
             

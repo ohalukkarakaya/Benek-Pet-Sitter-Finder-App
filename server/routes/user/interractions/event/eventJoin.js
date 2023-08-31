@@ -24,7 +24,7 @@ router.post(
 );
 
 // - tested
-// - pay 3d secure: tested | accept free event: - tested
+// - pay 3d secure: tested | accept free event: tested
 //accept invitation
 router.put(
     "/invitation/:invitationId/:response",
@@ -32,7 +32,8 @@ router.put(
     acceptEventInvitationController
 );
 
-// - 
+// - tested
+// - pay 3d secure: tested | return ticket: tested | get free ticket: tested
 //buy ticket for event
 router.post(
     "/:eventId",

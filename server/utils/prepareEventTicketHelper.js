@@ -9,6 +9,33 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+function generateQRCode( ticketData, ticket ){
+    return new Promise(
+        ( resolve, reject ) => {
+            QRCode.toDataURL(
+                ticketData, 
+                async ( err, url ) => {
+                    if ( err ) {
+                        reject(
+                            {
+                                error: true,
+                                serverStatus: -1,
+                                message: "Internal server error"
+                            }
+                        );
+                    } else {
+                        ticket.ticketUrl = url;
+                        ticket.markModified( "ticketUrl" );
+                        const ticketToSend = await ticket.save();
+                        resolve( ticketToSend );
+                    }
+                }
+            );
+        }
+    );
+}
+
+
 const prepareEventTicketHelper = async (
     userId,
     invitationId,
@@ -74,25 +101,7 @@ const prepareEventTicketHelper = async (
 
         let ticketData = JSON.stringify( data );
 
-        let ticketToSend;
-        QRCode.toDataURL( 
-            ticketData, 
-            async ( err, url ) => {
-                if( err ){
-                    return {
-                        error: true,
-                        serverStatus: -1,
-                        message: "Internal server error"
-                    };
-                }else{
-                    ticket.ticketUrl = url;
-                    ticket.markModified("ticketUrl");
-                    ticketToSend = await ticket.save();
-                }
-
-                
-            }
-        );
+        const ticketToSend = await generateQRCode( ticketData, ticket );
 
         mentionedEvent.willJoin
         && mentionedEvent.willJoin.length >= 0

@@ -142,7 +142,7 @@ const acceptEventInvitationController = async ( req, res ) => {
                                 : null;
 
             const cardNo = req.body.cardNo.toString();
-            const cvc = req.body.cvc.toString();
+            const cvv = req.body.cvv.toString();
             const cardExpiryDate = req.body.cardExpiryDate.toString();
             const userId = req.user._id.toString();
             const price = parseFloat( invitation.ticketPrice.price );
@@ -155,7 +155,7 @@ const acceptEventInvitationController = async ( req, res ) => {
                                             cardNo, //card number
                                             cardExpiryDate.split("/")[0], //card expiry month
                                             cardExpiryDate.split("/")[1], //card expiry year
-                                            cvc, //card cvc
+                                            cvv, //card cvv
                                             invitation._id.toString(), //parent id
                                             "EventTicket", //payment type
                                             invitation.eventAdminId, //caregiver id
