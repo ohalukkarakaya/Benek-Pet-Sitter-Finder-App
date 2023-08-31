@@ -10,6 +10,62 @@ import mokaCheckifCardAlreadyRegisteredHelper from "../mokaHelpers/mokaCheckifCa
 
 import crypto from "crypto";
 
+const generateUniqueCode = () => {
+    return crypto.randomBytes( 12 )
+                 .toString('hex');
+};
+
+const validateCardData = (
+    cardToken, 
+    cardNumber, 
+    cardExpiryMonth, 
+    cardExpiryYear, 
+    cardCvc, 
+    paymentType
+) => {
+    if(
+        !cardToken 
+        && !(
+            cardNumber 
+            && cardExpiryMonth 
+            && cardExpiryYear 
+            && cardCvc
+        ) 
+        && !(
+            paymentType === "CareGive" 
+            || paymentType === "EventTicket" 
+            || paymentType === "Donation"
+        )
+    ){
+        throw new Error( "Missing Card or Payment Info" );
+    }
+};
+
+const validateCustomer = ( customer ) => {
+    if ( !customer ){
+        throw new Error( "Customer Not Found" );
+    }
+};
+
+const validateCustomerInfo = ( customer ) => {
+    if (
+        !(
+            customer.phone 
+            && customer.isPhoneVerified
+        ) 
+        || !(
+            customer.email 
+            && customer.isEmailVerified
+        ) 
+        || !( 
+            customer.identity
+                    .openAdress
+        )
+    ){
+        throw new Error( "Please Insert Your Phone & Email & Adress Firstly" );
+    }
+};
+
 const mokaCreatePaymentHelper = async (
     customerUserId,
     cardToken,
@@ -23,130 +79,81 @@ const mokaCreatePaymentHelper = async (
     careGiverGuid,
     amount,
     redirectUrl,
-    sholudRegisterCard,
+    shouldRegisterCard,
     isFromInvitation
-) => { 
-    try{
+) => {
+    try {
         if( !careGiverGuid ){
             return {
                 error: true,
                 serverStatus: -1,
                 message: "CareGiverGuid is required"
-            }
-        }
-        if(
-            !cardToken
-            && !(
-                cardNumber
-                && cardExpiryMonth
-                && cardExpiryYear
-                && cardCvc
-            )
-            && !(
-                paymentType === "CareGive"
-                || paymentType === "EventTicket"
-                || paymentType === "Donation"
-            )
-        ){
-            return {
-                error: true,
-                serverStatus: -1,
-                message: "Missing Card or Payment Info"
-            }
+            };
         }
 
-        const paymentUniqueCode = crypto.randomBytes( 12 )
-                                    .toString( 'hex' );
+        const paymentUniqueCode = generateUniqueCode();
+
+        validateCardData(
+            cardToken, 
+            cardNumber, 
+            cardExpiryMonth, 
+            cardExpiryYear, 
+            cardCvc, 
+            paymentType
+        );
 
         let payProcess;
-
-        let isPayWithRegisteredCard = cardToken
-                                      && cardToken !== undefined
-                                      && cardToken !== null;
-
         let registeredCardInfo;
 
         const checkCustomer = await mokaGetCustomerRequest( customerUserId );
-        const isCustomerRegistered = !( checkCustomer.error )
-                                        && (
-                                            checkCustomer.serverStatus > 0
-                                            || (
-                                                checkCustomer.data
-                                                && checkCustomer.data
-                                                                .sonuc > 0
-                                            )
+        const isCustomerRegistered = !( checkCustomer.error ) 
+                                      && (
+                                        checkCustomer.serverStatus > 0 
+                                        || (
+                                            checkCustomer.data 
+                                            && checkCustomer.data
+                                                            .sonuc > 0
                                         )
-                                        && checkCustomer.data
-                                        && checkCustomer.data
-                                                        .customerData
-                                                        .DealerCustomer
-                                                        .CustomerCode;
+                                     ) 
+                                     && checkCustomer.data 
+                                     && checkCustomer.data
+                                                     .customerData
+                                                     .DealerCustomer
+                                                     .CustomerCode;
 
         const customer = await User.findById( customerUserId );
-        if( !customer ){
-            return {
-                error: true,
-                serverStatus: -1,
-                message: "Customer Not Found"
-            }
-        }
+        validateCustomer( customer );
 
-        if( !isPayWithRegisteredCard ){
-
-
+        if( !cardToken ){
             if( !isCustomerRegistered ){
+                validateCustomerInfo( customer );
 
-                // check customer users required info
-                if( 
-                    !(
-                        customer.phone
-                        && customer.isPhoneVerified
-                    )
-                    || !(
-                        customer.email
-                        && customer.isEmailVerified
-                    )
-                    || !(
-                        customer.identity
-                                .openAdress
-                    )
-                ){
-                    return {
-                        error: true,
-                        serverStatus: 0,
-                        message: "Please Insert Your Phone & Email & Adress Firstly"
-                    }
-                }
-
-                var phoneNumberWithoutZero = customer.phone
-                                                     .replace(/\D/g, '')
-                                                     .slice(-10);
+                const phoneNumberWithoutZero = customer.phone
+                                                       .replace(/\D/g, '')
+                                                       .slice( -10 );
 
                 const registerCustomer = await mokaRegisterCustomerRequest(
-                                            customerUserId,
-                                            customer.identity.firstName,
-                                            customer.identity.lastName,
-                                            phoneNumberWithoutZero,
-                                            customer.email,
-                                            customer.identity
-                                                    .openAdress
-                                        );
+                    customerUserId,
+                    customer.identity.firstName,
+                    customer.identity.lastName,
+                    phoneNumberWithoutZero,
+                    customer.email,
+                    customer.identity.openAdress
+                );
 
-                if( 
-                    !registerCustomer
-                    || registerCustomer.error
-                    || !(
-                        registerCustomer.data
+                if(
+                    !registerCustomer 
+                    || registerCustomer.error 
+                    || !registerCustomer.data
                                         .customerData
                                         .DealerCustomer
                                         .DealerCustomerId
-                    )
                 ){
                     return {
                         error: true,
                         serverStatus: -1,
                         message: "Error While Customer Registration"
-                    }
+                    };
                 }
             }
 
@@ -155,54 +162,44 @@ const mokaCreatePaymentHelper = async (
                                                         cardNumber
                                                   );
 
-            if( 
-                sholudRegisterCard
-                && ! isCardAlreadyRegistered.isCardAlreadyRegistered
+            if(
+                shouldRegisterCard 
+                && !isCardAlreadyRegistered.isCardAlreadyRegistered
             ){
-
-                let cardName = customer.userName 
-                                            + "_" 
-                                            + customerUserId
-                                            + "_"
-                                            + crypto.randomBytes( 3 )
-                                                    .toString( 'hex' );
+                const cardName = `${customer.userName}_${customerUserId}_${crypto.randomBytes(3).toString('hex')}`;
 
                 const registerCard = await mokaRegisterCardRequest(
-                                                customerUserId,
-                                                customer.identity.firstName,
-                                                customer.identity.middleName,
-                                                customer.identity.lastName,
-                                                cardNumber.replaceAll( " ", "" ),
-                                                cardExpiryMonth,
-                                                cardExpiryYear,
-                                                cardName
-                                           );
+                    customerUserId,
+                    customer.identity.firstName,
+                    customer.identity.middleName,
+                    customer.identity.lastName,
+                    cardNumber.replaceAll(" ", ""),
+                    cardExpiryMonth,
+                    cardExpiryYear,
+                    cardName
+                );
 
                 if(
-                    registerCard.error
+                    registerCard.error 
                     && registerCard.serverStatus === 0
                 ){
-                    return registerCard
+                    return registerCard;
                 }
 
                 registeredCardInfo = registerCard.data
-                                                 .customerData
-                                                 .CardList
-                                                 .find(
-                                                    cardObject =>
+                                                .customerData
+                                                .CardList
+                                                .find(
+                                                    cardObject => 
                                                         cardObject.CardName === cardName
-                                                 );
+                                                );
 
                 if(
-                    !registerCard
-                    || registerCard.error
+                    !registerCard 
+                    || registerCard.error 
+                    || !registeredCardInfo 
                     || !(
-                        registerCard.data
-                                    .customerData
-                                    .CardList
-
-                        && registeredCardInfo
-
+                        registerCard.data.customerData.CardList 
                         && registerCard.data
                                        .customerData
                                        .CardList
@@ -214,7 +211,7 @@ const mokaCreatePaymentHelper = async (
                         error: true,
                         serverStatus: registerCard.serverStatus,
                         message: registerCard.message
-                    }
+                    };
                 }
 
                 const cardDataToSave = {
@@ -222,106 +219,44 @@ const mokaCreatePaymentHelper = async (
                     cardGuid: registeredCardInfo.CardToken
                 };
 
-                customer.cardGuidies = customer.cardGuidies !== undefined
-                                            ? customer.cardGuidies
-                                                      .push( cardDataToSave )
-                                            
+                customer.cardGuidies = customer.cardGuidies !== undefined 
+                                            ? customer.cardGuidies.push( cardDataToSave ) 
                                             : customer.cardGuidies = [ cardDataToSave ];
 
                 customer.markModified( "cardGuidies" );
             }
         }
 
-        const isCardRegistered = (
-            registeredCardInfo
-            && registeredCardInfo !== undefined
-            && registeredCardInfo !== null
+        payProcess = await mokaCreate3dPaymentRequest(
+            cardToken,
+            customer.identity.firstName,
+            customer.identity.middleName,
+            customer.identity.lastName,
+            cardNumber,
+            cardExpiryMonth,
+            cardExpiryYear,
+            cardCvc,
+            amount,
+            paymentUniqueCode,
+            paymentType,
+            redirectUrl,
+            careGiverGuid,
+            30
         );
 
-        isPayWithRegisteredCard
-        || isCardRegistered
-            ? payProcess = await mokaCreate3dPaymentRequest(
-                isPayWithRegisteredCard
-                    ? cardToken
-                    : registeredCardInfo.CardToken,
-                customer.identity.firstName,
-                customer.identity.middleName,
-                customer.identity.lastName,
-                null, // card Number
-                null, //card exp month
-                null, //card exp year
-                null ,// card cvc
-                amount,
-                paymentUniqueCode,
-                paymentType,
-                redirectUrl,
-                careGiverGuid,
-                30
-            )
-
-            : payProcess = await mokaCreate3dPaymentRequest(
-                null, // card token
-                customer.identity.firstName,
-                customer.identity.middleName,
-                customer.identity.lastName,
-                cardNumber, // card Number
-                cardExpiryMonth, //card exp month
-                cardExpiryYear, //card exp year
-                cardCvc ,// card cvc
-                amount,
-                paymentUniqueCode,
-                paymentType,
-                redirectUrl,
-                careGiverGuid,
-                30
-            );
-
-        if( isCardRegistered ){
-            customer.save(
-                function ( err ) {
-                    if( err ) {
-                        console.error( 'ERROR: While Saving Customer!' );
-                    }
-                  }
-            );
-        }
-
-
-        if(
-            !payProcess
-            || payProcess.error
+        if (
+            !payProcess 
+            || payProcess.error 
             || !(
-                payProcess.data
-                          .threeDPayData
-                          .Url
-
-                && payProcess.data
-                             .threeDPayData
-                             .Url !== undefined
-
-                && payProcess.data
-                             .threeDPayData
-                             .Url !== null
-            )
-            || !(
-                payProcess.data
-                          .threeDPayData
-                          .CodeForHash
-
-                && payProcess.data
-                             .threeDPayData
-                             .CodeForHash !== undefined
-
-                && payProcess.data
-                             .threeDPayData
-                             .CodeForHash !== null
+                payProcess.data.threeDPayData.Url 
+                && payProcess.data.threeDPayData.CodeForHash
             )
         ){
             return {
                 error: true,
                 serverStatus: payProcess.serverStatus,
                 message: payProcess.message
-            }
+            };
         }
 
         const savedPaymentData = await new PaymentData(
@@ -345,7 +280,7 @@ const mokaCreatePaymentHelper = async (
         const processedPaymentData = {
             error: false,
             serverStatus: 1,
-            message: "Payment Open Succesfully",
+            message: "Payment Open Successfully",
             payData: {
                 paymentDataId: savedPaymentData._id.toString(),
                 paymentUniqueCode: savedPaymentData.paymentUniqueCode,
@@ -359,9 +294,9 @@ const mokaCreatePaymentHelper = async (
         return {
             error: true,
             serverStatus: -1,
-            message: " Internal Server Error"
-        }
+            message: "Internal Server Error"
+        };
     }
-}
+};
 
 export default mokaCreatePaymentHelper;

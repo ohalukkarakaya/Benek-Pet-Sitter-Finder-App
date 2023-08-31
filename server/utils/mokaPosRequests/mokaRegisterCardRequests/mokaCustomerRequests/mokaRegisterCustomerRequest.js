@@ -1,6 +1,5 @@
 import mokaCredentialsHelper from "../../mokaHelpers/mokaCredentialsHelper.js";
 import truncateAdressForMoka from "../../mokaHelpers/truncateAdressForMoka.js";
-
 import axios from "axios";
 import dotenv from "dotenv";
 
@@ -15,89 +14,61 @@ const mokaRegisterCustomerRequest = async (
     email,
     address
 ) => {
-    return new Promise(
-        async (
-            resolve,
-            reject
-        ) => {
-            const mokaCredentials = mokaCredentialsHelper();
+    try{
+        const mokaCredentials = mokaCredentialsHelper();
+        const openAdressMaxLength = 50;
+        const openAdressFinal = truncateAdressForMoka( address, openAdressMaxLength );
 
-            let openAdressMaxLength = 50;
-            const openAdressFinal = truncateAdressForMoka( address, openAdressMaxLength );
+        const dealerCustomerRequest = {
+            "CustomerCode": userId,
+            "Password": userId,
+            "FirstName": firstName,
+            "LastName": lastName,
+            "GsmNumber": phoneNumber.replace("+90", ""),
+            "Email": email,
+            "Address": openAdressFinal
+        };
 
-            const dealerCustomerRequest = {
-                "CustomerCode": userId,
-                "Password": userId,
-                "FirstName": firstName,
-                "LastName": lastName,
-                "GsmNumber": phoneNumber.replaceAll( "+90", "" ),
-                "Email": email,
-                "Address": openAdressFinal
-            }
+        const data = {
+            "DealerCustomerAuthentication": mokaCredentials,
+            "DealerCustomerRequest": dealerCustomerRequest
+        };
 
-            
-            const data = {
-                "DealerCustomerAuthentication": mokaCredentials,
-                "DealerCustomerRequest": dealerCustomerRequest
+        const config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${env.MOKA_TEST_URL_BASE}/DealerCustomer/AddCustomer`,
+            headers: { 'Content-Type': 'application/json' },
+            data: data
+        };
 
-            }
+        const responseData = await axios.request( config );
+        const returnedResponse = responseData.data;
 
-            const config = {
-                method: 'post',
-                maxBodyLength: Infinity,
-                url: `${ env.MOKA_TEST_URL_BASE }/DealerCustomer/AddCustomer`,
-                headers: { 'Content-Type': 'application/json' },
-                data: data
-            };
-
-            try{
-                let response
-                const responseData = await axios.request( config );
-
-                const returnedResponse = responseData.data;
-                if(
-                    !responseData
-                    || responseData.status !== 200
-                    || returnedResponse.ResultCode !== "Success"
-                ){
-                    reject(
-                        {
-                            error: true,
-                            serverStatus: -1,
-                            message: `Api error: ${ responseData.status }, Server Message: ${ returnedResponse.ResultCode }`
-                        }
-                    );
-                }
-
-                let sonuc = returnedResponse.ResultCode === "Success"
-                                ? 1
-                                : -1;
-
-                let sonucStr = returnedResponse.ResultCode;
-                let customerData = returnedResponse.Data;
-
-                response = {
-                    error: false,
-                    data: {
-                        sonuc: sonuc,
-                        sonucStr: sonucStr,
-                        customerData: customerData
-                    }
-                }
-                
-                resolve( response );
-            }catch( err ){
-                console.log( "ERROR: mokaRegisterCustomerRequest - ", err );
-                reject(
-                    {
-                        error: true,
-                        serverStatus: -1,
-                        message: "Internal Server Error",
-                    }
-                );
-            }
+        if(
+            !responseData 
+            || responseData.status !== 200 
+            || returnedResponse.ResultCode !== "Success"
+        ) {
+            throw new Error( `Api error: ${responseData.status}, Server Message: ${returnedResponse.ResultCode}` );
         }
-    );
-}
+
+        const sonuc = returnedResponse.ResultCode === "Success" ? 1 : -1;
+        const sonucStr = returnedResponse.ResultCode;
+        const customerData = returnedResponse.Data;
+
+        return {
+            error: false,
+            data: {
+                sonuc: sonuc,
+                sonucStr: sonucStr,
+                customerData: customerData
+            }
+        };
+    }catch( err ){
+        console.log( "ERROR: mokaRegisterCustomerRequest - ", err );
+        throw new Error( "Internal Server Error" );
+    }
+};
 
 export default mokaRegisterCustomerRequest;
