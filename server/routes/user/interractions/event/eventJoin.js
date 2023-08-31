@@ -23,7 +23,8 @@ router.post(
     invitePrivateEventController
 );
 
-// - pay 3d secure: tested | TO DO: accept free event
+// - tested
+// - pay 3d secure: tested | accept free event: - tested
 //accept invitation
 router.put(
     "/invitation/:invitationId/:response",
@@ -31,6 +32,7 @@ router.put(
     acceptEventInvitationController
 );
 
+// - 
 //buy ticket for event
 router.post(
     "/:eventId",
@@ -38,6 +40,7 @@ router.post(
     buyTicketForEventController
 );
 
+// - To Do
 //use ticket
 router.put(
     "/:eventId",
@@ -61,6 +64,7 @@ router.get(
     getSendedEventInvitationsController
 );
 
+// - tested
 //get owned tickets
 router.get(
     "/getOwnedTickets",
@@ -68,6 +72,7 @@ router.get(
     getOwnedTicketsController
 );
 
+// - tested
 //get ticket by id
 router.get(
     "/getTicketById/:ticketId",

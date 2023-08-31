@@ -1,6 +1,6 @@
-import User from "../../../../../models/User.js";
 import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
+import getTicketInfoHelper from "../../../../../utils/getInfoOfEventTicketHelper.js";
 
 const getOwnedTicketsController = async ( req, res ) => {
     try{
@@ -10,7 +10,7 @@ const getOwnedTicketsController = async ( req, res ) => {
             {
                 userId: userId
             }
-        );
+        ).lean();
         
         if( eventTickets.length <= 0 ){
             return res.status( 404 ).json(
@@ -21,90 +21,28 @@ const getOwnedTicketsController = async ( req, res ) => {
             );
         }
 
-        eventTickets.forEach(
-            async ( ticket ) => {
-                const eventOfTicket = await Event.findById( ticket.eventId.toString() );
-                const eventAdmin = await User.findById( eventOfTicket.eventAdmin.toString() );
-                const eventAdminInfo = {
+        let tickets = [];
 
-                    userId: eventAdmin._id
-                                      .toString(),
-    
-                    userProfileImg: eventAdmin.profileImg
-                                              .imgUrl,
-    
-                    username: eventAdmin.userName,
-    
-                    userFullName: `${
-                            eventAdmin.identity
-                                      .firstName
-                        } ${
-                            eventAdmin.identity
-                                      .middleName
-                        } ${
-                            eventAdmin.identity
-                                      .lastName
-                        }`.replaceAll( "  ", " ")
-                };
+        for(
+            let ticket
+            of eventTickets
+        ){
+            const eventOfTicket = await Event.findById( ticket.eventId.toString() ).lean();
 
-                eventOfTicket.eventOrganizers.forEach(
-                    async ( organizerId ) => {
-                        const organizer = await User.findById( organizerId.toString() );
-                        const organizerObject = {
+            const ticketInfo = await getTicketInfoHelper( ticket, eventOfTicket );
 
-                            userId: organizer._id
-                                             .toString(),
-            
-                            userProfileImg: organizer.profileImg
-                                                     .imgUrl,
-            
-                            username: organizer.userName,
-            
-                            userFullName: `${
-                                    organizer.identity
-                                             .firstName
-                                } ${
-                                    organizer.identity
-                                             .middleName
-                                } ${
-                                    organizer.identity
-                                             .lastName
-                                }`.replaceAll( "  ", " ")
-                        };
-
-                        organizerId = organizerObject;
-                    }
-                );
-
-                const ticketInfo = {
-                    ticketId: ticket._id.toString(),
-                    eventId: eventOfTicket._id.toString(),
-                    eventImage: eventOfTicket.imgUrl,
-                    eventDesc: eventOfTicket.desc,
-                    eventAdmin: eventAdminInfo,
-                    eventOrganizers: eventOfTicket.eventOrganizers,
-                    eventAdress: eventOfTicket.adress,
-                    ticketPrice: ticket.paidPrice,
-                    boughtAt: ticket.boughtAt,
-                    isPrivate: ticket.isPrivate,
-                    eventDate: ticket.eventDate,
-                    orderId: ticket.orderId,
-                    ticketUrl: ticket.ticketUrl
-                };
-
-                ticket = ticketInfo
-            }
-        );
+            tickets.push( ticketInfo );
+        }
 
         return res.status( 200 ).json(
             {
                 error: false,
                 message: "Ticket List Prepared Succesfully",
-                tickets: eventTickets
+                tickets: tickets
             }
         );
     }catch( err ){
-        console.log("ERROR: getOwnedTicketsController - ", err);
+        console.log( "ERROR: getOwnedTicketsController - ", err );
         res.status(500).json(
             {
                 error: true,

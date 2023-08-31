@@ -5,6 +5,7 @@ import EventInvitation from "../../../../../models/Event/Invitations/InviteEvent
 import PaymentData from "../../../../../models/PaymentData/PaymentData.js";
 
 import mokaCreatePaymentHelper from "../../../../../utils/mokaPosRequests/mokaHelpers/mokaCreatePaymentHelper.js";
+import prepareEventTicketHelper from "../../../../../utils/prepareEventTicketHelper.js";
 
 import bcrypt from "bcrypt";
 import crypto from "crypto";
@@ -205,85 +206,45 @@ const acceptEventInvitationController = async ( req, res ) => {
                       );
         }
 
-        const randPassword = crypto.randomBytes( 10 )
-                                   .toString( 'hex' );
-
-        const salt = await bcrypt.genSalt(
-                                    Number(
-                                        process.env
-                                               .SALT
-                                    )
-                                  );
-
-        const hashTicketPassword = await bcrypt.hash( randPassword, salt );
-        const paidPrice = invitation.ticketPrice
-                                    .price
-                                    .toLocaleString( 'tr-TR' )
-                                    .replace( '.', '' );
-
-        const newEventTicket = new EventTicket(
-                                    {
-                                        eventOrganizers: event.eventOrganizers,
-                                        eventId: event._id.toString(),
-                                        userId: req.user._id.toString(),
-                                        ticketPassword: hashTicketPassword,
-                                        paidPrice: paidPrice,
-                                        eventDate: event.date,
-                                        expiryDate: event.expiryDate,
-                                        isPrivate: event.isPrivate,
-                                        ticketUrl: null
-                                    }
-                              );
-
-        const ticket = await newEventTicket.save();
-
-        const data = {
-            ticketId: ticket._id.toString(),
-            userId: req.user._id.toString(),
-            eventId: event._id.toString(),
-            ticketPassword: randPassword,
+        const careGiver = await User.findById( invitation.eventAdminId );
+        if( 
+            !careGiver 
+            || careGiver.deactivation.isDeactive
+        ){
+            return res.status( 404 )
+                      .json(
+                        {
+                            error: true,
+                            message: "CareGiver not Found"
+                        }
+                      );
         }
 
-        let ticketData = JSON.stringify( data );
-
-        QRCode.toDataURL(
-                ticketData, 
-                async ( err, url ) => {
-                    if( err ){
-                        return res.status( 500 )
-                                .json(
-                                    {
-                                        error: true,
-                                        message: "Error while generating QR code"
-                                    }
-                                );
-                    }
-                    ticket.ticketUrl = url;
-                    ticket.markModified("ticketUrl");
-                    await ticket.save();
-
-                    event.willJoin
-                        .push(
-                            req.user
-                            ._id
-                            .toString()
-                        );
-
-                    await event.save();
-
-                    await invitation.deleteOne();
-
-                    return res.status( 200 )
-                            .json(
-                                {
-                                    error: false,
-                                    message: `You accepted the invitation for event with "${event._id}" id successfully`,
-                                    payData: null,
-                                    ticket: ticket.ticketUrl
-                                }
-                            );
-                }
+        const eventTicketData = await  prepareEventTicketHelper(
+            req.user._id.toString(), //customer userId
+            req.params.invitationId, //eventInvitation Id
+            null, //event Id
+            "Free_Event", //virtualPosOrderId
+            careGiver.careGiveGUID, //care Giver guid
+            "Free_Event" // payment unique code
         );
+
+        if(
+            !eventTicketData
+            || eventTicketData.error
+        ){
+            return res.status( 500 )
+                      .json(
+                        {
+                            error: true,
+                            message: "Internal Server Error"
+                        }
+                      );
+        }
+
+        return res.status( 200 )
+                  .json( eventTicketData );
+
     }catch( err ){
         console.log( "ERROR: accept invitation - ", err );
         return res.status( 500 )

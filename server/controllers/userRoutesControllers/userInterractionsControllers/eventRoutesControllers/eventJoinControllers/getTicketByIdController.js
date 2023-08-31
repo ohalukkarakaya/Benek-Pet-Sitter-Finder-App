@@ -1,11 +1,11 @@
-import User from "../../../../../models/User.js";
 import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
+import getTicketInfoHelper from "../../../../../utils/getInfoOfEventTicketHelper.js";
 
 const getTicketByIdController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const ticketId = req.params.ticket.toString();
+        const ticketId = req.params.ticketId.toString();
         if( !ticketId ){
             return res.status( 400 ).json(
                 {
@@ -15,7 +15,7 @@ const getTicketByIdController = async ( req, res ) => {
             );
         }
 
-        const ticket = EventTicket.findById( ticketId.toString() );
+        const ticket = await EventTicket.findById( ticketId.toString() );
         if( 
             !ticket
             || ticket.userId !== userId
@@ -29,81 +29,16 @@ const getTicketByIdController = async ( req, res ) => {
         }
 
         const eventOfTicket = await Event.findById( ticket.eventId.toString() );
-        const eventAdmin = await User.findById( ticket.eventAdmin.toString() );
-                const eventAdminInfo = {
 
-                    userId: eventAdmin._id
-                                      .toString(),
-    
-                    userProfileImg: eventAdmin.profileImg
-                                              .imgUrl,
-    
-                    username: eventAdmin.userName,
-    
-                    userFullName: `${
-                            eventAdmin.identity
-                                      .firstName
-                        } ${
-                            eventAdmin.identity
-                                      .middleName
-                        } ${
-                            eventAdmin.identity
-                                      .lastName
-                        }`.replaceAll( "  ", " ")
-                };
+        const ticketInfo = await getTicketInfoHelper( ticket, eventOfTicket );
 
-                eventOfTicket.eventOrganizers.forEach(
-                    async ( organizerId ) => {
-                        const organizer = await User.findById( organizerId.toString() );
-                        const organizerObject = {
-
-                            userId: organizer._id
-                                             .toString(),
-            
-                            userProfileImg: organizer.profileImg
-                                                     .imgUrl,
-            
-                            username: organizer.userName,
-            
-                            userFullName: `${
-                                    organizer.identity
-                                             .firstName
-                                } ${
-                                    organizer.identity
-                                             .middleName
-                                } ${
-                                    organizer.identity
-                                             .lastName
-                                }`.replaceAll( "  ", " ")
-                        };
-
-                        organizerId = organizerObject;
-                    }
-                );
-
-                const ticketInfo = {
-                    ticketId: ticket._id.toString(),
-                    eventId: eventOfTicket._id.toString(),
-                    eventImage: eventOfTicket.imgUrl,
-                    eventDesc: eventOfTicket.desc,
-                    eventAdmin: eventAdminInfo,
-                    eventOrganizers: eventOfTicket.eventOrganizers,
-                    eventAdress: eventOfTicket.adress,
-                    ticketPrice: ticket.paidPrice,
-                    boughtAt: ticket.boughtAt,
-                    isPrivate: ticket.isPrivate,
-                    eventDate: ticket.eventDate,
-                    orderId: ticket.orderId,
-                    ticketUrl: ticket.ticketUrl
-                };
-
-                return res.status( 200 ).json(
-                    {
-                        error: false,
-                        message: "Ticket Data Prepared Succesfully",
-                        ticket: ticketInfo
-                    }
-                );
+        return res.status( 200 ).json(
+            {
+                error: false,
+                message: "Ticket Data Prepared Succesfully",
+                ticket: ticketInfo
+            }
+        );
                 
     }catch( err ){
         console.log("ERROR: getTicketByIdController - ", err);
