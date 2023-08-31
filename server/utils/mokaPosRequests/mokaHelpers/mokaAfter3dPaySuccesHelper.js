@@ -1,39 +1,50 @@
 import prepareEventTicketHelper from "../../prepareEventTicketHelper.js";
+import User from "../../../models/User.js";
 
+const mokaAfter3dPaySuccesHelper = async (virtualPosOrderId, paymentData) => {
+    try {
+        let preparedData = null;
 
-const mokaAfter3dPaySuccesHelper = async ( paymentData ) => {
-    try{
-        let preparedData;
-        switch( paymentData.type ){
-            case "CareGive":
-                //not yet
-            break;
+        if (
+            paymentData.type === "EventTicket"
+        ) {
+            const parentId = paymentData.isFromInvitation
+                ? paymentData.parentContentId
+                : null;
 
-            case "EventTicket":
-                preparedData = await prepareEventTicketHelper( 
-                                        paymentData.customerId,
-                                        paymentData.isFromInvitation
-                                            ? paymentData.parentContentId
-                                            : null,
-                                        paymentData.isFromInvitation
-                                            ? null
-                                            : paymentData.parentContentId
-                                     );
-            break;
+            const careGiver = await User.findById( paymentData.subSellerId );
+            
+            const preparedTicketData = await prepareEventTicketHelper(
+                paymentData.customerId,
+                paymentData.isFromInvitation
+                    ? parentId
+                    : null,
+                paymentData.isFromInvitation
+                    ? null
+                    : parentId,
+                virtualPosOrderId,
+                careGiver.careGiveGUID,
+                paymentData.paymentUniqueCode
+                );
 
-            case "Donation":
-                // not yet
-            break;
+            if( preparedTicketData ){
+                return  preparedTicketData;
+            }
         }
-        return preparedData;
+
+        return preparedData || {
+            error: true,
+            serverStatus: -1,
+            message: "Unexpected Payment Type"
+        };
     }catch( err ){
         console.log( "ERROR: mokaAfter3dPaySuccesHelper -", err );
         return {
             error: true,
             serverStatus: -1,
             message: "Internal Server Error"
-        }
+        };
     }
-}
+};
 
 export default mokaAfter3dPaySuccesHelper;

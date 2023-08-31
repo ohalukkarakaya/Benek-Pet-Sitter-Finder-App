@@ -165,6 +165,17 @@ const acceptEventInvitationController = async ( req, res ) => {
                                             true // is from invitation
                                       );
 
+            if( paymentData.message === 'Daily Limit Exceeded' ){
+                return res.status( 500 )
+                          .json(
+                            {
+                                error: true,
+                                message: "Daily Limit Exceeded",
+                                payError: paymentData
+                            }
+                          );
+            }
+
             if(
                 !paymentData 
                 || paymentData.error 
@@ -219,7 +230,8 @@ const acceptEventInvitationController = async ( req, res ) => {
                                         paidPrice: paidPrice,
                                         eventDate: event.date,
                                         expiryDate: event.expiryDate,
-                                        isPrivate: event.isPrivate
+                                        isPrivate: event.isPrivate,
+                                        ticketUrl: null
                                     }
                               );
 
@@ -247,6 +259,7 @@ const acceptEventInvitationController = async ( req, res ) => {
                                 );
                     }
                     ticket.ticketUrl = url;
+                    ticket.markModified("ticketUrl");
                     await ticket.save();
 
                     event.willJoin

@@ -244,6 +244,10 @@ const mokaCreatePaymentHelper = async (
             30
         );
 
+        if( payProcess.message === 'Daily Limit Exceeded' ){
+            return payProcess
+        }
+
         if (
             !payProcess 
             || payProcess.error 

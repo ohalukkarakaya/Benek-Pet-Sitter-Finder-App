@@ -54,7 +54,7 @@ const PaymentDataSchema = new mongoose.Schema(
         default: false
       },
       virtualPosOrderId: {
-        type: Boolean
+        type: String
       }
   },
   {

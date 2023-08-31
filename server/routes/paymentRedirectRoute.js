@@ -7,120 +7,120 @@ import express from "express";
 
 const router = express.Router();
 
+import dotenv from "dotenv";
+
+dotenv.config();
+
+// - tested
 router.post(
+    "/", 
+    async ( req, res ) => {
+    try{
+        const {
+            OtherTrxCode,
+            hashValue,
+            resultMessage,
+            trxCode
+        } = req.body;
+
+        const paymentUniqueId = OtherTrxCode.toString();
+        const virtualPosOrderId = trxCode.toString();
+
+        if(
+            !paymentUniqueId 
+            || !hashValue 
+            || !virtualPosOrderId
+        ){
+            return res.redirect( `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=false` );
+        }
+
+        const paymentData = await PaymentData.findOne({ paymentUniqueCode: paymentUniqueId });
+
+        if( !paymentData ){
+            return res.redirect( `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=false` );
+        }
+
+        const codeForHash = paymentData.codeForHash
+                                       .toUpperCase();
+
+        const succesfulHash = crypto.createHash( 'sha256' )
+                                    .update( `${codeForHash}T`, 'utf-8' )
+                                    .digest( 'hex' );
+
+        const failHash = crypto.createHash( 'sha256' )
+                               .update( `${codeForHash}F`, 'utf-8' )
+                               .digest( 'hex' );
+
+        const isSuccesful = hashValue === succesfulHash;
+        const isFail = hashValue === failHash;
+
+        let redirectUrl;
+
+        if( isSuccesful ){
+            paymentData.isPaid = true;
+            paymentData.virtualPosOrderId = virtualPosOrderId;
+
+            paymentData.markModified( "isPaid" );
+            paymentData.markModified( "virtualPosOrderId" );
+
+            let prepareTicket = await mokaAfter3dPaySuccesHelper( virtualPosOrderId, paymentData );
+
+            if (
+                prepareTicket
+                && paymentData.isFromInvitation
+            ){
+                paymentData.parentContentId = prepareTicket.ticketId;
+                paymentData.isFromInvitation = false;
+
+                paymentData.markModified( "parentContentId" );
+                paymentData.markModified( "isFromInvitation" );
+                
+            }
+
+            await paymentData.save();
+
+            redirectUrl = `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=true&ticketId=${prepareTicket.ticketId.toString()}`;
+
+        }else if( isFail ){
+            redirectUrl = `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=false`;
+        }else{
+            console.log( "ERROR: unexpected - paymentRedirectRoute - ", resultMessage );
+            redirectUrl = `${process.env.BASE_URL}?isSuccess=false`;
+        }
+
+        return res.redirect( redirectUrl );
+
+    }catch( err ){
+        console.log("ERROR: paymentRedirectRoute - ", err);
+        const redirectUrl = `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=false`;
+        return res.redirect(redirectUrl);
+    }
+});
+
+// - tested
+router.get(
     "/",
     async ( req, res ) => {
-        try{
-            const paymentUniqueId = req.body.OtherTrxCode.toString();
-            const hashValue = req.body.hashValue.toString();
-            const resultCode = req.body.resultCode.toString();
-            const resultMessage = req.body.resultMessage.toString();
-            const virtualPosOrderId = req.body.trxCode.toString();
+        const isSuccess = req.query.isSuccess === 'true';
+        const ticketId = req.query.ticketId;
 
-            if(
-                !paymentUniqueId
-                || !hashValue
-                || !virtualPosOrderId
-            ){
-                return res.status( 400 )
-                          .json(
-                            {
-                                error: true,
-                                message: "Missing Value Reached"
-                            }
-                          );
-            }
-
-            const paymentData = await PaymentData.findOne( { paymentUniqueCode: paymentUniqueId } );
-            if( !paymentData ){
-                return res.status( 404 )
-                          .json(
-                            {
-                                error: true,
-                                message: "Payment Not Found"
-                            }
-                          );
-            }
-
-            const codeForHash = paymentData.codeForHash
-                                           .toUpperCase();
-
-            const succesfulHash = crypto.createHash('sha256')
-                                        .updata( `${codeForHash}T`, 'utf-8' )
-                                        .digest('hex');
-
-            const failHash = crypto.createHash('sha256')
-                                   .updata( `${codeForHash}F`, 'utf-8' )
-                                   .digest('hex');
-
-            const isSuccesful = hashValue === succesfulHash;
-            const isFail = hashValue === failHash;
-
-            if( isSuccesful ){
-                paymentData.isPaid = true,
-                paymentData.virtualPosOrderId = virtualPosOrderId;
-
-                const paidPrice = `${ parseFloat( paymentData.priceData.price ) } ${ paymentData.priceData.priceType }`;
-
-                paymentData.markModified( "isPaid" );
-                paymentData.markModified( "virtualPosOrderId" );
-                paymentData.save(
-                    ( err ) => {
-                        if( err ){
-                            return res.status( 500 )
-                                      .json(
-                                          {
-                                              error: true,
-                                              message: "ERROR: while saving paymentData",
-                                              errorData: err
-                                          }
-                                      );
-                        }
-                    }
-                );
-                
-                const prepareTicket = await mokaAfter3dPaySuccesHelper( paymentData );
-
-                return res.status( 200 )
-                          .json(
-                            {
-                                error: false,
-                                serverStatus: 1,
-                                message: `You accepted the invitation for event with "${mentionedEvent._id}" id succesfully`,
-                                payData: paidPrice,
-                                ticket: prepareTicket.ticket
-
-                            }
-                          );
-
-            }else if( isFail ){
-                return res.status( 400 )
-                          .json(
-                            {
-                                error: true,
-                                resultCode: resultCode,
-                                message: resultMessage
-                            }
-                          );
-            }else{
-                console.log( "ERROR: unexpected - paymentRedirectRoute - ", resultMessage );
-                return res.status( 500 )
-                          .json(
-                            {
-                                error: true,
-                                message: "Internal Server Error"
-                            }
-                          );
-            }
-
-        }catch( err ){
-            console.log( "ERROR: paymentRedirectRoute - ", err );
-            return res.status( 500 )
+        if( isSuccess ){
+            return res.status( 200 )
                       .json(
                         {
-                            error: true,
-                            message: "Internal Server Error"
+                            error: false,
+                            message: "İşlem Başarılı, Yönlendiriliyorsunuz",
+                            ticketId: ticketId
                         }
+                      );
+        }else{
+            return res.status( 500 )
+                      .json(
+                            {
+                                error: true,
+                                message: "İşlem Başarısız, Yönlendiriliyorsunuz",
+                                ticketId: null
+                            }
                       );
         }
     }
