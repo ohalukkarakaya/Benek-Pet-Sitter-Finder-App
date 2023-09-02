@@ -95,7 +95,7 @@ const prepareEventTicketHelper = async (
         const data = {
             ticketId: newEventTicketData._id.toString(),
             userId: userId,
-            eventId: newEventTicketData._id.toString(),
+            eventId: newEventTicketData.eventId,
             ticketPassword: randPassword,
         };
 
