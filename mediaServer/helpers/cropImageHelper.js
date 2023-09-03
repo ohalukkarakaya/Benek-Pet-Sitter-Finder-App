@@ -11,44 +11,51 @@ const cropImageHelper = async (
 
       const width = image.bitmap.width;
       const height = image.bitmap.height;
-
-      const squareSize = Math.min(width, height);
+      const squareSize = Math.min( width, height );
       let newWidth;
       let newHeight;
 
-      if (fileType === 'cover' && aspectRatio < 4) {
+      if(
+        fileType === 'cover' 
+        && aspectRatio > 4
+      ){
         newWidth = height * 4;
-      } else if (fileType === 'cover' && aspectRatio > 4) {
+      }else if(
+        fileType === 'cover' 
+        && aspectRatio < 4
+      ){
         newHeight = width / 4;
       }
 
-      await image.crop(
-        fileType !== 'cover'
-          ? (width - squareSize) / 2
-          : newWidth
-          ? (width - newWidth) / 2
-          : 0,
+      let cropX, cropY, cropWidth, cropHeight;
 
-        fileType !== 'cover'
-          ? (height - squareSize) / 2
-          : newWidth
-          ? 0
-          : (height - newHeight) / 2,
+      if( fileType !== 'cover' ){
+        cropX = ( width - squareSize ) / 2;
+        cropY = ( height - squareSize ) / 2;
+        cropWidth = squareSize;
+        cropHeight = squareSize;
+      }else{
+        if( newWidth ){
+          cropX = ( width - newWidth ) / 2;
+          cropY = 0;
+          cropWidth = newWidth;
+          cropHeight = height;
+        }else if( newHeight ){
+          cropX = 0;
+          cropY = ( height - newHeight ) / 2;
+          cropWidth = width;
+          cropHeight = newHeight;
+        } else {
+          cropX = 0;
+          cropY = 0;
+          cropWidth = squareSize;
+          cropHeight = height;
+        }
+      }
 
-        fileType !== 'cover'
-          ? squareSize
-          : newWidth
-          ? newWidth
-          : height,
+      await image.crop( cropX, cropY, cropWidth, cropHeight ).write( tempFilePath );
 
-        fileType !== 'cover'
-          ? squareSize
-          : newWidth
-          ? height
-          : newHeight
-      ).write( tempFilePath );
-
-      return await Jimp.read( tempFilePath );;
+      return await Jimp.read( tempFilePath );
   } catch (error) {
     console.error('Görsel işleme hatası:', error);
   }
