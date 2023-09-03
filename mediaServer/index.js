@@ -10,14 +10,15 @@ const Jimp = require('jimp');
 
 const app = express();
 
+const compressImageHelper = require( './helpers/compressImageHelper' );
+const cropImageHelper = require( './helpers/cropImageHelper' );
+const cropVideoHelper = require( './helpers/cropVideoHelper' );
+const getAspectRatioHelper = require( './helpers/getAspectRatioHelper' );
+
 // Middleware
 app.use( bodyParser.json() );
 app.use( fileUpload() );
 
-
-const exec = util.promisify(
-                    require( 'child_process' ).exec
-                  );
 
 const ffmpegPath = process.cwd() + '/ffmpeg';
 
@@ -25,46 +26,14 @@ const chmodPromise = util.promisify( fs.chmod );
 
 const ffprobePromise = chmodPromise( ffmpegPath, '777' );
 
-const  compressImage = async (
-  inputPath, 
-  outputPath, 
-  quality,
-  maxFileSize
-) => {
-  try {
-    const inputImage = await Jimp.read( inputPath );
-    let currentQuality = quality;
-
-    while( 
-      inputImage.bitmap
-                .data
-                .length > maxFileSize * 1000 
-    ){
-      currentQuality -= 10;
-
-      if( currentQuality < 10 ){
-        // Minimum kaliteye ulaştık, sıkıştırmayı sonlandır
-        break;
-      }
-
-      await inputImage.quality( currentQuality );
-
-    }
-
-    await inputImage.writeAsync( outputPath );
-  }catch( error ){
-    console.error( 'Görsel sıkıştırma hatası:', error );
-  }
-}
-
 // Upload Endpoint
 app.post(
   '/upload', 
   async ( req, res ) => {
 
-    const outputPath = req.body.outputPath;
+    const outputPath = `./assets/${ req.body.outputPath }`;
     const fileType = req.body.fileType;
-    const allowedExtensions = ['jpg', 'jpeg', 'png', 'mp4'];
+    const allowedExtensions = [ 'jpg', 'jpeg', 'png', 'mp4', 'JPG', 'JPEG', 'PNG', 'MP4' ];
 
     const fileExtension = req.files.file.name.split('.').pop();
 
@@ -112,15 +81,29 @@ app.post(
     }
 
     const file = req.files.file;
-    const fileSize = parseFloat( file.size );
+    let fileSize = parseFloat( file.size );
 
+    const tempFilePath = `temp_${ randName }.${ fileExtension }`;
+    await util.promisify( file.mv )( tempFilePath );
+
+    // Get the aspect ratio asynchronously
+    const aspectRatio = await getAspectRatioHelper(tempFilePath);
+
+    if (
+      ((fileType === 'profile' || fileType === 'photo') && aspectRatio !== 1) ||
+      (fileType === 'cover' && aspectRatio !== 4)
+    ) {
+      await cropImageHelper(fileType, tempFilePath, aspectRatio);
+      await cropVideoHelper(fileType, tempFilePath);
+
+      fileSize = fs.statSync( tempFilePath ).size;
+    }
+    
     if(
       fileSize > parseFloat( maxFileSize )
       || maxDuration
     ){
       try {
-        const tempFilePath = `temp_${ randName }.${ fileExtension }`;
-        await util.promisify( file.mv )( tempFilePath );
         if(
           maxDuration
           && file.mimetype
@@ -220,32 +203,47 @@ app.post(
                       } 
                     );
         }else{
-          const quality = 70;
 
-          await compressImage(
-            tempFilePath, 
-            outputPath + '.' 
-                       + fileExtension, 
-            quality,
-            maxFileSize
-          );
-
-          if(
-            fs.statSync( tempFilePath )
-              .isFile()
+          for(
+            let quality = 50;
+            quality >= 10 && fileSize > maxFileSize;
+            quality -= 10
           ){
+            await compressImageHelper(
+              tempFilePath,
+              quality
+            );
+            
+            let image = null;
+            while ( image === null ){
+              try {
+                image = await Jimp.read( tempFilePath );
+              }catch( error ){
+                // Hata alındı, beklemeye devam edin
+              }
+            }
 
-            fs.unlinkSync( tempFilePath );
-
+            if( image ){
+              fileSize = await fs.statSync( tempFilePath ).size;
+            }
           }
 
-          return res.status( 200 )
-                    .json( 
-                      {
-                        error: false,
-                        message: "image compressed and uploaded"
-                      } 
-                    );
+          if( fileSize > maxFileSize ){
+              if(
+                  fs.statSync( tempFilePath )
+                    .isFile()
+              ){
+                  fs.unlinkSync( tempFilePath );
+              }
+
+              return res.status( 400 )
+                        .json(
+                          {
+                            error: true,
+                            message: "Image size is too big, please upload smaller image"
+                          }
+                        );
+          }
         }
       }catch( err ){
         console.error( 'Dosya boyutunu düşürme hatası:', err );
@@ -259,23 +257,23 @@ app.post(
       }
     }
 
-    // Dosyanın bulunup bulunmadığını kontrol et
-    if(
-      !fs.existsSync( newPath )
-    ){
-      try{
-        fs.mkdirSync( 
-            path.dirname( newPath ), 
-            { recursive: true }
-        );
-        fs.writeFileSync( newPath, '' );
-      }catch( err ){
-        console.error( 'Dosya oluşturma hatası:', err );
+    let image = null;
+    while ( image === null ){
+      try {
+        image = await Jimp.read( tempFilePath );
+      }catch( error ){
+        // Hata alındı, beklemeye devam edin
       }
     }
-
     // Dosyayı yükle
-    await util.promisify( file.mv )( newPath );
+    await image.writeAsync( newPath );
+
+    if(
+      fs.statSync( tempFilePath )
+        .isFile()
+    ){
+        fs.unlinkSync( tempFilePath );
+    }
     
 
     //Response Dön
