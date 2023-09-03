@@ -14,6 +14,8 @@ const compressImageHelper = require( './helpers/compressImageHelper' );
 const cropImageHelper = require( './helpers/cropImageHelper' );
 const cropVideoHelper = require( './helpers/cropVideoHelper' );
 const getAspectRatioHelper = require( './helpers/getAspectRatioHelper' );
+const getVideoMetaDataHelper = require( './helpers/getVideoMetaDataHelper' );
+const getVideoDurationHelper = require( './helpers/getVideoDurationHelper.js' );
 
 // Middleware
 app.use( bodyParser.json() );
@@ -86,15 +88,37 @@ app.post(
     const tempFilePath = `temp_${ randName }.${ fileExtension }`;
     await util.promisify( file.mv )( tempFilePath );
 
-    // Get the aspect ratio asynchronously
-    const aspectRatio = await getAspectRatioHelper(tempFilePath);
+    let aspectRatio;
+    let videoMetadata
+    if( fileType === 'video' ){
+      videoMetadata = await getVideoMetaDataHelper( tempFilePath );
+    }
+    if( fileType !== 'video' ){
+      // Get the aspect ratio asynchronously
+      aspectRatio = await getAspectRatioHelper( tempFilePath );
+    }
+    
 
     if (
-      ((fileType === 'profile' || fileType === 'photo') && aspectRatio !== 1) ||
-      (fileType === 'cover' && aspectRatio !== 4)
-    ) {
-      await cropImageHelper(fileType, tempFilePath, aspectRatio);
-      await cropVideoHelper(fileType, tempFilePath);
+      (
+        (
+          fileType === 'profile' 
+          || fileType === 'photo'
+        )
+        && aspectRatio !== 1
+      ) 
+      || (
+        fileType === 'cover' 
+        && aspectRatio !== 4
+      )
+      || (
+        fileType === 'storyImage'
+        && aspectRatio !== 0.5625
+      )
+      || fileType === 'video'
+    ){
+      await cropImageHelper( fileType, tempFilePath, aspectRatio );
+      await cropVideoHelper( fileType, tempFilePath, videoMetadata );
 
       fileSize = fs.statSync( tempFilePath ).size;
     }
@@ -106,13 +130,10 @@ app.post(
       try {
         if(
           maxDuration
-          && file.mimetype
-                 .startsWith( 'video' )
+          && fileType === 'video'
         ){
 
-          const metadata = await ffprobePromise( file.tempFilePath );
-          const duration = metadata.format
-                                   .duration;
+          const duration = await getVideoDurationHelper( videoMetadata );
 
           if( duration > maxDuration ){
 

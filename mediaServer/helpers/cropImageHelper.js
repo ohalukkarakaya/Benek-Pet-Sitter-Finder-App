@@ -6,7 +6,8 @@ const cropImageHelper = async (
     aspectRatio
 ) => {
 
-  try {
+  try{
+    if( fileType !== 'video' ){
       const image = await Jimp.read( tempFilePath );
 
       const width = image.bitmap.width;
@@ -25,6 +26,20 @@ const cropImageHelper = async (
         && aspectRatio < 4
       ){
         newHeight = width / 4;
+      }
+
+      if(
+        fileType == 'storyImage'
+        && aspectRatio > 0.5625
+      ){
+        //yükseklik sabit
+        newWidth = height * ( 9 / 16 );
+      }else if(
+        fileType == 'storyImage'
+        && aspectRatio > 0.5625
+      ){
+        //genişlik sabit
+        newHeight = width * ( 9 / 16 );
       }
 
       let cropX, cropY, cropWidth, cropHeight;
@@ -56,8 +71,10 @@ const cropImageHelper = async (
       await image.crop( cropX, cropY, cropWidth, cropHeight ).write( tempFilePath );
 
       return await Jimp.read( tempFilePath );
-  } catch (error) {
-    console.error('Görsel işleme hatası:', error);
+    }
+      
+  }catch( error ){
+    console.error( 'Görsel işleme hatası:', error );
   }
 }
 
