@@ -56,10 +56,12 @@ app.post(
                            .toString( 'hex' );
 
     // Dosyayı hedef dizine taşı
-    const newPath = __dirname + '/./assets/' 
-                              + outputPath 
-                              + '.' 
-                              + fileExtension;
+    const newPath = outputPath + '.' 
+                               + fileExtension;
+
+    // Dosya adını silip diri almak için
+    const slashPosition = newPath.lastIndexOf( '/' );
+    const dirName = newPath.slice( 0, slashPosition );
 
     let maxFileSize, maxDuration;
 
@@ -206,23 +208,6 @@ app.post(
               break;
             }
           }
-
-          if(
-            fs.statSync( tempFilePath )
-              .isFile()
-          ){
-
-            fs.unlinkSync( tempFilePath );
-
-          }
-
-          return res.status( 200 )
-                    .json( 
-                      {
-                        error: false,
-                        message: "file compressed and uploaded"
-                      } 
-                    );
         }else{
 
           for(
@@ -278,24 +263,45 @@ app.post(
       }
     }
 
-    let image = null;
-    while ( image === null ){
-      try {
-        image = await Jimp.read( tempFilePath );
-      }catch( error ){
-        // Hata alındı, beklemeye devam edin
-      }
-    }
-    // Dosyayı yükle
-    await image.writeAsync( newPath );
+    if( fileType !== 'video' ){
+      let image = null;
+      while ( image === null ){
+        try {
+          image = await Jimp.read( tempFilePath );
+        }catch( error ){
+          // Hata alındı, beklemeye devam edin
+        }
 
-    if(
-      fs.statSync( tempFilePath )
-        .isFile()
-    ){
-        fs.unlinkSync( tempFilePath );
+        // resim dosyasını yükle
+        await image.writeAsync( newPath );
+      }
+    }else{
+
+      if( !fs.existsSync( newPath ) ){
+
+        // yeni klasörü oluşturur
+        fs.mkdirSync(
+          dirName, 
+          { recursive: true }
+        );
+      }
+
+      await fs.rename(
+        tempFilePath,
+        newPath, 
+        ( err ) => {
+            if( err ){
+                console.error( 'Dosya adı değiştirme hatası:', err );
+            }else{
+              if( fs.existsSync( tempFilePath ) ){
+
+                fs.unlinkSync( tempFilePath );
+        
+              }
+            }
+        }
+      )
     }
-    
 
     //Response Dön
     return res.status( 200 )

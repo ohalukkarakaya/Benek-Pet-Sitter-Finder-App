@@ -21,58 +21,15 @@ const cropVideoHelper = async (
             // Dosyanın izinlerini ayarla
             await chmodPromise( process.cwd() + '/ffmpeg', '777' );
 
+            let ffmpegCommand;
+
             // Eğer mevcut en-boy oranı hedef orandan büyükse
             if( width / height > targetAspectRatio ){
 
                 const newWidth = height * targetAspectRatio;
                 const xOffset = ( width - newWidth ) / 2;
 
-                try{
-                    await new Promise(
-                      (
-                        resolve, 
-                        reject
-                      ) => {
-                        ffmpeg( tempFilePath ).toFormat('mp4')
-                                              .addOptions( `-vf crop=${ newWidth }:${ height }:${ xOffset },setdar=0.5625` )
-                                              .on(
-                                                'error', 
-                                                ( error ) => {
-                                                    console.log( 'Failed to process video: ' + error );
-                                                    reject( error );
-                                                }
-                                              ).save( 'ffmpeg_' + tempFilePath )
-                                               .on(
-                                                    'progress', 
-                                                    ( progress ) => {
-                                                        console.log( progress );
-                                                    }
-                                                ).on(
-                                                    'end', 
-                                                    () => {
-                                                        if( fs.existsSync( tempFilePath ) ){
-
-                                                            fs.rename(
-                                                                'ffmpeg_' + tempFilePath, 
-                                                                tempFilePath, 
-                                                                ( err ) => {
-                                                                    if( err ){
-                                                                        console.error( 'Dosya adı değiştirme hatası:', err );
-                                                                    } 
-                                                                }
-                                                            )
-                                                
-                                                            fs.unlinkSync( tempFilePath );
-                                                
-                                                        }
-                                                        resolve();
-                                                    }
-                                                ).run();
-                      }
-                    );
-                }catch( err ){
-                    console.log( err );
-                }
+                ffmpegCommand = `-vf crop=${ newWidth }:${ height }:${ xOffset },setdar=0.5625`;
             }
             // Eğer mevcut en-boy oranı hedef orandan küçükse
             else if( width / height < targetAspectRatio ){
@@ -80,55 +37,54 @@ const cropVideoHelper = async (
                 const newHeight = width / targetAspectRatio;
                 const yOffset = ( height - newHeight ) / 2;
 
-                try{
-                    await new Promise(
-                      (
-                        resolve, 
-                        reject
-                      ) => {
-                        ffmpeg( tempFilePath ).toFormat('mp4')
-                                              .addOptions( `-vf crop=${ width }:${ newHeight }:0:${ yOffset },setdar=0.5625` )
-                                              .on(
-                                                'error', 
-                                                ( error ) => {
-                                                    console.log( 'Failed to process video: ' + error );
-                                                    reject( error );
-                                                }
-                                              ).save( 'ffmpeg_' + tempFilePath )
-                                               .on(
-                                                    'progress', 
-                                                    ( progress ) => {
-                                                        console.log( progress );
-                                                    }
-                                                ).on(
-                                                    'end', 
-                                                    () => {
-                                                        if( fs.existsSync( tempFilePath ) ){
-
-                                                            fs.rename(
-                                                                'ffmpeg_' + tempFilePath, 
-                                                                tempFilePath, 
-                                                                ( err ) => {
-                                                                    if( err ){
-                                                                        console.error( 'Dosya adı değiştirme hatası:', err );
-                                                                    } 
-                                                                }
-                                                            )
-                                                
-                                                            fs.unlinkSync( tempFilePath );
-                                                
-                                                        }
-                                                        resolve();
-                                                    }
-                                                ).run();
-                      }
-                    );
-                }catch( err ){
-                    console.log( err );
-                }
+                ffmpegCommand = `-vf crop=${ width }:${ newHeight }:0:${ yOffset },setdar=0.5625`;
             }
-        
-            console.log( 'Video 9:16 oranında kırıldı ve kaydedildi.' );
+
+            try{
+                // crop komutunu çalıştır
+                await new Promise(
+                  (
+                    resolve, 
+                    reject
+                  ) => {
+                    ffmpeg( tempFilePath ).toFormat('mp4')
+                                          .addOptions( ffmpegCommand )
+                                          .on(
+                                            'error', 
+                                            ( error ) => {
+                                                console.log( 'Failed to process video: ' + error );
+                                                reject( error );
+                                            }
+                                          ).save( 'ffmpeg_' + tempFilePath )
+                                           .on(
+                                                'end', 
+                                                () => {
+
+                                                    console.log( 'Video 9:16 oranında kırpıldı ve kaydedildi.' );
+
+                                                    if( fs.existsSync( tempFilePath ) ){
+
+                                                        fs.unlinkSync( tempFilePath );
+
+                                                        fs.rename(
+                                                            'ffmpeg_' + tempFilePath, 
+                                                            tempFilePath, 
+                                                            ( err ) => {
+                                                                if( err ){
+                                                                    console.error( 'Dosya adı değiştirme hatası:', err );
+                                                                } 
+                                                            }
+                                                        )
+                                            
+                                                    }
+                                                    resolve();
+                                                }
+                                            ).run();
+                  }
+                );
+            }catch( err ){
+                console.log( err );
+            }
         }
       }catch( error ){
         console.error( 'Video kırma hatası:', error );
