@@ -16,6 +16,7 @@ const cropVideoHelper = require( './helpers/cropVideoHelper' );
 const getAspectRatioHelper = require( './helpers/getAspectRatioHelper' );
 const getVideoMetaDataHelper = require( './helpers/getVideoMetaDataHelper' );
 const getVideoDurationHelper = require( './helpers/getVideoDurationHelper.js' );
+const compressVideoHelper = require( './helpers/compressVideoHelper' );
 
 // Middleware
 app.use( bodyParser.json() );
@@ -66,22 +67,15 @@ app.post(
     let maxFileSize, maxDuration;
 
     if( fileType === 'profile' ){
-
-      maxFileSize = 0.05 * 1024 * 1024; // 4MB
-
+      maxFileSize = 4 * 1024 * 1024; // 4 MB
     }else if( fileType === 'cover' ){
-
-      maxFileSize = 8 * 1024 * 1024; // 8MB
-
+      maxFileSize = 8 * 1024 * 1024; // 8 MB
     }else if( fileType === 'photo' ){
-
-      maxFileSize = 15 * 1024 * 1024; // 15MB
-
+      maxFileSize = 15 * 1024 * 1024; // 15 MB
     }else if( fileType === 'video' ){
-
-      maxFileSize = 1.5 * 1024 * 1024 * 1024; // 1.5GB
-      maxDuration = 30;
-
+      maxFileSize = 0.04 * 1024 * 1024; // 4 MB - test için
+      // maxFileSize = 1 * 1024 * 1024 * 1024; // 1 GB
+      maxDuration = 30; // 30 Sec
     }
 
     const file = req.files.file;
@@ -103,42 +97,35 @@ app.post(
 
     if (
       (
-        (
-          fileType === 'profile' 
-          || fileType === 'photo'
-        )
+        ( fileType === 'profile' || fileType === 'photo' )
         && aspectRatio !== 1
       ) 
-      || (
-        fileType === 'cover' 
-        && aspectRatio !== 4
-      )
-      || (
-        fileType === 'storyImage'
-        && aspectRatio !== 0.5625
-      )
+      || ( fileType === 'cover' && aspectRatio !== 4 )
+      || ( fileType === 'storyImage' && aspectRatio !== 0.5625 )
       || fileType === 'video'
     ){
       await cropImageHelper( fileType, tempFilePath, aspectRatio );
       await cropVideoHelper( fileType, tempFilePath, videoMetadata );
 
-      fileSize = fs.statSync( tempFilePath ).size;
+      let isFileWriten = false;
+      while( !isFileWriten ){
+        if( fs.existsSync( tempFilePath ) ){
+          fileSize = fs.statSync( tempFilePath ).size;
+          isFileWriten = true;
+        }else{
+          //dosya yazılıyor döngüye devam et
+        }
+      }
     }
     
-    if(
-      fileSize > parseFloat( maxFileSize )
-      || maxDuration
-    ){
+    if( fileSize > parseFloat( maxFileSize ) || maxDuration ){
       try {
-        if(
-          maxDuration
-          && fileType === 'video'
-        ){
+        if( maxDuration && fileType === 'video' ){
 
           const duration = await getVideoDurationHelper( videoMetadata );
 
+          // videosüresi varsayılan süreden uzunsa yüklemeyi iptal et ve hata gönder
           if( duration > maxDuration ){
-
             if(
               fs.statSync( tempFilePath )
                 .isFile()
@@ -156,58 +143,9 @@ app.post(
                           }
                         );
           }
-          const tempfileSize = fs.statSync( tempFilePath ).size;
-          let newBitrate = 1000; // İlk başta kullanılacak varsayılan bitrate değeri (örnek olarak 1000 kbps)
-
-          // Dosyanın boyutunu düşürmek için bitrate değerini dinamik olarak ayarlayın
-          while( 
-            tempfileSize > parseFloat( maxFileSize ) 
-            && newBitrate > 100
-          ){
-            try {
-              await new Promise(
-                ( resolve, reject ) => {
-
-                  fs.chmod(
-                    process.cwd()+'/ffmpeg', 
-                    '777',
-                    () => {
-                      ffmpeg().input( tempFilePath )
-                              .videoBitrate(newBitrate + 'k')
-                              .on(
-                                'end', 
-                                () => {
-                                  resolve();
-                                }
-                              ).on(
-                                'error', 
-                                ( err ) => {
-                                  console.error('ffmpeg hatası:', err);
-                                  reject( err );
-                                }
-                              ).save( 
-                                outputPath + '.' 
-                                           + fileExtension
-                              );
-                    }
-                  );
-                }
-              );
-
-              const newFileSize = fs.statSync( outputPath )
-                                    .size;
-
-              if( newFileSize >= tempfileSize ){
-                newBitrate -= 100;
-              }else{
-                // Sıkıştırma işlemi dosya boyutunu azalttı, döngüyü sonlandırın
-                break;
-              }
-            }catch( error ){
-              console.error( 'Dosya boyutunu düşürme hatası:', error );
-              break;
-            }
-          }
+          
+          await compressVideoHelper( tempFilePath, maxFileSize );
+          
         }else{
 
           for(
@@ -274,10 +212,22 @@ app.post(
 
         // resim dosyasını yükle
         await image.writeAsync( newPath );
+
+        //temp dosyasını sil
+        if( fs.existsSync( tempFilePath ) ){
+          fs.unlinkSync( tempFilePath );
+        }
       }
     }else{
 
-      if( !fs.existsSync( newPath ) ){
+      // eğer dosya zaten varsa sil
+      if( fs.existsSync( newPath ) ){
+
+        fs.unlinkSync( newPath );
+      }
+
+      //eğer klasör yoksa oluştur
+      if( !fs.existsSync( dirName ) ){
 
         // yeni klasörü oluşturur
         fs.mkdirSync(
@@ -286,8 +236,37 @@ app.post(
         );
       }
 
+      const isVideoCompressed = fs.existsSync( 'ffmpeg_compress_' + tempFilePath );
+      const isVideoCropped = fs.existsSync( 'ffmpeg_' + tempFilePath );
+
+      let pathToProcess = tempFilePath;
+
+      if( isVideoCropped ){
+
+        if( fs.existsSync( tempFilePath ) ){
+          fs.unlinkSync( tempFilePath );
+        }
+
+        pathToProcess = 'ffmpeg_' + tempFilePath;
+
+      }
+
+      if( isVideoCompressed ){
+
+        if( fs.existsSync( tempFilePath ) ){
+          fs.unlinkSync( tempFilePath );
+        }
+
+        if( isVideoCropped ){
+          fs.unlinkSync( 'ffmpeg_' + tempFilePath )
+        }
+
+        pathToProcess = 'ffmpeg_compress_' + tempFilePath;
+
+      }
+
       await fs.rename(
-        tempFilePath,
+        pathToProcess,
         newPath, 
         ( err ) => {
             if( err ){

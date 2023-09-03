@@ -1,6 +1,5 @@
 const Jimp = require('jimp');
 const fs = require( 'fs' );
-const mime = require('mime');
 
 const compressImageHelper = async (
   inputPath,

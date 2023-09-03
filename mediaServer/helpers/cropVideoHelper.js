@@ -17,74 +17,63 @@ const cropVideoHelper = async (
     
             // Hedef en-boy oranı 9:16
             const targetAspectRatio = 9 / 16;
-        
-            // Dosyanın izinlerini ayarla
-            await chmodPromise( process.cwd() + '/ffmpeg', '777' );
 
-            let ffmpegCommand;
+            // eğer istenen aspect ratioda değilse
+            if( width / height !== targetAspectRatio ){
+                // Dosyanın izinlerini ayarla
+                await chmodPromise( process.cwd() + '/ffmpeg', '777' );
 
-            // Eğer mevcut en-boy oranı hedef orandan büyükse
-            if( width / height > targetAspectRatio ){
+                let ffmpegCommand;
 
-                const newWidth = height * targetAspectRatio;
-                const xOffset = ( width - newWidth ) / 2;
+                // Eğer mevcut en-boy oranı hedef orandan büyükse
+                if( width / height > targetAspectRatio ){
 
-                ffmpegCommand = `-vf crop=${ newWidth }:${ height }:${ xOffset },setdar=0.5625`;
-            }
-            // Eğer mevcut en-boy oranı hedef orandan küçükse
-            else if( width / height < targetAspectRatio ){
+                    const newWidth = height * targetAspectRatio;
+                    const xOffset = ( width - newWidth ) / 2;
 
-                const newHeight = width / targetAspectRatio;
-                const yOffset = ( height - newHeight ) / 2;
+                    ffmpegCommand = `-vf crop=${ newWidth }:${ height }:${ xOffset },setdar=0.5625`;
+                }
+                // Eğer mevcut en-boy oranı hedef orandan küçükse
+                else if( width / height < targetAspectRatio ){
 
-                ffmpegCommand = `-vf crop=${ width }:${ newHeight }:0:${ yOffset },setdar=0.5625`;
-            }
+                    const newHeight = width / targetAspectRatio;
+                    const yOffset = ( height - newHeight ) / 2;
 
-            try{
-                // crop komutunu çalıştır
-                await new Promise(
-                  (
-                    resolve, 
-                    reject
-                  ) => {
-                    ffmpeg( tempFilePath ).toFormat('mp4')
-                                          .addOptions( ffmpegCommand )
-                                          .on(
-                                            'error', 
-                                            ( error ) => {
-                                                console.log( 'Failed to process video: ' + error );
-                                                reject( error );
-                                            }
-                                          ).save( 'ffmpeg_' + tempFilePath )
-                                           .on(
-                                                'end', 
-                                                () => {
-
-                                                    console.log( 'Video 9:16 oranında kırpıldı ve kaydedildi.' );
-
-                                                    if( fs.existsSync( tempFilePath ) ){
-
-                                                        fs.unlinkSync( tempFilePath );
-
-                                                        fs.rename(
-                                                            'ffmpeg_' + tempFilePath, 
-                                                            tempFilePath, 
-                                                            ( err ) => {
-                                                                if( err ){
-                                                                    console.error( 'Dosya adı değiştirme hatası:', err );
-                                                                } 
-                                                            }
-                                                        )
-                                            
+                    ffmpegCommand = `-vf crop=${ width }:${ newHeight }:0:${ yOffset },setdar=0.5625`;
+                }
+                
+                try{
+                    // crop komutunu çalıştır
+                    await new Promise(
+                        (
+                            resolve, 
+                            reject
+                        ) => {
+                            ffmpeg( tempFilePath ).toFormat('mp4')
+                                                  .addOptions( ffmpegCommand )
+                                                  .on(
+                                                    'error', 
+                                                    ( error ) => {
+                                                        console.log( 'Failed to process video: ' + error );
+                                                        reject( error );
                                                     }
-                                                    resolve();
-                                                }
-                                            ).run();
-                  }
-                );
-            }catch( err ){
-                console.log( err );
+                                                   ).save( 'ffmpeg_' + tempFilePath )
+                                                    .on(
+                                                        'end', 
+                                                        () => {
+                                                            console.log( 'Video 9:16 oranında kırpıldı ve kaydedildi.' );
+                                                            
+                                                            resolve();
+                                                        }
+                                                    ).run();
+                        }
+                    );
+                }catch( err ){
+                    console.log( err );
+                }
             }
+        
+            
         }
       }catch( error ){
         console.error( 'Video kırma hatası:', error );

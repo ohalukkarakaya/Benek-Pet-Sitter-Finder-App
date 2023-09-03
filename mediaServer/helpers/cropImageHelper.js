@@ -1,4 +1,5 @@
 const Jimp = require('jimp');
+const fs = require( 'fs' );
 
 const cropImageHelper = async (
     fileType,
@@ -8,7 +9,17 @@ const cropImageHelper = async (
 
   try{
     if( fileType !== 'video' ){
-      const image = await Jimp.read( tempFilePath );
+
+      let image;
+      while( !image ){
+        if( fs.existsSync( tempFilePath ) ){
+          
+          image = await Jimp.read( tempFilePath );
+
+        }else{
+          //dosya yazılıyor döngüye devam et
+        }
+      }
 
       const width = image.bitmap.width;
       const height = image.bitmap.height;
@@ -44,7 +55,7 @@ const cropImageHelper = async (
 
       let cropX, cropY, cropWidth, cropHeight;
 
-      if( fileType !== 'cover' ){
+      if( fileType !== 'cover' && fileType !== 'storyImage' ){
         cropX = ( width - squareSize ) / 2;
         cropY = ( height - squareSize ) / 2;
         cropWidth = squareSize;
@@ -70,7 +81,14 @@ const cropImageHelper = async (
 
       await image.crop( cropX, cropY, cropWidth, cropHeight ).write( tempFilePath );
 
-      return await Jimp.read( tempFilePath );
+      let resultImage = null;
+      while ( resultImage === null ){
+        try {
+          return resultImage = await Jimp.read( tempFilePath );
+        }catch( error ){
+          // Hata alındı, beklemeye devam edin
+        }
+      }
     }
       
   }catch( error ){
