@@ -99,7 +99,10 @@ const uploadController = async ( req, res ) => {
                                             fileType
                                          );
 
-    if( compressProcessHelperResponse.error ){
+    if(
+      compressProcessHelperResponse
+      && compressProcessHelperResponse.error 
+    ){
         return res.status( 400 )
                   .json(
                     compressProcessHelperResponse

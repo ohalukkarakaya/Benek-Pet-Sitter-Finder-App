@@ -8,8 +8,6 @@ const cleanTempFilesHelper = async ( tempFilePath ) => {
         ( err ) => {
             if( err ){
                 console.error( 'Dosya silinirken hata oluştu:', err );
-            }else{
-                console.log( 'Dosya başarıyla silindi:', tempFilePath );
             }
         }
     );
@@ -21,8 +19,6 @@ const cleanTempFilesHelper = async ( tempFilePath ) => {
         ( err ) => {
             if( err ){
                 console.error( 'Dosya silinirken hata oluştu:', err );
-            }else{
-                console.log( 'Dosya başarıyla silindi:', 'ffmpeg_' + tempFilePath );
             }
         }
     );
@@ -33,8 +29,6 @@ const cleanTempFilesHelper = async ( tempFilePath ) => {
         ( err ) => {
             if( err ){
                 console.error( 'Dosya silinirken hata oluştu:', err );
-            }else{
-                console.log( 'Dosya başarıyla silindi:', 'ffmpeg_compress_' + tempFilePath );
             }
         }
     );

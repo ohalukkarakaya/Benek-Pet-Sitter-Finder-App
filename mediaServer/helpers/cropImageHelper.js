@@ -13,6 +13,7 @@ const cropImageHelper = async (
   try{
     if( fileType !== 4 ){ // if not video
 
+      //To Do: Bu yapı çok sık kullanıldı waitHelper ismiyle bir helper yazılabilir
       let image;
       while( !image ){
         if( fs.existsSync( tempFilePath ) ){
@@ -25,42 +26,37 @@ const cropImageHelper = async (
 
       const width = image.bitmap.width;
       const height = image.bitmap.height;
-      const squareSize = Math.min( width, height );
+
       let newWidth;
       let newHeight;
 
       if( aspectRatio > config().supportedAspectRatios[ fileType.toString() ] ){
-
+        // olması gerekenden genişse
         newWidth = height * config().supportedAspectRatios[ fileType.toString() ];
       }else if( aspectRatio < config().supportedAspectRatios[ fileType.toString() ] ){
-        
+        // olması gerekenden uzunsa
         newHeight = width / config().supportedAspectRatios[ fileType.toString() ];
       }
 
       let cropX, cropY, cropWidth, cropHeight;
 
-      if( fileType !== 2 && fileType !== 3 ){
-        cropX = ( width - squareSize ) / 2;
-        cropY = ( height - squareSize ) / 2;
+      if( newWidth ){
+        //genişlik sabit
+        cropX = ( width - newWidth ) / 2;
+        cropY = 0;
+        cropWidth = newWidth;
+        cropHeight = height;
+      }else if( newHeight ){
+        // boy sabit
+        cropX = 0;
+        cropY = ( height - newHeight ) / 2;
+        cropWidth = width;
+        cropHeight = newHeight;
+      } else {
+        cropX = 0;
+        cropY = 0;
         cropWidth = squareSize;
-        cropHeight = squareSize;
-      }else{
-        if( newWidth ){
-          cropX = ( width - newWidth ) / 2;
-          cropY = 0;
-          cropWidth = newWidth;
-          cropHeight = height;
-        }else if( newHeight ){
-          cropX = 0;
-          cropY = ( height - newHeight ) / 2;
-          cropWidth = width;
-          cropHeight = newHeight;
-        } else {
-          cropX = 0;
-          cropY = 0;
-          cropWidth = squareSize;
-          cropHeight = height;
-        }
+        cropHeight = height;
       }
 
       await image.crop( cropX, cropY, cropWidth, cropHeight ).write( tempFilePath );

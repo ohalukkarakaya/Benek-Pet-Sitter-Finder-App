@@ -19,6 +19,20 @@ const deleteAssetController = require( './controllers/deleteAssetController' );
 app.use( bodyParser.json() );
 app.use( fileUpload() );
 
+// asset protection
+app.get(
+  '/assets/*', 
+  ( req, res ) => {
+    return res.status( 401 )
+              .json(
+                {
+                  error: true,
+                  message: "You are not allowed to see assets"
+                }
+              );
+  }
+);
+
 // Upload Endpoint
 app.post(
   '/upload', 
