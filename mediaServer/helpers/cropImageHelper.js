@@ -1,6 +1,9 @@
 const Jimp = require('jimp');
 const fs = require( 'fs' );
 
+const cleanTempFilesHelper = require( './cleanTempFilesHelper' );
+const config = require( '../config' );
+
 const cropImageHelper = async (
     fileType,
     tempFilePath,
@@ -8,14 +11,13 @@ const cropImageHelper = async (
 ) => {
 
   try{
-    if( fileType !== 'video' ){
+    if( fileType !== 4 ){ // if not video
 
       let image;
       while( !image ){
         if( fs.existsSync( tempFilePath ) ){
           
           image = await Jimp.read( tempFilePath );
-
         }else{
           //dosya yazılıyor döngüye devam et
         }
@@ -27,35 +29,17 @@ const cropImageHelper = async (
       let newWidth;
       let newHeight;
 
-      if(
-        fileType === 'cover' 
-        && aspectRatio > 4
-      ){
-        newWidth = height * 4;
-      }else if(
-        fileType === 'cover' 
-        && aspectRatio < 4
-      ){
-        newHeight = width / 4;
-      }
+      if( aspectRatio > config().supportedAspectRatios[ fileType.toString() ] ){
 
-      if(
-        fileType == 'storyImage'
-        && aspectRatio > 0.5625
-      ){
-        //yükseklik sabit
-        newWidth = height * ( 9 / 16 );
-      }else if(
-        fileType == 'storyImage'
-        && aspectRatio > 0.5625
-      ){
-        //genişlik sabit
-        newHeight = width * ( 9 / 16 );
+        newWidth = height * config().supportedAspectRatios[ fileType.toString() ];
+      }else if( aspectRatio < config().supportedAspectRatios[ fileType.toString() ] ){
+        
+        newHeight = width / config().supportedAspectRatios[ fileType.toString() ];
       }
 
       let cropX, cropY, cropWidth, cropHeight;
 
-      if( fileType !== 'cover' && fileType !== 'storyImage' ){
+      if( fileType !== 2 && fileType !== 3 ){
         cropX = ( width - squareSize ) / 2;
         cropY = ( height - squareSize ) / 2;
         cropWidth = squareSize;
@@ -92,6 +76,7 @@ const cropImageHelper = async (
     }
       
   }catch( error ){
+    await cleanTempFilesHelper( tempFilePath );
     console.error( 'Görsel işleme hatası:', error );
   }
 }

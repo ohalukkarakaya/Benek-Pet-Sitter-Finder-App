@@ -5,6 +5,7 @@ const chmodPromise = util.promisify( fs.chmod );
 const ffprobe = util.promisify( ffmpeg.ffprobe );
 
 const getVideoDimensionsHelper = require( './getVideoDimensionsHelper' );
+const cleanTempFilesHelper = require( './cleanTempFilesHelper' );
 
 const cropVideoHelper = async ( 
     fileType,
@@ -12,7 +13,7 @@ const cropVideoHelper = async (
     videoMetadata
 ) => {
     try {
-        if( fileType === 'video' ){
+        if( fileType === 4 ){
             const { width, height } = await getVideoDimensionsHelper( tempFilePath, videoMetadata );
     
             // Hedef en-boy oranı 9:16
@@ -53,7 +54,8 @@ const cropVideoHelper = async (
                                                   .addOptions( ffmpegCommand )
                                                   .on(
                                                     'error', 
-                                                    ( error ) => {
+                                                    async( error ) => {
+                                                        await cleanTempFilesHelper( tempFilePath );
                                                         console.log( 'Failed to process video: ' + error );
                                                         reject( error );
                                                     }
@@ -61,14 +63,13 @@ const cropVideoHelper = async (
                                                     .on(
                                                         'end', 
                                                         () => {
-                                                            console.log( 'Video 9:16 oranında kırpıldı ve kaydedildi.' );
-                                                            
                                                             resolve();
                                                         }
                                                     ).run();
                         }
                     );
                 }catch( err ){
+                    await cleanTempFilesHelper( tempFilePath );
                     console.log( err );
                 }
             }

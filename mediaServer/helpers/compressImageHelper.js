@@ -1,6 +1,8 @@
 const Jimp = require('jimp');
 const fs = require( 'fs' );
 
+const cleanTempFilesHelper = require( './cleanTempFilesHelper' );
+
 const compressImageHelper = async (
   inputPath,
   quality
@@ -13,6 +15,7 @@ const compressImageHelper = async (
                .write( inputPath );
 
   }catch( error ){
+    await cleanTempFilesHelper( inputPath );
     console.error( 'Görsel sıkıştırma hatası:', error );
   }
 }
