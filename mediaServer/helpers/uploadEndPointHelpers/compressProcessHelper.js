@@ -37,7 +37,7 @@ const compressProcessHelper = async (
             
             await compressVideoHelper( tempFilePath, maxFileSize );
             
-          }else{
+          }else if( fileType !== 6 ){
   
             for(
               let quality = 50;

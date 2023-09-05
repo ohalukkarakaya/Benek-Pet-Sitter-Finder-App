@@ -18,6 +18,7 @@ const config = () => {
             "3": [ "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" ],
             "4": [ "mp4", "MP4" ],
             "5": [ "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" ],
+            "6": [ "pdf", "PDF" ]
         },
 
         "maxFileSizes": {
@@ -26,6 +27,7 @@ const config = () => {
             "3": 10 * 1024 * 1024, // 10 MB
             "4": 20 * 1024 * 1024, // 20 MB
             "5": 10 * 1024 * 1024, // 10 MB
+            "6": 10 * 1024 * 1024, // 10 MB
         },
 
         "supportedAspectRatios": {
@@ -36,7 +38,9 @@ const config = () => {
             "5": 1 / 1
         },
 
-        "maxDurationForVideo": 30 // in seconds
+        "maxDurationForVideo": 30, // in seconds
+
+        "pdfMaxPageCount": 1
     }
 };
 

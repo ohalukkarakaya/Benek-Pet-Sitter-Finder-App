@@ -10,10 +10,12 @@ const setAspectRatioHelper = require( '../helpers/uploadEndPointHelpers/setAspec
 const compressProcessHelper = require( '../helpers/uploadEndPointHelpers/compressProcessHelper' );
 const writeImageFileAfterProcessHelper = require( '../helpers/uploadEndPointHelpers/writeImageFileAfterProcessHelper' );
 const writeVideoFileAfterProcessHelper = require( '../helpers/uploadEndPointHelpers/writeVideoFileAfterProcessHelper' );
+const getMaxFileSizeAndMaxDurationHelper = require( '../helpers/uploadEndPointHelpers/getMaxFileSizeAndMaxDurationHelper' );
 
 const getAspectRatioHelper = require( '../helpers/getAspectRatioHelper' );
 const getVideoMetaDataHelper = require( '../helpers/getVideoMetaDataHelper' );
-const getMaxFileSizeAndMaxDurationHelper = require( '../helpers/uploadEndPointHelpers/getMaxFileSizeAndMaxDurationHelper' );
+const checkPdfFileHelper = require( '../helpers/checkPdfFileHelper' );
+const compressPdfHelper = require( '../helpers/compressPdfHelper' );
 
 const uploadController = async ( req, res ) => {
 
@@ -64,8 +66,43 @@ const uploadController = async ( req, res ) => {
     const tempFilePath = `temp_${ randName }.${ fileExtension }`;
     await util.promisify( file.mv )( tempFilePath );
 
+    //process pdf
+    if( fileType === 6 ){
+      const pdfFilter = await checkPdfFileHelper( tempFilePath );
+      if(
+        pdfFilter
+        && pdfFilter.error
+      ){
+        return res.status( 400 )
+                  .json(
+                    {
+                      error: true,
+                      message: "pdf format is setWordSpacing."
+                    }
+                  );
+      }
+
+      if( fileSize > config().maxFileSizes[ fileType.toString() ] ){
+        await compressPdfHelper( tempFilePath, fileType, newPath );
+      }else{
+        const pdfData = await fs.readFile( tempFilePath );
+        await fs.writeFile( newPath, pdfData );
+
+        if ( fs.existsSync( tempFilePath ) ){
+          fs.unlink(
+              tempFilePath, 
+              ( err ) => {
+                  if( err ){
+                      console.error( 'Dosya silinirken hata oluştu:', err );
+                  }
+              }
+          );
+        }
+      }
+    }
+
     let aspectRatio;
-    if( fileType !== 4 ){
+    if( fileType !== 4 && fileType !== 6 ){
 
       // Get the aspect ratio asynchronously
       aspectRatio = await getAspectRatioHelper( tempFilePath );
@@ -114,10 +151,10 @@ const uploadController = async ( req, res ) => {
     }
 
 
-    if( fileType !== 4 ){
+    if( fileType !== 4 && fileType !== 6 ){
       // write image file after process
       await writeImageFileAfterProcessHelper( tempFilePath, newPath );
-    }else{
+    }else if( fileType !== 6 ){
       // write video file after process
       await writeVideoFileAfterProcessHelper(
         newPath,

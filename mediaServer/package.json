@@ -20,6 +20,7 @@
     "imagemin-pngquant": "^9.0.2",
     "jimp": "^0.22.10",
     "mime": "^3.0.0",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "pdf-lib": "^1.17.1"
   }
 }
