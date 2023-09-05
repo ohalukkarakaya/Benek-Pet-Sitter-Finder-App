@@ -13,6 +13,7 @@ const config = () => {
         },
 
         "supportedExtensions": {
+            "all": [ "jpg", "jpeg", "png", "JPG", "JPEG", "PNG", "mp4", "MP4", "pdf", "PDF" ],
             "1": [ "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" ],
             "2": [ "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" ],
             "3": [ "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" ],

@@ -21,6 +21,20 @@ const uploadController = async ( req, res ) => {
     const outputPath =  config().outputPathBase 
                             + req.body.outputPath;
 
+    if(
+      outputPath.startsWith( "assets/" )
+      || outputPath.includes( "../" )
+      || outputPath.includes( "./" )
+    ){
+        return res.status( 401 )
+                  .json(
+                    {
+                        error: true,
+                        message: "wrong path"
+                    }
+                  );
+    }
+
     const fileTypeString = req.body.fileType;
     const fileType = config().fileTypeEnums[ fileTypeString ];
 
