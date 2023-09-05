@@ -15,7 +15,6 @@ const getMaxFileSizeAndMaxDurationHelper = require( '../helpers/uploadEndPointHe
 const getAspectRatioHelper = require( '../helpers/getAspectRatioHelper' );
 const getVideoMetaDataHelper = require( '../helpers/getVideoMetaDataHelper' );
 const checkPdfFileHelper = require( '../helpers/checkPdfFileHelper' );
-const compressPdfHelper = require( '../helpers/compressPdfHelper' );
 
 const uploadController = async ( req, res ) => {
 
@@ -83,10 +82,27 @@ const uploadController = async ( req, res ) => {
       }
 
       if( fileSize > config().maxFileSizes[ fileType.toString() ] ){
-        await compressPdfHelper( tempFilePath, fileType, newPath );
+        return res.status( 400 )
+                  .json(
+                    {
+                      error: true,
+                      message: "File size is too large"
+                    }
+                  );
       }else{
-        const pdfData = await fs.readFile( tempFilePath );
-        await fs.writeFile( newPath, pdfData );
+        const pdfData = await fs.readFileSync( tempFilePath );
+
+        //zaten varsa olanı sil
+        if( fs.existsSync( newPath ) ){
+          fs.unlinkSync( newPath );
+        }
+
+        fs.mkdirSync(
+          dirName, 
+          { recursive: true }
+        );
+
+        await fs.writeFileSync( newPath, pdfData );
 
         if ( fs.existsSync( tempFilePath ) ){
           fs.unlink(

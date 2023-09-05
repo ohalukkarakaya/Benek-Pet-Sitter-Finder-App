@@ -1,5 +1,8 @@
 const { PDFDocument, degrees, PageSizes } = require('pdf-lib');
-const fs = require('fs');
+const fs = require('fs').promises;
+
+//helpers
+const cleanTempFilesHelper = require( './cleanTempFilesHelper' );
 
 const checkPdfFileHelper = async ( tempFilePath ) => {
     try{
@@ -19,14 +22,14 @@ const checkPdfFileHelper = async ( tempFilePath ) => {
         const a4Width = PageSizes.A4[ 0 ];
         const a4Height = PageSizes.A4[ 1 ];
 
+        // Oran toleransı
+        const tolerance = 0.01;
+
         if( 
-            (
-                width !== a4Width
-                && height !== a4Height
-            )
+            pdfDoc.getPages().length > 1
             || (
-                width !== a4Height
-                && height !== a4Width
+                Math.abs( width / height - a4Width / a4Height ) > tolerance
+                && Math.abs( height / width - a4Width / a4Height ) > tolerance
             )
         ){
             await cleanTempFilesHelper( tempFilePath );
@@ -40,17 +43,20 @@ const checkPdfFileHelper = async ( tempFilePath ) => {
         const isLandscape = width > height;
 
         // Eğer PDF dikey bir A4'ten farklı bir boyutta ise
-        if(
-            !isLandscape 
-            || width !== a4Height 
-            || height !== a4Width
-        ){
+        if( !isLandscape ){
             // PDF'yi yatay A4 boyutuna çevir
             firstPage.setRotation( degrees( 90 ) );
             firstPage.setSize( a4Width, a4Height );
         }
 
-        if ( fs.existsSync( tempFilePath ) ){
+        const isFileExists = await fs.access( tempFilePath )
+                                     .then(
+                                        () => true
+                                      ).catch(
+                                        () => false
+                                      );
+
+        if ( isFileExists ){
             fs.unlink(
                 tempFilePath, 
                 ( err ) => {
@@ -69,7 +75,7 @@ const checkPdfFileHelper = async ( tempFilePath ) => {
 
     }catch( err ){
         await cleanTempFilesHelper( tempFilePath );
-        console.error( 'Pdf filtreleme algoritması hatası:', error );
+        console.error( 'Pdf filtreleme algoritması hatası:', err );
     }
 }
 
