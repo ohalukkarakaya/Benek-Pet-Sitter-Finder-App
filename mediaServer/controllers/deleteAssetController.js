@@ -1,22 +1,22 @@
 const fs = require('fs');
 const path = require('path');
 
+//hlepers
+const config = require( '../config' );
+
 const deleteAssetController = ( req, res ) => {
     const assetPath = req.query.assetPath;
 
     // assets klasöründe beklenen dosya yolu
-    const assetFilePath = path.join( __dirname, './assets', assetPath );
+    const assetFilePath = path.join( __dirname, '../assets', assetPath );
 
     const fileExtension = assetPath.split( '.' )
                                    .pop();
 
     if(
-        outputPath.startsWith( "assets/" )
-        || outputPath.includes( "../" )
-        || outputPath.includes( "./" )
-        || !fileExtension
-        || !config().supportedExtensions[ 'all' ]
-                    .includes( fileExtension )
+        assetPath.startsWith( "assets/" )
+        || assetPath.includes( "../" )
+        || assetPath.includes( "./" )
     ){
           return res.status( 401 )
                     .json(
@@ -59,7 +59,7 @@ const deleteAssetController = ( req, res ) => {
         fs.statSync( assetFilePath )
           .isDirectory()
     ){
-    fs.rmdirSync(
+    fs.rmSync(
             assetFilePath, 
             { recursive: true }
         );

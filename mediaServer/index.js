@@ -1,14 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
-const ffmpeg = require('fluent-ffmpeg');
-const util = require('util');
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const Jimp = require('jimp');
 
 const app = express();
+
+//helper
+const auth = require( './miidleWare/auth' );
 
 // Controllers
 const uploadController = require( './controllers/uploadController' );
@@ -21,7 +18,7 @@ app.use( fileUpload() );
 
 // asset protection
 app.get(
-  '/assets/*', 
+  '/assets/*',
   ( req, res ) => {
     return res.status( 401 )
               .json(
@@ -36,18 +33,21 @@ app.get(
 // Upload Endpoint
 app.post(
   '/upload', 
+  auth,
   uploadController
 );
 
 // Get Asset as Stream End Point
 app.get(
     '/getAsset', 
+    auth,
     getAssetController
 );
 
 // Delete An Asset End Point
 app.delete(
     '/deleteAsset', 
+    auth,
     deleteAssetController
 );
 

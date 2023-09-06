@@ -22,9 +22,9 @@ const uploadController = async ( req, res ) => {
                             + req.body.outputPath;
 
     if(
-      outputPath.startsWith( "assets/" )
-      || outputPath.includes( "../" )
-      || outputPath.includes( "./" )
+      req.body.outputPath.startsWith( "assets/" )
+      || req.body.outputPath.includes( "../" )
+      || req.body.outputPath.includes( "./" )
     ){
         return res.status( 401 )
                   .json(
@@ -90,7 +90,7 @@ const uploadController = async ( req, res ) => {
                   .json(
                     {
                       error: true,
-                      message: "pdf format is setWordSpacing."
+                      message: "file is not A4 format"
                     }
                   );
       }

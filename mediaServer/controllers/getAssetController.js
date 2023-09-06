@@ -9,9 +9,9 @@ const getAssetController = ( req, res ) => {
                                    .pop();
 
     if(
-        outputPath.startsWith( "assets/" )
-        || outputPath.includes( "../" )
-        || outputPath.includes( "./" )
+        assetPath.startsWith( "assets/" )
+        || assetPath.includes( "../" )
+        || assetPath.includes( "./" )
         || !fileExtension
         || !config().supportedExtensions[ 'all' ]
                     .includes( fileExtension )
@@ -26,7 +26,7 @@ const getAssetController = ( req, res ) => {
       }
 
     // assets klasöründe beklenen dosya yolu
-    const assetFilePath = path.join( __dirname, './assets', assetPath );
+    const assetFilePath = path.join( __dirname, '../assets', assetPath );
 
     
 
