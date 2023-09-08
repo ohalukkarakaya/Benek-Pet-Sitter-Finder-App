@@ -1,7 +1,7 @@
 const config = () => {
     return {
 
-        "outputPathBase": "./assets/",
+        "outputPathBase": "../assets/",
 
         "fileTypeEnums": {
             "profile": 1,

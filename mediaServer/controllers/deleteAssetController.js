@@ -8,7 +8,7 @@ const deleteAssetController = ( req, res ) => {
     const assetPath = req.query.assetPath;
 
     // assets klasöründe beklenen dosya yolu
-    const assetFilePath = path.join( __dirname, '../assets', assetPath );
+    const assetFilePath = path.join( __dirname, '../../assets', assetPath );
 
     const fileExtension = assetPath.split( '.' )
                                    .pop();

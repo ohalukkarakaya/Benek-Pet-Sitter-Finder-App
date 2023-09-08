@@ -22,7 +22,8 @@ const uploadController = async ( req, res ) => {
                             + req.body.outputPath;
 
     if(
-      req.body.outputPath.startsWith( "assets/" )
+      req.body.outputPath.startsWith( "../../assets/" )
+      || req.body.outputPath.startsWith( "../assets/" )
       || req.body.outputPath.includes( "../" )
       || req.body.outputPath.includes( "./" )
     ){
