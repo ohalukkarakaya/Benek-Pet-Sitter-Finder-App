@@ -1,4 +1,4 @@
-import User from "../../models/User.js";
+import Pet from "../../models/Pet.js";
 
 import uploadFileHelper from "./uploadFileHelper.js";
 
@@ -10,14 +10,14 @@ import crypto from "crypto";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const serverHandleCareGiveCertificatesHelper = async ( req, res, next ) => {
+const serverHandlePetVaccinationCertificatesHelper = async ( req, res, next ) => {
     try{
         upload.single( 'file' )(
             req,
             {},
             async ( err ) => {
                 if( err ){
-                    console.log( "ERROR: serverHandleCareGiveCertificatesHelper - ", err );
+                    console.log( "ERROR: serverHandlePetVaccinationCertificatesHelper - ", err );
                     return res.status( 500 )
                               .json(
                                 {
@@ -48,8 +48,8 @@ const serverHandleCareGiveCertificatesHelper = async ( req, res, next ) => {
                                         ? "pdf"
                                         : "photo";
 
-                const userId = req.user._id.toString();
-                req.user = await User.findById( userId );
+                const petId = req.pet._id.toString();
+                req.pet = await Pet.findById( petId );
 
                 //insert outputpath
                 const { originalname } = req.file;
@@ -57,20 +57,20 @@ const serverHandleCareGiveCertificatesHelper = async ( req, res, next ) => {
                 const randId = crypto.randomBytes( 6 )
                                      .toString( 'hex' );
 
-                const newFileName = userId + "_" 
+                const newFileName = petId + "_" 
                                            + randId 
-                                           + "_careGiveCertificate";
+                                           + "_vaccinationCertificate_";
 
                 req.certificateFileName = newFileName;
 
-                const pathToSend =  "profileAssets/" + userId
-                                                        + "/careGiveCertificates/"
-                                                        + newFileName;
+                const pathToSend =  "pets/" + petId
+                                            + "/petsVaccinationCertificates/"
+                                            + newFileName;
 
                 req.certificatePath = pathToSend + "."
-                                                + splitedOriginalName[
-                                                    splitedOriginalName.length - 1
-                                                ];
+                                                 + splitedOriginalName[
+                                                      splitedOriginalName.length - 1
+                                                   ];
 
                 try {
                     await fs.promises.writeFile(
@@ -91,7 +91,7 @@ const serverHandleCareGiveCertificatesHelper = async ( req, res, next ) => {
                                                                 + splitedOriginalName[
                                                                     splitedOriginalName.length - 1
                                                                   ] 
-                                        );
+                                      );
 
                 const uploadProfileImage = await uploadFileHelper(
                                                     writenFile,
@@ -102,23 +102,23 @@ const serverHandleCareGiveCertificatesHelper = async ( req, res, next ) => {
                                                     fileTypeEnum,
                                                     pathToSend,
                                                     res
-                                                );
+                                                 );
 
                 fs.rmSync( 
                     newFileName + "."
                                 + splitedOriginalName[
                                     splitedOriginalName.length - 1
-                                    ] 
-                    );
+                                  ] 
+                   );
 
                 if( uploadProfileImage.error ){
                     return res.status( 500 )
-                            .json(
-                                {
-                                    error: true,
-                                    message: "Internal Server Error"
-                                }
-                            );
+                              .json(
+                                    {
+                                        error: true,
+                                        message: "Internal Server Error"
+                                    }
+                               );
                 }
 
                 next();
@@ -127,7 +127,7 @@ const serverHandleCareGiveCertificatesHelper = async ( req, res, next ) => {
         
 
     }catch( err ){
-        console.log( "ERROR: serverHandleCareGiveCertificatesHelper - ", err );
+        console.log( "ERROR: serverHandlePetVaccinationCertificatesHelper - ", err );
         return res.status( 500 )
                   .json(
                     {
@@ -138,4 +138,4 @@ const serverHandleCareGiveCertificatesHelper = async ( req, res, next ) => {
     }
 }
 
-export default serverHandleCareGiveCertificatesHelper;
+export default serverHandlePetVaccinationCertificatesHelper;

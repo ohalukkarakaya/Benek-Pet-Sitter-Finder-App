@@ -4,7 +4,7 @@ import auth from "../../middleware/auth.js";
 import editPetAuth from "../../middleware/editPetAuth.js";
 import uploadPetProfileImageHelper from "../../utils/fileHelpers/uploadPetProfileImageHelper.js";
 import uploadPetImagesHelper from "../../utils/fileHelpers/uploadPetImagesHelper.js";
-import { uploadPetVaccinationCertificate } from "../../middleware/imageHandle/serverHandlePetVaccinationCertificates.js";
+import serverHandlePetVaccinationCertificatesHelper from "../../utils/fileHelpers/serverHandlePetVaccinationCertificatesHelper.js";
 
 import petInteractions from "./petInteractions.js";
 
@@ -81,7 +81,7 @@ router.put(
   "/petsVaccinationCertificate/:petId", 
   auth,
   editPetAuth,
-  uploadPetVaccinationCertificate,
+  serverHandlePetVaccinationCertificatesHelper,
   insertPetVaccinationCertificateController
 );
 
