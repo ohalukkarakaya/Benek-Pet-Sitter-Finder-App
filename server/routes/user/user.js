@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 
 import auth from "../../middleware/auth.js";
-import { updateProfileImg } from "../../middleware/imageHandle/serverHandleProfileImage.js";
+import uploadProfileAssetsHelper from "../../utils/fileHelpers/uploadProfileAssetsHelper.js";
 
 import userSetingsRoutes from './userSettings.js';
 import userInterractionsRoutes from "./userInterractions.js"
@@ -26,7 +26,7 @@ const router = express.Router();
 router.post(
   "/moreUserInfo",
   auth,
-  updateProfileImg,
+  uploadProfileAssetsHelper,
   userGetMoreInfoController
 );
 

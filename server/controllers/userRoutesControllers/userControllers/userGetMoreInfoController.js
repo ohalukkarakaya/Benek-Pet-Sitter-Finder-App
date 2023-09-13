@@ -13,10 +13,10 @@ const userGetMoreInfoController = async (req, res, next) => {
         //if there is existing images and they uploaded to media server
         if (req.files) {
         if(req.files.profileImg){
-            var uploadedProfileImgImage = req.profileCdnPath;
+            var uploadedProfileImgImage = req.profilePath;
         }
         if(req.files.coverImg){
-            var uploadedCoverImgImage = req.coverCdnPath;
+            var uploadedCoverImgImage = req.coverPath;
         }
 
         if(
