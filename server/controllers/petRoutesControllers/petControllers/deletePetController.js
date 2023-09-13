@@ -2,11 +2,7 @@ import User from "../../../models/User.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
 import ReportMission from "../../../models/Report/ReportMission.js";
 
-import s3 from "../../../utils/s3Service.js";
-
-import dotenv from "dotenv";
-
-dotenv.config();
+import deleteFileHelper from "../../../utils/fileHelpers/deleteFileHelper.js";
 
 const deletePetController = async (req, res) => {
     try{
@@ -212,40 +208,8 @@ const deletePetController = async (req, res) => {
               }
             );
           }
-    
-          //delete images of pet
-          const emptyS3Directory = async ( bucket, dir ) => {
-            const listParams = {
-              Bucket: bucket,
-              Prefix: dir
-            };
-            const listedObjects = await s3.listObjectsV2( listParams );
-            if (
-              !( listedObjects.Contents )
-              || listedObjects.Contents
-                              .length === 0
-            ) return;
-            const deleteParams = {
-              Bucket: bucket,
-              Delete: { Objects: [] }
-            };
-    
-            listedObjects.Contents
-                         .forEach(
-                            ({ Key }) => {
-                              deleteParams.Delete.Objects.push({ Key });
-                            }
-                          );
-            await s3.deleteObjects( deleteParams );
-            if ( listedObjects.IsTruncated ) await emptyS3Directory(bucket, dir);
-          }
           
-            emptyS3Directory( 
-                  process.env
-                         .BUCKET_NAME, 
-                  
-                  `pets/${petId}/`
-            ).then(
+          deleteFileHelper( `pets/${petId}/` ).then(
               (_) => {
                 //delete pet
                 req.pet

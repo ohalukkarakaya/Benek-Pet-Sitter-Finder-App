@@ -19,6 +19,7 @@ import paramDeleteSubSellerRequest from "../utils/paramRequests/subSellerRequest
 import paramCancelOrderRequest from "../utils/paramRequests/paymentRequests/paramCancelOrderRequest.js";
 
 import s3 from "../utils/s3Service.js";
+import deleteFileHelper from "../utils/fileHelpers/deleteFileHelper.js";
 
 dotenv.config();
 
@@ -95,30 +96,8 @@ const expireUser = cron.schedule(
                                     }
 
                                     //delete images of pet
-                                    async function emptyS3Directory(bucket, dir){
-                                        const listParams = {
-                                            Bucket: bucket,
-                                            Prefix: dir
-                                        };
-                                        const listedObjects = await s3.listObjectsV2(listParams);
-                                        if (
-                                            !listedObjects.Contents
-                                            || listedObjects.Contents
-                                                            .length === 0
-                                        ) return;
-                                        const deleteParams = {
-                                            Bucket: bucket,
-                                            Delete: { Objects: [] }
-                                        };
 
-                                        listedObjects.Contents.forEach(({ Key }) => {
-                                            deleteParams.Delete.Objects.push({ Key });
-                                        });
-                                        await s3.deleteObjects(deleteParams);
-                                        if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
-                                    }
-
-                                    emptyS3Directory(process.env.BUCKET_NAME, `pets/${petId}/`).then(
+                                    deleteFileHelper( `pets/${petId}/` ).then(
                                         (_) => {
                                           //delete pet
                                           pet.deleteOne().then(
@@ -593,29 +572,7 @@ const expireUser = cron.schedule(
 
                         //delete user
                         //delete images of user
-                        async function emptyS3Directory(bucket, dir){
-                            const listParams = {
-                                Bucket: bucket,
-                                Prefix: dir
-                            };
-                            const listedObjects = await s3.listObjectsV2(listParams);
-                            if (
-                                !listedObjects.Contents
-                                || listedObjects.Contents
-                                                .length === 0
-                            ) return;
-                            const deleteParams = {
-                                Bucket: bucket,
-                                Delete: { Objects: [] }
-                            };
-        
-                            listedObjects.Contents.forEach(({ Key }) => {
-                                deleteParams.Delete.Objects.push({ Key });
-                            });
-                            await s3.deleteObjects(deleteParams);
-                            if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
-                        }
-                        emptyS3Directory(process.env.BUCKET_NAME, `profileAssets/${user._id.toString()}/`).then(
+                        deleteFileHelper( `profileAssets/${user._id.toString()}/` ).then(
                             async (_) => {
 
                                 if( user.isCareGiver && user.careGiveGUID ){

@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import auth from "../../../../middleware/auth.js";
-import { uploadStory } from "../../../../middleware/contentHandle/serverHandleStoryContent.js";
+import serverHandleStoryContentHelper from "../../../../utils/fileHelpers/serverHandleStoryContentHelper.js";
 import storyCommentEndpoints from "./storyComments.js";
 
 //controllers
@@ -20,7 +20,7 @@ const router = express.Router();
 router.post(
     "/",
     auth,
-    uploadStory,
+    serverHandleStoryContentHelper,
     createStoryController
 );
 
