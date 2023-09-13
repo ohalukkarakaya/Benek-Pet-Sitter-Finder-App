@@ -3,7 +3,7 @@ import express from "express";
 import auth from "../../middleware/auth.js";
 import editPetAuth from "../../middleware/editPetAuth.js";
 import uploadPetProfileImageHelper from "../../utils/fileHelpers/uploadPetProfileImageHelper.js";
-import { uploadPetImages } from "../../middleware/imageHandle/serverHandlePetImages.js";
+import uploadPetImagesHelper from "../../utils/fileHelpers/uploadPetImagesHelper.js";
 import { uploadPetVaccinationCertificate } from "../../middleware/imageHandle/serverHandlePetVaccinationCertificates.js";
 
 import petInteractions from "./petInteractions.js";
@@ -62,7 +62,7 @@ router.put(
   "/petsImages/:petId", 
   auth,
   editPetAuth,
-  uploadPetImages,
+  uploadPetImagesHelper,
   insertPetsImagesController
 );
 

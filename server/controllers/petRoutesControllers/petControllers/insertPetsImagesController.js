@@ -6,14 +6,14 @@ const insertPetsImagesController = async (req, res) => {
     try{
         var urlList = [];
         for(var i = 0; i < req.imageNames.length; i ++){
-          urlList.push(`${process.env.CDN_SUBDOMAIN}${req.imageNames[i]}`);
+          urlList.push( req.imageNames[ i ] );
           req.pet.images.push(
             {
-              imgUrl: `${process.env.CDN_SUBDOMAIN}${req.imageNames[i]}`
+              imgUrl: req.imageNames[ i ]
             }
           );
         }
-        if(urlList.length !== 0){
+        if( urlList.length !== 0 ){
           req.pet.markModified('images');
           req.pet.save(
             function (err) {

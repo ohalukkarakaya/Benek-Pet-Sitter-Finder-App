@@ -6,10 +6,6 @@ import uploadFileHelper from "./uploadFileHelper.js";
 import fs from "fs";
 import multer from "multer";
 import crypto from "crypto";
-import dotenv from "dotenv";
-
-dotenv.config();
-const env = process.env;
 
 // Multer ayarları
 const storage = multer.memoryStorage();
