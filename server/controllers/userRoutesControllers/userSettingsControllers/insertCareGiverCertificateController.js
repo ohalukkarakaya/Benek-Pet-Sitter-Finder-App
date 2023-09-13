@@ -1,19 +1,24 @@
-import User from "../../../models/User.js";
-
 const insertCareGiverCertificateController = async ( req, res ) => {
     try{
-        const userId = req.user._id.toString();
-        const user = await User.findById( userId );
-        if( req.cdnUrl ){
+        const user = req.user;
 
-            user.identity
-                .certificates = [];
+        if( req.certificatePath ){
+            if(
+                !(
+                    user.identity
+                        .certificates
+                )
+            ){
+                user.identity
+                    .certificates = [];
+            }
+            
 
             user.identity
                 .certificates.push(
                     {
                         desc: req.body.desc,
-                        fileUrl: req.cdnUrl
+                        fileUrl: req.certificatePath
                     }
                 );
             user.markModified('identity');
@@ -36,11 +41,11 @@ const insertCareGiverCertificateController = async ( req, res ) => {
                         {
                             error: false,
                             message: "Certificate Inserted Succesfully",
-                            url: req.cdnUrl,
+                            url: req.certificatePath,
                             desc: req.body.desc
                         }
                       );
-          }else{
+        }else{
             return res.status( 500 )
                       .json(
                         {
@@ -48,7 +53,7 @@ const insertCareGiverCertificateController = async ( req, res ) => {
                             message: "Cretificate Couldn't Uploaded"
                         }
                       );
-          }
+        }
     }catch( err ){
         console.log( "ERROR: insertCareGiverCertificateController - ", err );
         return res.status( 500 )
@@ -57,7 +62,7 @@ const insertCareGiverCertificateController = async ( req, res ) => {
                             error: true,
                             message: "Internal server error"
                         }
-                  );
+                   );
     }
 }
 

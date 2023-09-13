@@ -21,7 +21,7 @@ import editCareGiveCertificateDescController from "../../controllers/userRoutesC
 import deleteCareGiveCertificateController from "../../controllers/userRoutesControllers/userSettingsControllers/deleteCareGiveCertificateController.js"
 
 import auth from "../../middleware/auth.js";
-import { uploadCareGiverCertificate } from "../../middleware/imageHandle/serverHandleCareGiveCertificates.js";
+import serverHandleCareGiveCertificatesHelper from "../../utils/fileHelpers/serverHandleCareGiveCertificatesHelper.js";
 
 import dotenv from "dotenv";
 
@@ -106,7 +106,7 @@ router.put(
 router.post(
   "/certificate",
   auth,
-  uploadCareGiverCertificate,
+  serverHandleCareGiveCertificatesHelper,
   insertCareGiverCertificateController
 );
 

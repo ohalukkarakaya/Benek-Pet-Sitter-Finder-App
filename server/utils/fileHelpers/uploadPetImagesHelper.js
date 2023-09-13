@@ -35,8 +35,6 @@ const uploadPetImagesHelper = async ( req, res, next ) => {
                               );
                 }
 
-                const pet = req.pet;
-
                 for(
                     let file
                     of req.files
