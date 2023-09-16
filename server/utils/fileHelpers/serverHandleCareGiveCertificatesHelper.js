@@ -46,7 +46,7 @@ const serverHandleCareGiveCertificatesHelper = async ( req, res, next ) => {
 
                 const fileTypeEnum = isFilePdf
                                         ? "pdf"
-                                        : "photo";
+                                        : "horizontalPhoto";
 
                 const userId = req.user._id.toString();
                 req.user = await User.findById( userId );

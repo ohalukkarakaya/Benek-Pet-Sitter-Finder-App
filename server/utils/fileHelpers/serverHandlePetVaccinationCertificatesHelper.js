@@ -46,7 +46,7 @@ const serverHandlePetVaccinationCertificatesHelper = async ( req, res, next ) =>
 
                 const fileTypeEnum = isFilePdf
                                         ? "pdf"
-                                        : "photo";
+                                        : "horizontalPhoto";
 
                 const petId = req.pet._id.toString();
                 req.pet = await Pet.findById( petId );
