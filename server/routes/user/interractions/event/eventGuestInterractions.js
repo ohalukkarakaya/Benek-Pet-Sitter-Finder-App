@@ -1,7 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
 import auth from "../../../../middleware/auth.js";
+
 import afterEventCommentEndpoints from "./afterEventCommentOperations.js";
+
+import serverHandleAfterEventContentHelper from "../../../../utils/fileHelpers/serverHandleAfterEventContentHelper.js";
 import { uploadEventContent } from "../../../../middleware/contentHandle/serverHandleAfterEventContent.js";
 
 //controllers
@@ -15,14 +18,15 @@ dotenv.config();
 
 const router = express.Router();
 
-// - 
+// - tested
 // upload content
 router.post(
     "/:eventId",
     auth,
-    uploadEventContent,
+    serverHandleAfterEventContentHelper,
     eventUploadContentController
 );
+
 
 // edit content
 router.put(
@@ -53,6 +57,6 @@ router.get(
     getAfterEventContentListController
 );
 
-router.use("/comment", afterEventCommentEndpoints);
+router.use( "/comment", afterEventCommentEndpoints );
 
 export default router;

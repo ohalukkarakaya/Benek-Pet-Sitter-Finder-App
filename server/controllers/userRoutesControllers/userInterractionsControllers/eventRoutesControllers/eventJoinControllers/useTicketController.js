@@ -3,7 +3,6 @@ import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
 
 import mokaApprove3dPaymentRequest from "../../../../../utils/mokaPosRequests/mokaPayRequests/mokaApprove3dPaymentRequest.js";
-import paramAproveOrderRequest from "../../../../../utils/paramRequests/paymentRequests/paramAproveOrderRequest.js";
 
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
