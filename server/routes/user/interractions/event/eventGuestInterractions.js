@@ -5,7 +5,6 @@ import auth from "../../../../middleware/auth.js";
 import afterEventCommentEndpoints from "./afterEventCommentOperations.js";
 
 import serverHandleAfterEventContentHelper from "../../../../utils/fileHelpers/serverHandleAfterEventContentHelper.js";
-import { uploadEventContent } from "../../../../middleware/contentHandle/serverHandleAfterEventContent.js";
 
 //controllers
 import eventUploadContentController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/eventRoutesControllers/eventGuestInterractionsControllers/eventUploadContentController.js";
@@ -27,12 +26,12 @@ router.post(
     eventUploadContentController
 );
 
-
+// - tested
 // edit content
 router.put(
     "/:eventId/:contentId",
     auth,
-    uploadEventContent,
+    serverHandleAfterEventContentHelper,
     eventEditContentController
 );
 

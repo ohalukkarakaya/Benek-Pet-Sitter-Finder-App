@@ -13,7 +13,7 @@ const upload = multer({ storage });
 
 const serverHandleAfterEventContentHelper = async ( req, res, next ) => {
     try{
-        upload.single( 'file' )(
+        upload.single( 'file' )( 
             req,
             {},
             async ( err ) => {
@@ -31,14 +31,19 @@ const serverHandleAfterEventContentHelper = async ( req, res, next ) => {
                 const contentId = req.params.contentId;
                 const isEditing = contentId;
 
+                const eventId = req.params.eventId.toString();
+                const userId = req.user._id.toString();
+
+                req.meetingEvent = await Event.findById( eventId );
+
                 if( isEditing ){
                     req.content = req.meetingEvent.afterEvent.find(
                         contentObject =>
                             contentObject._id.toString() === contentId
                     );
         
-                    if( req.content.isUrl ){
-                        req.existingImageUrl = req.content.value;
+                    if( req.content.content.isUrl ){
+                        req.existingImageUrl = req.content.content.value;
                     }
                 }
 
@@ -54,11 +59,6 @@ const serverHandleAfterEventContentHelper = async ( req, res, next ) => {
                                   );
                     }
                 }
-
-                const eventId = req.params.eventId.toString();
-                const userId = req.user._id.toString();
-
-                req.meetingEvent = await Event.findById( eventId );
 
                 if( req.file ){
                     const fileType = req.file.mimetype;
