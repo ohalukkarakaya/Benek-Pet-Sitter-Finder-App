@@ -1,5 +1,8 @@
 import mokaCredentialsHelper from "../../mokaHelpers/mokaCredentialsHelper.js";
 import mokaCheckifCardAlreadyRegisteredHelper from "../../mokaHelpers/mokaCheckifCardAlreadyRegisteredHelper.js";
+
+import https from "https";
+import crypto from "node:crypto";
 import axios from "axios";
 import dotenv from "dotenv";
 
@@ -51,6 +54,7 @@ const mokaRegisterCard = async (
             maxBodyLength: Infinity,
             url: `${env.MOKA_TEST_URL_BASE}/DealerCustomer/AddCard`,
             headers: { 'Content-Type': 'application/json' },
+            httpsAgent: new https.Agent( { secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT } ),
             data: data,
         };
 

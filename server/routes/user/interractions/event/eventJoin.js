@@ -41,7 +41,7 @@ router.post(
     buyTicketForEventController
 );
 
-// - To Do
+// - tested
 //use ticket
 router.put(
     "/:eventId",

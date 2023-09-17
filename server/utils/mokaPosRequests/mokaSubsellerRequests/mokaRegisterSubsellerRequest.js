@@ -1,6 +1,8 @@
 import mokaCredentialsHelper from "../mokaHelpers/mokaCredentialsHelper.js";
 import truncateAdressForMoka from "../mokaHelpers/truncateAdressForMoka.js";
 
+import https from "https";
+import crypto from "node:crypto";
 import axios from "axios";
 import dotenv from "dotenv";
 
@@ -75,6 +77,7 @@ const mokaRegisterSubsellerRequest = async (
                 maxBodyLength: Infinity,
                 url: `${ env.MOKA_TEST_URL_BASE }/Dealer/CreateDirectDealer`,
                 headers: { 'Content-Type': 'application/json' },
+                httpsAgent: new https.Agent( { secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT } ),
                 data: data
             };
 

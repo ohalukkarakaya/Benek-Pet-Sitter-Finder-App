@@ -113,7 +113,7 @@ const useTicketController = async ( req, res ) => {
                                                 error: true,
                                                 message: `User with the id "${ticketOwner._id}" not found therefore ticket has been terminated`
                                             }
-                                      );
+                                       );
                         }
                     ).catch(
                         ( error ) => {
