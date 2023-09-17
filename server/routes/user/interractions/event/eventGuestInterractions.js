@@ -43,6 +43,7 @@ router.delete(
     eventDeleteContentController
 );
 
+// - tested
 //like or remove like after event content
 router.put(
     "/like/:eventId/:contentId",
@@ -50,7 +51,9 @@ router.put(
     afterEventContentLikeRemoveLikeController
 );
 
-//get after event list by event Id
+
+// - tested
+//get after event content list by event Id
 router.get(
     "/get/:eventId/:skip/:limit",
     auth,
