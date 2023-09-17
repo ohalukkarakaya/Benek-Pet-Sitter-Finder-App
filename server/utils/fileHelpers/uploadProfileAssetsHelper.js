@@ -111,7 +111,6 @@ const uploadProfileAssetsHelper = async ( req, res, next ) => {
                             req.files.profileImg[0].buffer,
                             "binary"
                         );
-                        console.log("Dosya yazma başarılı");
                     } catch (err) {
                         console.error("Dosya yazma hatası:", err);
                     }
@@ -190,8 +189,6 @@ const uploadProfileAssetsHelper = async ( req, res, next ) => {
 
                             "binary"
                         );
-
-                        console.log( "Dosya yazma başarılı" );
 
                     }catch( err ){
                         console.error( "Dosya yazma hatası:", err );

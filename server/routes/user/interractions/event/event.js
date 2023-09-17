@@ -15,7 +15,7 @@ import eventJoinEndpoints from "./eventJoin.js";
 import afterEventEndpoints from "./eventGuestInterractions.js";
 import organizerEndpoints from "./organizerOperations.js";
 
-import { uploadEventImage } from "../../../../middleware/contentHandle/serverHandleEventImage.js";
+import serverHandleEventImageHelper from "../../../../utils/fileHelpers/serverHandleEventImageHelper.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -35,7 +35,7 @@ router.post(
 router.put(
     "/image/:eventId",
     auth,
-    uploadEventImage,
+    serverHandleEventImageHelper,
     uploadEventImageController
 );
 

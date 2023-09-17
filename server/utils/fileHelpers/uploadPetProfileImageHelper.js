@@ -188,8 +188,6 @@ const uploadPetProfileImageHelper = async ( req, res, next ) => {
                             "binary"
                         );
 
-                        console.log( "Dosya yazma başarılı" );
-
                     }catch( err ){
                         console.error( "Dosya yazma hatası:", err );
                     }
