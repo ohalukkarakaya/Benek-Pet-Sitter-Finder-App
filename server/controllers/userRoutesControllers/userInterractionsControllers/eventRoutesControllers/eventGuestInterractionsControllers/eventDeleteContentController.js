@@ -1,5 +1,7 @@
 import Event from "../../../../../models/Event/Event.js";
-import s3 from "../../../../../utils/s3Service.js";
+
+import deleteFileHelper from "../../../../../utils/fileHelpers/deleteFileHelper.js";
+
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -54,26 +56,17 @@ const eventDeleteContentController = async (req, res) => {
 
         const areThereImgOnServer = content.content.isUrl;
 
-        if(areThereImgOnServer){
-            const splitedUrl = content.content.value.split("/");
-            imgName = splitedUrl[splitedUrl.length - 1];
-
-            const deleteImg = async (deleteParams) => {
-                try {
-                    s3.deleteObject(deleteParams).promise();
-                    console.log("Success", data);
-                    return data;
-                } catch (err) {
-                    console.log("Error", err);
-                }
-              };
-
-              const deleteContentImageParams = {
-                Bucket: process.env.BUCKET_NAME,
-                Key: `events/${req.eventId.toString()}/afterEventContents/${imgName}`
-            };
-
-            await deleteImg(deleteContentImageParams);
+        if( areThereImgOnServer ){
+            const deleteFile = await deleteFileHelper( content.content.value );
+            if( deleteFile.error ){
+                return res.status( 500 )
+                          .json(
+                            {
+                                error: true,
+                                message: "Internal Server Error"
+                            }
+                          );
+            }
         }
 
         meetingEvent.afterEvent = meetingEvent.afterEvent.filter(
@@ -81,35 +74,38 @@ const eventDeleteContentController = async (req, res) => {
                 contentObject._id.toString() !== contentId
         );
 
-        meetingEvent.markModified("afterEvent");
+        meetingEvent.markModified( "afterEvent" );
         meetingEvent.save(
-            (error) => {
-                if(error){
-                    console.log(error);
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                    );
+            ( error ) => {
+                if( error ){
+                    console.log( error );
+                    return res.status( 500 )
+                              .json(
+                                    {
+                                        error: true,
+                                        message: "Internal server error"
+                                    }
+                               );
                 }
             }
         );
 
-        return res.status(200).json(
-            {
-                error: false,
-                message: "content add succesfully"
-            }
-        );
-    }catch(err){
-        console.log("ERROR: edit after event interraction - ", err);
-        return res.status(500).json(
-            {
-                error: true,
-                message: "Internal server error"
-            }
-        );
+        return res.status( 200 )
+                  .json(
+                        {
+                            error: false,
+                            message: "content deleted succesfully"
+                        }
+                   );
+    }catch( err ){
+        console.log( "ERROR: edit after event interraction - ", err );
+        return res.status( 500 )
+                  .json(
+                        {
+                            error: true,
+                            message: "Internal server error"
+                        }
+                   );
     }
 }
 

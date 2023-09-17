@@ -110,7 +110,7 @@ const serverHandleAfterEventContentHelper = async ( req, res, next ) => {
                     req.afterEventContentFileName = newFileName;
 
                     const pathToSend =  "events/" + eventId
-                                                  + "/"
+                                                  + "/eventContents/"
                                                   + newFileName;
 
                     req.afterEventContentPath = pathToSend + "."

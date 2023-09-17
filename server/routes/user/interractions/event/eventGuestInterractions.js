@@ -35,6 +35,7 @@ router.put(
     eventEditContentController
 );
 
+// - tested
 // delete content
 router.delete(
     "/:eventId/:contentId",
