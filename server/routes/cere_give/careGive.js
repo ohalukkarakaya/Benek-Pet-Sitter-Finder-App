@@ -36,7 +36,7 @@ router.post(
     careGiveInvitationController
 );
 
-// 
+// - tested
 //get care give invitations
 router.get(
     "/invitations/:skip/:limit",
@@ -44,6 +44,7 @@ router.get(
     getCareGiveInvitationsController
 );
 
+//
 //get sended care give invitations
 router.get(
     "/sendedInvitations/:skip/:limit",

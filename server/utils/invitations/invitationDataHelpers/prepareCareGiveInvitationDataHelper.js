@@ -8,8 +8,8 @@ const prepareCareGiveInvitationDataHelper = async ( invitation ) => {
     try{
         const invitationOfCareGive = invitation.invitation;
         const sender = await User.findById( 
-                                        invitation.from
-                                                .toString() 
+                                        invitationOfCareGive.from
+                                                            .toString() 
                                   );
 
         if( !sender ){
@@ -21,7 +21,7 @@ const prepareCareGiveInvitationDataHelper = async ( invitation ) => {
 
         const senderInfo = getLightWeightUserInfoHelper( sender );
 
-        invitation.from = senderInfo;
+        invitationOfCareGive.from = senderInfo;
 
         const price = invitation.prices.priceType !== "Free" 
                             ? `${ invitation.prices.servicePrice } ${ invitation.prices.priceType }`

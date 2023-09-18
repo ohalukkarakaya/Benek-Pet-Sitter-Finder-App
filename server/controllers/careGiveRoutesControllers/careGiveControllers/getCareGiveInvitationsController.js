@@ -4,7 +4,6 @@ import prepareCareGiveInvitationDataHelper from "../../../utils/invitations/invi
 
 const getCareGiveInvitationsController = async ( req, res ) => {
     try{
-
         const userId = req.user._id.toString();
         const skip = parseInt( req.params.skip ) || 0;
         const limit = parseInt( req.params.limit ) || 15;
