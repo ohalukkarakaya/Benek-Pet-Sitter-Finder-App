@@ -1,24 +1,47 @@
-import cron from "node-cron";
 import Event from "../models/Event/Event.js";
 import EventTicket from "../models/Event/EventTicket.js";
-import paramCancelOrderRequest from "../utils/paramRequests/paymentRequests/paramCancelOrderRequest.js";
-import s3 from "../utils/s3Service.js";
+
+import deleteFileHelper from "../utils/fileHelpers/deleteFileHelper.js";
+import mokaVoid3dPaymentRequest from "../utils/mokaPosRequests/mokaPayRequests/mokaVoid3dPaymentRequest.js";
+
+import cron from "node-cron";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const expireEvents = cron.schedule(
     '0 0 0 * * *',
+    // "* * * * *", // her dakika başı
     async () => {
         try{
-            const expiredEvents = await Event.find().where('expiryDate').lte(Date.now());
+            const now = new Date();
+
+            const currentYear = now.getUTCFullYear();
+            const currentMonth = now.getUTCMonth();
+            const currentDate = now.getUTCDate();
+            const currentHour = now.getUTCHours();
+
+            const currentDateTime = new Date(
+                                            currentYear, 
+                                            currentMonth, 
+                                            currentDate, 
+                                            currentHour, 
+                                            0, 
+                                            0, 
+                                            0
+                                        );
+
+            const expiredEvents = await Event.find()
+                                             .where( 'expiryDate' )
+                                             .lte( currentDateTime );
+
             expiredEvents.map(
-                async (meetingEvent) => {
+                async ( meetingEvent ) => {
                     const soldTickets = await EventTicket.find({ eventId: meetingEvent._id.toString() });
                     const cancelPayments = soldTickets.map(
-                        (ticket) => {
+                        ( ticket ) => {
                             return new Promise(
-                                async (resolve, reject) => {
+                                async ( resolve, reject ) => {
                                     if(
                                         ticket.paidPrice.priceType !== "Free"
                                         && ticket.paidPrice.price > 0
@@ -27,35 +50,32 @@ const expireEvents = cron.schedule(
                                         && ticket.orderInfo.pySiparisGuid
                                     ){
                                         //cancel payment
-                                        const cancelPayment = await paramCancelOrderRequest(
-                                            ticket.orderInfo.pySiparisGuid,
-                                            "IPTAL",
-                                            ticket.orderId,
-                                            ticket.paidPrice
-                                        );
+                                        const cancelPayment = await mokaVoid3dPaymentRequest( ticket.orderId );
                         
                                         if( 
                                             !cancelPayment 
-                                            || cancelPayment.error === true 
-                                            || !( cancelPayment.data )
+                                            || (
+                                                cancelPayment.serverStatus
+                                                && cancelPayment.serverStatus !== 0
+                                                && cancelPayment.serverStatus !== 1
+                                                && (
+                                                    cancelPayment.error === true 
+                                                    || !( cancelPayment.data )
+                                                )
+                                            )
                                         ){
-                                            return res.status( 500 ).json(
-                                                {
-                                                    error: true,
-                                                    message: "Internal server error"
-                                                }
-                                            );
+                                            console.log( "ERROR: While Canceling Payment" );
                                         }
                                     }
 
                                     ticket.deleteOne().then(
                                         (_) => {
-                                            return resolve(true);
+                                            return resolve( true );
                                         }
                                     ).catch(
-                                        (error) => {
+                                        ( error ) => {
                                             if(error){
-                                                console.log(error);
+                                                console.log( error );
                                             }
                                         }
                                     )
@@ -64,51 +84,36 @@ const expireEvents = cron.schedule(
                         }
                     );
                     
-                    Promise.all(cancelPayments).then(
+                    Promise.all( cancelPayments ).then(
                         (_) => {
                             //delete images of event
-                            async function emptyS3Directory(bucket, dir){
-                            const listParams = {
-                                Bucket: bucket,
-                                Prefix: dir
-                            };
-                            const listedObjects = await s3.listObjectsV2(listParams);
-                            if (
-                                !listedObjects.Contents
-                                || listedObjects.Contents
-                                                .length === 0
-                            ) return;
-                            const deleteParams = {
-                                Bucket: bucket,
-                                Delete: { Objects: [] }
-                            };
+                            const contentUrl = `events/${meetingEvent._id.toString()}/`;
+                            deleteFileHelper( contentUrl ).then(
+                                ( data ) => {
+
+                                    if( data.error ){
+                                        console.log( `ERROR: while deleting Event content '${ contentUrl }'` );
+                                    }
         
-                            listedObjects.Contents.forEach(({ Key }) => {
-                                deleteParams.Delete.Objects.push({ Key });
-                            });
-                            await s3.deleteObjects(deleteParams);
-                                if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
-                            }
-                            emptyS3Directory(process.env.BUCKET_NAME, `events/${meetingEvent._id.toString()}/`).then(
-                                (_) => {
-                                  //delete pet
-                                  meetingEvent.deleteOne().then(
-                                    (_) => {
-                                        console.log("deleted an expired event");
-                                    }
-                                  ).catch(
-                                    (error) => {
-                                      console.log(error);
-                                    }
-                                  );
+                                    meetingEvent.deleteOne()
+                                                .then(
+                                                    (_) => {
+                                                        console.log("one event deleted");
+                                                    }
+                                                ).catch(
+                                                    ( error ) => {
+                                                      console.log( error );
+                                                    }
+                                                );
+        
                                 }
-                              );
+                            );
                         }
                     );
                 }
             );
-        }catch(err){
-            console.log(err);
+        }catch( err ){
+            console.log( err );
         }
     }
 );

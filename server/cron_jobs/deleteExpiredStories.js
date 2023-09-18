@@ -1,7 +1,8 @@
-import cron from "node-cron";
 import Story from "../models/Story.js";
-import s3 from "../utils/s3Service.js";
+
+import cron from "node-cron";
 import dotenv from "dotenv";
+
 import deleteFileHelper from "../utils/fileHelpers/deleteFileHelper.js";
 
 dotenv.config();
@@ -38,9 +39,9 @@ const expireStories = cron.schedule(
                     const contentUrl = story.contentUrl;
 
                     deleteFileHelper( contentUrl ).then(
-                        ( error, data ) => {
+                        ( data ) => {
 
-                            if( error ){
+                            if( data.error ){
                                 console.log( `ERROR: while deleting story content '${ contentUrl }'` );
                             }
 

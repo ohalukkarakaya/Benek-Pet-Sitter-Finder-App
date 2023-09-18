@@ -21,7 +21,8 @@ const getAfterEventCommentsController = async ( req, res ) => {
             );
         }
 
-        const searchedEvent = await Event.findById( eventId );
+        const searchedEvent = await Event.findById( eventId )
+                                         .lean();
         if(
             !searchedEvent 
             || (
@@ -51,25 +52,29 @@ const getAfterEventCommentsController = async ( req, res ) => {
             );
         }
 
-        const afterEvent = searchedEvent.afterEvent.find(
-            afterEventObject =>
-                afterEventObject._id.toString() === afterEventId
-        );
+        const afterEvent = searchedEvent.afterEvent
+                                        .find(
+                                            afterEventObject =>
+                                                afterEventObject._id.toString() === afterEventId
+                                         );
+
         if( !afterEvent ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "AfterEvent Not Found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "AfterEvent Not Found"
+                            }
+                       );
         }
 
         let comments;
-        if( skip = 0 ){
-            const usersComments = afterEvent.comments.filter(
-                commentObject =>
-                    commentObject.userId.toString() === userId
-            );
+        if( skip === 0 ){
+            const usersComments = afterEvent.comments
+                                            .filter(
+                                                commentObject =>
+                                                    commentObject.userId.toString() === userId
+                                             );
 
             limit = limit - usersComments.length;
             comments = usersComments;
@@ -87,64 +92,106 @@ const getAfterEventCommentsController = async ( req, res ) => {
 
             const limitedComments = commentList.slice( startIndex, endIndex );
 
-            comments.push( limitedComments );
+            if( limitedComments.length > 0 ){
+                comments.push( limitedComments );
+            }
         }
 
         if( comments.length > 0 ){
-            comments.forEach(
-                async ( commentObject) => {
-                    const commentedUser = await User.findById( commentObject.userId.toString() );
-                    const commentedUserInfo = getLightWeightUserInfoHelper( commentedUser );
-                    commentObject.user = commentedUserInfo;
-                    delete commentObject.userId;
+            for(
+                let commentObject
+                of comments
+            ){
+                const commentedUser = await User.findById( 
+                                                    commentObject.userId
+                                                                 .toString() 
+                                                 );
 
-                    let firstFiveOfLikeLimit = 5;
-                    
-                    if( replyObject.likes.length < 5 ){
-                        firstFiveOfLikeLimit = replyObject.likes.length;
-                    }
+                const commentedUserInfo = getLightWeightUserInfoHelper( commentedUser );
+                commentObject.user = commentedUserInfo;
+                delete commentObject.userId;
 
-                    for( let i = 0; i <= firstFiveOfLikeLimit; i++ ){
-                        const likedUser = await User.findById( commentObject.likes[ i ].toString() );
-                        const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
-    
-                        commentObject.firstFiveLikedUser.push( likedUserInfo );
-                    }
-
-                    const replyCount = commentObject.replies.length;
-                    const lastReply = commentObject.replies.pop();
-                    
-                    commentObject.lastReply = lastReply;
-                    commentObject.replyCount = replyCount;
-                    delete commentObject.replies;
+                let firstFiveOfLikeLimit = 5;
+                
+                if( 
+                    commentObject.likes
+                                 .length < 5 
+                ){
+                    firstFiveOfLikeLimit = commentObject.likes
+                                                        .length;
                 }
-            );
 
-            const usersComments = comments.filter(
-                commentObject =>
-                    commentObject.user.userId === userId
-            ).sort(
-                ( a, b ) => 
-                    b.createdAt - a.createdAt
-            );
+                commentObject.firstFiveLikedUser = [];
+                for( 
+                    let i = 0; 
+                    i < firstFiveOfLikeLimit; 
+                    i++ 
+                ){
+                    const likedUser = await User.findById( 
+                                                    commentObject.likes[ i ]
+                                                                 .toString() 
+                                                 );
 
-            const otherComments = comments.filter(
-                commentObject =>
-                    commentObject.user.userId !== userId
-            ).sort(
-                ( a, b ) => 
-                    b.createdAt - a.createdAt
-            );
+                    const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
+                    commentObject.firstFiveLikedUser
+                                 .push( likedUserInfo );
+                }
+
+                const replyCount = commentObject.replies.length;
+                const lastReply = commentObject.replies.length > 0
+                                    ?   commentObject.replies.pop()
+                                    : {};
+
+                if( lastReply.likes ){
+                    lastReply.likeCount = lastReply.likes
+                                                   .length;
+
+                    delete lastReply.likes;
+                }
+                
+                commentObject.lastReply = lastReply;
+                commentObject.replyCount = replyCount;
+                commentObject.likeCount = commentObject.likes.length;
+
+                delete commentObject.likes;
+                delete commentObject.replies;
+            }
+
+            let usersComments;
+            let otherComments;
+
+            if( comments.length > 0 ){
+                usersComments = comments.filter(
+                                            commentObject =>
+                                                commentObject.user
+                                                             .userId
+                                                             .toString() === userId
+                                         ).sort(
+                                            ( a, b ) => 
+                                                b.createdAt - a.createdAt
+                                         );
+
+                otherComments = comments.filter(
+                                            commentObject =>
+                                                commentObject.user
+                                                             .userId
+                                                             .toString() !== userId
+                                         ).sort(
+                                            ( a, b ) => 
+                                                b.createdAt - a.createdAt
+                                         );
+            }
 
             const resultCommentData = [...usersComments, ...otherComments];
-            return res.status( 200 ).json(
-                {
-                    error: false,
-                    message: "Comments Prepared succesfully",
-                    commentCount: comments.length,
-                    comments: resultCommentData
-                }
-            );
+            return res.status( 200 )
+                      .json(
+                            {
+                                error: false,
+                                message: "Comments Prepared succesfully",
+                                commentCount: comments.length,
+                                comments: resultCommentData
+                            }
+                       );
         }else{
             return res.status( 404 ).json(
                 {

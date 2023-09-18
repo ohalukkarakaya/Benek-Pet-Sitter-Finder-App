@@ -7,7 +7,7 @@ const afterEventLikeCommentOrReplyController = async (req, res) => {
     try{
         const eventId = req.params.eventId;
         const contentId = req.params.contentId;
-        const commentId = req.params.commentId;
+        const commentId = req.body.commentId;
 
         const replyId = req.body.replyId;
         const isReply = replyId;

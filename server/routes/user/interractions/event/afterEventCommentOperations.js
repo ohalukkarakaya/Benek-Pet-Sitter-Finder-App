@@ -14,6 +14,7 @@ dotenv.config();
 
 const router = express.Router();
 
+// - tested
 //create comment or reply comment of content
 router.put(
     "/:eventId/:contentId",
@@ -21,6 +22,7 @@ router.put(
     afterEventCreateCommentOrReplyCommentController
 );
 
+// - tested
 //edit comment or reply
 router.put(
     "/edit/:eventId/:contentId",
@@ -28,6 +30,7 @@ router.put(
     afterEventEditCommentOrReplyController
 );
 
+// - tested
 //delete comment or reply
 router.delete(
     "/:eventId/:contentId",
@@ -35,23 +38,26 @@ router.delete(
     afterEventDeleteCommentOrReplyController
 );
 
+// - tested
 //like comment
 router.put(
-    "/like/:eventId/:contentId/:commentId",
+    "/like/:eventId/:contentId",
     auth,
     afterEventLikeCommentOrReplyController
 );
 
+// - tested
 //get comment list by afterEvent Id
 router.get(
-    "getComments/:eventId/:contentId/:skip/:limit",
+    "/getComments/:eventId/:contentId/:skip/:limit",
     auth,
     getAfterEventCommentsController
 );
 
-//To Do: get comment replyies
+// - 
+//To Do: get comment replies
 router.get(
-    "getReplies/:eventId/:contentId/:commentId/:skip/:limit",
+    "/getReplies/:eventId/:contentId/:commentId/:skip/:limit",
     auth,
     getRepliesOfAfterEventCommentController
 );

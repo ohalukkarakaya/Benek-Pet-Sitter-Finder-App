@@ -59,7 +59,8 @@ const NotificationSchema = new schema(
                     "event",
                     "eventComment",
                     "careGive",
-                    "pet"
+                    "pet",
+                    "afterEvent"
                 ],
             }
         },
@@ -73,7 +74,8 @@ const NotificationSchema = new schema(
                     "pet",
                     "petImage",
                     "story",
-                    "event"
+                    "event",
+                    "afterEvent"
                 ],
             }
         },
@@ -84,7 +86,8 @@ const NotificationSchema = new schema(
             contentType:{
                 type: String,
                 enum: [ 
-                    "pet"
+                    "pet",
+                    "event"
                 ],
             }
         },

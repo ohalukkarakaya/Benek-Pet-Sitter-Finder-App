@@ -3,8 +3,6 @@ import User from "../../../../../models/User.js";
 
 import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
-import mongoose from "mongoose";
-
 const getAfterEventContentListController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
@@ -27,154 +25,97 @@ const getAfterEventContentListController = async ( req, res ) => {
                                        .lean()
                                        .exec();
 
-        const eventAdminsAfterEventContents = searchedEvent.afterEvent
-                                                           .filter(
-                                                                afterEventObject =>
-                                                                    afterEventObject.userId
-                                                                                    .toString() === searchedEvent.eventAdmin
-                                                            ).sort(
-                                                                ( a, b ) => 
-                                                                    b.createdAt - a.createdAt
-                                                              );
-
-        const eventWithUsersAfterEvent = searchedEvent.afterEvent
-                                                      .filter(
-                                                        afterEventObject =>
-                                                            afterEventObject.userId
-                                                                            .toString() === userId
-                                                       ).sort(
-                                                         ( a, b ) => 
-                                                             b.createdAt - a.createdAt
-                                                       );
-
-        const afterEvventsWithoutUsers = searchedEvent.afterEvent
-                                                      .filter(
-                                                        afterEventObject =>
-                                                            afterEventObject.userId
-                                                                            .toString() !== searchedEvent.eventAdmin
-                                                            && afterEventObject.userId
-                                                                               .toString() !== userId
-                                                       ).sort(
-                                                            ( a, b ) => 
-                                                                b.createdAt - a.createdAt
-                                                       );
-
-        const startIndex = skip > 0
-                            ? skip - 1
-                            : skip;
-        const endIndex = startIndex + ( limit - 1 );
-
-        const totalList = [ 
-                            ...eventAdminsAfterEventContents, 
-                            ...eventWithUsersAfterEvent, 
-                            ...afterEvventsWithoutUsers 
-                          ];
-
-        searchedEvent.afterEvent = totalList.slice( startIndex, endIndex );
-
-
         if(
-            !searchedEvent 
+            !meetingEvent 
             || (
-                searchedEvent.isPrivate
-                && (
-                    searchedEvent.eventAdmin !== userId
-                    && !(
-                            searchedEvent.eventOrganizers
-                                         .includes( userId )
-                        )
-                    && !(
-                        searchedEvent.willJoin
-                                     .includes( userId )
-                       )
-                    && !(
-                        searchedEvent.joined
-                                     .includes( userId )
-                       )
-                )
+                meetingEvent.isPrivate 
+                && !(
+                        meetingEvent.eventAdmin === userId 
+                        || meetingEvent.eventOrganizers
+                                       .includes( userId ) 
+                        || meetingEvent.willJoin
+                                       .includes( userId ) 
+                        || meetingEvent.joined
+                                       .includes( userId )
+                    )
             )
         ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "Event Not Found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                         {
+                            error: true,
+                            message: "Event Not Found"
+                         }
+                       );
         }
 
-        for(
-            let afterEventObject
-            of searchedEvent.afterEvent
-        ){
-            var lastComment = afterEventObject.comments
-                                ? afterEventObject.comments.pop()
-                                : null;
+        const promises = searchedEvent.afterEvent
+                                      .map(
+            async ( afterEventObject ) => {
+                const lastComment = afterEventObject.comments 
+                                        ? afterEventObject.comments
+                                                          .pop() 
+                                        : null;
 
-            const commentCount = afterEventObject.comments
-                                    ? afterEventObject.comments.length
-                                    : 0;
+                const commentCount = afterEventObject.comments 
+                                        ? afterEventObject.comments
+                                                          .length 
+                                        : 0;
 
-            if( lastComment ){
-                lastComment.replyCount =  lastComment
-                                          && lastComment.replies
-                                                ? lastComment.replies.length
+                if( lastComment ){
+                    lastComment.replyCount = lastComment.replies 
+                                                ? lastComment.replies
+                                                             .length 
                                                 : 0;
-            }
-            
+                                                
+                    if( lastComment.replies ) delete lastComment.replies;
+                }
 
-            if( 
-                lastComment
-                && lastComment.replies 
-            ){
-                delete lastComment.replies;
-            }
-            
-            afterEventObject.lastComment = lastComment;
-            afterEventObject.commentCount = commentCount;
+                const sharedUser = await User.findById( afterEventObject.userId );
+                const sharedUserInfo = getLightWeightUserInfoHelper( sharedUser );
 
-            if( afterEventObject.comments ){
-                delete afterEventObject.comments;
-            }
-            
+                const firstFiveUserLimit = Math.min(
+                                                    afterEventObject.likes
+                                                                    .length, 
+                                                    5
+                                                );
+                                                
+                const likedUsers = await Promise.all(
+                    afterEventObject.likes
+                                    .slice(
+                                        0, 
+                                        firstFiveUserLimit
+                                    ).map(
+                                        async ( userId ) => {
+                                            const likedUser = await User.findById( userId.toString() );
+                                            return getLightWeightUserInfoHelper( likedUser );
+                                        }
+                                    )
+                );
 
-            const sharedUser = await User.findById( afterEventObject.userId );
-            const sharedUserInfo = getLightWeightUserInfoHelper( sharedUser );
+                delete afterEventObject.userId;
+      
+                return {
+                    ...afterEventObject,
+                    lastComment,
+                    commentCount,
+                    firstFiveLikedUser: likedUsers,
+                    user: sharedUserInfo
+                };
+          }
+        );
 
-            afterEventObject.firstFiveLikedUser = [];
-            afterEventObject.user = sharedUserInfo;
-            delete afterEventObject.userId;
-
-            let firstFiveUserLimit = afterEventObject.likes
-                                                     .length > 5
-                                        ? 5
-                                        : afterEventObject.likes
-                                                          .length - 1; 
-            for( 
-                let i = 0; 
-                i <= firstFiveUserLimit; 
-                i++ 
-            ){
-                const likedUser = await User.findById( 
-                                                afterEventObject.likes[ i ]
-                                                                .toString() 
-                                             );
-                                             
-                const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
-
-                afterEventObject.firstFiveLikedUser
-                                .push( likedUserInfo );
-            }
-        }
+        const afterEventContents = await Promise.all( promises );
 
         return res.status( 200 )
                   .json(
                         {
                             error: false,
-                            message: "After event contents prepared succesfully",
+                            message: "After event contents prepared successfully",
                             data: {
-                                eventId: eventId,
+                                eventId,
                                 totalAfterEventCount: meetingEvent.afterEvent.length,
-                                afterEventContents: searchedEvent.afterEvent
+                                afterEventContents
                             }
                         }
                    );

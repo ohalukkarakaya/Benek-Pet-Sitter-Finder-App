@@ -184,6 +184,7 @@ const sendNotification = async (
             ).catch(
                 (error) => {
                     if(error){
+                        let data;
                         console.log("Error: sendNotification - ", error);
                         return data = {
                             error: true,

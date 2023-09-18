@@ -8,7 +8,7 @@ const getStoryCommentsController = async ( req, res ) => {
         const storyId = req.params.storyId.toString();
         let skip = parseInt( req.params.skip ) || 0;
         let limit = parseInt( req.params.limit ) || 15;
-
+ 
         if( !storyId ){
             return res.status( 400 ).json(
                 {
@@ -117,7 +117,7 @@ const getStoryCommentsController = async ( req, res ) => {
                                     ?   commentObject.replies.pop()
                                     : {};
 
-                if( lastReply .likes ){
+                if( lastReply.likes ){
                     lastReply.likeCount = lastReply.likes
                                                    .length;
 
