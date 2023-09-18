@@ -54,8 +54,8 @@ router.get(
     getAfterEventCommentsController
 );
 
-// - 
-//To Do: get comment replies
+// - tested
+//comment replies
 router.get(
     "/getReplies/:eventId/:contentId/:commentId/:skip/:limit",
     auth,

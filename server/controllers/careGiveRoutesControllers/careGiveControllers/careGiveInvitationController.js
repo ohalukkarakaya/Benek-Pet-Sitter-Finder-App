@@ -1,6 +1,7 @@
 import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
+
 import dotenv from "dotenv";
 import { createRequire } from "module";
 
@@ -8,26 +9,18 @@ import sendNotification from "../../../utils/notification/sendNotification.js";
 
 const require = createRequire(import.meta.url);
 const rawPricingDataset = require('../../../src/care_give_pricing.json');
-const pricingDataset = JSON.parse(
-                            JSON.stringify( rawPricingDataset )
-                       );
+const pricingDataset = JSON.parse( JSON.stringify( rawPricingDataset ) );
 
 dotenv.config();
 
 const careGiveInvitationController = async ( req, res ) => {
     try{
-        const petId = req.body
-                         .petId;
+        const petId = req.body.petId;
+        const startDate = req.body.startDate;
+        const endDate = req.body.endDate;
+        const meetingAdress = req.body.meetingAdress;
 
-        const startDate = req.body
-                             .startDate;
-
-        const endDate = req.body
-                           .endDate;
-
-        const meetingAdress = req.body
-                                 .meetingAdress;
-
+        const price = req.body.price;
         if(
             !petId
             || !startDate
@@ -44,8 +37,7 @@ const careGiveInvitationController = async ( req, res ) => {
 
         let pricingToSave;
         let miliSecToCountEndDate;
-        const price = req.body
-                         .price;
+
         if( price ){
             if(
                 !price.petTypeCode 
@@ -89,12 +81,8 @@ const careGiveInvitationController = async ( req, res ) => {
             }
 
             const pricingType = price.type;
-            const servicePrice = pricing.servicePrice[ 
-                                                price.type 
-                                         ];
-            const extraMissionPrice = petTypePricingModel.extraMission[ 
-                                                                    priceType 
-                                                          ];
+            const servicePrice = pricing.servicePrice[ price.type ];
+            const extraMissionPrice = petTypePricingModel.extraMission[ priceType ];
             const maxMissionCount = pricing.numberOfTasks;
 
             miliSecToCountEndDate = Number( pricing.milisecondsToAdd );
@@ -120,9 +108,7 @@ const careGiveInvitationController = async ( req, res ) => {
 
         if(
             pet.primaryOwner
-               .toString() === req.user
-                                  ._id
-                                  .toString()
+               .toString() === req.user._id.toString()
         ){
             return res.status( 400 )
                       .json(
@@ -133,15 +119,13 @@ const careGiveInvitationController = async ( req, res ) => {
                        );
         }
 
-        const isPetAlreadyInCareGive = CareGive.find(
-            careGiveObject =>
-                careGiveObject.petId
-                              .toString() === pet._id
-                                                 .toString()
-                && Date.now() < Date.parse( 
-                                        careGiveObject.endDate 
-                                     )
-        );
+        const isPetAlreadyInCareGive = await CareGive.findOne(
+                                                            {
+                                                                petId: pet._id.toString(),
+                                                                endDate: { $gt: new Date() }
+                                                            }
+                                                      );
+
         if( isPetAlreadyInCareGive ){
             return res.status( 403 )
                       .json(
@@ -165,12 +149,7 @@ const careGiveInvitationController = async ( req, res ) => {
                        );
         }
 
-        const careGiver = await User.findById(
-                                        req.user
-                                           ._id
-                                           .toString()
-                                    );
-
+        const careGiver = await User.findById( req.user._id.toString() );
         const owner = await User.findById(
                                     pet.primaryOwner
                                        .toString()
@@ -178,21 +157,14 @@ const careGiveInvitationController = async ( req, res ) => {
         if(
             !owner
             || !careGiver
-            || owner.deactivation
-                    .isDeactive 
-
-            || careGiver.deactivation
-                        .isDeactive
-
-            || careGiver.blockedUsers
-                        .includes( 
-                            owner._id.toString() 
-                        )
-
-            || owner.blockedUsers
-                    .includes( 
-                        careGiver._id.toString() 
-                    )
+            || owner.deactivation.isDeactive 
+            || careGiver.deactivation.isDeactive
+            || careGiver.blockedUsers.includes( 
+                                        owner._id.toString() 
+                                      )
+            || owner.blockedUsers.includes( 
+                                    careGiver._id.toString() 
+                                  )
         ){
             return res.status( 404 )
                       .json(
@@ -208,6 +180,7 @@ const careGiveInvitationController = async ( req, res ) => {
                                     && careGiver.phone 
                                     && careGiver.iban
                                     && careGiver.careGiveGUID;
+
         if( !isCareGiverVerified ){
             return res.status( 403 )
                       .json(
@@ -220,73 +193,45 @@ const careGiveInvitationController = async ( req, res ) => {
             await new CareGive(
                 {
                     invitation: {
-                        from: req.user
-                                 ._id
-                                 .toString(),
-
-                        to: req.body
-                               .userId
-                               .toString(),
-
-                        careGiverParamGuid: careGiver.careGiveGUID
-                                                     .toString()
+                        from: req.user._id.toString(),
+                        to: req.body.userId.toString(),
+                        careGiverParamGuid: careGiver.careGiveGUID.toString()
                     },
-                    petId: pet._id
-                              .toString(),
+                    petId: pet._id.toString(),
                     careGiver: {
-                        careGiverId: req.user
-                                        ._id
-                                        .toString(),
-
+                        careGiverId: req.user._id.toString(),
                         careGiverContact: {
-                            careGiverPhone: req.user
-                                               .phone,
-
-                            careGiverEmail: req.user
-                                               .email
-                        }
+                                            careGiverPhone: req.user.phone,
+                                            careGiverEmail: req.user.email
+                                          }
                     },
                     petOwner: {
-                        petOwnerId: owner._id
-                                         .toString(),
+                        petOwnerId: owner._id.toString(),
                         petOwnerContact: {
-                            petOwnerEmail: owner.email,
-                            petOwnerPhone: owner.phone
-                        }
+                                            petOwnerEmail: owner.email,
+                                            petOwnerPhone: owner.phone
+                                         }
                     },
                     price: pricingToSave,
                     startDate: startDate,
-                    endDate: new Date(Date.parse(startDate) + miliSecToCountEndDate),
+                    endDate: new Date( Date.parse( startDate ) + miliSecToCountEndDate ),
                     adress: meetingAdress
                 }
             ).then(
                 async ( careGiveInvitation ) => {
                     await sendNotification(
-                        req.user
-                           ._id
-                           .toString(),
-
-                        req.body
-                           .userId
-                           .toString(),
-
+                        req.user._id.toString(),
+                        req.body.userId.toString(),
                         "careGiveInvitation",
-                        careGiveInvitation._id
-                                          .toString(),
-
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
+                        careGiveInvitation._id.toString(),
+                        null, null, null, null, null, null
                     );
 
                     return res.status( 200 )
                               .json(
                                    {
                                        error: false,
-                                       message: `user with the id "${req.body.ownerId}" invented to careGive`
+                                       message: `user with the id "${ req.body.ownerId }" invented to careGive`
                                    }
                                );
                 }
@@ -305,9 +250,8 @@ const careGiveInvitationController = async ( req, res ) => {
                 }
             );
         }
-    }catch(err){
+    }catch( err ){
         console.log( "Error: care give", err );
-
         return res.status( 500 )
                   .json(
                        {

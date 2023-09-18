@@ -6,12 +6,14 @@ import logoutController from "../../controllers/authRoutesControllers/refreshTok
 
 const router = Router();
 
+// - tested
 // Get new access token
 router.post(
     "/",
     getNewAccessTokenController
 );
 
+// - tested
 // Logout
 router.delete(
     "/",

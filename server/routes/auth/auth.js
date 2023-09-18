@@ -12,24 +12,28 @@ dotenv.config();
 
 const router = express.Router();
 
+// - tested
 //SignUp
 router.post(
   "/signUp", 
   signUpController
 );
-  
+
+// - tested
 //LogIn
 router.post(
   "/login",
   logInController
 );
 
+// - tested
 // Verify OTP
 router.post(
   "/verifyOTP",
   verifyOtpController
 );
 
+// - tested
 // Resend OTP Code
 router.post(
   "/resendOtp",
