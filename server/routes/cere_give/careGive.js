@@ -28,7 +28,7 @@ dotenv.config();
 
 const router = express.Router();
 
-// - To Do
+// - tested
 //invite a user to care give
 router.post(
     "/",
@@ -36,6 +36,7 @@ router.post(
     careGiveInvitationController
 );
 
+// 
 //get care give invitations
 router.get(
     "/invitations/:skip/:limit",

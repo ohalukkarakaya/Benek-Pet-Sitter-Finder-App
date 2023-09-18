@@ -52,7 +52,8 @@ const careGiveInvitationController = async ( req, res ) => {
                                }
                            );
             }
-            const petTypePricingModel = pricingDataset.find(
+            const petTypePricingModel = pricingDataset.prices
+                                                      .find(
                                                           pricingObject =>
                                                               pricingObject.id === price.petTypeCode
                                                        );
@@ -81,11 +82,11 @@ const careGiveInvitationController = async ( req, res ) => {
             }
 
             const pricingType = price.type;
-            const servicePrice = pricing.servicePrice[ price.type ];
-            const extraMissionPrice = petTypePricingModel.extraMission[ priceType ];
-            const maxMissionCount = pricing.numberOfTasks;
+            const servicePrice = pricing.priceData.servicePrice[ price.type ];
+            const extraMissionPrice = petTypePricingModel.extraMission[ pricingType ];
+            const maxMissionCount = pricing.priceData.numberOfTasks;
 
-            miliSecToCountEndDate = Number( pricing.milisecondsToAdd );
+            miliSecToCountEndDate = eval( pricing.priceData.milisecondsToAdd );
 
             pricingToSave = {
                 "priceType": pricingType,
@@ -190,12 +191,37 @@ const careGiveInvitationController = async ( req, res ) => {
                            }
                        );
         }else{
+
+            const parcalanmisBitisTarih = endDate.split('.');
+            const jsBitisTarih = new Date(
+                parseInt( parcalanmisBitisTarih[ 2 ] ), // Yıl
+                parseInt( parcalanmisBitisTarih[ 1 ] ) - 1, // Ay (0-11 arası)
+                parseInt( parcalanmisBitisTarih[ 0 ] ) // Gün
+            );
+            const jsEndDate = new Date( jsBitisTarih );
+
+            const parcalanmisBaslangicTarih = startDate.split('.');
+            const jsTarih = new Date(
+                parseInt( parcalanmisBaslangicTarih[ 2 ] ), // Yıl
+                parseInt( parcalanmisBaslangicTarih[ 1 ] ) - 1, // Ay (0-11 arası)
+                parseInt( parcalanmisBaslangicTarih[ 0 ] ) // Gün
+            );
+            const jsStartDate = new Date( jsTarih );
+
+            let endDateToSave;
+            if( miliSecToCountEndDate ){
+                endDateToSave = new Date( jsStartDate.getTime() + miliSecToCountEndDate );
+            }else{
+                endDateToSave = jsEndDate
+            }
+            
+
             await new CareGive(
                 {
                     invitation: {
                         from: req.user._id.toString(),
-                        to: req.body.userId.toString(),
-                        careGiverParamGuid: careGiver.careGiveGUID.toString()
+                        to: owner._id.toString(),
+                        careGiverPosGuid: careGiver.careGiveGUID.toString()
                     },
                     petId: pet._id.toString(),
                     careGiver: {
@@ -212,16 +238,21 @@ const careGiveInvitationController = async ( req, res ) => {
                                             petOwnerPhone: owner.phone
                                          }
                     },
-                    price: pricingToSave,
-                    startDate: startDate,
-                    endDate: new Date( Date.parse( startDate ) + miliSecToCountEndDate ),
-                    adress: meetingAdress
+                    prices: pricingToSave,
+                    startDate: jsStartDate,
+                    endDate: endDateToSave,
+                    adress: {
+                        "adressDesc": meetingAdress.adressDesc,
+                        "long": meetingAdress.lng,
+                        "lat": meetingAdress.lat
+                    }
                 }
-            ).then(
+            ).save()
+             .then(
                 async ( careGiveInvitation ) => {
                     await sendNotification(
                         req.user._id.toString(),
-                        req.body.userId.toString(),
+                        owner._id.toString(),
                         "careGiveInvitation",
                         careGiveInvitation._id.toString(),
                         null, null, null, null, null, null
@@ -231,13 +262,13 @@ const careGiveInvitationController = async ( req, res ) => {
                               .json(
                                    {
                                        error: false,
-                                       message: `user with the id "${ req.body.ownerId }" invented to careGive`
+                                       message: `user with the id "${ owner._id.toString() }" invented to careGive`
                                    }
                                );
                 }
             ).catch(
-                (error) => {
-                    if(error){
+                ( error ) => {
+                    if( error ){
                         console.log("Error: while creating CareGiveObject - ", error);
                         return res.status( 500 )
                                   .json(

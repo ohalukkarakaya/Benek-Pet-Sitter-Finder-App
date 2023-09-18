@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const CareGiveSchema = new mongoose.Schema(
   {
       invitation: {
-        careGiverParamGuid: {
+        careGiverPosGuid: {
             type: String
         },
         from: {
@@ -25,16 +25,13 @@ const CareGiveSchema = new mongoose.Schema(
         actionCode: {
             codeType: {
                 type: String,
-                enum: [ "Start", "Finish", "Done" ],
-                required: true
+                enum: [ "Start", "Finish", "Done" ]
             },
             codePassword: {
-                type: String,
-                required: true
+                type: String
             },
             code: {
-                type: String,
-                required: true
+                type: String
             }
         }
       },
@@ -55,24 +52,20 @@ const CareGiveSchema = new mongoose.Schema(
       },
       careGiver: {
         careGiverId: {
-            type: String,
-            required: true
+            type: String
         },
         careGiverContact: {
             careGiverPhone: {
-                type: String,
-                required: true
+                type: String
             },
             careGiverEmail: {
-                type: String,
-                required: true
+                type: String
             }
         }
       },
       petOwner: {
         petOwnerId: {
-            type: String,
-            required: true
+            type: String
         },
         petOwnerContact: {
             petOwnerEmail: {
@@ -98,16 +91,13 @@ const CareGiveSchema = new mongoose.Schema(
         },
         orderInfo: {
             pySiparisGuid: {
-              type: String,
-              required: true
+              type: String
             },
             sanalPosIslemId: {
-              type: String,
-              required: true
+              type: String
             },
             subSellerGuid: {
-              type: String,
-              required: true
+              type: String
             }
         },
         extraMissionPrice: {
