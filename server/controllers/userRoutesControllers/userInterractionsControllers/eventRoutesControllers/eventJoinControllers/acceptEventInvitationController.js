@@ -8,7 +8,7 @@ import mokaCreatePaymentHelper from "../../../../../utils/mokaPosRequests/mokaHe
 import prepareEventTicketHelper from "../../../../../utils/prepareEventTicketHelper.js";
 
 import bcrypt from "bcrypt";
-import crypto from "crypto";
+import crypto from "crypto"; 
 import QRCode from "qrcode";
 import dotenv from "dotenv";
 
@@ -16,9 +16,7 @@ dotenv.config();
 
 const acceptEventInvitationController = async ( req, res ) => {
     try {
-        const response = req.params
-                            .response === "true";
-
+        const response = req.params.response === "true";
         if(
             !req.params.invitationId 
             || typeof response !== 'boolean'
@@ -32,11 +30,7 @@ const acceptEventInvitationController = async ( req, res ) => {
                       );
         }
 
-        const invitation = await EventInvitation.findById(
-                                                    req.params
-                                                       .invitationId
-                                                 );
-
+        const invitation = await EventInvitation.findById( req.params.invitationId );
         if( !invitation ){
             return res.status( 404 )
                       .json(
@@ -48,9 +42,7 @@ const acceptEventInvitationController = async ( req, res ) => {
         }
 
         if(
-            invitation.invitedId !== req.user
-                                        ._id
-                                        .toString()
+            invitation.invitedId !== req.user._id.toString()
         ){
             return res.status( 401 )
                       .json(
@@ -97,7 +89,7 @@ const acceptEventInvitationController = async ( req, res ) => {
                                     message: "You are already a participant of the event"
                                 }
                               );
-                } else {
+                }else{
                     return res.status( 500 )
                               .json(
                                 {

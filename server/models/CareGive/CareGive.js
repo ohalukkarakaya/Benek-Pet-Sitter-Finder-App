@@ -86,18 +86,15 @@ const CareGiveSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
-        orderId: {
-            type: String,
-        },
-        orderInfo: {
-            pySiparisGuid: {
-              type: String
+        orderInfo : {
+            paymentId: {
+                type: String
             },
-            sanalPosIslemId: {
-              type: String
+            orderId: {
+                type: String,
             },
-            subSellerGuid: {
-              type: String
+            orderUniqueCode: {
+                type: String
             }
         },
         extraMissionPrice: {

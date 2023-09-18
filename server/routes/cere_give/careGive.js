@@ -52,7 +52,7 @@ router.get(
     getSendedCareGiveInvitationsController
 );
 
-
+// - tested
 //accept invitation
 router.put(
     "/:careGiveId/:response",
@@ -60,6 +60,7 @@ router.put(
     replyCareGiveInvitationController
 );
 
+// - To Do
 //start care give
 router.put(
     "/start/:careGiveId",
