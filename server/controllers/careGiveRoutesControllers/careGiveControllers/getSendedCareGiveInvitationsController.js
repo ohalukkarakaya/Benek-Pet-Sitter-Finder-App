@@ -2,6 +2,7 @@ import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
 
+import prepareCareGiveInvitationDataHelper from "../../../utils/invitations/invitationDataHelpers/prepareCareGiveInvitationDataHelper.js";
 import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
 import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
@@ -34,45 +35,39 @@ const getSendedCareGiveInvitationsController = async ( req, res ) => {
             );
         }
 
-        invitedCareGives.forEach(
-            async ( careGiveObject ) => {
-                const invitation = careGiveObject.invitation;
-                const invitedUser = await User.findById( 
-                    invitation.to
-                              .toString() 
-                );
-
-                const invitedUserInfo = getLightWeightUserInfoHelper( invitedUser );
-
-                invitation.to = invitedUserInfo;
-
-                const price = careGiveObject.prices.priceType !== "Free" 
-                                    ? `${careGiveObject.prices.servicePrice} ${careGiveObject.prices.priceType}`
-                                    : `${careGiveObject.prices.priceType}`
-
-                invitation.price = price;
-
-                const pet = await Pet.findById( careGiveObject.petId.toString() );
-                const petInfo = getLightWeightPetInfoHelper( pet );
-
-                invitation.pet = petInfo;
-
-                delete invitation.actionCode;
-                delete invitation.careGiverParamGuid;
-                delete invitation.isAccepted;
-
-                careGiveObject = invitation;
+        let newInvitationList = [];
+        for(
+            let careGiveObject
+            of invitedCareGives
+        ){
+            const preparedInvitationData = await prepareCareGiveInvitationDataHelper( careGiveObject.toObject() );
+            if(
+                !preparedInvitationData
+                || !( preparedInvitationData.data )
+                || preparedInvitationData.length <= 0
+                || preparedInvitationData.error
+            ){
+                return res.status( 500 )
+                          .json(
+                            {
+                                error: true,
+                                message: preparedInvitationData.message
+                            }
+                          );
             }
-        );
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "Sended Care Give Inventations Listed",
-                totalInvitationCount: totalInvitationCount,
-                invitations: invitedCareGives
-            }
-        );
+            newInvitationList.push( preparedInvitationData.data );
+        }
+
+        return res.status( 200 )
+                  .json(
+                        {
+                            error: false,
+                            message: "Sended Care Give Inventations Listed",
+                            totalInvitationCount: totalInvitationCount,
+                            invitations: newInvitationList
+                        }
+                   );
 
     }catch( err ){
         console.log("ERROR: getSendedCareGiveInvitationsController - ", err);

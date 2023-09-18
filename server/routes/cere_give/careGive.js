@@ -44,13 +44,14 @@ router.get(
     getCareGiveInvitationsController
 );
 
-//
+// - tested
 //get sended care give invitations
 router.get(
     "/sendedInvitations/:skip/:limit",
     auth,
     getSendedCareGiveInvitationsController
 );
+
 
 //accept invitation
 router.put(
