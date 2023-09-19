@@ -1,6 +1,7 @@
 const mokaValidateHourForVoidPaymentHelper = ( dateTime ) => {
     const createdAt = new Date( dateTime );
-    const currentHour = new Date().getUTCHours();
+    const currentDateTime = new Date()
+    const currentHour = currentDateTime.getUTCHours();
 
     const targetHour = 22; // 22:00
 
@@ -10,12 +11,12 @@ const mokaValidateHourForVoidPaymentHelper = ( dateTime ) => {
     if(
         (
             turkishCreatedAt.getHours() < targetHour 
-            && currentDateTime.getHours() < targetHour
+            && currentHour < targetHour
         ) 
         || (
             turkishCreatedAt.getHours() >= targetHour 
-            && turkishCreatedAt.getDate() === currentDateTime.getDate() 
-            && currentDateTime.getHours() >= targetHour
+            && turkishCreatedAt.getDate() === currentDateTime.getDate()
+            && currentHour >= targetHour
         )
     ){
         return true;

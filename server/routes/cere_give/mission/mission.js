@@ -70,6 +70,7 @@ router.get(
     getMissionCallenderByPetIdController
 );
 
+// - tested
 router.use("/schedule", scheduleMissionEndPoints);
 
 export default router;

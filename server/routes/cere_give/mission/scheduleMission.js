@@ -20,7 +20,7 @@ router.put(
     scheduleMissionController
 );
 
-// - To Do
+// - tested
 //delete mission
 router.delete(
     "/delete/:careGiveId/:missionId",

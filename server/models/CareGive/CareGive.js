@@ -202,6 +202,10 @@ const CareGiveSchema = new mongoose.Schema(
                     default: false
                 }
             },
+            createdAt: {
+                type: Date,
+                default: Date.now
+            }
         }
       ]
   },
