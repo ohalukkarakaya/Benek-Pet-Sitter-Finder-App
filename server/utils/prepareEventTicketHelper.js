@@ -13,7 +13,13 @@ function generateQRCode( ticketData, ticket ){
     return new Promise(
         ( resolve, reject ) => {
             QRCode.toDataURL(
-                ticketData, 
+                ticketData,
+                {
+                    color: {
+                      dark: '#000000ff',  // black dots
+                      light: '#0000' // Transparent background
+                    }
+                },
                 async ( err, url ) => {
                     if ( err ) {
                         reject(

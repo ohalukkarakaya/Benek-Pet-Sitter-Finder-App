@@ -53,19 +53,20 @@ router.get(
 );
 
 // - tested
-//accept invitation
-router.put(
-    "/:careGiveId/:response",
-    auth,
-    replyCareGiveInvitationController
-);
-
-// - To Do
 //start care give
 router.put(
     "/start/:careGiveId",
     auth,
     startCareGiveController
+);
+
+// - tested
+// free careGive - tested | paid careGive -> payent success - tested | paid careGive -> payent fail - tested
+//accept invitation
+router.put(
+    "/:careGiveId/:response",
+    auth,
+    replyCareGiveInvitationController
 );
 
 //get careGive list
