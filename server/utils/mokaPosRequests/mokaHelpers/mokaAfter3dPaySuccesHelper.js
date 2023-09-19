@@ -2,6 +2,7 @@ import User from "../../../models/User.js";
 
 import prepareEventTicketHelper from "../../prepareEventTicketHelper.js";
 import prepareCareGiveTicketHelper from "../../prepareCareGiveTicketHelper.js";
+import extendCareGiveHelper from "../../extendCareGiveHelper.js";
 
 const mokaAfter3dPaySuccesHelper = async ( virtualPosOrderId, paymentData ) => {
     try {
@@ -37,6 +38,22 @@ const mokaAfter3dPaySuccesHelper = async ( virtualPosOrderId, paymentData ) => {
         ){
             const preparedTicketData = await prepareCareGiveTicketHelper(
                 paymentData.parentContentId,
+                virtualPosOrderId,
+                paymentData._id.toString(),
+                paymentData.paymentUniqueCode
+            );
+
+            if( preparedTicketData ){
+                return  preparedTicketData;
+            }
+        }
+
+        if(
+            paymentData.type === "CareGiveExtension"
+        ){
+            const preparedTicketData = await extendCareGiveHelper(
+                paymentData.parentContentId,
+                paymentData.priceData,
                 virtualPosOrderId,
                 paymentData._id.toString(),
                 paymentData.paymentUniqueCode

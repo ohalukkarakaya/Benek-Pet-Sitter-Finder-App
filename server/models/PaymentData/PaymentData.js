@@ -27,6 +27,9 @@ const PaymentDataSchema = new mongoose.Schema(
         price: {
             type: Number,
             required: true,
+        },
+        extraTimeData: {
+          type: String
         }
       },
       parentContentId:{
@@ -34,7 +37,7 @@ const PaymentDataSchema = new mongoose.Schema(
       },
       type: {
         type: String,
-        enum: [ "CareGive", "EventTicket", "Donation" ],
+        enum: [ "CareGive", "CareGiveExtension", "EventTicket", "Donation" ],
         required: true
       },
       isFromInvitation: {

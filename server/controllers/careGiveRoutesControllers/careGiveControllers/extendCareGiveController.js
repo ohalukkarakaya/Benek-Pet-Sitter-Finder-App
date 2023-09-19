@@ -1,4 +1,7 @@
 import CareGive from "../../../models/CareGive/CareGive.js";
+
+import mokaCreatePaymentHelper from "../../../utils/mokaPosRequests/mokaHelpers/mokaCreatePaymentHelper.js";
+
 import dotenv from "dotenv";
 import { createRequire } from "module";
 
@@ -10,11 +13,8 @@ dotenv.config();
 
 const extendCareGiveController = async (req, res) => {
     try{
-        const careGiveId = req.params
-                              .careGiveId;
-        const price = req.body
-                         .price;
-
+        const careGiveId = req.params.careGiveId;
+        const price = req.body.price;
         if( !careGiveId ){
             return res.status( 400 )
                       .json(
@@ -49,10 +49,7 @@ const extendCareGiveController = async (req, res) => {
                            }
                        );
         }
-        if(
-            careGive.prices
-                    .priceType !== price.type
-        ){
+        if( careGive.prices.priceType !== price.type ){
             return res.status( 400 )
                       .json(
                            {
@@ -62,7 +59,8 @@ const extendCareGiveController = async (req, res) => {
                        );
         }
 
-        const petTypePricingModel = pricingDataset.find(
+        const petTypePricingModel = pricingDataset.prices
+                                                  .find(
                                                        pricingObject =>
                                                            pricingObject.id === price.petTypeCode
                                                    );
@@ -90,41 +88,75 @@ const extendCareGiveController = async (req, res) => {
                        );
         }
 
-        careGive.prices
-                .servicePrice = careGive.prices
-                                        .servicePrice + pricing.servicePrice[
-                                                                    price.type
-                                                                ];
-        careGive.endDate = new Date( Date.parse( careGive.endDate ) + pricing.milisecondsToAdd );
-        careGive.markModified("prices");
-        careGive.markModified("endDate");
-        careGive.save()
-                .then(
-                    async ( careGive ) => {
+        let miliSecToCountEndDate = pricing.priceData.milisecondsToAdd;
 
-                        return res.status( 200 )
-                                .json(
-                                    {
-                                        error: false,
-                                        message: "CareGive extended succesfully",
-                                        newEndDate: new Date(careGive.endDate)
-                                    }
-                                );
-                    }
-                ).catch(
-                    ( error ) => {
-                        if( error ){
-                            console.log( error );
-                            return res.status( 500 )
-                                      .json(
-                                          {
-                                              error: true,
-                                              message: "Internal server error"
-                                          }
-                                      );
+        const cardGuid = req.body.cardGuid 
+                            ? req.body.cardGuid.toString() 
+                            : null;
+
+        const cardNo = req.body.cardNo.toString();
+        const cvv = req.body.cvc.toString();
+        const cardExpiryDate = req.body.cardExpiryDate.toString();
+        const userId = req.user._id.toString();
+        const priceToPay = parseFloat( pricing.priceData.servicePrice[ price.type ] );
+
+        const redirectUrl = process.env.BASE_URL + "/api/paymentRedirect";
+
+        const paymentData = await mokaCreatePaymentHelper(
+            userId, //customer user id
+            cardGuid, //card guid
+            cardNo, //card number
+            cardExpiryDate.split("/")[0], //card expiry month
+            cardExpiryDate.split("/")[1], //card expiry year
+            cvv, //card cvv
+            careGive._id.toString(), //parent id
+            "CareGiveExtension", //payment type
+            miliSecToCountEndDate, //extension data
+            careGive.careGiver.careGiverId, //caregiver id
+            careGive.invitation.careGiverPosGuid, //caregiver guid
+            priceToPay, // amount
+            redirectUrl,
+            req.body.recordCard === 'true',
+            false // is from invitation
+        );
+
+        if( paymentData.message === 'Daily Limit Exceeded' ){
+            return res.status( 500 )
+                        .json(
+                        {
+                            error: true,
+                            message: "CareGiver Daily Limit Exceeded",
+                            payError: paymentData
                         }
-                    }
-                );
+                        );
+        }
+
+        if(
+            !paymentData 
+            || paymentData.error 
+            || paymentData.serverStatus !== 1 
+            || !paymentData.payData 
+            || paymentData.payData === null 
+            || paymentData.payData === undefined
+        ){
+            return res.status( 500 )
+                        .json(
+                        {
+                            error: true,
+                            message: "Error While Payment",
+                            payError: paymentData
+                        }
+                        );
+        }
+
+        return res.status( 200 )
+                    .json(
+                        {
+                            error: false,
+                            message: "Waiting for 3d payment approve",
+                            payData: paymentData.payData
+                        }
+                    );
     }catch( err ){
         console.log( "ERROR: finish care give", err );
 

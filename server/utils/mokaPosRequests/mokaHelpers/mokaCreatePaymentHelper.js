@@ -75,6 +75,7 @@ const mokaCreatePaymentHelper = async (
     cardCvc,
     parentContentId,
     paymentType,
+    extraTimeData,
     carGiverUserId,
     careGiverGuid,
     amount,
@@ -270,7 +271,8 @@ const mokaCreatePaymentHelper = async (
                 customerId: customerUserId,
                 subSellerGuid: careGiverGuid,
                 priceData: {
-                    price: amount
+                    price: amount,
+                    extraTimeData: extraTimeData
                 },
                 parentContentId: parentContentId,
                 type: paymentType,

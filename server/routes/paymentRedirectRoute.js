@@ -82,13 +82,14 @@ router.post(
 
             await paymentData.save();
 
-            redirectUrl = `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=true&ticketId=${prepareTicket.ticketId.toString()}`;
+            redirectUrl = `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=true&ticketId=${ prepareTicket.ticketId.toString() }`;
 
         }else if( isFail ){
+            await paymentData.deleteOne();
             redirectUrl = `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=false`;
         }else{
             console.log( "ERROR: unexpected - paymentRedirectRoute - ", resultMessage );
-            redirectUrl = `${process.env.BASE_URL}?isSuccess=false`;
+            redirectUrl = `${process.env.BASE_URL}/api/paymentRedirect?isSuccess=false`;
         }
 
         return res.redirect( redirectUrl );

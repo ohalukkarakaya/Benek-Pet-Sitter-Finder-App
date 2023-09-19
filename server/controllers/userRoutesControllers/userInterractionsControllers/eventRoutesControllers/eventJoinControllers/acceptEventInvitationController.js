@@ -150,6 +150,7 @@ const acceptEventInvitationController = async ( req, res ) => {
                                             cvv, //card cvv
                                             invitation._id.toString(), //parent id
                                             "EventTicket", //payment type
+                                            null,
                                             invitation.eventAdminId, //caregiver id
                                             ( await User.findById( invitation.eventAdminId ) ).careGiveGUID, //caregiver guid
                                             price, // amount

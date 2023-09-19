@@ -224,6 +224,7 @@ const buyTicketForEventController = async (req, res) => {
                                             cvv, //card cvv
                                             event._id.toString(), //parent id
                                             "EventTicket", //payment type
+                                            null,
                                             event.eventAdmin, //caregiver id
                                             ( 
                                                 await User.findById( 

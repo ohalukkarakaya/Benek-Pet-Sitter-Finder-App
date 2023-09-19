@@ -61,14 +61,6 @@ router.put(
 );
 
 // - tested
-// free careGive - tested | paid careGive -> payent success - tested | paid careGive -> payent fail - tested
-//accept invitation
-router.put(
-    "/:careGiveId/:response",
-    auth,
-    replyCareGiveInvitationController
-);
-
 //get careGive list
 router.get(
     "/getCareGiveList/:skip/:limit",
@@ -76,6 +68,7 @@ router.get(
     getCareGiveListController
 );
 
+// - TO DO
 //get finished careGive List
 router.get(
     "/getFinishedCareGiveList/:skip/:limit",
@@ -83,6 +76,7 @@ router.get(
     getFinishedCareGiveListController
 );
 
+// - tested
 //get careGive by careGiveId
 router.get(
     "/getCareGive/:careGiveId",
@@ -90,6 +84,7 @@ router.get(
     getCareGiveController
 );
 
+// - tested
 //get petOwner careGive List
 router.get(
     "/getPetOwnerCareGiveList/:skip/:limit",
@@ -97,6 +92,7 @@ router.get(
     getPetOwnerCareGiveListController
 );
 
+// - TO DO
 //get petOwner Finished careGive List
 router.get(
     "/getPetOwnerFinishedCareGiveList/:skip/:limit",
@@ -104,6 +100,7 @@ router.get(
     getPetOwnerFinishedCareGiveListController
 );
 
+// - tested
 //get CareGiver careGive List
 router.get(
     "/getCareGiverCareGiveList/:skip/:limit",
@@ -111,6 +108,7 @@ router.get(
     getCareGiverCareGiveListController
 );
 
+// - TO DO
 //get CareGiver Finished careGive List
 router.get(
     "/getCareGiverFinishedCareGiveList/:skip/:limit",
@@ -118,6 +116,7 @@ router.get(
     getCareGiverFinishedCareGiveListController
 );
 
+// - tested
 //extend care give
 router.put(
     "/extend/:careGiveId",
@@ -147,7 +146,16 @@ router.post(
     giveStarToCareGiverController
 );
 
-router.use("/mission", missionEndPoints);
-router.use("/emergency", emergencyEndPoints);
+// - tested
+// free careGive - tested | paid careGive -> payent success - tested | paid careGive -> payent fail - tested
+//accept invitation
+router.put(
+    "/:careGiveId/:response",
+    auth,
+    replyCareGiveInvitationController
+);
+
+router.use( "/mission", missionEndPoints );
+router.use( "/emergency", emergencyEndPoints );
 
 export default router;

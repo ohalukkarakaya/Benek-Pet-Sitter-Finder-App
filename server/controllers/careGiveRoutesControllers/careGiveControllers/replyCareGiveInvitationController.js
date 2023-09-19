@@ -205,6 +205,7 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                                                     cvv, //card cvv
                                                     invitedCareGive._id.toString(), //parent id
                                                     "CareGive", //payment type
+                                                    null,
                                                     invitedCareGive.careGiver.careGiverId, //caregiver id
                                                     invitedCareGive.invitation.careGiverPosGuid, //caregiver guid
                                                     price, // amount
