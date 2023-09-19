@@ -158,10 +158,23 @@ const CareGiveSchema = new mongoose.Schema(
                 type: Date,
                 required: true,
                 validate: [
-                    function (value) {
-                        const startDate = Date.parse(this.missionDate);
-                        return startDate < Date.parse(value);
-                    }
+                    function ( value ){
+                        const startDate = new Date( this.missionDate );
+                        const endDate = new Date( value );
+
+                        if( isNaN( startDate ) || isNaN( endDate ) ) {
+                            // Tarihler geçerli değilse hata üret
+                            return false;
+                        }
+
+                        if( startDate >= endDate ){
+                            // missionDate, missionDeadline'dan büyük veya eşitse hata üret
+                            return false;
+                        }
+
+                        return true;
+                    },
+                    "Invalid missionDeadline"
                 ]
             },
             isExtra: {
@@ -169,42 +182,21 @@ const CareGiveSchema = new mongoose.Schema(
                 default: false
             },
             extraMissionInfo: {
-                orderId: {
-                    type: String,
-                    required: true
-                },
-                pySiparisGuid: {
-                    type: String,
-                    required: true
-                },
-                sanalPosIslemId: {
-                    type: String,
-                    required: true
-                },
-                subSellerGuid: {
-                    type: String,
-                    required: true
-                },
-                paidPrice: {
-                    type: String,
-                    required: true
-                }
+                paymentDataId: { type: String },
+                orderUniqueCode: { type: String },
+                sanalPosIslemId: { type: String },
+                subSellerGuid: { type: String },
+                paidPrice: { type: String }
             },
             missionContent:{
                 timeSignature: {
-                    timePassword: {
-                        type: String,
-                        required:true
-                    },
+                    timePassword: { type: String },
                     expiresAt: {
                         type: Date,
                         default: Date.now() + 10 * 60 * 1000
                     }
                 },
-                videoUrl: {
-                    type: String,
-                    required: true,
-                },
+                videoUrl: { type: String },
                 isApproved: {
                     type: Boolean,
                     default: false

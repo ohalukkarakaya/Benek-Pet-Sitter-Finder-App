@@ -110,6 +110,7 @@ const extendCareGiveController = async (req, res) => {
             cardExpiryDate.split("/")[1], //card expiry year
             cvv, //card cvv
             careGive._id.toString(), //parent id
+            null,
             "CareGiveExtension", //payment type
             miliSecToCountEndDate, //extension data
             careGive.careGiver.careGiverId, //caregiver id

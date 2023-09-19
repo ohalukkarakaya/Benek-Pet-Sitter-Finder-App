@@ -12,6 +12,7 @@ dotenv.config();
 
 const router = express.Router();
 
+// - tested
 //schedule mission
 router.put(
     "/:careGiveId",
@@ -19,9 +20,10 @@ router.put(
     scheduleMissionController
 );
 
+// - To Do
 //delete mission
 router.delete(
-    "/mission/delete/:careGiveId/:missionId",
+    "/delete/:careGiveId/:missionId",
     auth,
     deleteMissionController 
 );

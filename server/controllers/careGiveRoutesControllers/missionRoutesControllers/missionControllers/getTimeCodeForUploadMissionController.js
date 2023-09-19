@@ -8,57 +8,69 @@ const getTimeCodeForUploadMissionController = async (req, res) => {
         const missionId = req.params.missionId;
         const userId = req.user._id.toString();
 
-        if(!careGiveId || !missionId || !userId){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "missing params"
-                }
-            );
+        if(
+            !careGiveId 
+            || !missionId 
+            || !userId
+        ){
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "missing params"
+                            }
+                       );
         }
 
-        const careGive = await CareGive.findById(careGiveId.toString());
-        if(!careGive){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "Care give not found"
-                }
-            );
+        const careGive = await CareGive.findById( careGiveId.toString() );
+        if( !careGive ){
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Care give not found"
+                            }
+                       );
         }
 
-        if(careGive.careGiver.careGiverId.toString() !== userId){
-            return res.status(401).json(
-                {
-                    error: true,
-                    message: "You are not authorized to upload this mission"
-                }
-            );
+        if( careGive.careGiver.careGiverId.toString() !== userId ){
+            return res.status( 401 )
+                      .json(
+                            {
+                                error: true,
+                                message: "You are not authorized to upload this mission"
+                            }
+                       );
         }
 
         const mission = careGive.missionCallender.find(
             missionObject =>
                 missionObject._id.toString() !== missionId.toString()
         );
-        if(!mission){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "mission not found"
-                }
-            );
+        if( !mission ){
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "mission not found"
+                            }
+                       );
         }
 
         if(
             !mission.missionAcception.isAccepted
-            || mission.extra.isExtra && !mission.extra.isExtraAccepted
+            || ( 
+                mission.extra.isExtra 
+                && !mission.extra.isExtraAccepted 
+            )
         ){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "mission not accepted yet"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "mission not accepted yet"
+                            }
+                       );
         }
 
         let password = crypto.randomBytes( 3 )

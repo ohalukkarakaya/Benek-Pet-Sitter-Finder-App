@@ -74,6 +74,7 @@ const mokaCreatePaymentHelper = async (
     cardExpiryYear,
     cardCvc,
     parentContentId,
+    productDesc,
     paymentType,
     extraTimeData,
     carGiverUserId,
@@ -275,6 +276,7 @@ const mokaCreatePaymentHelper = async (
                     extraTimeData: extraTimeData
                 },
                 parentContentId: parentContentId,
+                productDesc: productDesc,
                 type: paymentType,
                 isFromInvitation: isFromInvitation,
                 threeDUrl: payProcess.data.threeDPayData.Url,

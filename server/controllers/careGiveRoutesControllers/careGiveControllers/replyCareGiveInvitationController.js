@@ -20,28 +20,28 @@ const replyCareGiveInvitationController = async ( req, res ) => {
             !careGiveId 
             || !usersResponse
         ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "missing params"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "missing params"
+                            }
+                       );
         }
 
         const invitedCareGive = await CareGive.findById( careGiveId );
         if( !invitedCareGive ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "care give not found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "care give not found"
+                            }
+                       );
         }
 
         if(
-
-            invitedCareGive.invitation
-                           .to !== req.user._id.toString()
+            invitedCareGive.invitation.to !== req.user._id.toString()
             || req.user._id.toString() !== invitedCareGive.petOwner
                                                           .petOwnerId
                                                           .toString()
@@ -55,10 +55,7 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                        );
         }
 
-        if(
-            invitedCareGive.invitation
-                           .isAccepted
-        ){
+        if( invitedCareGive.invitation.isAccepted ){
             return res.status( 400 )
                       .json(
                         {
@@ -84,10 +81,7 @@ const replyCareGiveInvitationController = async ( req, res ) => {
         const response = usersResponse === "true";
         if( response ){
             //accept invitation
-            const pet = await Pet.findById( 
-                                    invitedCareGive.petId
-                                                   .toString() 
-                                  );
+            const pet = await Pet.findById( invitedCareGive.petId.toString() );
             if( !pet ){
                 return res.status( 404 )
                           .json(
@@ -98,12 +92,7 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                            );
             }
 
-            const careGiver = await User.findById( 
-                                            invitedCareGive.careGiver
-                                                           .careGiverId
-                                                           .toString()
-                                         );
-
+            const careGiver = await User.findById( invitedCareGive.careGiver.careGiverId.toString() );
             if(
                 !careGiver 
                 || careGiver.deactivation.isDeactive
@@ -123,20 +112,11 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                            );
             }
 
-            const petOwner = await User.findById( 
-                                            invitedCareGive.petOwner
-                                                           .petOwnerId
-                                                           .toString() 
-                                        );
+            const petOwner = await User.findById( invitedCareGive.petOwner.petOwnerId.toString() );
             if(
                 !petOwner
                 || petOwner.deactivation.isDeactive
-                || petOwner.blockedUsers
-                           .includes(
-                                invitedCareGive.careGiver
-                                               .careGiverId
-                                               .toString()
-                            )
+                || petOwner.blockedUsers.includes( invitedCareGive.careGiver.careGiverId.toString() )
             ){
                 return res.status( 404 )
                           .json(
@@ -197,22 +177,23 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                     const redirectUrl = process.env.BASE_URL + "/api/paymentRedirect";
         
                     const paymentData = await mokaCreatePaymentHelper(
-                                                    userId, //customer user id
-                                                    cardGuid, //card guid
-                                                    cardNo, //card number
-                                                    cardExpiryDate.split("/")[0], //card expiry month
-                                                    cardExpiryDate.split("/")[1], //card expiry year
-                                                    cvv, //card cvv
-                                                    invitedCareGive._id.toString(), //parent id
-                                                    "CareGive", //payment type
-                                                    null,
-                                                    invitedCareGive.careGiver.careGiverId, //caregiver id
-                                                    invitedCareGive.invitation.careGiverPosGuid, //caregiver guid
-                                                    price, // amount
-                                                    redirectUrl,
-                                                    req.body.recordCard === 'true',
-                                                    false // is from invitation
-                                              );
+                        userId, //customer user id
+                        cardGuid, //card guid
+                        cardNo, //card number
+                        cardExpiryDate.split("/")[0], //card expiry month
+                        cardExpiryDate.split("/")[1], //card expiry year
+                        cvv, //card cvv
+                        invitedCareGive._id.toString(), //parent id
+                        null,
+                        "CareGive", //payment type
+                        null,
+                        invitedCareGive.careGiver.careGiverId, //caregiver id
+                        invitedCareGive.invitation.careGiverPosGuid, //caregiver guid
+                        price, // amount
+                        redirectUrl,
+                        req.body.recordCard === 'true',
+                        false // is from invitation
+                    );
         
                     if( paymentData.message === 'Daily Limit Exceeded' ){
                         return res.status( 500 )
@@ -256,11 +237,11 @@ const replyCareGiveInvitationController = async ( req, res ) => {
             }
             // Get the base64 url
             const careGiveTicketData = await prepareCareGiveTicketHelper(
-                                                invitedCareGive._id.toString(),
-                                                "Free_Care_Give", //virtualPosOrderId
-                                                "Free_Care_Give", //paymentDataId
-                                                "Free_Care_Give", //orderUniqueCode
-                                             );
+                invitedCareGive._id.toString(),
+                "Free_Care_Give", //virtualPosOrderId
+                "Free_Care_Give", //paymentDataId
+                "Free_Care_Give", //orderUniqueCode
+            );
 
             if(
                 !careGiveTicketData

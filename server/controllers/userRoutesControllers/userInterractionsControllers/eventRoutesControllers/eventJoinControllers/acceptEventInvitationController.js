@@ -149,6 +149,7 @@ const acceptEventInvitationController = async ( req, res ) => {
                                             cardExpiryDate.split("/")[1], //card expiry year
                                             cvv, //card cvv
                                             invitation._id.toString(), //parent id
+                                            null, //productDesc
                                             "EventTicket", //payment type
                                             null,
                                             invitation.eventAdminId, //caregiver id

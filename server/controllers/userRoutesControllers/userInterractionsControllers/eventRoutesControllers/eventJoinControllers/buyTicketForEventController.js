@@ -223,6 +223,7 @@ const buyTicketForEventController = async (req, res) => {
                                             cardExpiryDate.split( "/" )[ 1 ], //card expiry year
                                             cvv, //card cvv
                                             event._id.toString(), //parent id
+                                            null, //productDesc
                                             "EventTicket", //payment type
                                             null,
                                             event.eventAdmin, //caregiver id

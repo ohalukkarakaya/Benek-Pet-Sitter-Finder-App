@@ -28,16 +28,15 @@ const PaymentDataSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        extraTimeData: {
-          type: String
-        }
+        extraTimeData: { type: String }
       },
       parentContentId:{
         type: String
       },
+      productDesc: { type: String },
       type: {
         type: String,
-        enum: [ "CareGive", "CareGiveExtension", "EventTicket", "Donation" ],
+        enum: [ "CareGive", "CareGiveExtension", "ExtraMission", "EventTicket", "Donation" ],
         required: true
       },
       isFromInvitation: {
@@ -56,9 +55,7 @@ const PaymentDataSchema = new mongoose.Schema(
         type: Boolean,
         default: false
       },
-      virtualPosOrderId: {
-        type: String
-      }
+      virtualPosOrderId: { type: String }
   },
   {
       timestamps: true

@@ -18,6 +18,7 @@ dotenv.config();
 
 const router = express.Router();
 
+// - 
 //get time code for upload mission
 router.put(
     "/timeSignatureCode/:careGiveId/:missionId",
@@ -36,7 +37,7 @@ router.post(
 
 //approve mission
 router.put(
-    "/:careGiveId/:missionId",
+    "/approve/:careGiveId/:missionId",
     auth,
     approveMissionController
 );
