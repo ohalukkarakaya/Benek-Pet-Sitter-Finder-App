@@ -36,13 +36,11 @@ const mokaAfter3dPaySuccesHelper = async ( virtualPosOrderId, paymentData ) => {
             paymentData.type === "CareGive"
         ){
             const preparedTicketData = await prepareCareGiveTicketHelper(
-                    paymentData.customerId,
-                    paymentData.parentContentId,
-                    null,
-                    virtualPosOrderId,
-                    paymentData._id.toString(),
-                    paymentData.paymentUniqueCode
-                );
+                paymentData.parentContentId,
+                virtualPosOrderId,
+                paymentData._id.toString(),
+                paymentData.paymentUniqueCode
+            );
 
             if( preparedTicketData ){
                 return  preparedTicketData;

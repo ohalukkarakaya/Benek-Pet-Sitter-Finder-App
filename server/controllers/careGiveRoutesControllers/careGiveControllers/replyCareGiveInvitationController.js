@@ -165,247 +165,160 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                            );
             }
 
-            invitedCareGive.petOwner
-                           .petOwnerContact
-                           .petOwnerEmail = petOwner.email;
-
-            invitedCareGive.petOwner
-                           .petOwnerContact
-                           .petOwnerPhone = petOwner.phone;
-
-            invitedCareGive.markModified("petOwner");
-
-            const careGiveHistoryRecordforPet = {
-                careGiver: careGiver._id.toString(),
-                startDate: invitedCareGive.startDate,
-                endDate: invitedCareGive.endDate,
-                price: invitedCareGive.prices
-            }
-
-            const careGiveHistoryRecordforCareGiver = {
-                pet: pet._id.toString(),
-                startDate: invitedCareGive.startDate,
-                endDate: invitedCareGive.endDate,
-                price: invitedCareGive.prices
-            }
-
-            const careGiveHistoryRecordforPetOwner = {
-                pet: pet._id.toString(),
-                careGiver: careGiver._id.toString(),
-                startDate: invitedCareGive.startDate,
-                endDate: invitedCareGive.endDate,
-                price: invitedCareGive.prices
-            }
-
-            pet.careGiverHistory
-               .push( 
-                  careGiveHistoryRecordforPet 
-                );
-
-            pet.markModified( "careGiverHistory" );
-
-            careGiver.caregiverCareer
-                     .push(
-                        careGiveHistoryRecordforCareGiver
-                      );
-
-            careGiver.markModified( "caregiverCareer" );
-
-            petOwner.pastCaregivers
-                    .push(
-                       careGiveHistoryRecordforPetOwner
-                    );
-            petOwner.markModified( "pastCaregivers" );
-
-            pet.save().then(
-                (_) => {
-                    careGiver.save().then(
-                        async (__) => {
-                            if( isPetOwner ){
-                                if(
-                                    invitedCareGive.prices.priceType !== "Free" 
-                                    && invitedCareGive.prices.servicePrice !== 0
-                                ){
-                                    const didAlreadyPay = await PaymentData.findOne({ parentContentId: invitedCareGive._id.toString() });
-                                    if(
-                                        didAlreadyPay
-                                        || invitedCareGive.invitation.isAccepted
-                                    ){
-                                        return res.status( 400 )
-                                                  .json(
-                                                    {
-                                                        error: true,
-                                                        message: "Already Paid"
-                                                    }
-                                                  );
+            if( isPetOwner ){
+                if(
+                    invitedCareGive.prices.priceType !== "Free" 
+                    && invitedCareGive.prices.servicePrice !== 0
+                ){
+                    const didAlreadyPay = await PaymentData.findOne({ parentContentId: invitedCareGive._id.toString() });
+                    if(
+                        didAlreadyPay
+                        || invitedCareGive.invitation.isAccepted
+                    ){
+                        return res.status( 400 )
+                                  .json(
+                                    {
+                                        error: true,
+                                        message: "Already Paid"
                                     }
+                                  );
+                    }
 
-                                    const cardGuid = req.body.cardGuid 
-                                                        ? req.body.cardGuid.toString() 
-                                                        : null;
-                        
-                                    const cardNo = req.body.cardNo.toString();
-                                    const cvv = req.body.cvc.toString();
-                                    const cardExpiryDate = req.body.cardExpiryDate.toString();
-                                    const userId = req.user._id.toString();
-                                    const price = parseFloat( invitedCareGive.prices.servicePrice );
-                        
-                                    const redirectUrl = process.env.BASE_URL + "/api/paymentRedirect";
-                        
-                                    const paymentData = await mokaCreatePaymentHelper(
-                                                                    userId, //customer user id
-                                                                    cardGuid, //card guid
-                                                                    cardNo, //card number
-                                                                    cardExpiryDate.split("/")[0], //card expiry month
-                                                                    cardExpiryDate.split("/")[1], //card expiry year
-                                                                    cvv, //card cvv
-                                                                    invitedCareGive._id.toString(), //parent id
-                                                                    "CareGive", //payment type
-                                                                    invitedCareGive.careGiver.careGiverId, //caregiver id
-                                                                    invitedCareGive.invitation.careGiverPosGuid, //caregiver guid
-                                                                    price, // amount
-                                                                    redirectUrl,
-                                                                    req.body.recordCard === 'true',
-                                                                    false // is from invitation
-                                                              );
-                        
-                                    if( paymentData.message === 'Daily Limit Exceeded' ){
-                                        return res.status( 500 )
-                                                  .json(
-                                                    {
-                                                        error: true,
-                                                        message: "CareGiver Daily Limit Exceeded",
-                                                        payError: paymentData
-                                                    }
-                                                  );
-                                    }
-                        
-                                    if(
-                                        !paymentData 
-                                        || paymentData.error 
-                                        || paymentData.serverStatus !== 1 
-                                        || !paymentData.payData 
-                                        || paymentData.payData === null 
-                                        || paymentData.payData === undefined
-                                    ){
-                                        return res.status( 500 )
-                                                  .json(
-                                                    {
-                                                        error: true,
-                                                        message: "Error While Payment",
-                                                        payError: paymentData
-                                                    }
-                                                  );
-                                    }
-
-                                    petOwner.save(
-                                        ( err ) => {
-                                            if( err ){
-                                                console.log( err );
-                                            }
-                                        }
-                                    );
-                        
-                                    return res.status( 200 )
-                                              .json(
-                                                {
-                                                    error: false,
-                                                    message: "Waiting for 3d payment approve",
-                                                    payData: paymentData.payData,
-                                                    code: null
-                                                }
+                    const cardGuid = req.body.cardGuid 
+                                        ? req.body.cardGuid.toString() 
+                                        : null;
+        
+                    const cardNo = req.body.cardNo.toString();
+                    const cvv = req.body.cvc.toString();
+                    const cardExpiryDate = req.body.cardExpiryDate.toString();
+                    const userId = req.user._id.toString();
+                    const price = parseFloat( invitedCareGive.prices.servicePrice );
+        
+                    const redirectUrl = process.env.BASE_URL + "/api/paymentRedirect";
+        
+                    const paymentData = await mokaCreatePaymentHelper(
+                                                    userId, //customer user id
+                                                    cardGuid, //card guid
+                                                    cardNo, //card number
+                                                    cardExpiryDate.split("/")[0], //card expiry month
+                                                    cardExpiryDate.split("/")[1], //card expiry year
+                                                    cvv, //card cvv
+                                                    invitedCareGive._id.toString(), //parent id
+                                                    "CareGive", //payment type
+                                                    invitedCareGive.careGiver.careGiverId, //caregiver id
+                                                    invitedCareGive.invitation.careGiverPosGuid, //caregiver guid
+                                                    price, // amount
+                                                    redirectUrl,
+                                                    req.body.recordCard === 'true',
+                                                    false // is from invitation
                                               );
+        
+                    if( paymentData.message === 'Daily Limit Exceeded' ){
+                        return res.status( 500 )
+                                  .json(
+                                    {
+                                        error: true,
+                                        message: "CareGiver Daily Limit Exceeded",
+                                        payError: paymentData
+                                    }
+                                  );
+                    }
+        
+                    if(
+                        !paymentData 
+                        || paymentData.error 
+                        || paymentData.serverStatus !== 1 
+                        || !paymentData.payData 
+                        || paymentData.payData === null 
+                        || paymentData.payData === undefined
+                    ){
+                        return res.status( 500 )
+                                  .json(
+                                    {
+                                        error: true,
+                                        message: "Error While Payment",
+                                        payError: paymentData
+                                    }
+                                  );
+                    }
+        
+                    return res.status( 200 )
+                              .json(
+                                {
+                                    error: false,
+                                    message: "Waiting for 3d payment approve",
+                                    payData: paymentData.payData,
+                                    code: null
                                 }
-                            }
+                              );
+                }
+            }
+            // Get the base64 url
+            const careGiveTicketData = await prepareCareGiveTicketHelper(
+                                                invitedCareGive._id.toString(),
+                                                "Free_Care_Give", //virtualPosOrderId
+                                                "Free_Care_Give", //paymentDataId
+                                                "Free_Care_Give", //orderUniqueCode
+                                             );
 
-                            // Get the base64 url
-                            const careGiveTicketData = await prepareCareGiveTicketHelper(
-                                                                invitedCareGive.petOwner.petOwnerId,
-                                                                invitedCareGive._id.toString(),
-                                                                petOwner,
-                                                                "Free_Care_Give", //virtualPosOrderId
-                                                                "Free_Care_Give", //paymentDataId
-                                                                "Free_Care_Give", //orderUniqueCode
-                                                             );
-
-                            if(
-                                !careGiveTicketData
-                                || careGiveTicketData.error
-                            ){
-                                return res.status( 500 )
-                                          .json(
-                                                {
-                                                    error: true,
-                                                    message: "Internal Server Error"
-                                                }
-                                           );
-                            }
-
-                            return res.status( 200 )
-                                      .json(
-                                            {
-                                                error: false,
-                                                message: "careGive accepted",
-                                                code: careGiveTicketData.url
-                                            }
-                                       );
-                        }
-                    ).catch(
-                        (err) => {
-                            console.log(err);
-                            return res.status(500).json(
+            if(
+                !careGiveTicketData
+                || careGiveTicketData.error
+            ){
+                return res.status( 500 )
+                            .json(
                                 {
                                     error: true,
-                                    message: "Internal server error"
+                                    message: "Internal Server Error"
                                 }
                             );
-                        }
-                    );
-                }
-            ).catch(
-                (err) => {
-                    console.log(err);
-                    return res.status(500).json(
+            }
+
+            return res.status( 200 )
+                        .json(
+                            {
+                                error: false,
+                                message: "careGive accepted",
+                                code: careGiveTicketData.url
+                            }
+                        );
+        }else{
+            //reject invitation
+            invitedCareGive.deleteOne()
+                           .then(
+                                (_) => {
+                                    return res.status( 200 )
+                                            .json(
+                                                    {
+                                                        error: false,
+                                                        message: "Invitation rejected succesfully"
+                                                    }
+                                            );
+                                }
+                            ).catch(
+                                ( error ) => {
+                                    if( error ){
+                                        console.log( error );
+                                        return res.status( 500 )
+                                                  .json(
+                                                        {
+                                                            error: true,
+                                                            message: "Internal server error"
+                                                        }
+                                                   );
+                                    }
+                                }
+                            );
+        }
+    }catch( err ){
+        console.log( "Error: care give", err );
+        return res.status( 500 )
+                  .json(
                         {
                             error: true,
                             message: "Internal server error"
                         }
-                    );
-                }
-            );
-        }else{
-            //reject invitation
-            invitedCareGive.deleteOne().then(
-                (_) => {
-                    return res.status(200).json(
-                        {
-                            error: false,
-                            message: "Invitation rejected succesfully"
-                        }
-                    );
-                }
-            ).catch(
-                (error) => {
-                    if(error){
-                        console.log(error);
-                        return res.status(500).json(
-                            {
-                                error: true,
-                                message: "Internal server error"
-                            }
-                        );
-                    }
-                }
-            );
-        }
-    }catch(err){
-        console.log("Error: care give", err);
-        return res.status(500).json(
-            {
-                error: true,
-                message: "Internal server error"
-            }
-        );
+                   );
     }
 }
 
