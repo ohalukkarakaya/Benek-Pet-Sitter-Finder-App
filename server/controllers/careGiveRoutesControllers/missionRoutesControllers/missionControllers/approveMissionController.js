@@ -9,25 +9,27 @@ const approveMissionController = async (req, res) => {
     try{
         const careGiveId = req.params.careGiveId;
         const missionId = req.params.missionId;
-
-        if(!careGiveId || !missionId){
-            return res.status(500).json(
-                {
-                    error: true,
-                    message: "Missing params"
-                }
-            );
+        if( !careGiveId || !missionId ){
+            return res.status( 500 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Missing params"
+                            }
+                       );
         }
 
-        const careGive = await CareGive.findById(careGiveId.toString());
-        if(!careGive){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "CareGive not found"
-                }
-            );
+        const careGive = await CareGive.findById( careGiveId.toString() );
+        if( !careGive ){
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "CareGive not found"
+                            }
+                       );
         }
+
         if(
             careGive.petOwner
                     .petOwnerId
@@ -48,18 +50,16 @@ const approveMissionController = async (req, res) => {
             missionObject =>
                 missionObject._id.toString() === missionId.toString()
         );
-        if(!mission){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "Mission not found"
-                }
-            );
+        if( !mission ){
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Mission not found"
+                            }
+                       );
         }
-        if(
-            !mission.missionContent
-                    .videoUrl
-        ){
+        if( !mission.missionContent.videoUrl ){
             return res.status( 400 )
                       .json(
                             {
@@ -68,62 +68,56 @@ const approveMissionController = async (req, res) => {
                             }
                        );
         }
-
-        mission.missionContent
-               .isApproved = true;
-
+        mission.missionContent.isApproved = true;
         careGive.markModified( "missionCallender" );
         careGive.save()
                 .then(
-            async ( savedCareGive ) => {
+                    async ( savedCareGive ) => {
 
-                await sendNotification(
-                    savedCareGive.petOwner
-                                 .petOwnerId
-                                 .toString(),
-                    savedCareGive.careGiver
-                                 .careGiverId
-                                 .toString(),
-                    "missionAprove",
-                    missionId.toString(),
-                    "careGive",
-                    savedCareGive._id
-                                 .toString(),
-                    null,
-                    null,
-                    null,
-                    null
+                        await sendNotification(
+                            savedCareGive.petOwner.petOwnerId.toString(),
+                            savedCareGive.careGiver.careGiverId.toString(),
+                            "missionAprove",
+                            missionId.toString(),
+                            "careGive",
+                            savedCareGive._id.toString(),
+                            null,
+                            null,
+                            null,
+                            null
+                        );
+
+                        return res.status( 200 )
+                                .json(
+                                        {
+                                            error: false,
+                                            message: "mission approved succesfully"
+                                        }
+                                );
+                    }
+                ).catch(
+                    ( error ) => {
+                        if( error ){
+                            console.log( error );
+                            return res.status( 500 )
+                                    .json(
+                                            {
+                                                error: true,
+                                                message: "Internal server error"
+                                            }
+                                    );
+                        }
+                    }
                 );
-
-                return res.status( 200 )
-                          .json(
-                                {
-                                    error: false,
-                                    message: "mission approved succesfully"
-                                }
-                           );
-            }
-        ).catch(
-            (error) => {
-                if(error){
-                    console.log(error);
-                    return res.status(500).json(
+    }catch( err ){
+        console.log( err );
+        return res.status( 500 )
+                  .json(
                         {
                             error: true,
                             message: "Internal server error"
                         }
-                    );
-                }
-            }
-        );
-    }catch(err){
-        console.log(err);
-        return res.status(500).json(
-            {
-                error: true,
-                message: "Internal server error"
-            }
-        );
+                   );
     }
 }
 

@@ -36,7 +36,7 @@ router.post(
     uploadMissionController
 );
 
-// 
+// - tested
 //approve mission
 router.put(
     "/approve/:careGiveId/:missionId",
@@ -44,6 +44,7 @@ router.put(
     approveMissionController
 );
 
+// - tested 
 //report mission
 router.put(
     "/report/:careGiveId/:missionId",

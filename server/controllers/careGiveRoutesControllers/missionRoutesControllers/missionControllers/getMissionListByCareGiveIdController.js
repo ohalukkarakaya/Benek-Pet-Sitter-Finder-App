@@ -12,59 +12,59 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
         const limit = parseInt( req.params.limit ) || 15;
 
         if( !careGiveId ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "Missing Params"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Missing Params"
+                            }
+                       );
         }
 
         const careGive = await CareGive.findById( careGiveId ).lean();
         if( !careGive ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "CareGive Not Found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "CareGive Not Found"
+                            }
+                       );
         }
 
         const pet = await Pet.findById( careGive.petId.toString() ).lean();
         if( !pet ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "Pet Not Found"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Pet Not Found"
+                            }
+                       );
         }
 
         if(
-            !(
-                pet.allOwners
-                   .includes( userId )
-            )
-
-            && careGive.careGiver
-                       .careGiverId !== userId
+            !( pet.allOwners.includes( userId ) )
+            && careGive.careGiver.careGiverId !== userId
         ){
-            return res.statu( 401 ).json(
-                {
-                    error: true,
-                    message: "UnAuthorized"
-                }
-            );
+            return res.statu( 401 )
+                      .json(
+                            {
+                                error: true,
+                                message: "UnAuthorized"
+                            }
+                       );
         }
 
         const missionCallender = careGive.missionCallender;
         if( missionCallender.length <= 0 ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    messae: "No Mission Found In This CareGive"
-                }
-            );
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                messae: "No Mission Found In This CareGive"
+                            }
+                       );
         }
 
         const startIndex = missionCallender.length - skip - 1;
@@ -72,26 +72,14 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
 
         const petInfo = getLightWeightPetInfoHelper( pet );
 
-        const petOwner = await User.findById( 
-                                        careGive.petOwner
-                                                .petOwnerId
-                                                .toString()
-                                    );
-
-        const careGiver = await User.findById( 
-                                        careGive.careGiver
-                                                .careGiverId
-                                                .toString()
-                                    );
+        const petOwner = await User.findById( careGive.petOwner.petOwnerId.toString());
+        const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );
 
         const petOwnerInfo = getLightWeightUserInfoHelper( petOwner );
         const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
 
         let careGiveRoleId;
-        if(
-            pet.allOwners
-               .includes( userId )
-        ){
+        if( pet.allOwners.includes( userId ) ){
             careGiveRoleId = 1;
         }else if( userId === careGiver._id.toString() ){
             careGiveRoleId = 2;
