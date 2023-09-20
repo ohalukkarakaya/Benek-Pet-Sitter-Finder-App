@@ -48,7 +48,7 @@ const uploadProfileAssetsHelper = async ( req, res, next ) => {
                           .profileImg[ 0 ]
                 ){
                     const deleteExistingImage = await deleteFileHelper( user.profileImg.imgUrl );
-                    if( deleteExistingImage.err ){
+                    if( deleteExistingImage.error ){
                         return res.status( 500 )
                                 .json(
                                     {
@@ -71,7 +71,7 @@ const uploadProfileAssetsHelper = async ( req, res, next ) => {
                           .coverImg[ 0 ]
                 ){
                     const deleteExistingImage = await deleteFileHelper( user.coverImg.imgUrl );
-                    if( deleteExistingImage.err ){
+                    if( deleteExistingImage.error ){
                         return res.status( 500 )
                                 .json(
                                     {

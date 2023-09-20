@@ -1,12 +1,15 @@
 import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
 import CareGive from "../../../models/CareGive/CareGive.js";
+import PaymentData from "../../../models/PaymentData/PaymentData.js";
+
+import mokaVoid3dPaymentRequest from "../../../utils/mokaPosRequests/mokaPayRequests/mokaVoid3dPaymentRequest.js";
+import mokaValidateHourForVoidPaymentHelper from "../../../utils/mokaPosRequests/mokaHelpers/mokaValidateHourForVoidPaymentHelper.js";
+import deleteFileHelper from "../../../utils/fileHelpers/deleteFileHelper.js";
 
 const cancelCareGiveController = async (req, res ) => {
     try{
-        const careGiveId = req.params
-                              .careGiveId
-                              .toString();
+        const careGiveId = req.params.careGiveId.toString();
         if( !careGiveId ){
             return res.status( 400 )
                       .json(
@@ -29,17 +32,8 @@ const cancelCareGiveController = async (req, res ) => {
         }
 
         if(
-            careGive.petOwner
-                    .petOwnerId
-                    .toString() !== req.user
-                                       ._id
-                                       .toString()
-
-            && careGive.careGiver
-                       .careGiverId
-                       .toString() !== req.user
-                                          ._id
-                                          .toString()
+            careGive.petOwner.petOwnerId.toString() !== req.user._id.toString()
+            && careGive.careGiver.careGiverId.toString() !== req.user._id.toString()
         ){
             return res.status( 401 )
                       .json(
@@ -50,10 +44,10 @@ const cancelCareGiveController = async (req, res ) => {
                        );
         }
 
-        if(
-            Date.parse( 
-                    careGive.startDate 
-                ) <= Date.now()
+        if( 
+            new Date( careGive.startDate ).getTime() <= Date.now() 
+            || careGive.isStarted
+            || careGive.finishProcess.isFinished
         ){
             return res.status( 400 )
                       .json(
@@ -64,90 +58,70 @@ const cancelCareGiveController = async (req, res ) => {
                        );
         }
 
-        const petOwner = await User.findById( 
-                                        careGive.petOwner
-                                                .petOwnerId
-                                                .toString() 
-                                    );
 
+        const petOwner = await User.findById( careGive.petOwner.petOwnerId.toString() );
         if(
             !petOwner 
-            || petOwner.deactivation
-                       .isDeactive
+            || petOwner.deactivation.isDeactive
         ){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "Pet owner not found"
+            return res.status( 404 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Pet owner not found"
+                            }
+                       );
+        }
+
+        const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );
+        const pet = await Pet.findById( careGive.petId.toString() );
+
+        if(
+            careGive.prices.priceType !== "Free" 
+            && careGive.prices.servicePrice > 0
+        ){
+            const paidPayments = await PaymentData.find({ parentContentId: careGive._id.toString() });
+            if( 
+                !paidPayments 
+                || paidPayments.length <= 0
+            ){
+                return res.status( 500 )
+                          .json(
+                            {
+                                error: true,
+                                message: "Internal Server Error"
+                            }
+                          );
+            }
+
+            for(
+                let payment
+                of paidPayments
+            ){
+                const cancelPayment = await mokaVoid3dPaymentRequest( payment.virtualPosOrderId );
+                if( 
+                    !cancelPayment 
+                    || (
+                        cancelPayment.serverStatus
+                        && cancelPayment.serverStatus !== 0
+                        && cancelPayment.serverStatus !== 1
+                        && (
+                            cancelPayment.error === true 
+                            || !( cancelPayment.data )
+                        )
+                    )
+                ){
+                    return res.status( 500 )
+                            .json(
+                                    {
+                                        error: true,
+                                        message: "Internal server error"
+                                    }
+                            );
                 }
-            );
-        }
 
-        const careGiver = await User.findById( 
-                                            careGive.careGiver
-                                                    .careGiverId
-                                                    .toString() 
-                                     );
-        if(
-            !careGiver 
-            || careGiver.deactivation
-                        .isDeactive
-        ){
-            return res.status( 404 )
-                      .json(
-                           {
-                               error: true,
-                               message: "Care Giver not found"
-                           }
-                       );
-        }
-
-        const pet = await Pet.findById( 
-                                    careGive.petId
-                                            .toString() 
-                              );
-        if( !pet ){
-            return res.status( 404 )
-                      .json(
-                           {
-                               error: true,
-                               message: "Pet not found"
-                           }
-                       );
-        }
-
-        if(
-            careGive.prices
-                    .priceType !== "Free" 
-            && careGive.prices
-                       .servicePrice > 0
-        ){
-            if( 
-                petOwner.refundCredit.priceType !== careGive.prices.priceType
-                && petOwner.refundCredit.priceType !== "None"
-            ){
-                return res.status(400).json(
-                    {
-                        error: true,
-                        message: "money type doesn't fit"
-                    }
-                );
+                await payment.deleteOne();
             }
-
-            if( 
-                petOwner.refundCredit
-                        .priceType === "None" 
-            ){
-                petOwner.refundCredit
-                        .priceType = careGive.prices
-                                             .priceType
-            }
-
-            petOwner.refundCredit
-                    .credit = petOwner.refundCredit
-                                      .credit + careGive.prices
-                                                        .servicePrice;
-            petOwner.markModified("refundCredit");
         }
 
         petOwner.pastCaregivers = petOwner.pastCaregivers
@@ -157,7 +131,8 @@ const cancelCareGiveController = async (req, res ) => {
                                                                                    .careGiverId
                                                                                    .toString()
                                            );
-        petOwner.markModified("refundCredit");
+
+        petOwner.markModified("pastCaregivers");
         petOwner.save(
             function (err) {
                 if(err) {
@@ -173,7 +148,7 @@ const cancelCareGiveController = async (req, res ) => {
                                         .toString() !== careGive.petId
                                                                 .toString()
                   );
-        careGiver.markModified("caregiverCareer");
+        careGiver.markModified( "caregiverCareer" );
         careGiver.save(
             function (err) {
                 if(err) {
@@ -200,6 +175,17 @@ const cancelCareGiveController = async (req, res ) => {
               }
         );
 
+        const deleteAssets = await deleteFileHelper( `CareGive/${ careGive._id.toString() }` );
+        if( deleteAssets.error ){
+            return res.status( 500 )
+                    .json(
+                        {
+                            error: true,
+                            message: "Internal Server Error"
+                        }
+                    );
+        }
+        
         careGive.deleteOne()
                 .then(
                     async (_) => {

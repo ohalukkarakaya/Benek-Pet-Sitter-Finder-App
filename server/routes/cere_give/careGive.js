@@ -68,7 +68,7 @@ router.get(
     getCareGiveListController
 );
 
-// - TO DO
+// - tested
 //get finished careGive List
 router.get(
     "/getFinishedCareGiveList/:skip/:limit",
@@ -92,7 +92,7 @@ router.get(
     getPetOwnerCareGiveListController
 );
 
-// - TO DO
+// - tested
 //get petOwner Finished careGive List
 router.get(
     "/getPetOwnerFinishedCareGiveList/:skip/:limit",
@@ -108,7 +108,7 @@ router.get(
     getCareGiverCareGiveListController
 );
 
-// - TO DO
+// - tested
 //get CareGiver Finished careGive List
 router.get(
     "/getCareGiverFinishedCareGiveList/:skip/:limit",
@@ -124,6 +124,7 @@ router.put(
     extendCareGiveController
 );
 
+// - tested
 //finish care give
 router.put(
     "/finish/:careGiveId",
@@ -131,6 +132,7 @@ router.put(
     finishCareGiveController
 );
 
+// - tested
 //cancel careGive
 router.post(
     "/cancel/:careGiveId",
@@ -138,7 +140,7 @@ router.post(
     cancelCareGiveController
 );
 
-
+// - tested
 //give star to care giver
 router.post(
     "/giveStar/:careGiveId/:star",
@@ -155,6 +157,7 @@ router.put(
     replyCareGiveInvitationController
 );
 
+// - tested
 router.use( "/mission", missionEndPoints );
 router.use( "/emergency", emergencyEndPoints );
 

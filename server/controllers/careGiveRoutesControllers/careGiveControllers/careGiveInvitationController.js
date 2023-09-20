@@ -123,7 +123,8 @@ const careGiveInvitationController = async ( req, res ) => {
         const isPetAlreadyInCareGive = await CareGive.findOne(
                                                             {
                                                                 petId: pet._id.toString(),
-                                                                endDate: { $gt: new Date() }
+                                                                endDate: { $gt: new Date() },
+                                                                'finishProcess.isFinished': false
                                                             }
                                                       );
 

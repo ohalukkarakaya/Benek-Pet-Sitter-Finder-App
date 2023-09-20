@@ -33,7 +33,7 @@ const finishCareGiveController = async ( req, res ) => {
                        );
         }
 
-        if( codeType !== "finish" ){
+        if( codeType !== "Finish" ){
             return res.status( 400 )
                       .json(
                            {
@@ -54,11 +54,7 @@ const finishCareGiveController = async ( req, res ) => {
                        );
         }
 
-        if( 
-            userId !== careGive.petOwner
-                               .petOwnerId
-                               .toString() 
-        ){
+        if( userId !== careGive.petOwner.petOwnerId.toString() ){
             return res.status( 400 )
                       .json(
                            {
@@ -79,13 +75,10 @@ const finishCareGiveController = async ( req, res ) => {
                        );
         }
 
-        const careGiver = await User.findById( userId );
+        const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );
         if( 
             !careGiver 
-
-            || careGiver.deactivation
-                        .isDeactive
-
+            || careGiver.deactivation.isDeactive
             || careGiver.blockedUsers
                         .includes( 
                             careGive.petOwner
@@ -102,19 +95,11 @@ const finishCareGiveController = async ( req, res ) => {
                        );
         }
 
-        const petOwner = await User.findById(
-                                        careGive.petOwner
-                                                .petOwnerId
-                                                .toString()
-                                    );
+        const petOwner = await User.findById( careGive.petOwner.petOwnerId.toString() );
         if(
             !petOwner
-
-            || petOwner.deactivation
-                       .isDeactive
-
-            || petOwner.blockedUsers
-                       .includes( userId )
+            || petOwner.deactivation.isDeactive
+            || petOwner.blockedUsers.includes( userId )
         ){
             return res.status( 404 )
                       .json(
@@ -126,15 +111,9 @@ const finishCareGiveController = async ( req, res ) => {
         }
 
         if(
-            pet._id
-               .toString() !== petIdFromCode
-
-            || careGiver._id
-                        .toString() !== careGiverIdFromCode
-
-            || req.user
-                  ._id
-                  .toString() !== petOwnerIdFromCode
+            pet._id.toString() !== petIdFromCode
+            || careGiver._id.toString() !== careGiverIdFromCode
+            || req.user._id.toString() !== petOwnerIdFromCode
         ){
             return res.status( 400 )
                       .json(
@@ -146,13 +125,8 @@ const finishCareGiveController = async ( req, res ) => {
         }
 
         const verifiedPassword = await bcrypt.compare(
-
             actionCodePassword,
-
-            careGive.invitation
-                    .actionCode
-                    .code
-
+            careGive.invitation.actionCode.codePassword
         );
         if( !verifiedPassword ){
             return res.status( 403 )
@@ -164,26 +138,13 @@ const finishCareGiveController = async ( req, res ) => {
                        );
         }
 
-        careGive.invitation
-                .actionCode
-                .codeType = "Done";
-
-        careGive.invitation
-                .actionCode
-                .codePassword = "-";
-
-        careGive.invitation
-                .actionCode
-                .codePassword = "_";
-
+        careGive.invitation.actionCode.codeType = "Done";
+        careGive.invitation.actionCode.codePassword = "-";
+        careGive.invitation.actionCode.codePassword = "_";
         careGive.markModified( "invitation" );
 
-        careGive.finishProcess
-                .isFinished = true;
-
-        careGive.finishProcess
-                .finishDate = Date.now();
-
+        careGive.finishProcess.isFinished = true;
+        careGive.finishProcess.finishDate = Date.now();
         careGive.markModified( "finishProcess" );
 
         careGive.save()
@@ -211,8 +172,7 @@ const finishCareGiveController = async ( req, res ) => {
                         }
                     }
                 );
-
-    }catch(err){
+    }catch( err ){
         console.log( "ERROR: finish care give", err );
         return res.status( 500 )
                   .json(
