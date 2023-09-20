@@ -56,6 +56,19 @@ const deleteMissionController = async (req, res) => {
                        );
         }
 
+        if( 
+            mission.missionContent
+            && mission.missionContent.videoUrl
+        ){
+            return res.status( 400 )
+                      .json(
+                        {
+                            error: true,
+                            message: "You can't delete this mission"
+                        }
+                      );
+        }
+
         if( mission.isExtra && mission.extraMissionInfo ){
             //cancel payment
             const isMissionCanCancel = mokaValidateHourForVoidPaymentHelper( mission.createdAt );

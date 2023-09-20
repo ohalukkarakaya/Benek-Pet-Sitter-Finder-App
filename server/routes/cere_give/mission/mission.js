@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import scheduleMissionEndPoints from "./scheduleMission.js"
 import auth from "../../../middleware/auth.js";
 import validateMission from "../../../middleware/validateMission.js";
-import { uploadMissionContent } from "../../../middleware/contentHandle/serverHandleMissionContent.js";
+import serverHandleMissionContentHelper from "../../../utils/fileHelpers/serverHandleMissionContentHelper.js";
 
 //controllers
 import getTimeCodeForUploadMissionController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/getTimeCodeForUploadMissionController.js";
@@ -11,14 +11,14 @@ import uploadMissionController from "../../../controllers/careGiveRoutesControll
 import approveMissionController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/approveMissionController.js";
 import reportMissionController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/reportMissionController.js";
 import getMissionListByCareGiveIdController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/getMissionListByCareGiveIdController.js";
-import getMissionCallenderController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/getMissionListByCareGiveIdController.js";
+import getMissionCallenderController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/getMissionCallenderController.js";
 import getMissionCallenderByPetIdController from "../../../controllers/careGiveRoutesControllers/missionRoutesControllers/missionControllers/getMissionCallenderByPetIdController.js";
 
 dotenv.config();
 
 const router = express.Router();
 
-// - 
+// - tested
 //get time code for upload mission
 router.put(
     "/timeSignatureCode/:careGiveId/:missionId",
@@ -26,15 +26,17 @@ router.put(
     getTimeCodeForUploadMissionController
 );
 
+// - tested
 //upload mission
 router.post(
     "/:careGiveId/:missionId",
     auth,
     validateMission,
-    uploadMissionContent,
+    serverHandleMissionContentHelper,
     uploadMissionController
 );
 
+// 
 //approve mission
 router.put(
     "/approve/:careGiveId/:missionId",
@@ -49,6 +51,7 @@ router.put(
     reportMissionController
 );
 
+// - tested
 //get mission list by careGiveId
 router.get(
     "/getMissionCalenderByCareGiveId/:careGiveId/:skip/:limit",
@@ -56,6 +59,7 @@ router.get(
     getMissionListByCareGiveIdController
 );
 
+// - tested
 //get releated missions by userId
 router.get(
     "/getMissionCalender/:skip/:limit",
@@ -63,6 +67,7 @@ router.get(
     getMissionCallenderController
 );
 
+// - tested
 //get missions by pet id
 router.get(
     "/getMissionCalenderByPetId/:petId/:skip/:limit",

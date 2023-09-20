@@ -7,7 +7,7 @@ import getLightWeightUserInfoHelper from "../../../../utils/getLightWeightUserIn
 const getMissionListByCareGiveIdController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const careGiveId = req.params.careGiveId.roString();
+        const careGiveId = req.params.careGiveId.toString();
         const skip = parseInt( req.params.skip ) || 0;
         const limit = parseInt( req.params.limit ) || 15;
 
@@ -20,7 +20,7 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
             );
         }
 
-        const careGive = await CareGive.findById( careGiveId );
+        const careGive = await CareGive.findById( careGiveId ).lean();
         if( !careGive ){
             return res.status( 404 ).json(
                 {
@@ -30,7 +30,7 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
             );
         }
 
-        const pet = await Pet.findById( careGive.petId.toString() );
+        const pet = await Pet.findById( careGive.petId.toString() ).lean();
         if( !pet ){
             return res.status( 404 ).json(
                 {
@@ -100,45 +100,44 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
 
 
         const limitedMissionCallender = missionCallender.slice( startIndex, endIndex );
-        limitedMissionCallender.forEach(
-            async ( mission ) => {
-                let missionContent;
-                if( 
-                    mission.missionContent
-                           .videoUrl
-                ){
-                    missionContent = {
-                        videoUrl: mission.missionContent
-                                         .videoUrl,
-                        timeCode: mission.missionContent
-                                              .timeSignature
-                                              .timePassword,
-                    }
+        let missionList = [];
+        for(
+            let mission
+            of limitedMissionCallender
+        ){
+            let missionContent;
+            if( 
+                mission.missionContent
+                && mission.missionContent.videoUrl
+            ){
+                missionContent = {
+                    videoUrl: mission.missionContent.videoUrl,
+                    timeCode: mission.missionContent.timeSignature.timePassword,
                 }
-
-                const missionInfo = {
-                    id: mission._id.toString(),
-                    roleId: careGiveRoleId,
-                    pet: petInfo,
-                    careGiver: careGiverInfo,
-                    petOwner: petOwnerInfo,
-                    desc: mission.missionDesc,
-                    date: mission.missionDate,
-                    deadline: mission.missionDeadline,
-                    isExtra: mission.isExtra,
-                    content: missionContent,
-                }
-
-                mission = missionInfo;
             }
-        );
+
+            const missionInfo = {
+                id: mission._id.toString(),
+                roleId: careGiveRoleId,
+                pet: petInfo,
+                careGiver: careGiverInfo,
+                petOwner: petOwnerInfo,
+                desc: mission.missionDesc,
+                date: mission.missionDate,
+                deadline: mission.missionDeadline,
+                isExtra: mission.isExtra,
+                content: missionContent,
+            }
+
+            missionList.push( missionInfo );
+        }
 
         return res.status( 200 ).json(
             {
                 error: true,
                 message: "Mission List prepared succesfully",
                 totalMissionCount: missionCallender.length,
-                missions: missionInfo
+                missions: missionList
             }
         );
 

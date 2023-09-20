@@ -7,8 +7,8 @@ const uploadMissionController = async (req, res) => {
     try{
         const careGive = req.careGive;
         const mission = req.mission;
-        const cdnUrl = req.cdnUrl;
-        const fileName = req.missionContent;
+        const cdnUrl = req.missionFilePath;
+        const fileName = req.missionFileName;
         
         if(
             !careGive 

@@ -7,7 +7,7 @@ import getLightWeightUserInfoHelper from "../../../../utils/getLightWeightUserIn
 const getMissionCallenderByPetIdController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const petId = req.params.petId.roString();
+        const petId = req.params.petId.toString();
         const skip = parseInt( req.params.skip );
         const limit = parseInt( req.params.limit );
 
@@ -45,7 +45,7 @@ const getMissionCallenderByPetIdController = async ( req, res ) => {
             }
         }
         
-        const careGives = await CareGive.find( careGiveQuery );
+        const careGives = await CareGive.find( careGiveQuery ).lean();
         if(
             !careGives
             || careGives.length <= 0
@@ -58,84 +58,74 @@ const getMissionCallenderByPetIdController = async ( req, res ) => {
             );
         }
 
-        careGives.forEach(
-            async ( careGive ) => {
-                careGive.missionCallender.forEach(
-                    async ( mission ) => {
+        let missionCalenderList = [];
+        for(
+            let careGive
+            of careGives
+        ){
+            let missionList = [];
+            for(
+                let mission
+                of careGive.missionCallender
+            ){
+                const pet = await Pet.findById( careGive.petId.toString() );
+                const petInfo = getLightWeightPetInfoHelper( pet );
 
-                        const pet = await Pet.findById( careGive.petId.toString() );
+                const petOwner = await User.findById( careGive.petOwner.petOwnerId.toString() );
+                const petOwnerInfo = getLightWeightUserInfoHelper( petOwner );
 
-                        const petInfo = getLightWeightPetInfoHelper( pet );
-                
-                        const petOwner = await User.findById( 
-                                                        careGive.petOwner
-                                                                .petOwnerId
-                                                                .toString()
-                                                    );
-                
-                        const careGiver = await User.findById( 
-                                                        careGive.careGiver
-                                                                .careGiverId
-                                                                .toString()
-                                                    );
-                
-                        const petOwnerInfo = getLightWeightUserInfoHelper( petOwner );
-                
-                        const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
+                const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );
+                const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
 
-                        let careGiveRoleId;
-                        if(
-                            pet.allOwners
-                            .includes( userId )
-                        ){
-                            careGiveRoleId = 1;
-                        }else if( userId === careGiver._id.toString() ){
-                            careGiveRoleId = 2;
-                        }
+                let careGiveRoleId;
+                if( pet.allOwners.includes( userId ) ){
+                    careGiveRoleId = 1;
+                }else if( userId === careGiver._id.toString() ){
+                    careGiveRoleId = 2;
+                }
 
-                        let missionContent;
-                        if( 
-                            mission.missionContent
-                                .videoUrl
-                        ){
-                            missionContent = {
-                                videoUrl: mission.missionContent
-                                                .videoUrl,
-                                timeCode: mission.missionContent
-                                                    .timeSignature
-                                                    .timePassword,
-                            }
-                        }
-
-                        const missionInfo = {
-                            id: mission._id.toString(),
-                            careGiveId: careGive._id.toString(),
-                            roleId: careGiveRoleId,
-                            pet: petInfo,
-                            careGiver: careGiverInfo,
-                            petOwner: petOwnerInfo,
-                            desc: mission.missionDesc,
-                            date: mission.missionDate,
-                            deadline: mission.missionDeadline,
-                            isExtra: mission.isExtra,
-                            content: missionContent,
-                        }
-
-                        mission = missionInfo;
+                let missionContent;
+                if(  mission.missionContent.videoUrl ){
+                    missionContent = {
+                        videoUrl: mission.missionContent.videoUrl,
+                        timeCode: mission.missionContent.timeSignature.timePassword,
                     }
-                );
+                }
 
-                careGive = careGive.missionCallender;
+                const missionInfo = {
+                    id: mission._id.toString(),
+                    careGiveId: careGive._id.toString(),
+                    roleId: careGiveRoleId,
+                    pet: petInfo,
+                    careGiver: careGiverInfo,
+                    petOwner: petOwnerInfo,
+                    desc: mission.missionDesc,
+                    date: mission.missionDate,
+                    deadline: mission.missionDeadline,
+                    isExtra: mission.isExtra,
+                    content: missionContent,
+                }
+
+                if( missionInfo ){
+                    missionList.push( missionInfo );
+                }
             }
-        );
 
-        const allMissions = [].concat(...careGives)
+            if( missionList.length > 0 ){
+                missionCalenderList = missionCalenderList.concat(...missionList);
+            }
+        }
+
+        const allMissions = [].concat(...missionCalenderList)
                               .sort(
                                  ( a, b ) => 
                                       b.date - a.date
                                );
 
-        const startIndex = allMissions.length - skip - 1;
+        const startIndex = skip > 0
+                            ? skip - 1
+                            : skip;
+
         const endIndex = startIndex + limit;
 
         const limitedMissionCallender = allMissions.slice( startIndex, endIndex );
