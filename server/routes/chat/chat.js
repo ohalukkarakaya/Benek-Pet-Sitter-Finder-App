@@ -19,6 +19,7 @@ import meetingRoutes from "./meeting.js";
 dotenv.config();
 const router = express.Router();
 
+// - tested
 //Create Chat
 router.post(
     "/create",

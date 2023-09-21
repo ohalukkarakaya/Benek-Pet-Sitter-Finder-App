@@ -4,6 +4,7 @@ import User from "../../../models/User.js";
 const createChatController = async (req, res) => {
     try{
         const memberList = req.body.memberList;
+        const chatDesc = req.body.chatDesc.toString()
         if( !memberList ){
             return res.status( 400 )
                       .json(
@@ -17,7 +18,7 @@ const createChatController = async (req, res) => {
         const createrUserId = req.user._id.toString();
         const membersWithoutCreater = memberList.filter(
             memberUserId =>
-                    memberUserId.toString() === createrUserId
+                    memberUserId.toString() !== createrUserId
         );
 
         if( membersWithoutCreater.length <= 0 ){
@@ -64,47 +65,26 @@ const createChatController = async (req, res) => {
                        );
         }
 
-        const areThereChatWithSameMembers = await Chat.find(
+        const aggregatePipeline = [
             {
-                $and: [
-                  { 'members.userId': { $in: memberList } },
-                  {
-                    'members.userId': {
-                        $nin: memberUserIdList.filter(
-                                                id => 
-                                                  id !== null 
-                                                  && id !== undefined
-                                               ) 
-                    } 
-                 },
-                 {
-                   $where: `this.members.length === ${ memberList.length } 
-                            && new Set(
-                                this.members.map(
-                                    member => 
-                                        member.userId
-                                )
-                            ).size === ${ memberList.length }
-                            && this.members.map(
-                                member => 
-                                    member.userId
-                            ).every(
-                                ( item ) => 
-                                    new Set(
-                                        ${ JSON.stringify( memberList ) }
-                                    ).has( item )
-                            )`
-                 }
-                ]
-            }
-        );
+              $match: {
+                'members.userId': { $all: memberList },
+              },
+            },
+        ];
+          
 
-        if( areThereChatWithSameMembers ){
+        const areThereChatWithSameMembers = await Chat.aggregate( aggregatePipeline );
+
+        if( 
+            areThereChatWithSameMembers
+            && areThereChatWithSameMembers.length > 0 
+        ){
             return res.status( 200 )
                       .json(
                             {
                                 error: false,
-                                chatId: areThereChatWithSameMembers._id.toString(),
+                                chatId: areThereChatWithSameMembers[0]._id.toString(),
                                 message: "There is allready chat with same members",
                             }
                        );
@@ -123,7 +103,7 @@ const createChatController = async (req, res) => {
         await new Chat(
             {
               members: memberLisToAdd,
-              chatDesc: req.body.chatDesc.toString()
+              chatDesc: chatDesc
             }
         ).save()
          .then(

@@ -1,144 +1,115 @@
-import cron from "node-cron";
 import CareGive from "../models/CareGive/CareGive.js";
 import ReportedMission from "../models/Report/ReportMission.js";
-import s3 from "../utils/s3Service.js";
+import PaymentData from "../models/PaymentData/PaymentData.js";
 
-import paramAproveOrderRequest from "../utils/paramRequests/paymentRequests/paramAproveOrderRequest.js";
+import deleteFileHelper from "../utils/fileHelpers/deleteFileHelper.js";
+
+import mokaApprove3dPaymentRequest from "../utils/mokaPosRequests/mokaPayRequests/mokaApprove3dPaymentRequest.js";
 
 import dotenv from "dotenv";
+import cron from "node-cron";
 
 dotenv.config();
 
+// - tested
 const expireCareGive = cron.schedule(
-    '0 0 0 * * *',
+    '0 0 0 * * *', // her gün gece 12:00
+    // "* * * * *", // her dakika başı
     async () => {
         try{
+            const now = new Date();
+
+            const currentYear = now.getUTCFullYear();
+            const currentMonth = now.getUTCMonth();
+            const currentDate = now.getUTCDate();
+            const currentHour = now.getUTCHours();
+
+            const currentDateTime = new Date(
+                currentYear, 
+                currentMonth, 
+                currentDate, 
+                currentHour, 
+                0, 0, 0
+            );
+
+            const oneWeekAgo = currentDateTime.setDate( now.getDate() - 7 );
+
             const expiredCareGives = await CareGive.find(
                 {
                     $and: [
                         { "finishProcess.isFinished": true },
                         { 
                             "finishProcess.finishDate": {
-                                $lte: Date.now() + 604800000
+                                $lte: oneWeekAgo
                             }
                         }
                     ]
                     
                 }
             );
+
             if( expiredCareGives.length > 0 ){
-                expiredCareGives.map(
-                    async ( careGive ) => {
-                        const isCareGiveReported = await ReportedMission.find(
-                                                            reportedMissionObject =>
-                                                                reportedMissionObject.careGiveId
-                                                                                     .toString() === careGive._id
-                                                                                                             .toString()
-                                                        );
-                        if( !isCareGiveReported ){
-                            //delete images of event
-                            const emptyS3Directory = async ( bucket, dir ) => {
-                                const listParams = {
-                                    Bucket: bucket,
-                                    Prefix: dir
-                                };
-                                const listedObjects = await s3.listObjectsV2( listParams );
-                                if (
-                                    !listedObjects.Contents
-                                    || listedObjects.Contents
-                                                    .length === 0
-                                ) return;
-                                const deleteParams = {
-                                    Bucket: bucket,
-                                    Delete: { Objects: [] }
-                                };
-            
-                                listedObjects.Contents
-                                             .forEach(
-                                                ({ Key }) => {
-                                                    deleteParams.Delete
-                                                                .Objects
-                                                                .push({ Key });
-                                                }
-                                              );
-
-                                await s3.deleteObjects( deleteParams );
-                                if ( listedObjects.IsTruncated ) await emptyS3Directory(bucket, dir);
-                            }
-                            emptyS3Directory(
-                                process.env.BUCKET_NAME, 
-                                `careGive/${ careGive._id
-                                                     .toString() }/`
-                            ).then(
-                                async (_) => {
-    
-                                    if( 
-                                        careGive.prices
-                                                .priceType !== "Free"
-
-                                        && careGive.prices
-                                                   .servicePrice !== 0 
-                                    ){
-                                        //approve payments
-                                        const approveCareGivePayment = await paramAproveOrderRequest(
-                                                                                        careGive.prices
-                                                                                                .orderInfo
-                                                                                                .pySiparisGuid
-                                                                             );
-                                        if( 
-                                            !approveCareGivePayment 
-                                            || approveCareGivePayment.error === true 
-                                        ){
-                                            console.log( 
-                                                     approveCareGivePayment.data
-                                                                           .sonucStr 
-                                                    );
-                                        }
-                                    }
-
-                                    careGive.missionCallender
-                                            .forEach(
-                                                async ( mission ) => {
-                                                    if( 
-                                                        mission.isExtra 
-                                                        && mission.extraMissionInfo 
-                                                        && mission.extraMissionInfo
-                                                                  .paidPrice 
-                                                    ){
-                                                        //approve extra mission payments
-                                                        const approveCareGivePayment = await paramAproveOrderRequest(
-                                                                                                    mission.extraMissionInfo
-                                                                                                           .pySiparisGuid
-                                                                                             );
-                                                        if( 
-                                                            !approveCareGivePayment 
-                                                            || approveCareGivePayment.error === true 
-                                                        ){
-                                                            console.log( 
-                                                                       approveCareGivePayment.data
-                                                                                             .sonucStr 
-                                                                    );
-                                                        }
-                                                    }
-                                                }
-                                            );
-    
-                                    //delete CareGive
-                                    careGive.deleteOne()
-                                            .then(
-                                                (_) => {
-                                                    console.log( "deleted an expired Care Give" );
-                                                }
-                                            ).catch(
-                                                ( error ) => {
-                                                    console.log( error );
-                                                }
-                                            );
-                                }
-                            );
+                for(
+                    let careGive
+                    of expiredCareGives
+                ){
+                    const isCareGiveReported = await ReportedMission.find(
+                        {
+                            careGiveId: careGive._id.toString()
                         }
+                    );
+
+                    if( 
+                        !isCareGiveReported
+                        || isCareGiveReported.length <= 0
+                    ){
+                        //delete assets of event
+                        const deleteAssets = await deleteFileHelper( `CareGive/${ careGive._id.toString() }` );
+                        if( deleteAssets.error ){
+                            return res.status( 500 )
+                                    .json(
+                                        {
+                                            error: true,
+                                            message: "Internal Server Error"
+                                        }
+                                    );
+                        }
+
+                        const paymentsToApprove = await PaymentData.find(
+                            { 
+                                parentContentId: careGive._id.toString(),
+                                isPaid: true
+                            }
+                        );
+
+                        if(
+                            paymentsToApprove
+                            && paymentsToApprove.length > 0
+                        ){
+                            for(
+                                let payment
+                                of paymentsToApprove
+                            ){
+                                const approvePayment = await mokaApprove3dPaymentRequest(
+                                    payment.subSellerGuid,
+                                    payment.virtualPosOrderId
+                                );
+
+                                if( 
+                                    !approvePayment 
+                                    || approvePayment.error === true 
+                                ){
+                                    console.log( `ERROR: Approve Payment - ${ payment._id.toString() } -`, approvePayment.message );
+                                }
+
+                                await payment.deleteOne();
+                            }
+                        }
+
+                        //delete CareGive
+                        await careGive.deleteOne();
                     }
-                );
+                }
             }
         }catch( err ){
             console.log( err );

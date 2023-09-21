@@ -23,8 +23,8 @@ const sendEmailHelper = (
                                 <tr>
                                     <td align="left" style="word-break: break-word; padding: 10px 32px; font-family: arial, helvetica, sans-serif;">
                                     <div>
-                                        <div style=" text-align: center; background-color: #D54D3A !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
-                                        <strong style="color: rgb(255, 255, 255) !important; letter-spacing: 10px !important;">${ password }</strong>
+                                        <div style=" text-align: center; background-color: #D0EAF2 !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
+                                        <strong style="color: #000 !important; letter-spacing: 10px !important;">${ password }</strong>
                                         </div>
                                     </div>
                                     </td>
@@ -41,8 +41,8 @@ const sendEmailHelper = (
                                 <tr>
                                     <td align="left" style="word-break: break-word; padding: 10px 32px; font-family: arial, helvetica, sans-serif;">
                                     <div>
-                                        <div style=" text-align: center; background-color: #D54D3A !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
-                                        <strong style="color: rgb(255, 255, 255) !important; letter-spacing: 10px !important;">${ password }</strong>
+                                        <div style=" text-align: center; background-color: #D0EAF2 !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
+                                        <strong style="color: #000 !important; letter-spacing: 10px !important;">${ password }</strong>
                                         </div>
                                     </div>
                                     </td>
@@ -51,8 +51,8 @@ const sendEmailHelper = (
                             </table>`;
     }else if( type === "emergency" ){
         title = "Acil Durum"
-        message = `Bu mesaj, bakıcınız: ${careGiverName} tarafından, evcil hayvanınız: ${petName} hakkında gönderilmiş bir acil durum mesajıdır.`
-        warning = `<b>Lütfen belirtilen iletişim bilgilerinden, derhal bakıcınızla iletişime geçiniz. TelNo: ${careGiverPhone}, Email: ${careGiverEmail}</b>`;
+        message = `Bu mesaj, bakıcınız: <b>${careGiverName}</b> tarafından, evcil hayvanınız: <b>${petName}</b> hakkında gönderilmiş bir acil durum mesajıdır.`
+        warning = `Lütfen belirtilen iletişim bilgilerinden, derhal bakıcınızla iletişime geçiniz. TelNo: <b>${careGiverPhone}</b>, Email: <b>${careGiverEmail}</b>`;
         style = `style="max-width: 320px; min-width: 500px; display: table-cell; vertical-align: top;"`;
         messageComponent = `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0" style="font-family: arial, helvetica, sans-serif;">
                                 <tbody>
