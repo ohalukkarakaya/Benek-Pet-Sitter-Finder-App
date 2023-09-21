@@ -24,8 +24,7 @@ const twilioClient = twilio(
     try {
         await twilioClient.verify
                           .services( 
-                                process.env
-                                       .TWILIO_SERVICE_ID 
+                                process.env.TWILIO_SERVICE_ID 
                           ).verifications
                            .create(
                                {
@@ -33,7 +32,7 @@ const twilioClient = twilio(
                                    channel: 'sms'
                                }
                            ).then(
-                               (data) => {
+                               ( data ) => {
                                    new PhoneOtpVerification(
                                        {
                                            userId: _id,

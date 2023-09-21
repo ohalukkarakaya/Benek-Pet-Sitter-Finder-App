@@ -3,9 +3,14 @@ import User from "../../models/User.js";
 import Pet from "../../models/Pet.js";
 
 import sendNotification from "../../utils/notification/sendNotification.js";
+import vatanSmsApiRequest from "../../utils/vatan_sms/vatanSmsApiRequest.js";
+import vatanSmsBalanceQueryApiRequest from "../../utils/vatan_sms/vatanSmsBalanceQueryApiRequest.js";
+import sendEmailHelper from "../userRoutesControllers/userControllers/passwordEmailHelper.js"; 
+
 import twilio from "twilio";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import fs from "fs";
 
 dotenv.config();
 
@@ -13,13 +18,14 @@ const emergencyController = async (req, res) => {
     try{
         const careGiveId = req.params.careGiveId.toString();
         const emergencyMessage = req.body.emergencyMessage;
-        if(!careGiveId || !emergencyMessage){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "Missing params"
-                }
-            );
+        if(! careGiveId || !emergencyMessage ){
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Missing params"
+                            }
+                       );
         }
 
         const careGive = await CareGive.findById( careGiveId );
@@ -33,12 +39,9 @@ const emergencyController = async (req, res) => {
                        );
         }
 
-        if(
-            req.user
-               ._id
-               .toString() !== careGive.careGiver
-                                       .careGiverId
-                                       .toString()
+        if(  
+            req.user._id.toString() !== careGive.careGiver.careGiverId.toString() 
+            // || careGive.finishProcess.isFinished
         ){
             return res.status( 401 )
                       .json(
@@ -49,15 +52,10 @@ const emergencyController = async (req, res) => {
                         );
         }
 
-        const careGiver = await User.findById(
-                                            careGive.careGiver
-                                                    .careGiverId
-                                                    .toString()
-                                    );
+        const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );
         if(
             !careGiver 
-            || careGiver.deactivation
-                        .isDeactive
+            || careGiver.deactivation.isDeactive
         ){
             return res.status( 404 )
                       .json(
@@ -68,15 +66,10 @@ const emergencyController = async (req, res) => {
                        );
         }
 
-        const petOwner = await User.findById( 
-                                        careGive.careGiver
-                                                .careGiverId
-                                                .toString() 
-                                    );
+        const petOwner = await User.findById( careGive.careGiver.careGiverId.toString() );
         if(
             !petOwner 
-            || petOwner.deactivation
-                       .isDeactive
+            || petOwner.deactivation.isDeactive
         ){
             return res.status( 404 )
                       .json(
@@ -87,10 +80,7 @@ const emergencyController = async (req, res) => {
                        );
         }
 
-        const pet = await Pet.findById(
-                                    careGive.petId
-                                            .toString()
-                              );
+        const pet = await Pet.findById( careGive.petId.toString() );
         if( !pet ){
             return res.status( 404 )
                       .json(
@@ -101,27 +91,14 @@ const emergencyController = async (req, res) => {
                       );
         }
 
-        let petOwnerPhone = careGive.petOwner
-                                    .petOwnerContact
-                                    .petOwnerPhone;
-
-        if( 
-            !careGive.petOwner
-                     .petOwnerContact
-                     .petOwnerPhone 
-        ){
+        let petOwnerPhone = careGive.petOwner.petOwnerContact.petOwnerPhone;
+        if( !careGive.petOwner.petOwnerContact.petOwnerPhone ){
             petOwnerPhone = petOwner.phone;
         }
 
-        let petOwnerEmail = careGive.petOwner
-                                    .petOwnerContact
-                                    .petOwnerEmail;
+        let petOwnerEmail = careGive.petOwner.petOwnerContact.petOwnerEmail;
 
-        if( 
-            !careGive.petOwner
-                     .petOwnerContact
-                     .petOwnerEmail 
-        ){
+        if( !careGive.petOwner.petOwnerContact.petOwnerEmail ){
             petOwnerEmail = petOwner.email;
         }
 
@@ -139,85 +116,102 @@ const emergencyController = async (req, res) => {
         }
 
         if( petOwnerPhone ){
-            const accountSid = process.env
-                                      .TWILIO_ACCOUNT_SID;
-
-            const authToken = process.env
-                                     .TWILIO_AUTH_TOKEN;
-
-            const client = new twilio( 
-                                    accountSid, 
-                                    authToken
-                               );
-
-            const from = process.env
-                                .TWILIO_PHONE_NUMBER;
-
             const to = petOwnerPhone;
-            const body = `"${emergencyMessage}". This is an emergency message from your care giver: ${careGiver.identity.firstName} ${careGiver.identity.lastName}, about your pet: ${pet.name}. Please contact with your care giver immediately with the specified contact information. Phone: ${careGiver.phone}, Email: ${careGiver.email}`;
+            const body = `"${emergencyMessage}". Bu mesaj, bakıcınız: ${careGiver.identity.firstName} ${careGiver.identity.lastName} tarafından, evcil hayvanınız: ${pet.name} hakkında gönderilmiş bir acil durum mesajıdır. Lütfen belirtilen iletişim bilgilerinden, derhal bakıcınızla iletişime geçiniz. TelNo: ${careGiver.phone}, Email: ${careGiver.email}`;
 
-            client.messages
-                  .create(
-                        {
-                            body: body,
-                            from: from,
-                            to: to
-                        }
-                   ).then(
-                            message => console.log(
-                                                  message.sid
-                                               )
-                         );
+            let areThereEnoughVatanSmsBalance;
+            const vatanSmsBalance = await vatanSmsBalanceQueryApiRequest();
+            areThereEnoughVatanSmsBalance = (
+                        vatanSmsBalance.kalanBakiye >= vatanSmsBalance.smsBirimFiyat
+                        && vatanSmsBalance.smsBirimFiyat !== -1
+                        && vatanSmsBalance.kalanBakiye !== -1
+                        && vatanSmsBalance.smsBirimFiyat > 0
+            );
 
+            if( areThereEnoughVatanSmsBalance ){
+                let smsRequest = await vatanSmsApiRequest(
+                    body,
+                    to,
+                    "Normal",
+                    "Tr",
+                    true
+                );
+                
+                if(
+                    !smsRequest
+                    || !( smsRequest.serverStatus )
+                    || smsRequest.serverStatus !== 1
+                    || smsRequest.error
+                ){
+                    console.log( "ERROR: vatanSmsSendValidationOtp - ", smsRequest.message );
+                    return res.status( 500 )
+                              .json(
+                                {
+                                    error: true,
+                                    message: "Internal Server Error"
+                                }
+                              );
+                }
+            }else{
+                const accountSid = process.env.TWILIO_ACCOUNT_SID;
+                const authToken = process.env.TWILIO_AUTH_TOKEN;
+                const client = new twilio( accountSid, authToken );
+
+                const from = process.env.TWILIO_PHONE_NUMBER;
+
+                await client.messages
+                      .create(
+                            {
+                                body: body,
+                                from: from,
+                                to: to
+                            }
+                       ).then( 
+                        message => 
+                            console.log( message.sid ) 
+                       );
+            }
         }
 
         if( petOwnerEmail ){
             let transporter = nodemailer.createTransport(
                 {
-                  host: process.env.AUTH_EMAIL_HOST,
-                  port: process.env.AUTH_EMAIL_PORT,
-                  secure: true,
-                  dkim: {
-                    domainName: process.env.DKIM_DOMAIN,
-                    keySelector: process.env.DKIM_SELECTOR,
-                    privateKey: fs.readFileSync(
-                                        process.env
-                                               .DKIM_PRIVATE_KEY_FILE_PATH, 
-                                        "utf8"
-                                ),
-                    cacheDir: '/tmp',
-                    cacheTreshold: 2048,
-                  },
-                  auth: {
-                    user: process.env.AUTH_EMAIL,
-                    pass: process.env.AUTH_PASS,
+                    host: process.env.AUTH_EMAIL_HOST,
+                    port: process.env.AUTH_EMAIL_PORT,
+                    secure: true,
+                    dkim: {
+                      domainName: process.env.DKIM_DOMAIN,
+                      keySelector: process.env.DKIM_SELECTOR,
+                      privateKey: fs.readFileSync(
+                                            process.env.DKIM_PRIVATE_KEY_FILE_PATH, 
+                                            "utf8"
+                                    ),
+                      cacheDir: '/tmp',
+                      cacheTreshold: 2048,
+                    },
+                    auth: {
+                      user: process.env.AUTH_EMAIL,
+                      pass: process.env.AUTH_PASS,
+                    }
                   }
-                }
               );
+
+              const htmlEmail = sendEmailHelper( "emergency", null, `${careGiver.identity.firstName} ${careGiver.identity.lastName}`, pet.name, careGiver.phone, careGiver.email, emergencyMessage );
 
               //mail options
               const mailOptions = {
                 from: process.env.AUTH_EMAIL,
                 to: petOwnerEmail,
-                subject: "Emergency Message About ${pet.name}",
-                html: `<p><b>"${emergencyMessage}".</b></p>
-                      <p>This is an emergency message from your care giver: ${careGiver.identity.firstName} ${careGiver.identity.lastName},</p>
-                      <p>about your pet: ${pet.name}.</p>
-                      <p>Please contact with your care giver immediately with the specified contact information.</p>
-                      <p>Phone: <b>${careGiver.phone}</b>, Email: <b>${careGiver.email}</b></p>`,
-
+                subject: `${pet.name} Hakkında Acil Bir Durum Oluştu!`,
+                html: htmlEmail,
               };
 
               await transporter.sendMail( mailOptions );
         }
 
         await sendNotification(
-            req.user
-               ._id
-               .toString(),
-            careGive.petOwner
-                    .petOwnerId
-                    .toString(),
+            req.user._id.toString(),
+            careGive.petOwner.petOwnerId.toString(),
             "emergency",
             careGiveId.toString(),
             null,
@@ -235,14 +229,15 @@ const emergencyController = async (req, res) => {
                             message: "Emergancy message succesfully send to pet owner"
                         }
                    );
-    }catch(err){
-        console.log(err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+    }catch( err ){
+        console.log( err );
+        res.status( 500 )
+           .json(
+                {
+                    error: true,
+                    message: "Internal Server Error"
+                }
+            );
     }
 }
 

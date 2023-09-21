@@ -2,7 +2,9 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import fs from "fs";
+
 import ChangeEmailOTP from "../models/UserSettings/ChangeEmail.js";
+import sendEmailHelper from "../controllers/userRoutesControllers/userControllers/passwordEmailHelper.js";
 
 dotenv.config();
 
@@ -51,13 +53,14 @@ let transporter = nodemailer.createTransport(
                            )
                    }`;
 
+      const htmlEmail = sendEmailHelper( "otp", otp, null, null, null, null, null );
+
       //mail options
       const mailOptions = {
         from: process.env.AUTH_EMAIL,
         to: email,
-        subject: "Verify your email",
-        html: `<p>Enter <b>${otp}</b> in the app to verify your email adress and complate the signup</p>
-        <p>This code <b>expires in 1 hour</b></p>`,
+        subject: "Epostanızı Doğrulayın",
+        html: htmlEmail
 
       };
 

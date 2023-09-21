@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import fs from "fs";
 
+import sendEmailHelper from "../controllers/userRoutesControllers/userControllers/passwordEmailHelper.js";
+
 dotenv.config();
 
 let transporter = nodemailer.createTransport(
@@ -33,15 +35,14 @@ let transporter = nodemailer.createTransport(
   next 
 ) => {
     try {
+      const htmlEmail = sendEmailHelper( "tempPassWord", otp, null, null, null, null, null );
 
       //mail options
       const mailOptions = {
         from: process.env.AUTH_EMAIL,
         to: email,
-        subject: "One Time Password",
-        html: `<p>Use <b>${newPassword}</b> in the app as your new password.</p>
-        <p>We forcely reccomend you to <b>set a new password as soon as possible</b> in the app</p>`,
-
+        subject: "Benek Geçici Şifreniz",
+        html: htmlEmail,
       };
       await transporter.sendMail( mailOptions );
       

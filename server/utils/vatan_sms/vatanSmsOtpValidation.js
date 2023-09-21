@@ -46,7 +46,8 @@ const vatanSmsSendValidationOtp = async ( res, phoneNumber, id ) => {
                                 otp,
                                 phoneNumber,
                                 "Normal",
-                                "Tr"
+                                "Tr",
+                                false
                               );
 
     if(

@@ -1,19 +1,72 @@
-const passwordEmailHelper = (
+const sendEmailHelper = (
     type,
-    password
+    password,
+    careGiverName,
+    petName,
+    careGiverPhone,
+    careGiverEmail,
+    emergencyMessage
 ) => {
     let title;
     let message;
     let warning;
+    let messageComponent;
+    let style;
 
     if( type === "otp" ){
         title = "👋 &nbsp; Benek'e Hoş Geldiniz"
         message = "Lütfen aşağıdaki altı haneli kodu BenekApp'te ilgili alana girerek <br> Eposta adresinizi onaylayıp, üyeliğinizi tamamlayın.";
-        warning = "Bu kodun <b>1 saat içerisinde süresi dolar.</b> Benek'te bir hesap oluşturmaya çalışmadıysanız, bu epostayı görmezden gelebilirsiniz. ";
+        warning = "Bu kodun <b>1 saat içerisinde süresi dolar.</b> Benek'te bir hesap oluşturmaya çalışmadıysanız, bu epostayı görmezden gelebilirsiniz.";
+        style = `style="max-width: 320px; min-width: 500px; display: table-cell; vertical-align: top;"`
+        messageComponent = `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0" style="font-family: arial, helvetica, sans-serif;">
+                                <tbody>
+                                <tr>
+                                    <td align="left" style="word-break: break-word; padding: 10px 32px; font-family: arial, helvetica, sans-serif;">
+                                    <div>
+                                        <div style=" text-align: center; background-color: #D54D3A !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
+                                        <strong style="color: rgb(255, 255, 255) !important; letter-spacing: 10px !important;">${ password }</strong>
+                                        </div>
+                                    </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>`;
     }else if( type === "tempPassWord" ){
-        title = "Temporary Password"
+        title = "Geçici Şifre"
         message = "Lütfen aşağıdaki şifreyi yeni Benek şifreniz olarak kullanın. "; 
         warning = "Şiddetle, uygulama üzerinden <b>mümkün olan ilk fırsatta yeni bir şifre oluşturmanızı tavsiye ederiz.</b> ";
+        style = `style="max-width: 320px; min-width: 500px; display: table-cell; vertical-align: top;"`;
+        messageComponent = `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0" style="font-family: arial, helvetica, sans-serif;">
+                                <tbody>
+                                <tr>
+                                    <td align="left" style="word-break: break-word; padding: 10px 32px; font-family: arial, helvetica, sans-serif;">
+                                    <div>
+                                        <div style=" text-align: center; background-color: #D54D3A !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
+                                        <strong style="color: rgb(255, 255, 255) !important; letter-spacing: 10px !important;">${ password }</strong>
+                                        </div>
+                                    </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>`;
+    }else if( type === "emergency" ){
+        title = "Acil Durum"
+        message = `Bu mesaj, bakıcınız: ${careGiverName} tarafından, evcil hayvanınız: ${petName} hakkında gönderilmiş bir acil durum mesajıdır.`
+        warning = `<b>Lütfen belirtilen iletişim bilgilerinden, derhal bakıcınızla iletişime geçiniz. TelNo: ${careGiverPhone}, Email: ${careGiverEmail}</b>`;
+        style = `style="max-width: 320px; min-width: 500px; display: table-cell; vertical-align: top;"`;
+        messageComponent = `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0" style="font-family: arial, helvetica, sans-serif;">
+                                <tbody>
+                                <tr>
+                                    <td align="left" style="word-break: break-word; padding: 10px 32px; font-family: arial, helvetica, sans-serif;">
+                                    <div>
+                                        <div style=" text-align: center; background-color: #D54D3A !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
+                                        <strong style="color: rgb(255, 255, 255) !important;">${ emergencyMessage }</strong>
+                                        </div>
+                                    </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>`;
     }
 
     return `
@@ -58,22 +111,10 @@ const passwordEmailHelper = (
         <div class="x_u-row-container" style="padding: 0px; background-color: transparent !important;">
             <div class="x_u-row" style="margin: 0px auto; min-width: 320px; max-width: 500px; overflow-wrap: break-word; word-break: break-word; background-color: transparent !important;">
             <div style="border-collapse: collapse; display: table; width: 100%; height: 100%; background-color: transparent !important;">
-                <div class="x_u-col x_u-col-100" style="max-width: 320px; min-width: 500px; display: table-cell; vertical-align: top;">
+                <div class="x_u-col x_u-col-100" ${ style }>
                 <div style="height: 100%; border-radius: 0px; width: 100% !important;">
                     <div style="height: 100%; padding: 0px; border-width: 0px; border-style: solid; border-color: transparent; border-radius: 0px;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0" style="font-family: arial, helvetica, sans-serif;">
-                        <tbody>
-                        <tr>
-                            <td align="left" style="word-break: break-word; padding: 10px 32px; font-family: arial, helvetica, sans-serif;">
-                            <div>
-                                <div style=" text-align: center; background-color: #D54D3A !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
-                                <strong style="color: rgb(255, 255, 255) !important; letter-spacing: 10px !important;">${ password }</strong>
-                                </div>
-                            </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    ${ messageComponent }
                     <table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0" style="font-family: arial, helvetica, sans-serif; color: rgb(255, 255, 255) !important;">
                         <tbody style="color: rgb(255, 255, 255) !important;">
                         <tr style="color: rgb(255, 255, 255) !important;">
@@ -96,4 +137,4 @@ const passwordEmailHelper = (
     `;
 }
 
-export default passwordEmailHelper;
+export default sendEmailHelper;

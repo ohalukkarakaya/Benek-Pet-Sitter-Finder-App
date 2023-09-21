@@ -9,7 +9,8 @@ const vatanSmsApiRequest = async (
     otp, 
     phone,
     smsType,
-    lng 
+    lng,
+    isEmergencyMessage
 ) => {
     return new Promise(
         async (
@@ -41,10 +42,12 @@ const vatanSmsApiRequest = async (
             }
         
             let message;
-            if( lng === "Tr" ){
+            if( lng === "Tr" && !isEmergencyMessage ){
                 message = `Benek App Onay Kodunuz: ${ otp }`;
-            }else{
+            }else if( !isEmergencyMessage ){
                 message = `Your Benek App Verification Code: ${ otp }`;
+            }else{
+                message = otp
             }
         
             const now = new Date();
