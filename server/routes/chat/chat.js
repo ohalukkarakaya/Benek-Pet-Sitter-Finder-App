@@ -67,7 +67,7 @@ router.post(
     updateChatDescController
 );
 
-//  
+// - tested
 //get chats
 router.get(
     "/get/:skip/:limit",
@@ -75,6 +75,7 @@ router.get(
     getChatsController
 );
 
+// - tested
 //search chat
 router.get(
     "/search/:searchValue",
