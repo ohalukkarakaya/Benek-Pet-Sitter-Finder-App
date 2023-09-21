@@ -11,7 +11,8 @@ const ChatSchema = new mongoose.Schema(
           joinDate: {
             type: Date,
             default: Date.now()
-          }
+          },
+          leaveDate: { type: Date }
         },
       ],
       meeting: [

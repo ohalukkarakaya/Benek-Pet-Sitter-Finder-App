@@ -178,12 +178,12 @@ const cancelCareGiveController = async (req, res ) => {
         const deleteAssets = await deleteFileHelper( `CareGive/${ careGive._id.toString() }` );
         if( deleteAssets.error ){
             return res.status( 500 )
-                    .json(
+                      .json(
                         {
                             error: true,
                             message: "Internal Server Error"
                         }
-                    );
+                      );
         }
         
         careGive.deleteOne()

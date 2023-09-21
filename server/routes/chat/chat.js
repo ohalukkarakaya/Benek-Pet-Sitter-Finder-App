@@ -27,6 +27,7 @@ router.post(
     createChatController
 );
 
+// - tested
 //Add Member to Chat
 router.post(
     "/addMember/:chatId/:userId",
@@ -34,6 +35,7 @@ router.post(
     addMemberToChatController
 );
 
+// - 
 //leave chat
 router.delete(
     "/leave/:chatId",
