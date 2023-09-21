@@ -64,7 +64,7 @@ const serverHandleEventImageHelper = async ( req, res, next ) => {
 
                 if( req.meetingEvent.imgUrl ){
                     const deleteExistingImage = await deleteFileHelper( req.meetingEvent.imgUrl );
-                    if( deleteExistingImage.err ){
+                    if( deleteExistingImage.error ){
                         return res.status( 500 )
                                 .json(
                                     {

@@ -77,7 +77,7 @@ const leaveChatController = async ( req, res ) => {
 
         if( isUserAlone ){
             //delete images of chat
-            const deleteAssets = await deleteFileHelper( `ChatAssets/${chat._id.toString()}` );
+            const deleteAssets = await deleteFileHelper( `chatAssets/${chat._id.toString()}` );
             if( deleteAssets.error ){
                 return res.status( 500 )
                         .json(

@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 
 import auth from "../../middleware/auth.js";
-import { updateChatImg } from "../../middleware/imageHandle/serverHandleChatImage.js";
+import serverHandleChatImageHelper from "../../utils/fileHelpers/serverHandleChatImageHelper.js";
 
 //controllers
 import createChatController from "../../controllers/chatRoutesControllers/chatControllers/createChatController.js";
@@ -35,7 +35,7 @@ router.post(
     addMemberToChatController
 );
 
-// - 
+// - tested
 //leave chat
 router.delete(
     "/leave/:chatId",
@@ -43,13 +43,15 @@ router.delete(
     leaveChatController
 );
 
+// - tested
 //add chat image
 router.post(
     "/image/:chatId",
     auth,
-    updateChatImg
+    serverHandleChatImageHelper
 );
 
+// - tested
 //add chat name
 router.post(
     "/name/:chatId",
@@ -57,13 +59,15 @@ router.post(
     updateChatNameController
 );
 
-//add chat desc
+// - tested
+//edit chat desc
 router.post(
     "/desc/:chatId",
     auth,
     updateChatDescController
 );
 
+//  
 //get chats
 router.get(
     "/get/:skip/:limit",
