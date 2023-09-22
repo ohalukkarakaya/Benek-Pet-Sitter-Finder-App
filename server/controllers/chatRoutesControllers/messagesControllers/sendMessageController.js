@@ -9,23 +9,24 @@ import dotenv from "dotenv";
 import io from "socket.io-client";
 
 import sendNotification from "../../../utils/notification/sendNotification.js";
+import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
 dotenv.config();
 
 const socket = io( process.env.SOCKET_URL );
 
 
-const sendMessageController = async (req, res) => {
+const sendMessageController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
 
         const chatId = req.params.chatId.toString();
-        const messageType = req.body.messageType.toString();
-        const IdOfTheUserOrPetWhichProfileSended = req.body.IdOfTheUserWhichProfileSended.toString();
-        const fileUrlPath = req.chatFileCdnPath.toString();
-        const message = req.body.message.toString();
-        const paymentType = req.body.paymentType.toString();
-        const paymentReleatedRecordId = req.body.paymentReleatedRecordId.toString();
+        const messageType = req.params.messageType.toString();
+        const IdOfTheUserOrPetWhichProfileSended = req.body.IdOfTheUserWhichProfileSended;
+        const fileUrlPath = req.chatFilePath;
+        const message = req.body.message;
+        const paymentType = req.body.paymentType;
+        const paymentReleatedRecordId = req.body.paymentReleatedRecordId;
 
         if( !chatId || !messageType ){
             return res.status(400).json(
@@ -43,36 +44,39 @@ const sendMessageController = async (req, res) => {
             && messageType !== "UserProfile"
             && messageType !== "PetProfile"
         ){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "wrong message type"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "wrong message type"
+                            }
+                       );
         }
 
         if( 
             messageType === "Text" 
             && !message
         ){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "Message missing"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Message missing"
+                            }
+                       );
         }
 
         if(
             messageType === "File"
             && !fileUrlPath
         ){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "Error with file"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Error with file"
+                            }
+                       );
         }
 
         if(
@@ -86,12 +90,13 @@ const sendMessageController = async (req, res) => {
                 && paymentReleatedRecordId
             )
         ){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: "Error with payment"
-                }
-            );
+            return res.status( 400 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Error with payment"
+                            }
+                       );
         }
 
         if(
@@ -347,135 +352,86 @@ const sendMessageController = async (req, res) => {
             }
 
             chat.messages.push( messageObject );
-
         }
 
-        chat.markModified("messages");
-        chat.save(
-            function (err) {
-                if(err) {
-                    console.error(`ERROR: While send message!, ${err}`);
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: "Internal Server Error"
-                        }
-                    );
-                }
-                }
-        ).then(
-            async ( chat ) => {
-                if( !chat ) {
-                    console.error(`ERROR: While send message!, ${err}`);
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: "Internal Server Error"
-                        }
-                    );
-                }
+        chat.markModified( "messages" );
+        const savedChat = await chat.save();
+        if( !savedChat ) {
+            console.error( `ERROR: While send message!` );
+            return res.status( 500 )
+                      .json(
+                            {
+                                error: true,
+                                message: "Internal Server Error"
+                            }
+                      );
+        }
 
-                const messageToSend = chat.messages[ 
-                                                chat.messages
-                                                    .length - 1 
-                                           ];
+        const messageToSend = savedChat.messages[ savedChat.messages.length - 1 ];
+        let seenByList = [];
+        for( let seenUserId of messageToSend.seenBy ){
+            let userData = await User.findById( seenUserId );
+            if( !userData ){ break; }
 
-                let seenByList = [];
+            let userInfo = getLightWeightUserInfoHelper( userData );
 
-                for( let seenUserId of messageToSend.seenBy ){
-                    let userData = await User.findById( seenUserId );
-                    if( !userData ){ break; }
+            if( userInfo ){
+                seenByList.push( userInfo );
+            }
+        }
 
-                    let seenUserData = {
-                        userId: userData._id
-                                        .toString(),
-                        username: userData.userName,
-                        profileImg: userData.profileImg
-                                            .imgUrl
-                    }
+        if( seenByList.length === messageToSend.seenBy.length ){
+            messageToSend.seenBy = seenByList
+        }
 
-                    if( seenUserData ){
-                        seenByList.push( seenUserData );
-                    }
-                }
+        let chatMemberInfoList = [];
+        for( let member of chat.members ){
+            let memberObject = await User.findById( member.userId );
+            if( !memberObject ){ break; }
 
-                if( 
-                    seenByList.length === messageToSend.seenBy
-                                                       .length 
-                ){
-                    messageToSend.seenBy = seenByList
-                }
+            let memberInfo = getLightWeightUserInfoHelper( memberObject );
+            chatMemberInfoList.push( memberInfo );
+        }
 
-                let chatMemberInfoList = chat.members;
-                for( let member of chatMemberInfoList ){
+        const responseChat = {
+            id: savedChat._id.toString(),
+            members: chatMemberInfoList,
+            chatStratDate: savedChat.chatStartDate,
+            chatName: savedChat.chatName,
+            chatDesc: savedChat.chatDesc,
+            chatImageUrl: savedChat.chatImageUrl,
+            message: messageToSend
+        }
+        
+        //send responseChat data to socket server
+        const newChatMembers = savedChat.members.map( member => member.userId );
+        const receiverList = newChatMembers.filter( memberId => memberId.toString() !== userId );
 
-                    let memberObject = await User.findById( member.userId );
-                    if( !memberObject ){ break; }
-    
-                    member.userId = memberObject._id
-                                                .toString();
-                    member.username = memberObject.userName;
-                    member.profileImg = memberObject.profileImg
-                                                    .imgUrl;
-    
-                }
+        await sendNotification( userId, receiverList, "message", messageToSend._id.toString(), "chat", responseChat.id, null, null, null, null );
+        
+        socket.emit(
+            "sendMessage",
+            responseChat,
+            receiverList
+        );
 
-                const responseChat = {
-                    id: chat._id.toString(),
-                    members: chatMemberInfoList,
-                    chatStratDate: chat.chatStartDate,
-                    chatName: chat.chatName,
-                    chatDesc: chat.chatDesc,
-                    chatImageUrl: chat.chatImageUrl,
-                    message: messageToSend
-                }
-
-                //send responseChat data to socket server
-                const chatMembers = chat.members.map( member => member.userId );
-                const receiverList = chatMembers.filter(
-                    memberId =>
-                        memberId.toString() !== userId
-                );
-
-                await sendNotification(
-                    userId,
-                    receiverList,
-                    "message",
-                    messageToSend._id.toString(),
-                    "chat",
-                    responseChat.id,
-                    null,
-                    null,
-                    null,
-                    null
-                );
-
-                socket.emit(
-                    "sendMessage",
-                    {
-                        chatObject: responseChat,
-                        receiverIdList: receiverList 
-                    }
-                );
-
-                return res.status(200).json(
+        return res.status( 200 )
+                  .json(
                     {
                         error: true,
                         message: "message sended succesfully",
                         chat: responseChat
                     }
-                );
-            }
-        );
-        
-    }catch(err){
-        console.log(err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+                  );
+    }catch( err ){
+        console.log( err );
+        res.status( 500 )
+           .json(
+                {
+                    error: true,
+                    message: "Internal Server Error"
+                }
+            );
     }
 }
 

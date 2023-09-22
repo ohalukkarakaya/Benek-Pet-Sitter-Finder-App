@@ -6,7 +6,8 @@ import seeMessagesController from "../../controllers/chatRoutesControllers/messa
 import getMessagesController from "../../controllers/chatRoutesControllers/messagesControllers/getMessagesController.js";
 
 import auth from "../../middleware/auth.js";
-import { uploadChatFile } from "../../middleware/imageHandle/serverHandleChatFile.js";
+
+import serverHandleChatFileHelper from "../../utils/fileHelpers/serverHandleChatFileHelper.js";
 
 import dotenv from "dotenv";
 
@@ -15,11 +16,12 @@ dotenv.config();
 
 const router = express.Router();
 
+// - tested
 //send message
 router.post(
-    "/send/:chatId",
+    "/send/:chatId/:messageType",
     auth,
-    uploadChatFile,
+    serverHandleChatFileHelper,
     sendMessageController
 );
 

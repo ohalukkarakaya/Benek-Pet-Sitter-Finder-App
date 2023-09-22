@@ -169,11 +169,8 @@ const sendNotification = async (
                     ){
                         socket.emit(
                             "sendNotification",
-                            {
-                                to: notification.to[ 0 ]
-                                                .toString(),
-                                notification: preparedNotificationData[ 0 ]
-                            }
+                            notification.to[ 0 ].toString(),
+                            preparedNotificationData[ 0 ]
                         );
                     }
 

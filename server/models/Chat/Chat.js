@@ -38,15 +38,9 @@ const ChatSchema = new mongoose.Schema(
         type: Date,
         default: Date.now()
       },
-      chatName: {
-        type: String
-      },
-      chatDesc: {
-        type: String
-      },
-      chatImageUrl: {
-        type: String
-      },
+      chatName: { type: String },
+      chatDesc: { type: String },
+      chatImageUrl: { type: String },
       messages: [
       {
         sendedUserId: {
@@ -57,29 +51,18 @@ const ChatSchema = new mongoose.Schema(
             type: String,
             enum: [ "Text", "File", "PaymentOffer", "UserProfile", "PetProfile", "Event" ]
         },
-        IdOfTheUserOrPetWhichProfileSended: {
-            type: String
-        },
-        fileUrl: {
-            type: String
-        },
-        message: {
-            type: String
-        },
+        IdOfTheUserOrPetWhichProfileSended: { type: String },
+        fileUrl: { type: String },
+        message: { type: String },
         paymentOffer: {
             receiverUserId: {
-                type: String,
-                required: true
+                type: String
             },
             paymentType: {
                 type: String,
                 enum: [ "EventInvitation", "CareGive" ],
-                required: true
             },
-            releatedrecordId: {
-                type: String,
-                required: true
-            }
+            releatedrecordId: { type: String }
         },
         seenBy: [ String ],
         sendDate: {

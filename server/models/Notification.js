@@ -60,7 +60,8 @@ const NotificationSchema = new schema(
                     "eventComment",
                     "careGive",
                     "pet",
-                    "afterEvent"
+                    "afterEvent",
+                    "chat"
                 ],
             }
         },
