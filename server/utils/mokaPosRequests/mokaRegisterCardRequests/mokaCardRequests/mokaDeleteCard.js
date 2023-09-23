@@ -1,4 +1,4 @@
-import mokaCredentialsHelper from "../mokaHelpers/mokaCredentialsHelper.js";
+import mokaCredentialsHelper from "../../mokaHelpers/mokaCredentialsHelper.js";
 
 import https from "https";
 import crypto from "node:crypto";

@@ -34,21 +34,23 @@ const getMessagesController = async (req, res) => {
         const userDataList = [];
         for( let member of chat.members ){
             // sohbet üyesi kullanıcıyı bul
-            let memberObject = await User.findById( member.userId.toString() );
-            if( !memberObject ){
-                return res.status( 404 )
-                          .json(
-                                {
-                                    error: true,
-                                    message: `user with the id: "${member.userId.toString()}" not found`
-                                }
-                           );
-            }
-            //kullanıcının verilerini filtrele
-            let memberData = getLightWeightUserInfoHelper( memberObject );
-            if( memberData ){
-                //veriyi listeye ekle
-                userDataList.push( memberData );
+            if( !( member.leaveDate ) ){
+                let memberObject = await User.findById( member.userId.toString() );
+                if( !memberObject ){
+                    return res.status( 404 )
+                              .json(
+                                    {
+                                        error: true,
+                                        message: `user with the id: "${member.userId.toString()}" not found`
+                                    }
+                               );
+                }
+                //kullanıcının verilerini filtrele
+                let memberData = getLightWeightUserInfoHelper( memberObject );
+                if( memberData ){
+                    //veriyi listeye ekle
+                    userDataList.push( memberData );
+                }
             }
         }
 

@@ -174,7 +174,7 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                     const userId = req.user._id.toString();
                     const price = parseFloat( invitedCareGive.prices.servicePrice );
         
-                    const redirectUrl = process.env.BASE_URL + "/api/paymentRedirect";
+                    const redirectUrl = process.env.BASE_URL + "/api/payment/redirect";
         
                     const paymentData = await mokaCreatePaymentHelper(
                         userId, //customer user id

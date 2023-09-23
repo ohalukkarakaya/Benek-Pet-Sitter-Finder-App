@@ -212,7 +212,7 @@ const buyTicketForEventController = async (req, res) => {
                 const userId = req.user._id.toString();
                 const price = parseFloat( event.ticketPrice.price );
 
-                const redirectUrl = process.env.BASE_URL + "/api/paymentRedirect";
+                const redirectUrl = process.env.BASE_URL + "/api/payment/redirect";
 
                 //take payment
                 const paymentData = await mokaCreatePaymentHelper(
