@@ -17,40 +17,26 @@ const processAfterEventObject = async afterEventObject => {
     // İlgili afterEventObject'un işlemleri burada gerçekleşecek
 
     // Öncelikle, afterEventObject içindeki 'likes' alanındaki kullanıcıları işleyelim
-    const likedUsersPromises = afterEventObject.likes
-                                               .map(
-                                                    async likedUserId => {
-                                                        const likedUser = await User.findById(
-                                                                                        likedUserId.toString()
-                                                                                     );
-
-                                                        return getLightWeightUserInfoHelper( likedUser );
-                                                    }
-                                                );
+    const likedUsersPromises = afterEventObject.likes.map(
+        async likedUserId => {
+            const likedUser = await User.findById( likedUserId.toString() );
+            return getLightWeightUserInfoHelper( likedUser );
+        }
+    );
     
     const likedUsers = await Promise.all( likedUsersPromises );
-
-    // 'comments' alanını temizleyelim
+    // 'comments' alanını temizle
     delete afterEventObject.comments;
-
-    // 'likedUsers' alanını güncelleyelim
+    // 'likedUsers' alanını güncelle
     afterEventObject.likedUsers = likedUsers;
-
-    // Eğer tüm beğenenler eklenmişse, 'likes' alanını temizleyelim
-    if(
-        likedUsers.length === afterEventObject.likes
-                                              .length
-    ){
+    // Eğer tüm beğenenler eklenmişse, 'likes' alanını temizle
+    if( likedUsers.length === afterEventObject.likes.length ){
         delete afterEventObject.likes;
     }
-
-    // 'userId' alanını kullanarak içerik oluşturan kullanıcıyı işleyelim
-    const contentCreator = await User.findById(
-                                        afterEventObject.userId
-                                                        .toString()
-                                      );
-
+    // 'userId' alanını kullanarak içerik oluşturan kullanıcıyı işle
+    const contentCreator = await User.findById( afterEventObject.userId.toString() );
     const contentCreatorInfo = getLightWeightUserInfoHelper( contentCreator );
+
     afterEventObject.user = contentCreatorInfo;
     delete afterEventObject.userId;
 
@@ -64,26 +50,15 @@ const getRelevantUserInfo = async userId => {
 
 const getLightWeightEventInfoHelper = async ( event ) => {
     try{
+        // veriyi hazırla
         const willJoinList = await processUserList( event.willJoin );
         const joinedList = await processUserList( event.joined );
         const organizersList = await processUserList( event.eventOrganizers );
-
-        const eventAdminInfo = await getRelevantUserInfo(
-                                                event.eventAdmin
-                                                     .toString()
-                                     );
+        const eventAdminInfo = await getRelevantUserInfo( event.eventAdmin.toString() );
 
         let lastAfterEventObject = null;
-        if (
-            event.afterEvent
-                 .length > 0
-        ) {
-            lastAfterEventObject = await processAfterEventObject(
-                                                    event.afterEvent[
-                                                                event.afterEvent
-                                                                     .length - 1
-                                                          ]
-                                         );
+        if( event.afterEvent.length > 0 ){
+            lastAfterEventObject = await processAfterEventObject( event.afterEvent[ event.afterEvent.length - 1 ] );
         }
 
         const remainedEventQuota = event.maxGuest

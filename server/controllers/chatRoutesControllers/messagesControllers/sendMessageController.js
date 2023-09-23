@@ -8,6 +8,7 @@ import Pet from "../../../models/Pet.js";
 import dotenv from "dotenv";
 import io from "socket.io-client";
 
+import writeMessageToChatHelper from "../../../utils/writeMessageToChatHelper.js";
 import sendNotification from "../../../utils/notification/sendNotification.js";
 import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
@@ -37,6 +38,7 @@ const sendMessageController = async ( req, res ) => {
             );
         }
 
+        // eğer mesaj tipi hatalıysa hata dön
         if(
             messageType !== "Text"
             && messageType !== "File"
@@ -53,6 +55,7 @@ const sendMessageController = async ( req, res ) => {
                        );
         }
 
+        // mesaj tipi yazıysa ve mesaj yoksa hata dön
         if( 
             messageType === "Text" 
             && !message
@@ -66,6 +69,8 @@ const sendMessageController = async ( req, res ) => {
                        );
         }
 
+        // eğer dosya gönderildiyse ve medya sunucusuna yüklenen dosya
+        // yolu eksikse hata dön
         if(
             messageType === "File"
             && !fileUrlPath
@@ -79,6 +84,8 @@ const sendMessageController = async ( req, res ) => {
                        );
         }
 
+        // eğer ödeme teklifi açıldıysa ve ödeme istenilen içeriğin idsi
+        // ve tipi eksikse hata dön
         if(
             messageType === "PaymentOffer"
             && !(
@@ -99,6 +106,9 @@ const sendMessageController = async ( req, res ) => {
                        );
         }
 
+        // eğer başka bir kullanıcının ya da evcil hayvanın
+        // profili gönderildiyse ve kullanıcının idsi eksikse
+        // hata dön
         if(
             (
                 messageType === "UserProfile"
@@ -114,6 +124,8 @@ const sendMessageController = async ( req, res ) => {
             );
         }
 
+
+        // sohbet objesini bul, bulunamazsa hata dön
         const chat = await Chat.findById( chatId );
         if( !chat ){
             return res.status(404).json(
@@ -124,10 +136,13 @@ const sendMessageController = async ( req, res ) => {
             );
         }
 
+        // istek atan kullanıcının sohbet üyesi olup olmadığını kontrol et
+        // eğer değilse hata dön
         const isUserMember = chat.members.some(
             member =>
                 member.userId.toString() === userId
-        );
+                && !( member.leaveDate )
+        ).length > 0;
         if( !isUserMember ){
             return res.status(401).json(
                 {
@@ -137,237 +152,35 @@ const sendMessageController = async ( req, res ) => {
             );
         }
 
-        const chatMembers = chat.members.map( member => member.userId );
+        // sohbet üyelerinin user Idlerinden oluşan bir liste olultur
+        const chatMembers = chat.members
+                                .filter( member => !( member.leaveDate ) )
+                                .map( member => member.userId );
 
-        //text mesajını ekle
-        if( messageType === "Text" ){
-
-            const messageObject = {
-                sendedUserId: userId,
-                messageType: messageType,
-                message: message,
-                seenBy: [
-                    userId
-                ],
-                sendDate: Date.now()
-            }
-
-            chat.messages.push( messageObject );
-        }else if( messageType === "File" ){
-            //file mesajını ekle
-
-            const messageObject = {
-                sendedUserId: userId,
-                messageType: messageType,
-                fileUrl: fileUrlPath,
-                seenBy: [
-                    userId
-                ],
-                sendDate: Date.now()
-            }
-
-            chat.messages.push( messageObject );
-        }else if( messageType === "PaymentOffer"){
-            //payment offer mesajını ekle
-
-            if( paymentType === "EventInvitation" ){
-
-                const invitation = await EventInvitation.findById( paymentReleatedRecordId );
-                if( !invitation ){
-                    return res.status(404).json(
-                        {
-                            error: true,
-                            message: "Invitation not found"
-                        }
-                    );
-                }
-
-                const eventAdmin = invitation.eventAdminId.toString();
-                const invitedId = invitation.invitedId.toString();
-
-                if( eventAdmin !== userId || !(chatMembers.includes( invitedId )) ){
-                    return res.status(401).json(
-                        {
-                            error: true,
-                            message: "UnAthorized"
-                        }
-                    );
-                }
-
-                const messageObject = {
-                    sendedUserId: userId,
-                    messageType: messageType,
-                    paymentOffer: {
-                        receiverUserId: invitedId,
-                        paymentType: paymentType,
-                        releatedRecordId: paymentReleatedRecordId
-                    },
-                    seenBy: [
-                        userId
-                    ],
-                    sendDate: Date.now()
-                }
-
-                chat.messages.push( messageObject );
-
-            }else if( paymentType === "CareGive" ){
-                
-                const careGive = await CareGive.findById( paymentReleatedRecordId );
-                if( !careGive ){
-                    return res.status(404).json(
-                        {
-                            error: true,
-                            message: "Invitation not found"
-                        }
-                    );
-                }
-
-                const invitation = careGive.invitation;
-                if( 
-                    !(invitation.from.toString() !== userId) 
-                    || !(chatMembers.includes( invitation.to.toString() ))
-                ){
-                    return res.status(401).json(
-                        {
-                            error: true,
-                            message: "UnAthorized"
-                        }
-                    );
-                }
-
-                const messageObject = {
-                    sendedUserId: userId,
-                    messageType: messageType,
-                    paymentOffer: {
-                        receiverUserId: invitedId,
-                        paymentType: paymentType,
-                        releatedRecordId: paymentReleatedRecordId
-                    },
-                    seenBy: [
-                        userId
-                    ],
-                    sendDate: Date.now()
-                }
-
-                chat.messages.push( messageObject );
-            }
-
-        }else if( messageType === "UserProfile" ){
-            //user profili mesajını ekle
-
-            const sharedProfileUser = await User.findById( IdOfTheUserOrPetWhichProfileSended );
-            if( !sharedProfileUser ){
-                return res.status(404).json(
-                    {
-                        error: true,
-                        message: "User not found"
-                    }
-                );
-            }
-
-            const messageObject = {
-                sendedUserId: userId,
-                messageType: messageType,
-                IdOfTheUserOrPetWhichProfileSended: sharedProfileUser._id.toString(),
-                seenBy: [
-                    userId
-                ],
-                sendDate: Date.now()
-            }
-
-            chat.messages.push( messageObject );
-
-        }else if( messageType === "PetProfile" ){
-            //pet profili mesajını ekle
-
-            const sharedProfilePet = await Pet.findById( IdOfTheUserOrPetWhichProfileSended );
-            if( !sharedProfilePet ){
-                return res.status(404).json(
-                    {
-                        error: true,
-                        message: "Pet not found"
-                    }
-                );
-            }
-            
-            const messageObject = {
-                sendedUserId: userId,
-                messageType: messageType,
-                IdOfTheUserOrPetWhichProfileSended: sharedProfilePet._id.toString(),
-                seenBy: [
-                    userId
-                ],
-                sendDate: Date.now()
-            }
-
-            chat.messages.push( messageObject );
-
-        }else if( messageType === "Event" ){
-            //pet profili mesajını ekle
-
-            const sharedProfileEvent = await Event.findById( IdOfTheUserOrPetWhichProfileSended );
-            if( !sharedProfileEvent ){
-                return res.status(404).json(
-                    {
-                        error: true,
-                        message: "Event not found"
-                    }
-                );
-            }
-
-            const willJoin = sharedProfileEvent.willJoin;
-            const joined = sharedProfileEvent.joined;
-
-            const authorizedUsers = Array.from(
-                new Set(
-                    willJoin.concat( joined )
-                )
-            );
-
-            const unAuthorizedUsersInChat = chatMembers.filter(
-                memberId =>
-                    !authorizedUsers.includes( memberId )
-            );
-
-            if(
-                sharedProfileEvent.isPrivate
-                && unAuthorizedUsersInChat
-            ){
-                return res.status(401).json(
-                    {
-                        error: true,
-                        message: "UnAthorized"
-                    }
-                );
-            }
-            
-            const messageObject = {
-                sendedUserId: userId,
-                messageType: messageType,
-                IdOfTheUserOrPetWhichProfileSended: sharedProfileEvent._id.toString(),
-                seenBy: [
-                    userId
-                ],
-                sendDate: Date.now()
-            }
-
-            chat.messages.push( messageObject );
-        }
-
-        chat.markModified( "messages" );
-        const savedChat = await chat.save();
-        if( !savedChat ) {
-            console.error( `ERROR: While send message!` );
-            return res.status( 500 )
+        //mesajı chat objesine yaz ve kaydet
+        const savedMessage = await writeMessageToChatHelper(
+            chat,
+            chatMembers,
+            messageType,
+            userId,
+            fileUrlPath,
+            message,
+            paymentType,
+            paymentReleatedRecordId,
+            IdOfTheUserOrPetWhichProfileSended
+        );
+        if( savedMessage.error ){
+            return res.status( savedMessage.status )
                       .json(
-                            {
-                                error: true,
-                                message: "Internal Server Error"
-                            }
+                        {
+                            error: true,
+                            message: savedMessage.message
+                        }
                       );
         }
 
-        const messageToSend = savedChat.messages[ savedChat.messages.length - 1 ];
+        // chat objesinden gönderilecek mesajı al
+        const messageToSend = savedMessage;
         let seenByList = [];
         for( let seenUserId of messageToSend.seenBy ){
             let userData = await User.findById( seenUserId );

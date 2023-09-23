@@ -25,6 +25,7 @@ router.post(
     sendMessageController
 );
 
+// - tested
 //see messages
 router.post(
     "/see/:chatId",
@@ -32,6 +33,7 @@ router.post(
     seeMessagesController
 );
 
+// - tested
 //get messages
 router.get(
     "/get/:chatId/:skip/:limit",
