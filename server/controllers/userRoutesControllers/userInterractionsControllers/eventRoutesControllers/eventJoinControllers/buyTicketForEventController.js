@@ -111,16 +111,6 @@ const buyTicketForEventController = async (req, res) => {
                 && eventTicket.orderInfo
             ){
                 //cancel payment
-                const isTicketCanCancel = mokaValidateHourForVoidPaymentHelper( eventTicket.createdAt );
-                if( !isTicketCanCancel ){
-                    return res.status( 400 )
-                              .json(
-                                {
-                                    error: true,
-                                    message: "Payments can be cancel untill same day 22:00"
-                                }
-                              );
-                }
                 const cancelPayment = await mokaVoid3dPaymentRequest(  eventTicket.orderId );
 
                 if( 
@@ -144,13 +134,6 @@ const buyTicketForEventController = async (req, res) => {
                               );
                 }
             }
-
-            await PaymentData.findOneAndDelete(
-                                {
-                                    paymentUniqueCode: eventTicket.orderInfo
-                                                                  .pySiparisGuid
-                                }
-                              );
 
             eventTicket.deleteOne()
                        .then(

@@ -2,7 +2,6 @@ import CareGive from "../../../../models/CareGive/CareGive.js";
 import PaymentData from "../../../../models/PaymentData/PaymentData.js";
 
 import mokaVoid3dPaymentRequest from "../../../../utils/mokaPosRequests/mokaPayRequests/mokaVoid3dPaymentRequest.js";
-import mokaValidateHourForVoidPaymentHelper from "../../../../utils/mokaPosRequests/mokaHelpers/mokaValidateHourForVoidPaymentHelper.js";
 
 import dotenv from "dotenv";
 
@@ -71,16 +70,6 @@ const deleteMissionController = async (req, res) => {
 
         if( mission.isExtra && mission.extraMissionInfo ){
             //cancel payment
-            const isMissionCanCancel = mokaValidateHourForVoidPaymentHelper( mission.createdAt );
-            if( !isMissionCanCancel ){
-                return res.status( 400 )
-                            .json(
-                            {
-                                error: true,
-                                message: "Payments can be cancel untill same day 22:00"
-                            }
-                            );
-            }
             const cancelPayment = await mokaVoid3dPaymentRequest( mission.extraMissionInfo.sanalPosIslemId );
             if( 
                 !cancelPayment 
@@ -102,8 +91,6 @@ const deleteMissionController = async (req, res) => {
                                 }
                           );
             }
-
-            await PaymentData.findByIdAndDelete( mission.extraMissionInfo.paymentDataId );
         }
 
         careGive.missionCallender = careGive.missionCallender.filter(

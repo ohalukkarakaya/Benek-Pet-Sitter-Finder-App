@@ -5,6 +5,10 @@ import crypto from "node:crypto";
 import axios from "axios";
 import dotenv from "dotenv";
 
+import PaymentData from "../../../models/PaymentData/PaymentData.js";
+
+import mokaValidateHourForVoidPaymentHelper from "../mokaHelpers/mokaValidateHourForVoidPaymentHelper.js";
+
 dotenv.config();
 const env = process.env;
 
@@ -16,10 +20,32 @@ const mokaVoid3dPaymentRequest = async ( virtualPosOrderId ) => {
         ) => {
             const mokaCredentials = mokaCredentialsHelper();
 
+            const paymentData = await PaymentData.findOne({ virtualPosOrderId: virtualPosOrderId });
+            if( !paymentData ){
+                reject(
+                    {
+                        error: true,
+                        serverStatus: -1,
+                        message: `PaymentData Not Found`
+                    }
+                );
+            }
+
+            const isTimeValid = mokaValidateHourForVoidPaymentHelper( paymentData.createdAt );
+
             let paymentDealerRequest = {
                 "VirtualPosOrderId": virtualPosOrderId,
-                "ClientIP": process.env.MOKA_CLIENT_IP_FOR_TEST,
-                "VoidRefundReason": 2
+                "ClientIP": isTimeValid ? process.env.MOKA_CLIENT_IP_FOR_TEST : undefined,
+                "VoidRefundReason": isTimeValid ? 2 : undefined,
+                "Amount": isTimeValid ? undefined : paymentData.priceData.price,
+                "SubDealer": isTimeValid
+                                ? undefined 
+                                : [
+                                    { 
+                                        "DealerId": paymentData.subSellerGuid, 
+                                        "Amount": paymentData.priceData.price
+                                    }
+                                ]
             };
 
             
@@ -29,10 +55,12 @@ const mokaVoid3dPaymentRequest = async ( virtualPosOrderId ) => {
 
             }
 
+            const apiUrlEnd = isTimeValid ? "DoVoid" : "DoCreateRefundRequest";
+
             const config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: `${ env.MOKA_TEST_URL_BASE }/PaymentDealer/DoVoid`,
+                url: isT `${ env.MOKA_TEST_URL_BASE }/PaymentDealer/${ apiUrlEnd }`,
                 headers: { 'Content-Type': 'application/json' },
                 httpsAgent: new https.Agent( { secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT } ),
                 data: data
@@ -52,6 +80,7 @@ const mokaVoid3dPaymentRequest = async ( virtualPosOrderId ) => {
                         returnedResponse.ResultCode === 'PaymentDealer.DoVoid.PaymentNotFound'
                         || returnedResponse.ResultCode === 'PaymentDealer.DoVoid.PaymentNotAvailable'
                     ){
+                        await paymentData.deleteOne();
                         resolve(
                             {
                                 error: true,
@@ -85,6 +114,7 @@ const mokaVoid3dPaymentRequest = async ( virtualPosOrderId ) => {
                     }
                 }
                 
+                await paymentData.deleteOne();
                 resolve( response );
             }catch( err ){
                 console.log( "ERROR: mokaVoid3dPaymentRequest - ", err );

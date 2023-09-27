@@ -119,8 +119,6 @@ const cancelCareGiveController = async (req, res ) => {
                                     }
                             );
                 }
-
-                await payment.deleteOne();
             }
         }
 
