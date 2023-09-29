@@ -46,8 +46,7 @@ const becomeCareGiverController = async ( req, res ) => {
   
           
           //decrypt national id number
-          const recordedNationalId = user.identity
-                                         .nationalId;
+          const recordedNationalId = user.identity.nationalId;
           if( !recordedNationalId ){
             return res.status( 500 )
                       .json(
@@ -57,9 +56,7 @@ const becomeCareGiverController = async ( req, res ) => {
                         }
                       );
           }
-          const recordedIv = user.identity
-                                 .nationalId
-                                 .iv;
+          const recordedIv = user.identity.nationalId.iv;
           if( !recordedIv ){
             return res.status( 500 )
                       .json(
@@ -70,10 +67,7 @@ const becomeCareGiverController = async ( req, res ) => {
                       );
           }
   
-          const cryptedNationalId = user.identity
-                                        .nationalId
-                                        .idNumber;
-
+          const cryptedNationalId = user.identity.nationalId.idNumber;
           if( !cryptedNationalId ){
             return res.status( 400 )
                       .json(
@@ -86,21 +80,12 @@ const becomeCareGiverController = async ( req, res ) => {
   
           const iv = Buffer.from( recordedIv, 'hex' );
           const decipher = crypto.createDecipheriv(
-                                                process.env
-                                                       .NATIONAL_ID_CRYPTO_ALGORITHM, 
-                                                Buffer.from( 
-                                                          process.env
-                                                                 .NATIONAL_ID_CRYPTO_KEY 
-                                                       ), 
+                                                process.env.NATIONAL_ID_CRYPTO_ALGORITHM, 
+                                                Buffer.from( process.env.NATIONAL_ID_CRYPTO_KEY ), 
                                                 iv
                                   );
   
-          let nationalIdNo = decipher.update( 
-                                          cryptedNationalId, 
-                                          'hex', 
-                                          'utf8'
-                                      );
-
+          let nationalIdNo = decipher.update( cryptedNationalId, 'hex', 'utf8' );
           nationalIdNo += decipher.final( 'utf8' );
           //national id number decrypted
   

@@ -52,7 +52,8 @@ const createPaymentDealerRequest = (
         "OtherTrxCode": otherTrxCode,
         "IsPoolPayment": 1,
         "IsPreAuth": 0,
-        "IsTokenized": env.APP_NAME,
+        "IsTokenized": 0,
+        "Software": env.APP_NAME,
         "Description": description,
         "ReturnHash": 1,
         "RedirectUrl": redirectUrl,
@@ -99,22 +100,8 @@ const mokaCreate3dPaymentRequest = async (
 ) => {
     try {
         const mokaCredentials = mokaCredentialsHelper();
-        const fullName = [ firstName, middleName, lastName ].filter(
-                                                                name => 
-                                                                    name !== undefined 
-                                                                    && name !== null 
-                                                                    && name.trim() !== ""
-                                                             ).join(" ");
-
-        validateCardData(
-            cardToken, 
-            fullName, 
-            cardNumber, 
-            cardExpMonth, 
-            cardExpYear, 
-            cardCvcNumber
-        );
-
+        const fullName = [ firstName, middleName, lastName ].filter(  name => name !== undefined && name !== null && name.trim() !== "" ).join(" ");
+        validateCardData( cardToken, fullName, cardNumber, cardExpMonth, cardExpYear, cardCvcNumber );
         const paymentDealerRequest = createPaymentDealerRequest(
                                         careGiverMokaId,
                                         cardToken, 
@@ -140,7 +127,6 @@ const mokaCreate3dPaymentRequest = async (
             maxBodyLength: Infinity,
             url: `${env.MOKA_TEST_URL_BASE}/PaymentDealer/DoDirectPaymentThreeDMarketPlace`,
             headers: { 'Content-Type': 'application/json' },
-            httpsAgent: new https.Agent( { secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT } ),
             data: data,
         };
 
@@ -152,9 +138,7 @@ const mokaCreate3dPaymentRequest = async (
             || responseData.status !== 200 
             || returnedResponse.ResultCode !== "Success"
         ){
-            if(
-                returnedResponse.ResultCode === "PaymentDealer.CheckDealerPaymentLimits.DailyDealerLimitExceeded"
-            ){
+            if( returnedResponse.ResultCode === "PaymentDealer.CheckDealerPaymentLimits.DailyDealerLimitExceeded" ){
                 return {
                     error: false,
                     serverStatus: 0,

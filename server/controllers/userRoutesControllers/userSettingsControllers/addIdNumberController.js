@@ -14,21 +14,13 @@ const addIdNumberController = async ( req, res ) => {
                           ._id
                           .toString();
 
-        const isCitizenOfTurkey = req.body
-                                     .isTCCitizen;
-
-        const idNo = req.body
-                        .idNo;
-
-        const passportCountryCode = req.body 
-                                       .countryCode
+        const isCitizenOfTurkey = req.body.isTCCitizen;
+        const idNo = req.body.idNo;
+        const passportCountryCode = req.body.countryCode
         if(
           !idNo 
           || !isCitizenOfTurkey
-          || (
-            isCitizenOfTurkey === "false"
-            && !passportCountryCode
-          )
+          || ( isCitizenOfTurkey === "false" && !passportCountryCode )
         ){
           return res.status( 400 )
                     .json(
@@ -38,54 +30,27 @@ const addIdNumberController = async ( req, res ) => {
                       }
                     );
         }
-  
-        const isTCCitizen = isCitizenOfTurkey === "true";
-  
-        const trimedIdNo = idNo.toString()
-                               .replaceAll( " ", "" )
-                               .toUpperCase();
 
-                               
+        const isTCCitizen = isCitizenOfTurkey === "true";  
+        const trimedIdNo = idNo.toString().replaceAll( " ", "" ).toUpperCase();
         const isTcNo = validateTcNo( trimedIdNo );
         let isPassportNo = false;
-        if(
-          !isTCCitizen
-          && passportCountryCode
-        ){
-          isPassportNo = validator.isPassportNumber(
-                                              trimedIdNo, 
-                                              passportCountryCode
-                                   );
+        if( !isTCCitizen && passportCountryCode ){
+          isPassportNo = validator.isPassportNumber( trimedIdNo, passportCountryCode );
         }
-        
   
-        const nationalIdCryptoKey = process.env
-                                           .NATIONAL_ID_CRYPTO_KEY;
-
-        const nationalIdCryptoAlgorithm = process.env
-                                                 .NATIONAL_ID_CRYPTO_ALGORITHM;
-  
-        const iv = crypto.randomBytes( 16 )
-                         .toString( 'hex' );
-                         
+        const nationalIdCryptoKey = process.env.NATIONAL_ID_CRYPTO_KEY;
+        const nationalIdCryptoAlgorithm = process.env.NATIONAL_ID_CRYPTO_ALGORITHM;
+        const iv = crypto.randomBytes( 16 ).toString( 'hex' );
         const cipher = crypto.createCipheriv(
                                   nationalIdCryptoAlgorithm, 
                                   Buffer.from( nationalIdCryptoKey ), 
                                   Buffer.from( iv, 'hex' )
                               );
-
-        let encrypted = cipher.update(
-                                  trimedIdNo, 
-                                  'utf8', 
-                                  'hex'
-                               );
-
+        let encrypted = cipher.update( trimedIdNo, 'utf8', 'hex' );
         encrypted += cipher.final( 'hex' );
   
-        if(
-          !isTcNo 
-          && !isPassportNo
-        ){
+        if( !isTcNo && !isPassportNo ){
           return res.status( 400 )
                     .json(
                       {
@@ -96,11 +61,7 @@ const addIdNumberController = async ( req, res ) => {
         }
         
         const user = await User.findById( userId );
-        if( 
-          !user 
-          || user.deactivation
-                 .isDeactive 
-        ){
+        if( !user || user.deactivation.isDeactive ){
           return res.status( 404 )
                     .json(
                       {
@@ -111,12 +72,7 @@ const addIdNumberController = async ( req, res ) => {
         }
   
         if( isTCCitizen ){
-  
-          if( 
-            !isTcNo 
-            || isPassportNo 
-          ){
-  
+          if( !isTcNo || isPassportNo  ){
             return res.status( 400 )
                       .json(
                         {
@@ -124,15 +80,10 @@ const addIdNumberController = async ( req, res ) => {
                           message: "TC ID No is required for you"
                         }
                       );
-  
           }
   
         }else if( !isTCCitizen ){
-  
-          if( 
-            isTcNo 
-            || !isPassportNo 
-          ){
+          if( isTcNo || !isPassportNo ){
             return res.status( 400 )
                       .json(
                         {
@@ -141,24 +92,13 @@ const addIdNumberController = async ( req, res ) => {
                         }
                       );
           }
-  
         }
   
         //insert ID
-        user.identity
-            .nationalId = {};
-            
-        user.identity
-            .nationalId
-            .isTcCitizen = isTCCitizen;
-
-        user.identity
-            .nationalId
-            .iv = iv;
-
-        user.identity
-            .nationalId
-            .idNumber = encrypted;
+        user.identity.nationalId = {};
+        user.identity.nationalId.isTcCitizen = isTCCitizen;
+        user.identity.nationalId.iv = iv;
+        user.identity.nationalId.idNumber = encrypted;
 
         user.markModified( "identity" );
         user.save(
@@ -177,17 +117,12 @@ const addIdNumberController = async ( req, res ) => {
   
         const firstSplicedId = trimedIdNo.slice( 0, 3 );
         const lastSplicedId = trimedIdNo.slice( -2 );
-  
         return res.status( 200 )
                   .json(
                     {
                       error: false,
                       message: `Id number inserted succesfully`,
-                      idNumber: `${
-                                    firstSplicedId
-                                 }...${
-                                        lastSplicedId
-                                     }`
+                      idNumber: `${ firstSplicedId }...${ lastSplicedId }`
                     }
                   );
   

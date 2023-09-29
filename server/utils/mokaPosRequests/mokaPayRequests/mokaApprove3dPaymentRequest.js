@@ -1,16 +1,19 @@
 import mokaCredentialsHelper from "../mokaHelpers/mokaCredentialsHelper.js";
+import expenseDocumentGenerationHelper from "../mokaHelpers/expenseDocumentGenerationHelper.js";
 
 import https from "https";
 import crypto from "node:crypto";
 import axios from "axios";
 import dotenv from "dotenv";
+import PaymentData from "../../../models/PaymentData/PaymentData.js";
 
 dotenv.config();
 const env = process.env;
 
 const mokaApprove3dPaymentRequest = async (
     careGiverMokaId,
-    virtualPosOrderId
+    virtualPosOrderId,
+    res
 ) => {
     return new Promise(
         async (
@@ -54,11 +57,23 @@ const mokaApprove3dPaymentRequest = async (
                     || responseData.status !== 200
                     || returnedResponse.ResultCode !== "Success"
                 ){
-                    reject(
+                    return reject(
                         {
                             error: true,
                             serverStatus: -1,
                             message: `Api error: ${ responseData.status }, Server Message: ${ returnedResponse.ResultCode }`
+                        }
+                    );
+                }
+
+                const paymentData = await PaymentData.findOne({ virtualPosOrderId: virtualPosOrderId });
+                const expenseRegistration =  await expenseDocumentGenerationHelper( paymentData, res );
+                if( expenseRegistration.error ){
+                    return reject(
+                        {
+                            error: true,
+                            serverStatus: -1,
+                            message: "Expense Registration Error"
                         }
                     );
                 }
@@ -79,7 +94,7 @@ const mokaApprove3dPaymentRequest = async (
                     }
                 }
                 
-                resolve( response );
+                return resolve( response );
             }catch( err ){
                 console.log( "ERROR: mokaApprove3dPaymentRequest - ", err );
                 reject(

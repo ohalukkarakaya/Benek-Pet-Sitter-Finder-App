@@ -188,7 +188,8 @@ const useTicketController = async ( req, res ) => {
                                 //approve payment
                                 const approvePayment = await mokaApprove3dPaymentRequest(
                                                                     meetEvent.eventAdminCareGiveGuid,
-                                                                    ticket.orderInfo.sanalPosIslemId
+                                                                    ticket.orderInfo.sanalPosIslemId,
+                                                                    res
                                                              );
                                 if( 
                                     !approvePayment 

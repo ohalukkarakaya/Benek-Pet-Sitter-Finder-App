@@ -92,7 +92,8 @@ const expireCareGive = cron.schedule(
                             ){
                                 const approvePayment = await mokaApprove3dPaymentRequest(
                                     payment.subSellerGuid,
-                                    payment.virtualPosOrderId
+                                    payment.virtualPosOrderId,
+                                    res
                                 );
 
                                 if( 
