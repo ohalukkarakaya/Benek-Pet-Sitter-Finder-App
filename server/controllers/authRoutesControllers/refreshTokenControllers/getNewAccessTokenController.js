@@ -29,15 +29,14 @@ const getNewAccessTokenController = async ( req, res ) => {
                       .json(
                         {
                             error: true,
-                            message: error.details[ 0 ]
-                                          .message
+                            message: error.details[ 0 ].message
                         }
                       );
         }
 
         const payload = { 
                             _id: tokenDetails.tokenDetails._id, 
-                            roles: tokenDetails.tokenDetails.roles 
+                            roles: tokenDetails.tokenDetails.roles ? tokenDetails.tokenDetails.roles : 0
                         };
         const accessToken = jwt.sign(
                                     payload, 
@@ -50,6 +49,7 @@ const getNewAccessTokenController = async ( req, res ) => {
                     {
                         error: false,
                         message: "Access token created successfully",
+                        role: tokenDetails.tokenDetails.roles ? tokenDetails.tokenDetails.roles : 0,
                         accessToken,
                     }
                   );

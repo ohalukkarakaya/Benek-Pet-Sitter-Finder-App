@@ -20,20 +20,6 @@ const getLogsByUserIdAndDatePeriodController = async ( req, res ) => {
                       );
         }
 
-        const user = await User.findById( userId );
-        if( 
-            user.authRole !== 2
-            || user.authRole !== 1
-        ){
-            return res.status( 401 )
-                      .json(
-                        {
-                            error: true,
-                            message: "Unauthorized"
-                        }
-                      );
-        }
-
         // Tarihleri Date nesnesine dönüştür
         const start = new Date( startDate );
         const end = new Date( endDate );

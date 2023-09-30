@@ -6,15 +6,16 @@ import crypto from "crypto";
 import dotenv from 'dotenv';
 import util from 'util';
 
+//models
 import User from "../../../models/User.js";
 import ExpenseRecord from "../../../models/PaymentData/ExpenseRecord.js";
 
+// helpers
 import getLightWeightUserInfoHelper from "../..//getLightWeightUserInfoHelper.js";
 import uploadFileHelper from "../../fileHelpers/uploadFileHelper.js";
+import numberToTurkishHelper from "../../numberToTurkishHelper.js";
 
 dotenv.config();
-
-import numberToTurkishHelper from "../../numberToTurkishHelper.js";
 
 function escapeRegExp( text ){
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
@@ -100,26 +101,24 @@ const replaceText = async (
     const writeFileAsync = util.promisify(fs.writeFile);
 
     try {
-        const file = await readFileAsync( outputPath );
+        // Dosyayı asenkron olarak oku
+        const file = await readFileAsync(outputPath);
+
+        // Dosyayı PDF'e dönüştür
         const pdfBuffer = await new Promise(
-          ( resolve, reject ) => {
-            libre.convert(
-                file, 
-                '.pdf', 
-                undefined, 
-                ( err, done ) => {
+            ( resolve, reject ) => {
+                libre.convert( file, '.pdf', undefined, ( err, done ) => {
                     if( err ){
-                      reject( err );
-                    } else {
-                      resolve( done );
+                        reject( err );
+                    }else{
+                        resolve( done );
                     }
-                }
-            );
-          }
+                });
+            }
         );
 
-          // PDF'i dosyaya yaz
-        await writeFileAsync( outputPdfPath, pdfBuffer );
+        // PDF'i dosyaya yaz
+        await writeFileAsync(outputPdfPath, pdfBuffer);
     }catch( err ){
         console.error(`Dönüşüm hatası: ${err}`);
     }
@@ -136,7 +135,7 @@ const replaceText = async (
         if( err ){
           console.error( 'Dosya silinirken hata oluştu:', err );
         }else{
-          return true;
+          return true
         }
       }
     );
@@ -194,7 +193,7 @@ const expenseDocumentGenerationHelper = async ( paymentData, res ) => {
             }
         ).save();
 
-        await replaceText(
+        const replaceTextController = await replaceText(
             inputPath, 
             outputPath,
             outputPdfPath,

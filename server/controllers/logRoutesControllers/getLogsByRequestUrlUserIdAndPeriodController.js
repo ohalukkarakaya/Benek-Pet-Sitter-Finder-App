@@ -1,12 +1,13 @@
-import User from "../../models/User.js";
 import Log from "../../models/Log.js";
 
-const getLogsByRequestUrlUserIdAndPeriodController = async ( req, res ) => {
+import findMatchingRouteHelper from "../../utils/findMatchingRouteHelper.js";
+
+const getLogsByRequestUrlUserIdAndPeriodController = async ( req, res ) => { 
     try{
-        const userId = req.user._id.toString();
-        const { requestUrl, searchingUserId, startDate, endDate } = req.body;
+        const { requestUrl, method, searchingUserId, startDate, endDate } = req.body;
         if(
             !requestUrl
+            || !method
             || !searchingUserId
             || !startDate
             || !endDate
@@ -20,32 +21,18 @@ const getLogsByRequestUrlUserIdAndPeriodController = async ( req, res ) => {
                       );
         }
 
-        const user = await User.findById( userId );
-        if( 
-            user.authRole !== 2
-            || user.authRole !== 1
-        ){
-            return res.status( 401 )
-                      .json(
-                        {
-                            error: true,
-                            message: "Unauthorized"
-                        }
-                      );
-        }
-
          // Tarihleri Date nesnesine dönüştür
          const start = new Date( startDate );
          const end = new Date( endDate );
 
 
         // Logları çek
-        const regexPattern = new RegExp(`^${requestUrl}`);
+        let routePath = findMatchingRouteHelper( requestUrl, method.toUpperCase() );
 
         const logs = await Log.find(
                                 { 
                                     $and: [
-                                        { url: { $regex: regexPattern } },
+                                        { url: { $regex: `^${routePath}` } },
                                         { userId: searchingUserId },
                                         {
                                             date: { 

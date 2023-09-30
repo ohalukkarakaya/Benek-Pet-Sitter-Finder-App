@@ -1,9 +1,7 @@
-import User from "../../models/User.js";
 import Log from "../../models/Log.js";
 
 const getLogsByPeriodController = async( req, res ) => {
     try{
-        const userId = req.user._id.toString();
         const { startDate, endDate } = req.query;
         if(
             !startDate
@@ -14,20 +12,6 @@ const getLogsByPeriodController = async( req, res ) => {
                         {
                             error: true,
                             message: "Missing Param"
-                        }
-                      );
-        }
-
-        const user = await User.findById( userId );
-        if( 
-            user.authRole !== 2
-            || user.authRole !== 1
-        ){
-            return res.status( 401 )
-                      .json(
-                        {
-                            error: true,
-                            message: "Unauthorized"
                         }
                       );
         }

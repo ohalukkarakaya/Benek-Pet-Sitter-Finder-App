@@ -1,12 +1,13 @@
-import User from "../../models/User.js";
 import Log from "../../models/Log.js";
 
-const getLogsByRequestUrlAndUserIdController = async ( req, res ) => {
+import findMatchingRouteHelper from "../../utils/findMatchingRouteHelper.js";
+
+const getLogsByRequestUrlAndUserIdController = async ( req, res ) => { 
     try{
-        const userId = req.user._id.toString();
-        const { requestUrl, searchingUserId } = req.body;
+        const { requestUrl, method, searchingUserId } = req.body;
         if(
             !requestUrl
+            || !method
             || !searchingUserId
         ){
             return res.status( 400 )
@@ -18,28 +19,14 @@ const getLogsByRequestUrlAndUserIdController = async ( req, res ) => {
                       );
         }
 
-        const user = await User.findById( userId );
-        if( 
-            user.authRole !== 2
-            || user.authRole !== 1
-        ){
-            return res.status( 401 )
-                      .json(
-                        {
-                            error: true,
-                            message: "Unauthorized"
-                        }
-                      );
-        }
-
 
         // Logları çek
-        const regexPattern = new RegExp(`^${requestUrl}`);
+        let routePath = findMatchingRouteHelper( requestUrl, method.toUpperCase() );
 
         const logs = await Log.find(
                                 { 
                                     $and: [
-                                        { url: { $regex: regexPattern } },
+                                        { url: { $regex: `^${routePath}` } },
                                         { userId: searchingUserId }
                                     ]
                                 }

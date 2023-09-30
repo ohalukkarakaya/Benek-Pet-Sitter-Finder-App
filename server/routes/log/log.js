@@ -1,5 +1,5 @@
 import express from "express";
-import auth from "../../middleware/auth.js";
+import adminAuth from "../../middleware/adminAuth.js";
 
 //controllers
 import getLogsByPeriodController from "../../controllers/logRoutesControllers/getLogsByPeriodController.js";
@@ -12,52 +12,59 @@ import getLogsByRequestUrlUserIdAndPeriodController from "../../controllers/logR
 
 const router = express.Router();
 
+// - tested
 // get logs by time period -> /byDatePeriod?startDate=2023-05-16&endDate=2023-05-17
 router.get(
     "/byDatePeriod",
-    auth,
+    adminAuth,
     getLogsByPeriodController
 );
 
+// - tested
 // get logs by userId
 router.get(
     "/byUserId/:userId",
-    auth,
+    adminAuth,
     getLogsByUserIdController
 );
 
+// - tested
 // get logs by request url
-router.get(
-    "/byRequestUrl/:skip/:limit",
-    auth,
+router.post(
+    "/byRequestUrl",
+    adminAuth,
     getLogsByRequestUrlController
 );
 
+// - tested
 // get logs by userId and period -> /byUserIdAndDatePeriod/:userId/?startDate=2023-05-16&endDate=2023-05-17
 router.get(
     "/byUserIdAndDatePeriod/:userId",
-    auth,
+    adminAuth,
     getLogsByUserIdAndDatePeriodController
 );
 
+// - tested
 // get logs by request url and period
-router.get(
+router.post(
     "/byRequestUrlAndDatePeriod",
-    auth,
+    adminAuth,
     getLogsByRequestUrlAndDatePeriodController
 );
 
+// - tested
 // get logs by request url and userId
-router.get(
+router.post(
     "/byRequestUrlAndUserId",
-    auth,
+    adminAuth,
     getLogsByRequestUrlAndUserIdController
 );
 
+// - tested
 // get logs by request url, userId and period
-router.get(
-    "/byRequestUrlAndUserId",
-    auth,
+router.post(
+    "/byRequestUrlAndUserIdAndPeriod",
+    adminAuth,
     getLogsByRequestUrlUserIdAndPeriodController
 );
 

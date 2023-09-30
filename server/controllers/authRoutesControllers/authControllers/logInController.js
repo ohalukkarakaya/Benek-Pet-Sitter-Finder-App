@@ -150,22 +150,11 @@ const logInController = async ( req, res, next ) => {
         await UserOTPVerification.deleteMany({ userId: user._id });
       }
 
-      if( 
-        user.deactivation
-            .isDeactive 
-      ){
-        user.deactivation
-            .isDeactive = false;
-
-        user.deactivation
-            .deactivationDate = null;
-
-        user.deactivation
-            .isAboutToDelete = false;
-
-        user.deactivation
-            .markModified( "deactivation" );
-
+      if( user.deactivation.isDeactive ){
+        user.deactivation.isDeactive = false;
+        user.deactivation.deactivationDate = null;
+        user.deactivation.isAboutToDelete = false;
+        user.deactivation.markModified( "deactivation" );
         user.save(
           ( err ) => {
             if( err ) {
@@ -176,7 +165,7 @@ const logInController = async ( req, res, next ) => {
       }
       
       const { accessToken, refreshToken } = await generateTokens( user );
-
+      const userRoleId = user.authRole ? user.authRole : 0;
       user.save(
         ( err ) => {
             if( err ){
@@ -200,6 +189,7 @@ const logInController = async ( req, res, next ) => {
                     error: false,
                     isLoggedInIpTrusted: user.isLoggedInIpTrusted,
                     isEmailVerified: user.isEmailVerified,
+                    roleId: userRoleId,
                     accessToken,
                     refreshToken,
                     message: "Logged In Successfully"

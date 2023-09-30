@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const auth = async (req, res, next) => {
+const adminAuth = async (req, res, next) => {
     try{
         const token = req.header("x-access-token");
         if( !token ){
@@ -16,6 +16,15 @@ const auth = async (req, res, next) => {
                     );
         }
         const user = jwt.verify( token, process.env.ACCESS_TOKEN_PRIVATE_KEY );
+        if( user.roles !== 1 && user.roles !== 2 ){
+            return res.status( 401 )
+                      .json(
+                        {
+                            error: true,
+                            message: "UnAuthorized"
+                        }
+                      );
+        }
         req.user = user;
         next();
     }catch( err ){
@@ -41,4 +50,4 @@ const auth = async (req, res, next) => {
     }
 };
 
-export default auth;
+export default adminAuth;
