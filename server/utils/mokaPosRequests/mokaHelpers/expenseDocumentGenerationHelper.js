@@ -238,7 +238,13 @@ const expenseDocumentGenerationHelper = async ( paymentData, res ) => {
 
         expenseRecord.expensePdfDocumentUrl = `${ pathToSend }.pdf`;
         expenseRecord.markModified( "expensePdfDocumentUrl" );
-        await expenseRecord.save();
+        expenseRecord.save(
+            ( err ) => {
+                if( err ) {
+                    console.error('ERROR: While Update!', err);
+                }
+              }
+        );
 
         fs.unlink(
             newNameToRename, 
