@@ -5,6 +5,7 @@ import PaymentData from "../models/PaymentData/PaymentData.js";
 import deleteFileHelper from "../utils/fileHelpers/deleteFileHelper.js";
 
 import mokaApprove3dPaymentRequest from "../utils/mokaPosRequests/mokaPayRequests/mokaApprove3dPaymentRequest.js";
+import invoiceDocumentGenerationHelper from "../utils/mokaPosRequests/mokaHelpers/invoiceDocumentGenerationHelper.js";
 
 import dotenv from "dotenv";
 import cron from "node-cron";
@@ -82,6 +83,8 @@ const expireCareGive = cron.schedule(
                             }
                         );
 
+                        let paymentDataList = paymentsToApprove.toObject();
+                        let connectedExpenseDocumentIdiesList = [];
                         if(
                             paymentsToApprove
                             && paymentsToApprove.length > 0
@@ -90,7 +93,7 @@ const expireCareGive = cron.schedule(
                                 let payment
                                 of paymentsToApprove
                             ){
-                                const approvePayment = await mokaApprove3dPaymentRequest(
+                                const approvePayment = await mokaApprove3dPaymentRequest( 
                                     payment.subSellerGuid,
                                     payment.virtualPosOrderId,
                                     res
@@ -103,8 +106,13 @@ const expireCareGive = cron.schedule(
                                     console.log( `ERROR: Approve Payment - ${ payment._id.toString() } -`, approvePayment.message );
                                 }
 
+                                connectedExpenseDocumentIdiesList.push( approvePayment.data.expenseRecordId );
+
                                 await payment.deleteOne();
                             }
+
+                            // send invoice paper to customer
+                            await invoiceDocumentGenerationHelper( careGive.petOwner.petOwnerId, connectedExpenseDocumentIdiesList, paymentDataList, null );
                         }
 
                         //delete CareGive

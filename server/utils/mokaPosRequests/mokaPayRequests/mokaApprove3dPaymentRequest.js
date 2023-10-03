@@ -65,8 +65,11 @@ const mokaApprove3dPaymentRequest = async (
                         }
                     );
                 }
+                let paymentDataToReturn;
 
                 const paymentData = await PaymentData.findOne({ virtualPosOrderId: virtualPosOrderId });
+                paymentDataToReturn = paymentData.toObject();
+
                 const expenseRegistration =  await expenseDocumentGenerationHelper( paymentData, res );
                 if( expenseRegistration.error ){
                     return reject(
@@ -77,6 +80,8 @@ const mokaApprove3dPaymentRequest = async (
                         }
                     );
                 }
+
+                let expenseRecordId = expenseRegistration.data.expenseRecordId;
 
                 let sonuc = returnedResponse.ResultCode === "Success"
                                 ? 1
@@ -90,7 +95,9 @@ const mokaApprove3dPaymentRequest = async (
                     data: {
                         sonuc: sonuc,
                         sonucStr: sonucStr,
-                        threeDPayData: threeDPayData
+                        threeDPayData: threeDPayData,
+                        paymentData: paymentDataToReturn,
+                        expenseRecordId: expenseRecordId,
                     }
                 }
                 

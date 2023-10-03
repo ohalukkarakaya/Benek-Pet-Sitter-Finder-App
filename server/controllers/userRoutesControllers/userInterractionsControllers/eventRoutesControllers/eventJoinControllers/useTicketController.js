@@ -3,6 +3,7 @@ import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
 
 import mokaApprove3dPaymentRequest from "../../../../../utils/mokaPosRequests/mokaPayRequests/mokaApprove3dPaymentRequest.js";
+import invoiceDocumentGenerationHelper from "../../../../../utils/mokaPosRequests/mokaHelpers/invoiceDocumentGenerationHelper.js";
 
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
@@ -185,6 +186,8 @@ const useTicketController = async ( req, res ) => {
                                 && ticket.orderId
                                 && ticket.orderInfo.pySiparisGuid
                             ){
+                                let paymentDataList = [];
+                                let connectedExpenseDocumentIdiesList = [];
                                 //approve payment
                                 const approvePayment = await mokaApprove3dPaymentRequest(
                                                                     meetEvent.eventAdminCareGiveGuid,
@@ -203,6 +206,11 @@ const useTicketController = async ( req, res ) => {
                                                     }
                                               );
                                 }
+
+                                paymentDataList.push( approvePayment.data.paymentData );
+                                connectedExpenseDocumentIdiesList.push( approvePayment.data.expenseRecordId );
+
+                                await invoiceDocumentGenerationHelper( ticket.userId, connectedExpenseDocumentIdiesList, paymentDataList, res );
                             }
 
                             ticket.deleteOne()

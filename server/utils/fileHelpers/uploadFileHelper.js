@@ -59,32 +59,47 @@ const uploadFileHelper = async ( file, fileName, fileType, pathToSend, res ) => 
             || !( responseData.data )
         ){
             if( responseData.status === 401 ){
-                return res.status( 401 )
+                return res 
+                       ? res.status( 401 )
                             .json(
                                 {
                                     error: true,
                                     message: "Internal Server Error"
                                 }
-                            );
+                            )
+                        : {
+                            error: true,
+                            message: "Internal Server Error"
+                        };
             }
 
             if( responseData.status === 400 ){
-                return res.status( 400 )
+                return res 
+                     ? res.status( 400 )
                           .json(
                                 {
                                     error: true,
                                     message: responseData.data.message
                                 }
-                           );
+                           )
+                     : {
+                        error: true,
+                        message: "Internal Server Error"
+                       };
             }
 
-            return res.status( 500 )
+            return res
+                   ? res.status( 500 )
                         .json(
                         {
                             error: true,
                             message: "Internal Server Error"
                         }
-                        );
+                        )
+                    : {
+                        error: true,
+                        message: "Internal Server Error"
+                    };
         }
 
         return {
@@ -93,7 +108,6 @@ const uploadFileHelper = async ( file, fileName, fileType, pathToSend, res ) => 
         }
 
     }catch( err ){
-
         console.log( "ERROR: uploadFileHelper - ", err );
         return {
             error: true,

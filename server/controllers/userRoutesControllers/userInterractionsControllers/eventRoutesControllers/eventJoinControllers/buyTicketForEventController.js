@@ -17,9 +17,7 @@ const buyTicketForEventController = async (req, res) => {
     try{
         const eventId = req.params.eventId.toString();
 
-        if(
-            !eventId
-        ){
+        if( !eventId ){
             return res.status( 400 )
                       .json(
                             {
@@ -30,7 +28,6 @@ const buyTicketForEventController = async (req, res) => {
         }
 
         const event = await Event.findById( eventId );
-
         if( !event ){
             return res.status( 404 )
                       .json(
@@ -41,15 +38,27 @@ const buyTicketForEventController = async (req, res) => {
                       );
         }
 
-        if( 
-            event.date <= Date.now() 
-        ){
+        if( event.date <= Date.now() ){
             return res.status( 403 )
                       .json(
                             {
                                 error: true,
                                 message: "You can't plan to join event today or cancel ticket anymore"
                             }
+                      );
+        }
+
+        let isOrganizer = event.eventOrganizers.filter(
+            userId =>
+                userId.toString() === req.user._id.toString()
+        ).length > 0;
+        if( isOrganizer ){
+            return res.status( 400 )
+                      .json(
+                        {
+                            error: true,
+                            message: "You are organizer"
+                        }
                       );
         }
 
@@ -63,19 +72,15 @@ const buyTicketForEventController = async (req, res) => {
                        );
         }
 
-        const isAllreadyJoined = event.willJoin
-                                      .find(
-                                            userId => 
-                                                userId === req.user
-                                                              ._id
-                                                              .toString()
-                                      );
+        const isAllreadyJoined = event.willJoin.find(
+            userId => 
+                userId === req.user._id.toString()
+        );
 
         if(
             !isAllreadyJoined 
             && event.maxGuests !== -1 
-            && event.maxGuests <= event.willJoin
-                                       .length
+            && event.maxGuests <= event.willJoin.length
         ){
             return res.status( 400 )
                       .json(
@@ -87,13 +92,7 @@ const buyTicketForEventController = async (req, res) => {
         }
 
         if( isAllreadyJoined ){
-            const eventTicket = await EventTicket.findOne(
-                                            {
-                                                eventId: event._id.toString(),
-                                                userId: req.user._id.toString()
-                                            }
-                                      );
-
+            const eventTicket = await EventTicket.findOne({ eventId: event._id.toString(), userId: req.user._id.toString() });
             if( !eventTicket ){
                 return res.status( 500 )
                           .json(
@@ -135,24 +134,20 @@ const buyTicketForEventController = async (req, res) => {
                 }
             }
 
-            eventTicket.deleteOne()
-                       .then(
-                            (_) => {
-                                console.log( "deleted an ticket" );
-                            }
-                        ).catch(
-                            ( error ) => {
-                                console.log( error );
-                            }
-                          );
+            eventTicket.deleteOne().then(
+                (_) => {
+                    console.log( "deleted an ticket" );
+                }
+            ).catch(
+                ( error ) => {
+                    console.log( error );
+                }
+            );
 
-            event.willJoin = event.willJoin
-                                  .filter(
-                                        userId => 
-                                            userId !== req.user
-                                                          ._id
-                                                          .toString()
-                                   );
+            event.willJoin = event.willJoin.filter(
+                userId => 
+                    userId !== req.user._id.toString()
+            );
 
             event.markModified( "willJoin" );
 

@@ -1,7 +1,7 @@
 const numberToTurkishHelper = ( number ) => {
-    const birler = ["", "Bir", "İki", "Üç", "Dört", "Beş", "Altı", "Yedi", "Sekiz", "Dokuz"];
-    const onlar = ["", "On", "Yirmi", "Otuz", "Kırk", "Elli", "Altmış", "Yetmiş", "Seksen", "Doksan"];
-    const birimler = ["", "Bin", "Milyon", "Milyar", "Trilyon", "Katrilyon", "Kentilyon", "Seksilyon", "Septilyon", "Oktilyon", "Nonilyon", "Desilyon"];
+    const birler = [ "", "Bir", "İki", "Üç", "Dört", "Beş", "Altı", "Yedi", "Sekiz", "Dokuz" ];
+    const onlar = [ "", "On", "Yirmi", "Otuz", "Kırk", "Elli", "Altmış", "Yetmiş", "Seksen", "Doksan" ];
+    const birimler = [ "", "Bin", "Milyon", "Milyar", "Trilyon", "Katrilyon", "Kentilyon", "Seksilyon", "Septilyon", "Oktilyon", "Nonilyon", "Desilyon" ];
 
     const isDotIncluded = number.toString().includes(".");
     const isComaIncluded = number.toString().includes(",");
@@ -11,19 +11,15 @@ const numberToTurkishHelper = ( number ) => {
                                 ? ","
                                 : undefined
     // Küsürat kısmını ayır
-    const [tamKisim, kesirKisim] = number.toString().split( valueToSplit );
+    let [ tamKisim, kesirKisim ] = number.toString().split( valueToSplit );
 
-    const sayiStr = number.toString();
-    const tamKisimSayiUzunluk = tamKisim.length;
-    const kesirKisimSayiUzunluk = kesirKisim ? kesirKisim.length : 0;
-
-    if (number === 0) {
-        return "Sıfır";
+    if( number === 0 ){
+        return "Sıfır Türk Lirası";
     }
 
     let sonuc = "";
 
-    let çevrilenKesirKisim = "";
+    let cevrilenKesirKisim = "";
     let cevrilenSayi = "";
 
     let loopCount = 0;
@@ -31,50 +27,62 @@ const numberToTurkishHelper = ( number ) => {
         loopCount = 1;
     }
 
+    let isFractionStartsWithZero = kesirKisim.startsWith( '0' );
+    
+    //kesir kısım sıfır ile başlıyorsa başındaki sıfırı sil, sıfır ile başlamıyorsa sonuna bir sıfır ekle
+    if( isFractionStartsWithZero ){
+        kesirKisim = kesirKisim.replaceAll( '0', '' );
+    }else if( !isFractionStartsWithZero ){
+        kesirKisim = kesirKisim + '0';
+    }
+
     for( let indx = 0; indx <= loopCount; indx ++ ){
-
-        let sayiUzunluk = indx === 0 ? tamKisimSayiUzunluk : kesirKisimSayiUzunluk;
-
+        let number = indx === 0 ? tamKisim : kesirKisim;
         let valueToInsert = "";
 
-        for( let i = 0; i < sayiUzunluk; i += 3 ){
-            const blok = parseInt( sayiStr.substr( i, 3 ), 10 );
-    
-            if (blok === 0) continue;
-    
-            const yuzler = Math.floor( blok / 100 );
-            const onlarBasamagi = Math.floor( ( blok % 100 ) / 10 );
-            const birlerBasamagi = blok % 10;
-    
-            if( yuzler > 0 ){
-                valueToInsert += birler[ yuzler ] + " Yüz";
+        let i = 0;
+        while( number > 0 ){
+            const blok = number % 1000;
+            if( blok > 0 ){
+                let result = "";
+                
+                const yuzler = Math.floor( blok / 100 );
+                const onlarBasamagi = Math.floor( ( blok % 100 ) / 10 );
+                const birlerBasamagi = blok % 10;
+
+                if( yuzler > 0 ){
+                    result += birler[ yuzler ] + " Yüz ";
+                }
+
+                if( onlarBasamagi > 0 ){
+                    result += onlar[ onlarBasamagi ] + " ";
+                }
+
+                if( birlerBasamagi > 0 ){
+                    result += birler[ birlerBasamagi ] + " ";
+                }
+
+                const blokWords = result.trim();
+                if( valueToInsert ){
+                    valueToInsert = blokWords + " " + birimler[ i ] + valueToInsert;
+                }else{
+                    valueToInsert = blokWords + " " + birimler[ i ];
+                }
             }
-    
-            if( onlarBasamagi > 0 ){
-                valueToInsert += onlar[ onlarBasamagi ];
-            }
-    
-            if( birlerBasamagi > 0 ){
-                valueToInsert += birler[ birlerBasamagi ];
-            }
-    
-            if( i < sayiUzunluk - 3 ){
-                valueToInsert += " " + birimler[ 
-                                            Math.floor( ( sayiUzunluk - i - 1 ) / 3 ) 
-                                       ] + " ";
-            }
+            number = Math.floor( number / 1000 );
+            i++;
         }
 
         if( indx === 0 ){
-            cevrilenSayi = valueToInsert + " Türk Lirası";
+            cevrilenSayi = valueToInsert.trim() + " Türk Lirası";
         }else{
-            çevrilenKesirKisim = valueToInsert + " Kuruş";
+            cevrilenKesirKisim = valueToInsert.trim() + " Kuruş";
         }
     }
 
-    sonuc = çevrilenKesirKisim !== ""
-            && çevrilenKesirKisim !== undefined
-                ? cevrilenSayi + " " + çevrilenKesirKisim
+    sonuc = cevrilenKesirKisim !== ""
+            && cevrilenKesirKisim !== undefined
+                ? cevrilenSayi + " " + cevrilenKesirKisim
                 : cevrilenSayi;
 
     return sonuc;

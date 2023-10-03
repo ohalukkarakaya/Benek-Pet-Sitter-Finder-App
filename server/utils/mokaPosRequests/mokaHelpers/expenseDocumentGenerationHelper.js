@@ -193,12 +193,14 @@ const expenseDocumentGenerationHelper = async ( paymentData, res ) => {
             }
         ).save();
 
+        const expenseRecordId = expenseRecord._id.toString();
+
         const replaceTextController = await replaceText(
             inputPath, 
             outputPath,
             outputPdfPath,
             paymentData.type, 
-            expenseRecord._id.toString(),
+            expenseRecordId,
             paymentData.priceData.price,
             10, 
             fundSharePercentage,
@@ -264,7 +266,8 @@ const expenseDocumentGenerationHelper = async ( paymentData, res ) => {
             message: "Succesful",
             data: {
                 ContentType: "application/pdf",
-                path: `${ pathToSend }.pdf`
+                path: `${ pathToSend }.pdf`,
+                expenseRecordId: expenseRecordId
             }
         }
     }catch( err ){
