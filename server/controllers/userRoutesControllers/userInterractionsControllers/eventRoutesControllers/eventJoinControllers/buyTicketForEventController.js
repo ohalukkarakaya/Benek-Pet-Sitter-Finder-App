@@ -17,91 +17,31 @@ const buyTicketForEventController = async (req, res) => {
     try{
         const eventId = req.params.eventId.toString();
 
-        if( !eventId ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "evetId is required"
-                            }
-                      );
-        }
+        if( !eventId ){ return res.status( 400 ).json({ error: true, message: "evetId is required" }); }
 
+        // if there is no event or event is expired
         const event = await Event.findById( eventId );
-        if( !event ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Event not found"
-                            }
-                      );
-        }
+        if( !event ){ return res.status( 404 ).json({ error: true, message: "Event not found" }); }
+        if( event.date <= Date.now() ){ return res.status( 403 ).json({ error: true, message: "You can't plan to join event today or cancel ticket anymore" } ); }
 
-        if( event.date <= Date.now() ){
-            return res.status( 403 )
-                      .json(
-                            {
-                                error: true,
-                                message: "You can't plan to join event today or cancel ticket anymore"
-                            }
-                      );
-        }
+        //if user is organizer or event is a private event so user is not able to buy ticket
+        let isOrganizer = event.eventOrganizers.filter( userId => userId.toString() === req.user._id.toString() ).length > 0;
+        if( isOrganizer ){ return res.status( 400 ).json({ error: true, message: "You are organizer" } ); }
+        if( event.isPrivate ){ return res.status( 401 ).json({ error: true, message: "You can join only if you invented" }); }
 
-        let isOrganizer = event.eventOrganizers.filter(
-            userId =>
-                userId.toString() === req.user._id.toString()
-        ).length > 0;
-        if( isOrganizer ){
-            return res.status( 400 )
-                      .json(
-                        {
-                            error: true,
-                            message: "You are organizer"
-                        }
-                      );
-        }
-
-        if( event.isPrivate ){
-            return res.status( 401 )
-                      .json(
-                            {
-                                error: true,
-                                message: "You can join only if you invented"
-                            }
-                       );
-        }
-
-        const isAllreadyJoined = event.willJoin.find(
-            userId => 
-                userId === req.user._id.toString()
-        );
-
+        const isAllreadyJoined = event.willJoin.find( userId =>  userId === req.user._id.toString() );
         if(
             !isAllreadyJoined 
             && event.maxGuests !== -1 
             && event.maxGuests <= event.willJoin.length
         ){
-            return res.status( 400 )
-                      .json(
-                {
-                    error: true,
-                    message: "Guest quota exceeded"
-                }
-            );
+            return res.status( 400 ).json({ error: true, message: "Guest quota exceeded" });
         }
 
         if( isAllreadyJoined ){
+            
             const eventTicket = await EventTicket.findOne({ eventId: event._id.toString(), userId: req.user._id.toString() });
-            if( !eventTicket ){
-                return res.status( 500 )
-                          .json(
-                                {
-                                    error: true,
-                                    message: "Internal server error"
-                                }
-                          );
-            }
+            if( !eventTicket ){ return res.status( 500 ).json({ error: true, message: "Internal server error" }); }
 
             if(
                 event.ticketPrice.priceType !== "Free" 

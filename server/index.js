@@ -46,6 +46,7 @@ import expireStories from './cron_jobs/deleteExpiredStories.js';
 import expireEvents from './cron_jobs/deleteExpiredEvents.js';
 import expireCareGive from './cron_jobs/deleteExpiredCareGive.js';
 import expireUser from './cron_jobs/deleteExpiredUser.js';
+import expirePunishments from './cron_jobs/deleteExpiredPunishments.js';
 import deleteOverTimedLogs from './cron_jobs/deleteOverTimedLogs.js';
 
 import http from 'http';
@@ -69,7 +70,10 @@ expireCareGive;
 // - tested
 expireUser;
 
-//
+// - 
+expirePunishments;
+
+// - tested
 deleteOverTimedLogs;
 
 const connect = () => {

@@ -56,11 +56,7 @@ const startCareGiveController = async (req, res) => {
                             }
                        );
         }
-        if(
-            userId !== careGive.careGiver
-                               .careGiverId
-                               .toString()
-        ){
+        if( userId !== careGive.careGiver.careGiverId.toString() ){
             return res.status( 400 )
                       .json(
                             {

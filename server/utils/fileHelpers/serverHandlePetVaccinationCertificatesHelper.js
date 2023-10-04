@@ -18,28 +18,12 @@ const serverHandlePetVaccinationCertificatesHelper = async ( req, res, next ) =>
             async ( err ) => {
                 if( err ){
                     console.log( "ERROR: serverHandlePetVaccinationCertificatesHelper - ", err );
-                    return res.status( 500 )
-                              .json(
-                                {
-                                    error: true,
-                                    message: "Internal Server Error"
-                                }
-                              );
+                    return res.status( 500 ).json({ error: true,  message: "Internal Server Error" });
                 }
 
                 const fileType = req.file.mimetype;
-                if(
-                    fileType !== 'image/jpeg' 
-                    && fileType !== 'image/jpg' 
-                    && fileType !== 'application/pdf'
-                ){
-                    return res.status( 400 )
-                              .json(
-                                {
-                                    error: true,
-                                    message: "Wrong File Format"
-                                }
-                              );
+                if( fileType !== 'image/jpeg' && fileType !== 'image/jpg' && fileType !== 'application/pdf' ){
+                    return res.status( 400 ).json({ error: true, message: "Wrong File Format" });
                 }
 
                 const isFilePdf = fileType === 'application/pdf';
@@ -54,86 +38,40 @@ const serverHandlePetVaccinationCertificatesHelper = async ( req, res, next ) =>
                 //insert outputpath
                 const { originalname } = req.file;
                 const splitedOriginalName = originalname.split( "." );
-                const randId = crypto.randomBytes( 6 )
-                                     .toString( 'hex' );
-
-                const newFileName = petId + "_" 
-                                           + randId 
-                                           + "_vaccinationCertificate_";
-
+                const randId = crypto.randomBytes( 6 ).toString( 'hex' );
+                const newFileName = petId + "_" + randId + "_vaccinationCertificate_";
                 req.certificateFileName = newFileName;
-
-                const pathToSend =  "pets/" + petId
-                                            + "/petsVaccinationCertificates/"
-                                            + newFileName;
-
-                req.certificatePath = pathToSend + "."
-                                                 + splitedOriginalName[
-                                                      splitedOriginalName.length - 1
-                                                   ];
+                const pathToSend =  "pets/" + petId + "/petsVaccinationCertificates/" + newFileName;
+                req.certificatePath = pathToSend + "." + splitedOriginalName[ splitedOriginalName.length - 1 ];
 
                 try {
                     await fs.promises.writeFile(
-                        newFileName + "."
-                                    + splitedOriginalName[
-                                        splitedOriginalName.length - 1
-                                      ],
+                        newFileName + "." + splitedOriginalName[ splitedOriginalName.length - 1 ],
                         req.file.buffer,
                         "binary"
                     );
-                }catch( err ){
-                    console.error( "Dosya yazma hatası:", err );
-                }
+                }catch( err ){ console.error( "Dosya yazma hatası:", err ); }
 
-                const writenFile = fs.createReadStream( 
-                                                    newFileName + "."
-                                                                + splitedOriginalName[
-                                                                    splitedOriginalName.length - 1
-                                                                  ] 
-                                      );
-
+                const writenFile = fs.createReadStream( newFileName + "." + splitedOriginalName[ splitedOriginalName.length - 1 ] );
                 const uploadProfileImage = await uploadFileHelper(
-                                                    writenFile,
-                                                    newFileName + "."
-                                                                + splitedOriginalName[
-                                                                    splitedOriginalName.length - 1
-                                                                  ],
-                                                    fileTypeEnum,
-                                                    pathToSend,
-                                                    res
-                                                 );
-
-                fs.rmSync( 
-                    newFileName + "."
-                                + splitedOriginalName[
-                                    splitedOriginalName.length - 1
-                                  ] 
-                   );
+                    writenFile,
+                    newFileName + "."  + splitedOriginalName[ splitedOriginalName.length - 1 ],
+                    fileTypeEnum,
+                    pathToSend,
+                    res
+                );
+                fs.rmSync( newFileName + "." + splitedOriginalName[ splitedOriginalName.length - 1 ] );
 
                 if( uploadProfileImage.error ){
-                    return res.status( 500 )
-                              .json(
-                                    {
-                                        error: true,
-                                        message: "Internal Server Error"
-                                    }
-                               );
+                    return res.status( 500 ).json({ error: true, message: "Internal Server Error" });
                 }
 
                 next();
             }
         );
-        
-
     }catch( err ){
         console.log( "ERROR: serverHandlePetVaccinationCertificatesHelper - ", err );
-        return res.status( 500 )
-                  .json(
-                    {
-                        error: true,
-                        message: "Internal server error"
-                    }
-                  );
+        return res.status( 500 ).json({ error: true, message: "Internal server error" });
     }
 }
 

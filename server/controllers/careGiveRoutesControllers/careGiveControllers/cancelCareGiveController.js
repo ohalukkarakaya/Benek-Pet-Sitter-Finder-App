@@ -10,38 +10,17 @@ import deleteFileHelper from "../../../utils/fileHelpers/deleteFileHelper.js";
 const cancelCareGiveController = async (req, res ) => {
     try{
         const careGiveId = req.params.careGiveId.toString();
-        if( !careGiveId ){
-            return res.status( 400 )
-                      .json(
-                           {
-                               error: true,
-                               message: "missing params"
-                           }
-                       );
-        }
+        if( !careGiveId ){ return res.status( 400 ).json({ error: true, message: "missing params" }); }
 
+        //pull careGive object
         const careGive = await CareGive.findById( careGiveId );
-        if( !careGive ){
-            return res.status( 404 )
-                      .json(
-                           {
-                               error: true,
-                               message: "Care give not found"
-                           }
-                       );
-        }
+        if( !careGive ){ return res.status( 404 ).json({ error: true, message: "Care give not found" });}
 
         if(
             careGive.petOwner.petOwnerId.toString() !== req.user._id.toString()
             && careGive.careGiver.careGiverId.toString() !== req.user._id.toString()
         ){
-            return res.status( 401 )
-                      .json(
-                           {
-                               error: true,
-                               message: "You'r unauthorized to cancel this care give"
-                           }
-                       );
+            return res.status( 401 ).json({ error: true, message: "You'r unauthorized to cancel this care give" });
         }
 
         if( 
@@ -49,177 +28,75 @@ const cancelCareGiveController = async (req, res ) => {
             || careGive.isStarted
             || careGive.finishProcess.isFinished
         ){
-            return res.status( 400 )
-                      .json(
-                           {
-                               error: true,
-                               message: "It is too late to cancel"
-                           }
-                       );
+            return res.status( 400 ).json({ error: true, message: "It is too late to cancel" });
         }
 
-
+        //pull petOwner
         const petOwner = await User.findById( careGive.petOwner.petOwnerId.toString() );
-        if(
-            !petOwner 
-            || petOwner.deactivation.isDeactive
-        ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Pet owner not found"
-                            }
-                       );
-        }
+        if( !petOwner || petOwner.deactivation.isDeactive ){ return res.status( 404 ).json({ error: true, message: "Pet owner not found" }); }
 
+        // pull careGiver and pet
         const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );
         const pet = await Pet.findById( careGive.petId.toString() );
 
-        if(
-            careGive.prices.priceType !== "Free" 
-            && careGive.prices.servicePrice > 0
-        ){
-            const paidPayments = await PaymentData.find({ parentContentId: careGive._id.toString() });
-            if( 
-                !paidPayments 
-                || paidPayments.length <= 0
-            ){
-                return res.status( 500 )
-                          .json(
-                            {
-                                error: true,
-                                message: "Internal Server Error"
-                            }
-                          );
-            }
+        // if careGive is not free
+        if( careGive.prices.priceType !== "Free" && careGive.prices.servicePrice > 0 ){
 
-            for(
-                let payment
-                of paidPayments
-            ){
+            //pull payment data
+            const paidPayments = await PaymentData.find({ parentContentId: careGive._id.toString() });
+            if( !paidPayments || paidPayments.length <= 0 ){ return res.status( 500 ).json({ error: true, message: "Internal Server Error" }); }
+
+            // cancel all payments
+            for( let payment of paidPayments ){
                 const cancelPayment = await mokaVoid3dPaymentRequest( payment.virtualPosOrderId );
                 if( 
                     !cancelPayment 
-                    || (
-                        cancelPayment.serverStatus
-                        && cancelPayment.serverStatus !== 0
-                        && cancelPayment.serverStatus !== 1
-                        && (
-                            cancelPayment.error === true 
-                            || !( cancelPayment.data )
-                        )
+                    || (  
+                        cancelPayment.serverStatus && cancelPayment.serverStatus !== 0 && cancelPayment.serverStatus !== 1
+                        && ( cancelPayment.error === true || !( cancelPayment.data ) )
                     )
                 ){
-                    return res.status( 500 )
-                            .json(
-                                    {
-                                        error: true,
-                                        message: "Internal server error"
-                                    }
-                            );
+                    return res.status( 500 ).json({ error: true, message: "Internal server error" });
                 }
             }
+
         }
 
-        petOwner.pastCaregivers = petOwner.pastCaregivers
-                                          .filter(
-                                            careGiverId =>
-                                                careGiverId.toString() !== careGive.careGiver
-                                                                                   .careGiverId
-                                                                                   .toString()
-                                           );
-
-        petOwner.markModified("pastCaregivers");
-        petOwner.save(
-            function (err) {
-                if(err) {
-                    console.error('ERROR: While Update!');
-                }
-              }
+        // clean pet owners dependencies
+        petOwner.pastCaregivers = petOwner.pastCaregivers.filter(
+            careGiverId =>
+                careGiverId.toString() !== careGive.careGiver.careGiverId.toString()
         );
+        petOwner.markModified( "pastCaregivers" );
+        petOwner.save( ( err ) => { if( err ){ console.error( 'ERROR: While Update!' ); }});
 
-        careGiver.caregiverCareer
-                 .filter(
-                       careerObject =>
-                            careerObject.pet
-                                        .toString() !== careGive.petId
-                                                                .toString()
-                  );
+        // clean careGivers dependencies
+        careGiver.caregiverCareer = careGiver.caregiverCareer.filter(
+            careerObject =>
+                careerObject.pet.toString() !== careGive.petId.toString()
+        );
         careGiver.markModified( "caregiverCareer" );
-        careGiver.save(
-            function (err) {
-                if(err) {
-                    console.error('ERROR: While Update!');
-                }
-              }
+        careGiver.save( ( err ) => { if( err ){ console.error('ERROR: While Update!'); }});
+
+        // clean pets dependencies
+        pet.careGiverHistory = pet.careGiverHistory.filter(
+            historyObject =>
+                historyObject.careGiver.toString() !== careGive.careGiver.careGiverId.toString()
         );
-
-
-        pet.careGiverHistory
-           .filter(
-                historyObject =>
-                    historyObject.careGiver
-                                .toString() !== careGive.careGiver
-                                                        .careGiverId
-                                                        .toString()
-            );
         pet.markModified( "careGiverHistory" );
-        pet.save(
-              ( err ) => {
-                if( err ) {
-                    console.error( 'ERROR: While Update!' );
-                }
-              }
-        );
+        pet.save( ( err ) => { if( err ){ console.error( 'ERROR: While Update!' ); }});
 
+        //delete assets
         const deleteAssets = await deleteFileHelper( `CareGive/${ careGive._id.toString() }` );
-        if( deleteAssets.error ){
-            return res.status( 500 )
-                      .json(
-                        {
-                            error: true,
-                            message: "Internal Server Error"
-                        }
-                      );
-        }
+        if( deleteAssets.error ){ return res.status( 500 ).json({ error: true,  message: "Internal Server Error" }); }
         
+        // delete careGive object
         careGive.deleteOne()
-                .then(
-                    async (_) => {
-                        return res.status( 200 )
-                                  .json(
-                                       {
-                                           error: false,
-                                           message: "careGive canceled succesfully"
-                                       }
-                                   );
-                    }
-                ).catch(
-                    async ( error ) => {
-                        if( error ){
-                            console.log( error );
-
-                            return res.status( 500 )
-                                      .json(
-                                           {
-                                               error: true,
-                                               message: "Internal server error"
-                                           }
-                                       );
-                        }
-                    }
-                );
+            .then( async (_) => { return res.status( 200 ).json({ error: false, message: "careGive canceled succesfully" }); })
+            .catch( async ( error ) => { if( error ){ console.log( error ); return res.status( 500 ).json({ error: true, message: "Internal server error" } ); } });
     }catch( err ){
         console.log( "ERROR: cancel care give", err );
-
-        return res.status( 500 )
-                  .json(
-                       {
-                           error: true,
-                           message: "Internal server error"
-                       }
-                   );
+        return res.status( 500 ).json({ error: true, message: "Internal server error" });
     }
 }
 

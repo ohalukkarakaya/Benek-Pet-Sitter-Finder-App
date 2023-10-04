@@ -1,6 +1,6 @@
-const invoiceEmailHtmlHelper = () => {
+const petOwnerPaymentCancellationEmailHtmlHelper = () => {
     return `
-        <div style="padding-top: 10%">
+            <div style="padding-top: 10%">
         <div>
         <div>
             <div>
@@ -12,7 +12,7 @@ const invoiceEmailHtmlHelper = () => {
                         <p style="font-size: 14px; line-height: 140%; text-align: center;">
                         <span>
                             <strong>
-                                <span style="font-size: 24px; line-height: 33.6px;">BenekApp Faturanız Ektedir</span>
+                                <span style="font-size: 24px; line-height: 33.6px;">Yaptığınız Şikayeti Haklı Bulduk</span>
                             </strong>
                         </span>
                     </p>
@@ -27,7 +27,7 @@ const invoiceEmailHtmlHelper = () => {
                 <td align="left" style="padding: 13px 30px 30px; font-family: arial, helvetica, sans-serif;">
                     <div style="line-height: 140%; text-align: left; overflow-wrap: break-word;">
                     <p style="font-size: 14px; line-height: 140%; text-align: center;">
-                        <span style="font-size: 16px; line-height: 22.4px; font-family: Source Sans Pro, sans-serif;">Bizimle yaptığınız alışverişin faturası ektedir. Lütfen ekteki dosyayı indirip saklayın.</span>
+                        <span style="font-size: 16px; line-height: 22.4px; font-family: Source Sans Pro, sans-serif;">Satın aldığınız evcil hayvan bakım hizmeti sırasında yaptığınız şikayeti haklı bulduk ve bakıcınıza ceza puanı yazdık. Şayet üç ceza puanı alırsa, kara listeye girecek ve hesabı askıya alınacaktır. Ayrıca bizim uygulamamızda yaşadığınız mağduriyeti bir nebze olsun giderebilmek için yaptığınız ödemeyi iade ettik. Bu seferlik bizden olsun :)</span>
                     </p>
                 </div>
             </td>
@@ -49,7 +49,7 @@ const invoiceEmailHtmlHelper = () => {
                         <td align="left" style="word-break: break-word; padding: 25px 48px; font-family: arial, helvetica, sans-serif; color: rgb(255, 255, 255) !important;">
                         <div style="color: rgb(255, 255, 255) !important; line-height: 140%; text-align: left; overflow-wrap: break-word;">
                             <p style="font-size:14px; line-height:140%; text-align:center">
-                            <span style="font-size: 14px; line-height: 19.6px; color: rgb(173, 173, 173) !important; font-family: Source Sans Pro, sans-serif;" data-ogsc="rgb(103, 103, 103)">Bizi tercih ettiğiniz içi &nbsp; ♥︎ &nbsp; <b>Teşekkür Ederiz!</b></span>
+                            <span style="font-size: 14px; line-height: 19.6px; color: rgb(173, 173, 173) !important; font-family: Source Sans Pro, sans-serif;" data-ogsc="rgb(103, 103, 103)">Bizi tercih ettiğiniz için &nbsp; ♥︎ &nbsp; <b>Teşekkür Ederiz!</b></span>
                             </p>
                         </div>
                         </td>
@@ -65,4 +65,4 @@ const invoiceEmailHtmlHelper = () => {
     `;
 }
 
-export default invoiceEmailHtmlHelper;
+export default petOwnerPaymentCancellationEmailHtmlHelper;

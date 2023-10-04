@@ -21,15 +21,7 @@ const mokaVoid3dPaymentRequest = async ( virtualPosOrderId ) => {
             const mokaCredentials = mokaCredentialsHelper();
 
             const paymentData = await PaymentData.findOne({ virtualPosOrderId: virtualPosOrderId });
-            if( !paymentData ){
-                reject(
-                    {
-                        error: true,
-                        serverStatus: -1,
-                        message: `PaymentData Not Found`
-                    }
-                );
-            }
+            if( !paymentData ){ reject({ error: true, serverStatus: -1, message: `PaymentData Not Found` }); }
 
             const isTimeValid = mokaValidateHourForVoidPaymentHelper( paymentData.createdAt );
 

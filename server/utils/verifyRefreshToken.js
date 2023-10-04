@@ -15,27 +15,23 @@ const verifyRefreshToken = ( refreshToken ) => {
                     ( err, doc ) => {
                         if( err ){
                             console.log( err );
-                            return reject(
-                                    {
-                                        error: true, 
-                                        message: "Internal server error"
-                                    }
-                            );
+                            return reject({
+                                error: true, 
+                                message: "Internal server error"
+                            });
                         }
 
                         if( !doc ){
-                            return reject(
-                                    {
-                                        error: true, 
-                                        message: "Invalid Refresh Token"
-                                    }
-                            );
+                            return reject({
+                                error: true, 
+                                message: "Invalid Refresh Token"
+                            });
                         }
 
                         const tokenDetails = jwt.verify(
-                                                refreshToken, 
-                                                privateKey
-                                             );
+                            refreshToken, 
+                            privateKey
+                        );
                         resolve(
                             {
                                 tokenDetails,

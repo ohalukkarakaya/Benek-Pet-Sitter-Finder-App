@@ -21,20 +21,14 @@ const deletePetsImagesController = async (req, res) => {
                      );
         }
 
-        for(
-          let url
-          of urlList
-        ){
+        for( let url of urlList ){
           const deleteImg = await deleteFileHelper( url );
           if( deleteImg.err ){
             console.log( `ERROR: Image On Url '${url}' Couldn't Deleted` );
             break;
           }
 
-          req.pet.images = req.pet.images.filter(
-            img => 
-              img.imgUrl !== url
-          );
+          req.pet.images = req.pet.images.filter( img => img.imgUrl !== url );
         }
 
         const petImages = req.pet.images;
