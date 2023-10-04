@@ -65,7 +65,7 @@ const adminLoginController = async ( req, res ) => {
         // mobile başarılı cevabı dön
         return res.status( 200 ).json({
             error: false,
-            message: "Loged In Succesfully, you will receive your token from socket"
+            message: "Loged In Succesfully, you will be loged in from desktop app"
         });
 
     }catch( err ){
