@@ -1,7 +1,9 @@
 import AdminLoginCode from "../../models/Admin/AdminLoginCode.js";
 
 import crypto from "node:crypto";
-import QRCode from "qrcode";
+import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.js"
+import nodeCanvas from "canvas";
+import { JSDOM } from "jsdom";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 
@@ -9,8 +11,8 @@ dotenv.config();
 
 const getAdminLoginQrCodeController = async ( req, res ) => {
     try{
-        const clientId = req.params.socketId.toString();
-        if( !clientId ){ 
+        const clientId = req.params.clientId.toString();
+        if( !clientId ){
             return res.status( 400 ).json({ error: true, message: "Missing Params" });
         }
 
@@ -26,33 +28,44 @@ const getAdminLoginQrCodeController = async ( req, res ) => {
         const data = { qrCodePassword: generatedQrCodePassword };
         let qrCodeData = JSON.stringify( data );
 
-        // Get the base64 url
-        QRCode.toDataURL(
-            qrCodeData,
-            {
-                color: {
-                  dark: '#000000ff',  // Black dots
-                  light: '#0000' // Transparent background
-                }
+        // qr code options
+        const options = {
+            width: 300,
+            height: 300,
+            data: qrCodeData,
+            image: path.resolve( './src/benek_amblem.png' ),
+            dotsOptions: { type: "dots" },
+        };
+
+        const qrCodeSvgWithBlobImage = new QRCodeStyling({ 
+            jsdom: JSDOM, // this is required
+            nodeCanvas, // this is required
+            type: "svg",
+            ...options,
+            imageOptions: {
+                saveAsBlob: true,
+                crossOrigin: "anonymous",
+                margin: 0
             },
-            ( err, url ) => {
-                if( err ){
-                    return res.status( 500 ).json({ error: true, message: "error wile generating QR code" });
-                }
+            backgroundOptions: { color: 'rgba(255, 255, 255, 0)' },
+            cornersSquareOptions: { type: 'dot' },
+            cornersDotOptions: { type: 'extra-rounded' }
+        });
 
-                await new AdminLoginCode({
-                        clientId: clientId,
-                        codePassword: hashCodePassword
-                }).save();
+        qrCodeSvgWithBlobImage.getRawData("svg").then(( url ) => {
+            await new AdminLoginCode({
+                clientId: clientId,
+                codePassword: hashCodePassword
+            }).save();
 
-                return res.status( 200 ).json({
-                    error: false,
-                    message: "QR Code generated succesfully",
-                    clientId: clientId,
-                    code: url,
-                });
-            }
-        );
+            return res.status( 200 ).json({
+                error: false,
+                clientId: clientId,
+                code: url,
+            });
+        });
+
+        return res.status( 500 ).json({ error: true, message: "Internal Server Error" })
         
     }catch( err ){
         console.log( "ERROR: getAdminLoginQrCodeController - ", err );

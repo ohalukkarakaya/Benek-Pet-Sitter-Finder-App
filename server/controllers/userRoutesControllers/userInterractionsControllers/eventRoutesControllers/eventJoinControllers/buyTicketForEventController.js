@@ -2,14 +2,11 @@ import User from "../../../../../models/User.js";
 import Event from "../../../../../models/Event/Event.js";
 import EventTicket from "../../../../../models/Event/EventTicket.js";
 
-import mokaValidateHourForVoidPaymentHelper from "../../../../../utils/mokaPosRequests/mokaHelpers/mokaValidateHourForVoidPaymentHelper.js";
 import mokaCreatePaymentHelper from "../../../../../utils/mokaPosRequests/mokaHelpers/mokaCreatePaymentHelper.js";
 import mokaVoid3dPaymentRequest from "../../../../../utils/mokaPosRequests/mokaPayRequests/mokaVoid3dPaymentRequest.js";
-
 import prepareEventTicketHelper from "../../../../../utils/prepareEventTicketHelper.js";
 
 import dotenv from "dotenv";
-import PaymentData from "../../../../../models/PaymentData/PaymentData.js";
 
 dotenv.config();
 
@@ -64,13 +61,7 @@ const buyTicketForEventController = async (req, res) => {
                         )
                     )
                 ){
-                    return res.status( 500 )
-                              .json(
-                                    {
-                                        error: true,
-                                        message: "Internal server error"
-                                    }
-                              );
+                    return res.status( 500 ).json({ error: true, message: "Internal server error" });
                 }
             }
 
@@ -95,24 +86,12 @@ const buyTicketForEventController = async (req, res) => {
                 ( error ) => {
                     if( error ){
                         console.log( error );
-                        return res.status( 500 )
-                                  .json(
-                                        {
-                                            error: true,
-                                            message: "Internal server error"
-                                        }
-                                   );
+                        return res.status( 500 ).json({ error: true, message: "Internal server error" });
                     }
                 }
             );
 
-            return res.status( 200 )
-                      .json(
-                            {
-                                error: false,
-                                message: "Ticket removed and payment canceled succesfully"
-                            }
-                       );
+            return res.status( 200 ).json({ error: false, message: "Ticket removed and payment canceled succesfully" });
 
         }else{
             if(
@@ -134,37 +113,30 @@ const buyTicketForEventController = async (req, res) => {
 
                 //take payment
                 const paymentData = await mokaCreatePaymentHelper(
-                                            userId, //customer user id
-                                            cardGuid, //card guid
-                                            cardNo, //card number
-                                            cardExpiryDate.split( "/" )[ 0 ], //card expiry month
-                                            cardExpiryDate.split( "/" )[ 1 ], //card expiry year
-                                            cvv, //card cvv
-                                            event._id.toString(), //parent id
-                                            null, //productDesc
-                                            "EventTicket", //payment type
-                                            null,
-                                            event.eventAdmin, //caregiver id
-                                            ( 
-                                                await User.findById( 
-                                                                event.eventAdmin
-                                                           ) 
-                                            ).careGiveGUID, //caregiver guid
-                                            price, // amount
-                                            redirectUrl,
-                                            req.body.recordCard === 'true',
-                                            false // is from invitation
-                                          );
+                    userId, //customer user id
+                    cardGuid, //card guid
+                    cardNo, //card number
+                    cardExpiryDate.split( "/" )[ 0 ], //card expiry month
+                    cardExpiryDate.split( "/" )[ 1 ], //card expiry year
+                    cvv, //card cvv
+                    event._id.toString(), //parent id
+                    null, //productDesc
+                    "EventTicket", //payment type
+                    null,
+                    event.eventAdmin, //caregiver id
+                    ( await User.findById( event.eventAdmin ) ).careGiveGUID, //caregiver guid
+                    price, // amount
+                    redirectUrl,
+                    req.body.recordCard === 'true',
+                    false // is from invitation
+                );
 
                 if( paymentData.message === 'Daily Limit Exceeded' ){
-                    return res.status( 500 )
-                              .json(
-                                    {
-                                        error: true,
-                                        message: "Daily Limit Exceeded",
-                                        payError: paymentData
-                                    }
-                              );
+                    return res.status( 500 ).json({
+                        error: true,
+                        message: "Daily Limit Exceeded",
+                        payError: paymentData
+                    });
                 }
 
                 if(
@@ -175,25 +147,19 @@ const buyTicketForEventController = async (req, res) => {
                     || paymentData.payData === null 
                     || paymentData.payData === undefined
                 ){
-                    return res.status( 500 )
-                              .json(
-                                {
-                                    error: true,
-                                    message: "Error While Payment",
-                                    payError: paymentData
-                                }
-                              );
+                    return res.status( 500 ).json({
+                        error: true,
+                        message: "Error While Payment",
+                        payError: paymentData
+                    });
                 }
 
-                return res.status( 200 )
-                      .json(
-                        {
-                            error: false,
-                            message: "Waiting for 3d payment approve",
-                            payData: paymentData.payData,
-                            ticket: null
-                        }
-                      );
+                return res.status( 200 ).json({
+                    error: false,
+                    message: "Waiting for 3d payment approve",
+                    payData: paymentData.payData,
+                    ticket: null
+                });
             }
 
             //prepare ticket for free events
@@ -203,13 +169,10 @@ const buyTicketForEventController = async (req, res) => {
                 !careGiver 
                 || careGiver.deactivation.isDeactive
             ){
-                return res.status( 404 )
-                          .json(
-                                {
-                                    error: true,
-                                    message: "CareGiver not Found"
-                                }
-                          );
+                return res.status( 404 ).json({
+                    error: true,
+                    message: "CareGiver not Found"
+                });
             }
 
             const eventTicketData = await prepareEventTicketHelper(
@@ -225,31 +188,16 @@ const buyTicketForEventController = async (req, res) => {
                 !eventTicketData
                 || eventTicketData.error
             ){
-                return res.status( 500 )
-                          .json(
-                            {
-                                error: true,
-                                message: "Internal Server Error"
-                            }
-                          );
+                return res.status( 500 ).json({ error: true, message: "Internal Server Error" });
             }
     
-            return res.status( 200 )
-                      .json( eventTicketData );
-
+            return res.status( 200 ).json( eventTicketData );
         }
 
     }catch( err ){
 
         console.log( "ERROR: buy ticket - ", err );
-        return res.status( 500 )
-                  .json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                  );
-
+        return res.status( 500 ).json({ error: true, message: "Internal server error" });
     }
 }
 

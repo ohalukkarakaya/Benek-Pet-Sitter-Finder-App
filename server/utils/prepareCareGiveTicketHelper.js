@@ -4,7 +4,9 @@ import User from "../models/User.js";
 
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import QRCode from "qrcode";
+import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.js"
+import nodeCanvas from "canvas";
+import { JSDOM } from "jsdom";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -19,41 +21,47 @@ function generateQRCode(
 ){
     return new Promise(
         ( resolve, reject ) => {
-            QRCode.toDataURL(
-                ticketData,
-                {
-                    color: {
-                      dark: '#000000ff',  // black dots
-                      light: '#0000' // Transparent background
-                    }
+            const options = {
+                width: 300,
+                height: 300,
+                data: ticketData,
+                image: path.resolve( './src/benek_amblem.png' ),
+                dotsOptions: {
+                    type: "dots"
                 },
-                async ( err, url ) => {
-                    if ( err ) {
-                        reject(
-                            {
-                                error: true,
-                                serverStatus: -1,
-                                message: "Internal server error"
-                            }
-                        );
-                    } else {
-                        careGive.invitation.actionCode.codeType = "Start";
-                        careGive.invitation.actionCode.codePassword = hashCodePassword;
-                        careGive.invitation.actionCode.code = url;
-                        careGive.invitation.isAccepted = true;
-                        careGive.markModified("invitation");
+            };
 
-                        careGive.prices.orderInfo = {
-                            paymentId: paymentDataId,
-                            orderId: virtualPosOrderId,
-                            orderUniqueCode: orderUniqueCode
-                        }
-                        careGive.markModified("prices");
-                        const careGiveToSend = await careGive.save();
-                        resolve( careGiveToSend );
-                    }
+            const qrCodeSvgWithBlobImage = new QRCodeStyling({ 
+                jsdom: JSDOM, // this is required
+                nodeCanvas, // this is required
+                type: "svg",
+                ...options,
+                imageOptions: {
+                    saveAsBlob: true,
+                    crossOrigin: "anonymous",
+                    margin: 0
+                },
+                backgroundOptions: { color: 'rgba(255, 255, 255, 0)' },
+                cornersSquareOptions: { type: 'dot' },
+                cornersDotOptions: { type: 'extra-rounded' }
+            });
+
+            qrCodeSvgWithBlobImage.getRawData( "svg" ).then(async (url) => {
+                careGive.invitation.actionCode.codeType = "Start";
+                careGive.invitation.actionCode.codePassword = hashCodePassword;
+                careGive.invitation.actionCode.code = url;
+                careGive.invitation.isAccepted = true;
+                careGive.markModified("invitation");
+
+                careGive.prices.orderInfo = {
+                    paymentId: paymentDataId,
+                    orderId: virtualPosOrderId,
+                    orderUniqueCode: orderUniqueCode
                 }
-            );
+                careGive.markModified("prices");
+                const careGiveToSend = await careGive.save();
+                resolve( careGiveToSend );
+            });
         }
     );
 }

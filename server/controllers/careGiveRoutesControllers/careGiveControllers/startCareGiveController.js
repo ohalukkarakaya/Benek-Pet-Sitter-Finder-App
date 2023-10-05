@@ -5,7 +5,9 @@ import CareGive from "../../../models/CareGive/CareGive.js";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import QRCode from "qrcode";
+import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.js"
+import nodeCanvas from "canvas";
+import { JSDOM } from "jsdom";
 
 dotenv.config();
 
@@ -27,74 +29,33 @@ const startCareGiveController = async (req, res) => {
             || !careGiverIdFromCode
             || !codeType
         ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "missing params"
-                            }
-                       );
+            return res.status( 400 ).json({ error: true, message: "missing params" });
         }
 
         if( codeType !== "Start" && codeType !== "start" ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "This is not a start code"
-                            }
-                       );
+            return res.status( 400 ).json({ error: true, message: "This is not a start code" } );
         }
 
         const careGive = await CareGive.findById( careGiveId );
         if( !careGive ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Care give not found"
-                            }
-                       );
+            return res.status( 404 ).json({ error: true, message: "Care give not found" });
         }
         if( userId !== careGive.careGiver.careGiverId.toString() ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "care giver should scan this code"
-                            }
-                       );
+            return res.status( 400 ).json({ error: true, message: "care giver should scan this code" });
         }
 
         const pet = await Pet.findById( careGive.petId.toString() );
         if( !pet ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Pet not found"
-                            }
-                       );
+            return res.status( 404 ).json({ error: true, message: "Pet not found" });
         }
 
         const careGiver = await User.findById( userId );
         if(
             !careGiver 
             || careGiver.deactivation.isDeactive
-            || careGiver.blockedUsers
-                        .includes(
-                            careGive.petOwner
-                                    .petOwnerId
-                                    .toString()
-                        )
+            || careGiver.blockedUsers.includes( careGive.petOwner.petOwnerId.toString() )
         ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Care giver not found"
-                            }
-                       );
+            return res.status( 404 ).json({ error: true, message: "Care giver not found" });
         }
 
         const petOwner = await User.findById( careGive.petOwner.petOwnerId.toString() );
@@ -103,28 +64,15 @@ const startCareGiveController = async (req, res) => {
             || petOwner.deactivation.isDeactive
             || petOwner.blockedUsers.includes( userId )
         ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "pet owner not found"
-                            }
-                       );
+            return res.status( 404 ).json({ error: true, message: "pet owner not found" });
         }
 
         if(
             pet._id.toString() !== petIdFromCode
             || userId !== careGiverIdFromCode
-            || petOwner._id
-                       .toString() !== petOwnerIdFromCode
+            || petOwner._id.toString() !== petOwnerIdFromCode
         ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "data in code is invalid"
-                            }
-                       );
+            return res.status( 400 ).json({ error: true, message: "data in code is invalid" });
         }
 
         // İlk tarihi ayrıştır
@@ -145,27 +93,12 @@ const startCareGiveController = async (req, res) => {
             processedStartDate > nowDate
             || processedStartDate < nowDate
         ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "care give was past"
-                            }
-                       );
+            return res.status( 400 ).json({ error: true, message: "care give was past" });
         }
 
-        const verifiedPassword = await bcrypt.compare(
-                                                    actionCodePassword,
-                                                    careGive.invitation.actionCode.codePassword
-                                              );
+        const verifiedPassword = await bcrypt.compare( actionCodePassword, careGive.invitation.actionCode.codePassword );
         if( !verifiedPassword ){
-            return res.status( 403 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Invalid password"
-                            }
-                       );
+            return res.status( 403 ).json({ error: true,  message: "Invalid password" });
         }
 
         //generate password
@@ -185,68 +118,67 @@ const startCareGiveController = async (req, res) => {
 
         let qrCodeData = JSON.stringify( data );
 
-        // Get the base64 url
-        QRCode.toDataURL(
-            qrCodeData,
-            {
-                color: {
-                  dark: '#000000ff',  // Black dots
-                  light: '#0000' // Transparent background
-                }
+        const options = {
+            width: 300,
+            height: 300,
+            data: qrCodeData,
+            image: path.resolve( './src/benek_amblem.png' ),
+            dotsOptions: {
+                type: "dots"
             },
-            function ( err, url ) {
-                if( err ){
-                    return res.status(500).json(
-                        {
-                            error: true,
-                            message: "error wile generating QR code"
-                        }
-                    );
+        };
+
+        const qrCodeSvgWithBlobImage = new QRCodeStyling({ 
+            jsdom: JSDOM, // this is required
+            nodeCanvas, // this is required
+            type: "svg",
+            ...options,
+            imageOptions: {
+                saveAsBlob: true,
+                crossOrigin: "anonymous",
+                margin: 0
+            },
+            backgroundOptions: { color: 'rgba(255, 255, 255, 0)' },
+            cornersSquareOptions: { type: 'dot' },
+            cornersDotOptions: { type: 'extra-rounded' }
+        });
+
+        qrCodeSvgWithBlobImage.getRawData( "svg" ).then(async (url) => {
+            careGive.invitation.actionCode.codeType = "Finish";
+            careGive.invitation.actionCode.codePassword = hashCodePassword;
+            careGive.invitation.actionCode.code = url;
+            careGive.markModified( "invitation" );
+
+            careGive.isStarted = true;
+            careGive.markModified( "isStarted" );
+
+            careGive.save().then(
+                ( carGiveObject ) => {
+                    return res.status( 200 )
+                                .json({
+                                    error: false,
+                                    message: "care give started succesfully",
+                                    finishCode: url
+                                });
                 }
-
-                careGive.invitation.actionCode.codeType = "Finish";
-                careGive.invitation.actionCode.codePassword = hashCodePassword;
-                careGive.invitation.actionCode.code = url;
-                careGive.markModified( "invitation" );
-
-                careGive.isStarted = true;
-                careGive.markModified( "isStarted" );
-
-                careGive.save()
-                        .then(
-                            ( carGiveObject ) => {
-                                return res.status( 200 )
-                                        .json(
-                                                {
-                                                    error: false,
-                                                    message: "care give started succesfully",
-                                                    finishCode: url
-                                                }
-                                        );
-                            }
-                        ).catch(
-                            ( er ) => {
-                                console.log( er );
-                                return res.status( 500 )
-                                          .json(
-                                                {
-                                                    error: true,
-                                                    message: "Internal server error"
-                                                }
-                                           );
-                            }
-                        );
-            }
-        );
+            ).catch(
+                ( er ) => {
+                    console.log( er );
+                    return res.status( 500 )
+                              .json({
+                                error: true,
+                                message: "Internal server error"
+                              });
+                }
+            );
+        });
     }catch( err ){
         console.log( "Error: start care give - ", err );
         return res.status( 500 )
-                  .json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                   );
+                  .json({
+                     error: true,
+                     message: "Internal server error"
+                   });
     }
 }
 

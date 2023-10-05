@@ -97,9 +97,7 @@ morgan.token(
   ( req ) => {
     const token = req.header( "x-access-token" );
     if( !token ){
-
-      const refreshToken = req.body
-                              .refreshToken;
+      const refreshToken = req.body.refreshToken;
       if( !refreshToken ){
         return "No Token Provided";
       }
@@ -108,13 +106,8 @@ morgan.token(
     }
 
     try{
-      const tokenDetails = jwt.verify(
-                                  token,
-                                  process.env
-                                         .ACCESS_TOKEN_PRIVATE_KEY
-                               );
-      return tokenDetails._id
-                         .toString();
+      const tokenDetails = jwt.verify( token, process.env.ACCESS_TOKEN_PRIVATE_KEY );
+      return tokenDetails._id.toString();
     }catch( err ){
       if( err.name === 'TokenExpiredError' ){
         // Token süresi dolmuşsa
@@ -134,7 +127,7 @@ app.use(
         stream: {
           write: async ( log ) => {
             try{
-              // Log işleme kodlarını burada gerçekleştirin
+              // Log işleme
               const logData = await parseLogData( log );
               saveLogHelper( logData );
             }catch( err ){
@@ -167,10 +160,10 @@ app.use("/api/notification", notificationRoutes);
 app.use((err, req, res, next) => {
   const status = err.status || 500;
   const message = err.message || "Something went wrong";
-  return res.status(status).json({
+  return res.status( status ).json({
     success: false,
     status: status,
-    message: err,
+    message: message,
   })
 });
 

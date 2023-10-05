@@ -2,6 +2,7 @@ import express from "express";
 
 //controllers
 import getAdminLoginQrCodeController from "../../controllers/adminRoutes/getAdminLoginQrCodeController.js";
+import adminLoginController from "../../controllers/adminRoutes/adminLoginController.js";
 
 import adminAuth from "../../middleware/adminAuth";
 
@@ -12,11 +13,13 @@ dotenv.config();
 
 const router = express.Router();
 
+// get qr code
 router.get(
     "/getLoginQrCode/:clientId",
     getAdminLoginQrCodeController
 );
 
+//login
 router.post(
     "/login",
     adminAuth,

@@ -4,39 +4,49 @@ import EventInvitation from "../models/Event/Invitations/InviteEvent.js";
 
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import QRCode from "qrcode";
+import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.js"
+import nodeCanvas from "canvas";
+import { JSDOM } from "jsdom";
 import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config();
 
 function generateQRCode( ticketData, ticket ){
     return new Promise(
         ( resolve, reject ) => {
-            QRCode.toDataURL(
-                ticketData,
-                {
-                    color: {
-                      dark: '#000000ff',  // black dots
-                      light: '#0000' // Transparent background
-                    }
+            // qr code options
+            const options = {
+                width: 300,
+                height: 300,
+                data: ticketData,
+                image: path.resolve( './src/benek_amblem.png' ),
+                dotsOptions: {
+                    type: "dots"
                 },
-                async ( err, url ) => {
-                    if ( err ) {
-                        reject(
-                            {
-                                error: true,
-                                serverStatus: -1,
-                                message: "Internal server error"
-                            }
-                        );
-                    } else {
-                        ticket.ticketUrl = url;
-                        ticket.markModified( "ticketUrl" );
-                        const ticketToSend = await ticket.save();
-                        resolve( ticketToSend );
-                    }
-                }
-            );
+            }
+
+            const qrCodeSvgWithBlobImage = new QRCodeStyling({ 
+                jsdom: JSDOM, // this is required
+                nodeCanvas, // this is required
+                type: "svg",
+                ...options,
+                imageOptions: {
+                    saveAsBlob: true,
+                    crossOrigin: "anonymous",
+                    margin: 0
+                },
+                backgroundOptions: { color: 'rgba(255, 255, 255, 0)' },
+                cornersSquareOptions: { type: 'dot' },
+                cornersDotOptions: { type: 'extra-rounded' }
+            });
+
+            qrCodeSvgWithBlobImage.getRawData( "svg" ).then(async (url) => {
+                ticket.ticketUrl = url;
+                ticket.markModified( "ticketUrl" );
+                const ticketToSend = await ticket.save();
+                resolve( ticketToSend );
+            });
         }
     );
 }
@@ -111,8 +121,7 @@ const prepareEventTicketHelper = async (
 
         mentionedEvent.willJoin
         && mentionedEvent.willJoin.length >= 0
-            ? mentionedEvent.willJoin
-                            .push( userId )
+            ? mentionedEvent.willJoin.push( userId )
             : mentionedEvent.willJoin = [ userId ];
 
         mentionedEvent.markModified( "willJoin" );
