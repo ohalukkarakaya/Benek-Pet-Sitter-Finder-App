@@ -11,6 +11,7 @@ import getInvoicePaperListController from "../../controllers/adminRoutes/getInvo
 import getExpensePaperByIdController from "../../controllers/adminRoutes/getExpensePaperByIdController.js";
 import getExpensePaperListController from "../../controllers/adminRoutes/getExpensePaperListController.js";
 import punishUserController from "../../controllers/adminRoutes/punishUserController.js";
+import banUserController from "../../controllers/adminRoutes/banUserController.js";
 
 import adminAuth from "../../middleware/adminAuth";
 
@@ -90,6 +91,7 @@ router.post(
     punishUserController
 );
 
+// ban user by userId
 router.post(
     "/banUser/:userId",
     adminAuth,

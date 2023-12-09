@@ -36,8 +36,13 @@ const expireUser = cron.schedule(
             for( const punishment of punishmentRecords ){
 
                 const punishedUser = await User.findById( punishment.userId );
-                const isUserInUsersArray = users.some( user => user._id.toString() === punishedUser._id.toString() );
-                if( !isUserInUsersArray ){ users.push( punishedUser ); }
+                const isUserInUsersArray = users.some( 
+                    user => 
+                        user._id.toString() === punishedUser._id.toString() 
+                );
+                if( !isUserInUsersArray ){ 
+                    users.push( punishedUser ); 
+                }
 
                 const isUserAlreadyBanned = await BannedUsers.findOne({ userEmail: punishedUser.email });
                 if( !isUserAlreadyBanned ){
@@ -64,7 +69,10 @@ const expireUser = cron.schedule(
                             async ( petId ) => {
                                 const pet = await Pet.findById( petId.toString() );
                                 const petFollowers = pet.followers;
-                                const allOwners = pet.allOwners.filter( owner => owner.toString() !== pet.primaryOwner.toString() );
+                                const allOwners = pet.allOwners.filter( 
+                                    owner => 
+                                        owner.toString() !== pet.primaryOwner.toString() 
+                                );
 
                                 await PetSecondaryOwnerInvitation.deleteMany({ petId: pet._id.toString() });
                                 await PetHandOverInvitation.deleteMany({ petId: pet._id.toString() });
@@ -72,9 +80,18 @@ const expireUser = cron.schedule(
                                 //clean followers follow event
                                 for( var i = 0; i < petFollowers.length; i ++ ){
                                     follower = await User.findById( petFollowers[ i ] );
-                                    follower.followingUsersOrPets = follower.followingUsersOrPets.filter( followingObject => followingObject.followingId.toString() !== petId );
+                                    follower.followingUsersOrPets = follower.followingUsersOrPets.filter( 
+                                        followingObject => 
+                                            followingObject.followingId.toString() !== petId 
+                                    );
                                     follower.markModified("followingUsersOrPets");
-                                    follower.save( ( err ) => { if( err ){ console.log( err ); } });
+                                    follower.save( 
+                                        ( err ) => { 
+                                            if( err ){ 
+                                                console.log( err ); 
+                                            } 
+                                        }
+                                    );
                                 }
 
                                 //clean dependency of secondary owners
@@ -83,21 +100,48 @@ const expireUser = cron.schedule(
                                     const owner = await User.findById( ownerId );
                                     const deps = owner.dependedUsers;
 
-                                    for( var indx = 0; indx < deps.length; indx ++ ){ if( deps[ indx ].user.toString() === pet.primaryOwner.toString() ){
-                                        const linkedPets = deps[ indx ].linkedPets;
-                                        if( linkedPets.length > 1 ){ owner.dependedUsers[ indx ].linkedPets = owner.dependedUsers[ indx ].linkedPets.filter( pets => pets.toString() !==  pet._id.toString() ); }
-                                            else{ owner.dependedUsers = owner.dependedUsers.filter( dependeds => dependeds !== deps[ indx ] ); }
-                                    }}
+                                    for( var indx = 0; indx < deps.length; indx ++ ){
+                                        if( deps[ indx ].user.toString() === pet.primaryOwner.toString() ){
+                                            const linkedPets = deps[ indx ].linkedPets;
+                                            if( linkedPets.length > 1 ){
+                                                owner.dependedUsers[ indx ].linkedPets = owner.dependedUsers[ indx ].linkedPets.filter( 
+                                                                                            pets => 
+                                                                                                pets.toString() !==  pet._id.toString() 
+                                                                                         ); 
+                                            }else{ 
+                                                owner.dependedUsers = owner.dependedUsers.filter( 
+                                                                        dependeds => 
+                                                                            dependeds !== deps[ indx ] 
+                                                                      ); 
+                                            }
+                                        }
+                                    }
 
                                     owner.markModified( "dependedUser" );
-                                    owner.save(( err ) => { if( err ){ console.error( `ERROR: While Updating Secondary Owner "${owner._id.toString()}"!` ); }});
+                                    owner.save(
+                                        ( err ) => { 
+                                            if( err ){ 
+                                                console.log( `ERROR: While Updating Secondary Owner "${owner._id.toString()}"!` ); 
+                                            }
+                                        }
+                                    );
                                 }
 
                                 //delete images of pet
-                                deleteFileHelper( `pets/${petId}/` ).then( (_) => {
-                                    // delete pet
-                                    pet.deleteOne().then( (_) => { console.log( "A pet deleted because of owner" ); }).catch( ( error ) => { console.log( error ); } );
-                                });
+                                deleteFileHelper( `pets/${petId}/` ).then( 
+                                    (_) => {
+                                        // delete pet
+                                        pet.deleteOne().then( 
+                                            (_) => { 
+                                                onsole.log( "A pet deleted because of owner" ); 
+                                            }
+                                        ).catch( 
+                                            ( error ) => { 
+                                                console.log( error ); 
+                                            } 
+                                        );
+                                    }
+                                );
                             }
                         )
                     );
@@ -148,16 +192,36 @@ const expireUser = cron.schedule(
                                                 return reject( false ); 
                                             }
                                         }
-                                        ticket.deleteOne().then( (_) => { return resolve( true ); }).catch( ( error ) => { if( error ){ console.log(error); } } );
+                                        ticket.deleteOne().then( 
+                                            (_) => { 
+                                                return resolve( true ); 
+                                            }
+                                        ).catch( 
+                                            ( error ) => { 
+                                                if( error ){ 
+                                                    console.log(error); 
+                                                } 
+                                            } 
+                                        );
                                     });
                                 });
 
                                 Promise.all( cancelPayments ).then((_) => {
                                     //delete images of event
-                                    deleteFileHelper( `events/${meetingEvent._id.toString()}/` ).then((_) => {
-                                        //delete event
-                                        meetingEvent.deleteOne().then((_) => { console.log("an event deleted because of user") }).catch(( error ) => { console.log( error ); });
-                                    });
+                                    deleteFileHelper( `events/${meetingEvent._id.toString()}/` ).then(
+                                        (_) => {
+                                            //delete event
+                                            meetingEvent.deleteOne().then(
+                                                (_) => { 
+                                                    console.log("an event deleted because of user") 
+                                                }
+                                            ).catch(
+                                                ( error ) => { 
+                                                    console.log( error ); 
+                                                }
+                                            );
+                                        }
+                                    );
                                 });
 
                             }else{
@@ -177,7 +241,15 @@ const expireUser = cron.schedule(
                                             const contentUrl = afterEventObject.content.content.value;
                                             deleteFileHelper( contentUrl ).then((_) => {
                                                 //delete event
-                                                meetingEvent.deleteOne().then((_) => { console.log("an after event content deleted because of user") }).catch(( error ) => { console.log( error ); });
+                                                meetingEvent.deleteOne().then(
+                                                    (_) => { 
+                                                        console.log("an after event content deleted because of user") 
+                                                    }
+                                                ).catch(
+                                                    ( error ) => { 
+                                                        console.log( error ); 
+                                                    }
+                                                );
                                             });
                                         }
                                         //delete afterEvent
@@ -226,18 +298,33 @@ const expireUser = cron.schedule(
                                 //check if user was also joined guest
                                 const didUserJoin = meetingEvent.joined.find( userId => userId.toString() === user._id.toString() );
                                 if( didUserJoin ){
-                                    meetingEvent.joined = meetingEvent.joined.filter( userId => userId.toString() !== user._id.toString() );
+                                    meetingEvent.joined = meetingEvent.joined.filter( 
+                                        userId => 
+                                            userId.toString() !== user._id.toString() 
+                                    );
                                     meetingEvent.markModified("joined");
                                 }
 
                                 //check if user was also bought ticket
-                                const didUserBoughtTicket = meetingEvent.willJoin = meetingEvent.willJoin.find( userId => userId.toString() === user._id.toString() );
+                                const didUserBoughtTicket = meetingEvent.willJoin = meetingEvent.willJoin.find( 
+                                    userId => 
+                                        userId.toString() === user._id.toString() 
+                                );
+
                                 if( didUserBoughtTicket ){
-                                    meetingEvent.willJoin = meetingEvent.willJoin.filter( userId => userId.toString() !== user._id.toString() );
+                                    meetingEvent.willJoin = meetingEvent.willJoin.filter( 
+                                        userId => 
+                                            userId.toString() !== user._id.toString() 
+                                    );
                                     meetingEvent.markModified("willJoin");
                                 }
 
-                                meetingEvent.save(( err ) => { if( err ){ console.log( err ); } });
+                                meetingEvent.save(
+                                    ( err ) => { 
+                                        if( err ){ 
+                                            console.log( err ); } 
+                                    }
+                                );
                             }
                         }));
                     }
@@ -257,30 +344,74 @@ const expireUser = cron.schedule(
                                     )
                                 ){ console.log( 'ERROR' ); }
                             }
-                            ticket.deleteOne().then((_) => { console.log( "an event ticket deleted because of user" )}).catch(( error ) => { console.log( error ); });
+                            ticket.deleteOne().then(
+                                (_) => { 
+                                    console.log( "an event ticket deleted because of user" )
+                                }
+                            ).catch(
+                                ( error ) => { 
+                                    console.log( error ); 
+                                }
+                            );
                         }
                     }
 
-                    const eventInvitation = await EventInvitation.find({ $or: [{ invitedId: user._id.toString() }, { eventAdminId: user._id.toString() }]});
+                    const eventInvitation = await EventInvitation.find(
+                        { 
+                            $or: [
+                                { invitedId: user._id.toString() }, 
+                                { eventAdminId: user._id.toString() }
+                            ]
+                        }
+                    );
+
                     if( eventInvitation ){ 
                         await Promise.all( 
                             eventInvitation.map(( invitation ) => { 
-                                invitation.deleteOne().then().catch(( err ) => { if( err ){ console.log( err ); } }); 
+                                invitation.deleteOne().then().catch(
+                                    ( err ) => { 
+                                        if( err ){ 
+                                            console.log( err ); 
+                                        } 
+                                    }
+                                ); 
                             })
                         ); 
                     }
 
-                    const organizerInvitation = await OrganizerInvitation.find({ $or: [{ invitedId: user._id.toString() }, {eventAdminId: user._id.toString()}]});
+                    const organizerInvitation = await OrganizerInvitation.find(
+                        { 
+                            $or: [
+                                { invitedId: user._id.toString() }, 
+                                { eventAdminId: user._id.toString() }
+                            ]
+                        }
+                    );
                     if( organizerInvitation ){ 
                         await Promise.all( 
-                            organizerInvitation.map( ( invitation ) => { 
-                                invitation.deleteOne().then().catch(( err ) => { if( err ){ console.log( err ); }}); 
-                            })
+                            organizerInvitation.map( 
+                                ( invitation ) => { 
+                                    invitation.deleteOne().then().catch(( err ) => { if( err ){ console.log( err ); }}); 
+                                }
+                            )
                         ); 
                     }
 
                     //check if there is finished care give and delete if there is
-                    const careGives = await CareGive.find({ $and: [{ "finishProcess.isFinished": true }, { $or: [{ "careGiver.careGiverId": user._id.toString() }, { "petOwner.petOwnerId": user._id.toString() }] }]});
+                    const careGives = await CareGive.find(
+                        { 
+                            $and: [
+                                { "finishProcess.isFinished": true }, 
+                                { 
+                                    $or: [
+                                        { "careGiver.careGiverId": user._id.toString() }, 
+                                        { "petOwner.petOwnerId": user._id.toString() }
+                                    ] 
+                                }
+                            ]
+                        }
+                    );
+                    
                     if( careGives ){
                         await Promise.all( careGives.map( async ( careGive ) => {
                             const isCareGiveReported = await ReportedMission.find( 
@@ -301,7 +432,15 @@ const expireUser = cron.schedule(
                     const stories = await Story.find({ userId: user._id.toString() });
                     if( stories ){  
                         await Promise.all( stories.map(( story ) => { 
-                            story.deleteOne().then((_) => { console.log("deleted an expired story"); }).catch(( error ) => { console.log( error ); }); 
+                            story.deleteOne().then(
+                                (_) => { 
+                                    console.log("deleted an expired story"); 
+                                }
+                            ).catch(
+                                ( error ) => { 
+                                    console.log( error ); 
+                                }
+                            ); 
                         })); 
                     }
 
@@ -313,11 +452,21 @@ const expireUser = cron.schedule(
                     //delete images of user
                     deleteFileHelper( `profileAssets/${user._id.toString()}/` ).then( async (_) => {
                         //delete user
-                        user.deleteOne().then((_) => { console.log( "deleted an expired User" ); }).catch(( error ) => { console.log( error ); });
+                        user.deleteOne().then(
+                            (_) => {
+                                console.log( "deleted an expired User" ); 
+                            }
+                        ).catch(
+                            ( error ) => { 
+                                console.log( error ); 
+                            }
+                        );
                     });
                 });
             }
-        }catch( err ){ console.log( err ); }
+        }catch( err ){ 
+            console.log( err ); 
+        }
     }
 );
 
