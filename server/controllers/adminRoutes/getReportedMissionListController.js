@@ -11,8 +11,8 @@ import prepareReportedMissionHelper from "../../utils/adminHelpers/prepareReport
 
 const getReportedMissionListController = async ( req, res ) => {
     try{
-        const skip = req.params.skip || 0;
-        const limit = req.params.limit || 15;
+        const skip = parseInt( req.params.skip ) || 0;
+        const limit = parseInt( req.params.limit ) || 15;
 
         let reportedMissions = await ReportMission.find().skip( skip ).limit( limit ).lean();
 

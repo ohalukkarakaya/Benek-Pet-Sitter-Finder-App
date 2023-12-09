@@ -7,6 +7,9 @@ import getReportedMissionByIdController from "../../controllers/adminRoutes/getR
 import getReportedMissionListController from "../../controllers/adminRoutes/getReportedMissionListController.js";
 import replyReportController from "../../controllers/adminRoutes/replyReportController.js";
 import getInvoicePaperByIdController from "../../controllers/adminRoutes/getInvoicePaperByIdController.js";
+import getInvoicePaperListController from "../../controllers/adminRoutes/getInvoicePaperListController.js";
+import getExpensePaperByIdController from "../../controllers/adminRoutes/getExpensePaperByIdController.js";
+import getExpensePaperListController from "../../controllers/adminRoutes/getExpensePaperListController.js";
 
 import adminAuth from "../../middleware/adminAuth";
 
@@ -51,31 +54,35 @@ router.post(
     replyReportController
 );
 
-
+// get invoice paper and record info by id
 router.get(
     "/getInvoicePaperById/:invoiceId",
     adminAuth,
     getInvoicePaperByIdController
 );
 
+// get all invoice list
 router.get(
     "/getInvoicePaperList/:skip/:limit",
     adminAuth,
     getInvoicePaperListController
 );
 
+// get expense document by id
 router.get(
     "/getExpensePaperById/:expenseId",
     adminAuth,
     getExpensePaperByIdController
 );
 
+// get all expense documents
 router.get(
     "/getExpensePaperList/:skip/:limit",
     adminAuth,
     getExpensePaperListController
 );
 
+// punish user
 router.post(
     "/punishUser/:userId",
     adminAuth,
