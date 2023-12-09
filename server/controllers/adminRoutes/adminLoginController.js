@@ -11,6 +11,12 @@ import generateTokens from "../../utils/bodyValidation/user/generateTokens.js";
 dotenv.config();
 const socket = io( process.env.SOCKET_URL );
 
+//  *        ø        *         .                      *            .   *           .    *
+//                                *                  *  .                .
+//  *                *        .       *                ☾         *.             *.     .  *.   .
+//      *           .       *                *                 .               *.        *   .
+//     . adminLoginController   *       .         * .                  .  ø 
+
 const adminLoginController = async ( req, res ) => {
     try{
         //parametreleri karşıla eksikse hata dön

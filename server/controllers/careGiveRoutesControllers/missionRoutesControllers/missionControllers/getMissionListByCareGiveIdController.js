@@ -89,10 +89,7 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
 
         const limitedMissionCallender = missionCallender.slice( startIndex, endIndex );
         let missionList = [];
-        for(
-            let mission
-            of limitedMissionCallender
-        ){
+        for( let mission of limitedMissionCallender ){
             let missionContent;
             if( 
                 mission.missionContent

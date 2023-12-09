@@ -1,5 +1,7 @@
+// Models
 import AdminLoginCode from "../../models/Admin/AdminLoginCode.js";
 
+// Helpers
 import crypto from "node:crypto";
 import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.js"
 import nodeCanvas from "canvas";
@@ -8,6 +10,12 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+//  *        ø        *         .                      *            .   *           .    *
+//                                *                  *  .                .
+//  *                *        .       *                ☾         *.             *.     .  *.   .
+//      *           .       *                *                 .               *.        *   .
+//     . getAdminLoginQrCodeController   *       .         * .                  .  ø 
 
 const getAdminLoginQrCodeController = async ( req, res ) => {
     try{

@@ -38,7 +38,7 @@ import animalKeywordRoutes from './routes/key_words/animalCategory.js';
 import chatRoutes from './routes/chat/chat.js';
 import notificationRoutes from './routes/notification/notification.js';
 import logRoutes from './routes/log/log.js';
-import paymentRoutes from './routes/paymentRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js'; 
 
 import bodyParser from 'body-parser';
 

@@ -42,7 +42,7 @@ const expireCareGive = cron.schedule(
                     if( !isCareGiveReported || isCareGiveReported.length <= 0 ){
                         //delete assets of event
                         const deleteAssets = await deleteFileHelper( `CareGive/${ careGive._id.toString() }` );
-                        if( deleteAssets.error ){ console.log( `ERROR: delete asste - ${ careGive._id.toString() }` ); }
+                        if( deleteAssets.error ){ console.log( `ERROR: delete assets - ${ careGive._id.toString() }` ); }
 
                         const paymentsToApprove = await PaymentData.find({ parentContentId: careGive._id.toString(), isPaid: true });
                         let paymentDataList = paymentsToApprove.toObject();

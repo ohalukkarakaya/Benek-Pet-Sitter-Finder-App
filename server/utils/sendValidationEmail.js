@@ -98,12 +98,10 @@ let transporter = nodemailer.createTransport(
     }catch( e ){
 
       res.status( 500 )
-         .json(
-            {
+         .json({
               error: true,
               message: e.message,
-            }
-          )
+          })
           
     }
   }

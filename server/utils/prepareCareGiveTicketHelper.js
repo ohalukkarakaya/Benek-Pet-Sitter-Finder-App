@@ -12,12 +12,12 @@ import dotenv from "dotenv";
 dotenv.config();
 
 function generateQRCode( 
-            ticketData,
-            hashCodePassword,
-            virtualPosOrderId,
-            paymentDataId,
-            orderUniqueCode,
-            careGive 
+    ticketData,
+    hashCodePassword,
+    virtualPosOrderId,
+    paymentDataId,
+    orderUniqueCode,
+    careGive 
 ){
     return new Promise(
         ( resolve, reject ) => {
@@ -75,8 +75,8 @@ const prepareCareGiveTicketHelper = async (
 ) => {
     try{
         const randPassword = crypto.randomBytes( 10 ).toString( 'hex' );
-        const salt = await bcrypt.genSalt(Number(process.env.SALT));
-        const hashTicketPassword = await bcrypt.hash(randPassword, salt);
+        const salt = await bcrypt.genSalt( Number( process.env.SALT ) );
+        const hashTicketPassword = await bcrypt.hash( randPassword, salt );
 
         const careGive = await CareGive.findById( careGiveId );
 
@@ -197,13 +197,13 @@ const prepareCareGiveTicketHelper = async (
         );
 
         const careGiveToSend = await generateQRCode( 
-                                        qrCodeData, 
-                                        hashTicketPassword, 
-                                        virtualPosOrderId,
-                                        paymentDataId,
-                                        orderUniqueCode,
-                                        careGive 
-                                     );
+            qrCodeData, 
+            hashTicketPassword, 
+            virtualPosOrderId,
+            paymentDataId,
+            orderUniqueCode,
+            careGive 
+        );
 
         if( careGiveToSend ){
             return {

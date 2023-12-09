@@ -3,6 +3,9 @@ import express from "express";
 //controllers
 import getAdminLoginQrCodeController from "../../controllers/adminRoutes/getAdminLoginQrCodeController.js";
 import adminLoginController from "../../controllers/adminRoutes/adminLoginController.js";
+import getReportedMissionByIdController from "../../controllers/adminRoutes/getReportedMissionByIdController.js";
+import getReportedMissionListController from "../../controllers/adminRoutes/getReportedMissionListController.js";
+import replyReportController from "../../controllers/adminRoutes/replyReportController.js";
 
 import adminAuth from "../../middleware/adminAuth";
 
@@ -19,30 +22,34 @@ router.get(
     getAdminLoginQrCodeController
 );
 
-//login
+// login
 router.post(
     "/login",
     adminAuth,
     adminLoginController
 );
 
+// get Rreport by id
 router.get(
     "/reportedMissionById/:reportId",
     adminAuth,
     getReportedMissionByIdController
 );
 
+// get all reports
 router.get(
     "/reportedMissionList/:skip/:limit",
     adminAuth,
-    getReportedMissionList
+    getReportedMissionListController
 );
 
+// reply report
 router.post(
     "/replyReport/:reportId/:response",
     adminAuth,
     replyReportController
 );
+
 
 router.get(
     "/getInvoicePaperById/:invoiceId",

@@ -8,12 +8,12 @@ const adminAuth = async (req, res, next) => {
         const token = req.header("x-access-token");
         if( !token ){
             return res.status( 403 )
-                    .json(
+                      .json(
                         {
                             error: true,
                             message: "Access Denied: No token provided"
                         }
-                    );
+                      );
         }
         const user = jwt.verify( token, process.env.ACCESS_TOKEN_PRIVATE_KEY );
         if( user.roles !== 1 && user.roles !== 2 ){
