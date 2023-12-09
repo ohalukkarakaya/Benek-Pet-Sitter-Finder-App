@@ -2,9 +2,6 @@ import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 import fs from 'fs';
 
-//models
-import User from "../../../models/User.js";
-
 // helpers
 import careGiverPaymentCancellationEmailHtmlHelper from "./careGiverPaymentCancellationEmailHtmlHelper.js";
 import petOwnerPaymentCancellationEmailHtmlHelper from "./petOwnerPaymentCancellationEmailHtmlHelper.js";
@@ -13,7 +10,7 @@ dotenv.config();
 
 const sendPaymentCancellationEmailHelper = async ( petOwnerEmail, careGiverEmail ) => {
     try{
-        for( let i = 0; i <= 1; i ++ ){
+        for( let i = 0; i <= 1; i ++ ){ // iki kere girsin diye ( bir bakıcı bir de evcil hayvan sahibi için )
           //send email
           let transporter = nodemailer.createTransport({
                 host: process.env.AUTH_EMAIL_HOST,
@@ -61,7 +58,7 @@ const sendPaymentCancellationEmailHelper = async ( petOwnerEmail, careGiverEmail
             message: "Succesful",
         }
     }catch( err ){
-        console.log( "ERROR: expenseDocumentGenerationHelper - ", err );
+        console.log( "ERROR: sendPaymentCancellationEmailHelper - ", err );
         return {
             error: true,
             statusCode: 500,

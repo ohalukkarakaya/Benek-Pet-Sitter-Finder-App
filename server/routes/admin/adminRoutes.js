@@ -10,6 +10,7 @@ import getInvoicePaperByIdController from "../../controllers/adminRoutes/getInvo
 import getInvoicePaperListController from "../../controllers/adminRoutes/getInvoicePaperListController.js";
 import getExpensePaperByIdController from "../../controllers/adminRoutes/getExpensePaperByIdController.js";
 import getExpensePaperListController from "../../controllers/adminRoutes/getExpensePaperListController.js";
+import punishUserController from "../../controllers/adminRoutes/punishUserController.js";
 
 import adminAuth from "../../middleware/adminAuth";
 
