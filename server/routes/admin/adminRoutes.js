@@ -6,6 +6,7 @@ import adminLoginController from "../../controllers/adminRoutes/adminLoginContro
 import getReportedMissionByIdController from "../../controllers/adminRoutes/getReportedMissionByIdController.js";
 import getReportedMissionListController from "../../controllers/adminRoutes/getReportedMissionListController.js";
 import replyReportController from "../../controllers/adminRoutes/replyReportController.js";
+import getInvoicePaperByIdController from "../../controllers/adminRoutes/getInvoicePaperByIdController.js";
 
 import adminAuth from "../../middleware/adminAuth";
 

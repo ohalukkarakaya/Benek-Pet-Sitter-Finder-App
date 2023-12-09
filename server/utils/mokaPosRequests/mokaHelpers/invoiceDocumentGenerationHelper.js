@@ -229,13 +229,17 @@ const invoiceDocumentGenerationHelper = async ( userId, expensionRecordIdiesList
             }
             
         }else{
-            for( let payment of paymentDataList ){ totalPrice = totalPrice + payment.priceData.price; }
+            for( let payment of paymentDataList ){ 
+                totalPrice = totalPrice + payment.priceData.price; 
+            }
             pages.push( paymentDataList ); 
         }
 
         const paymentData = paymentDataList[ 0 ];
         const careGiver = await User.findById( paymentData.subSellerId );
-        const careGiverInfo = careGiver ? getLightWeightUserInfoHelper( careGiver ) : { userId: "Deleted User", userProfileImg: "", username: "Deleted User", userFullName: "Deleted User" };
+        const careGiverInfo = careGiver 
+                                ? getLightWeightUserInfoHelper( careGiver ) 
+                                : { userId: "Deleted User", userProfileImg: "", username: "Deleted User", userFullName: "Deleted User" };
         
         const customer = await User.findById( paymentData.customerId.toString() );
         const customerInfo = getLightWeightUserInfoHelper( customer );

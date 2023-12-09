@@ -31,7 +31,7 @@ const getReportedMissionListController = async ( req, res ) => {
     }catch( err ){
         console.log( "ERROR: getReportedMissionListController - ", err );
         return res.status( 500 )
-                  .json({ error: true, message: "Internal Server Error" })
+                  .json({ error: true, message: "Internal Server Error" });
     }
 }
 
