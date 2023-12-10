@@ -12,6 +12,7 @@ import getExpensePaperByIdController from "../../controllers/adminRoutes/getExpe
 import getExpensePaperListController from "../../controllers/adminRoutes/getExpensePaperListController.js";
 import punishUserController from "../../controllers/adminRoutes/punishUserController.js";
 import banUserController from "../../controllers/adminRoutes/banUserController.js";
+import getActiveUserCountController from "../../controllers/adminRoutes/getActiveUserCountController.js";
 
 import adminAuth from "../../middleware/adminAuth";
 
@@ -98,12 +99,14 @@ router.post(
     banUserController
 );
 
+// Count Active Users
 router.get(
     "/activeUserCount",
     adminAuth,
     getActiveUserCountController
 );
 
+// Count Payment Data Prices
 router.get(
     "/getPaymentsOnPool",
     adminAuth,
@@ -115,5 +118,17 @@ router.put(
     adminAuth,
     giveUserAuthorizationRoleController
 );
+
+router.get(
+    "/getBannedUsersList/:skip/:limit",
+    adminAuth,
+    getBannedUsersList
+)
+
+router.delete(
+    "/removeBan/:banId",
+    adminAuth,
+    removeBan
+)
 
 export default router;
