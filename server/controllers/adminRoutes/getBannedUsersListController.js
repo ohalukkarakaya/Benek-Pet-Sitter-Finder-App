@@ -10,7 +10,7 @@ import getLightWeightUserInfoHelper from "../../utils/getLightWeightUserInfoHelp
 //      *           .       *                *                 .               *.        *   .
 //     . getBannedUsersList   *       .         * .                  .  
 
-const getBannedUsersList = async ( req, res ) => {
+const getBannedUsersListController = async ( req, res ) => {
     try{
         let skip = parseInt( req.params.skip ) || 0;
         let limit = parseInt( req.params.limit ) || 15;
@@ -39,4 +39,4 @@ const getBannedUsersList = async ( req, res ) => {
     }
 }
 
-export default getBannedUsersList;
+export default getBannedUsersListController;
