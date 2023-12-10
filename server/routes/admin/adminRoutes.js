@@ -15,6 +15,7 @@ import banUserController from "../../controllers/adminRoutes/banUserController.j
 import getActiveUserCountController from "../../controllers/adminRoutes/getActiveUserCountController.js";
 import getPaymentsOnPoolController from "../../controllers/adminRoutes/getPaymentsOnPoolController.js";
 import giveUserAuthorizationRoleController from "../../controllers/adminRoutes/giveUserAuthorizationRoleController.js";
+import getBannedUsersList from "../../controllers/adminRoutes/getBannedUsersList.js";
 
 import adminAuth from "../../middleware/adminAuth";
 
