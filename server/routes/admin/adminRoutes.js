@@ -14,6 +14,7 @@ import punishUserController from "../../controllers/adminRoutes/punishUserContro
 import banUserController from "../../controllers/adminRoutes/banUserController.js";
 import getActiveUserCountController from "../../controllers/adminRoutes/getActiveUserCountController.js";
 import getPaymentsOnPoolController from "../../controllers/adminRoutes/getPaymentsOnPoolController.js";
+import giveUserAuthorizationRoleController from "../../controllers/adminRoutes/giveUserAuthorizationRoleController.js";
 
 import adminAuth from "../../middleware/adminAuth";
 
