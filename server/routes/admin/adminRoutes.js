@@ -13,6 +13,7 @@ import getExpensePaperListController from "../../controllers/adminRoutes/getExpe
 import punishUserController from "../../controllers/adminRoutes/punishUserController.js";
 import banUserController from "../../controllers/adminRoutes/banUserController.js";
 import getActiveUserCountController from "../../controllers/adminRoutes/getActiveUserCountController.js";
+import getPaymentsOnPoolController from "../../controllers/adminRoutes/getPaymentsOnPoolController.js";
 
 import adminAuth from "../../middleware/adminAuth";
 
