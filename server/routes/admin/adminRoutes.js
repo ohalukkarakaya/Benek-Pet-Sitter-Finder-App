@@ -17,8 +17,9 @@ import getPaymentsOnPoolController from "../../controllers/adminRoutes/getPaymen
 import giveUserAuthorizationRoleController from "../../controllers/adminRoutes/giveUserAuthorizationRoleController.js";
 import getBannedUsersListController from "../../controllers/adminRoutes/getBannedUsersListController.js";
 import removeBanController from "../../controllers/adminRoutes/removeBanController.js";
+import getAllEmployeesController from "../../controllers/adminRoutes/getAllEmployeesController.js";
 
-import { adminAuthAny, adminAuthSuperAdmin, adminAuthEditor, adminAuthAccounting } from "../../middleware/adminAuth.js";
+import { adminAuthAny, adminAuthSuperAdmin, adminAuthEvaluator, adminAuthAccounting } from "../../middleware/adminAuth.js";
 
 import dotenv from "dotenv";
 
@@ -46,7 +47,7 @@ router.post(
 // get Report by id
 router.get(
     "/reportedMissionById/:reportId",
-    adminAuthEditor,
+    adminAuthEvaluator,
     getReportedMissionByIdController
 );
 
@@ -54,7 +55,7 @@ router.get(
 // get all reports
 router.get(
     "/reportedMissionList/:skip/:limit",
-    adminAuthEditor,
+    adminAuthEvaluator,
     getReportedMissionListController
 );
 
@@ -62,7 +63,7 @@ router.get(
 // reply report
 router.post(
     "/replyReport/:reportId/:response",
-    adminAuthEditor,
+    adminAuthEvaluator,
     replyReportController
 );
 
@@ -102,7 +103,7 @@ router.get(
 // punish user
 router.post(
     "/punishUser/:userId",
-    adminAuthEditor,
+    adminAuthEvaluator,
     punishUserController
 );
 
@@ -110,7 +111,7 @@ router.post(
 // ban user by userId
 router.post(
     "/banUser/:userId",
-    adminAuthEditor,
+    adminAuthEvaluator,
     banUserController
 );
 
@@ -142,7 +143,7 @@ router.put(
 // Get Banned Users
 router.get(
     "/getBannedUsersList/:skip/:limit",
-    adminAuthEditor,
+    adminAuthEvaluator,
     getBannedUsersListController
 )
 
@@ -150,8 +151,16 @@ router.get(
 // Remove Ban
 router.delete(
     "/removeBan/:banId",
-    adminAuthEditor,
+    adminAuthEvaluator,
     removeBanController
+)
+
+// - tested
+// Get Employees
+router.get(
+    "/getEmployees/:skip/:limit",
+    adminAuthAny,
+    getAllEmployeesController
 )
 
 export default router;

@@ -144,7 +144,7 @@ const adminAuthDeveloper = async (req, res, next) => {
     }
 };
 
-const adminAuthEditor = async (req, res, next) => {
+const adminAuthEvaluator = async (req, res, next) => {
   try{
       const token = req.header("x-access-token");
       if( !token ){
@@ -242,6 +242,6 @@ export {
   adminAuthAny,
   adminAuthSuperAdmin,
   adminAuthDeveloper,
-  adminAuthEditor,
+  adminAuthEvaluator,
   adminAuthAccounting
 };

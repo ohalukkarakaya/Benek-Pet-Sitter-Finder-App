@@ -16,9 +16,9 @@ const giveUserAuthorizationRoleController = async ( req, res ) => {
                       .json({ error: true, message: "Missing Params" });
         }
 
-        const authIdies = { "0": "RegularUser", "1": "SuperAmin", "2": "Developer", "3": "Editor", "4": "Accounting" };
+        const authIdies = { "0": "RegularUser", "1": "SuperAmin", "2": "Developer", "3": "Evaluator", "4": "Accounting" };
 
-        //// 0 - sıradan kullanıcı, 1 - super admin, 2 - developer, 3 - editor, 4 - muhasebe
+        //// 0 - sıradan kullanıcı, 1 - super admin, 2 - developer, 3 - evaluator, 4 - muhasebe
         if( 
             givingRoleId !== 0 
             && givingRoleId !== 1

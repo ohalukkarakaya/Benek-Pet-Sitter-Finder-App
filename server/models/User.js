@@ -9,7 +9,7 @@ const UserSchema = new mongoose.Schema(
         },
         authRole: {
             type: Number,
-            enum: [ 0, 1, 2, 3, 4 ], // 0 - sıradan kullanıcı, 1 - super admin, 2 - developer, 3 - editor, 4 - muhasebe
+            enum: [ 0, 1, 2, 3, 4 ], // 0 - sıradan kullanıcı, 1 - super admin, 2 - developer, 3 - evaluator, 4 - muhasebe
             default: 0,
         },
         identity: {
