@@ -21,7 +21,7 @@ const replyReportController = async ( req, res ) => {
 
         adminsResponseToReport = adminsResponseToReport === 'True' || adminsResponseToReport === 'true';
 
-        const report = ReportMission.findById( reportId );
+        const report = await ReportMission.findById( reportId );
         if( !report ){
             return res.status( 404 )
                       .json({ error: true, message: "Report Not Found" })
@@ -34,13 +34,13 @@ const replyReportController = async ( req, res ) => {
             }
             
             // Punish CareGiver
-            const paymentData = PaymentData.findOne({ parentContentId: report.careGiveId.toString() });
+            const paymentData = await PaymentData.findOne({ parentContentId: report.careGiveId.toString() });
             await new AdminPaymentCancellation({ 
                 adminId: req.user._id.toString(), 
                 releatedContentId: report.careGiveId.toString(),
                 SubSellerId: report.careGiverId.toString(),
-                paymentVirtualPosId: paymentData.virtualPosOrderId.toString(),
-                paymentDataId: paymentData._id.toString(),
+                paymentVirtualPosId: paymentData && paymentData.virtualPosOrderId ? paymentData.virtualPosOrderId.toString() : null,
+                paymentDataId: paymentData ? paymentData._id.toString() : null,
                 CustomerId: report.petOwnerId.toString(),
                 contentUrl: report.videoUrl.toString(),
                 reportDesc: report.reportDesc.toString(),
