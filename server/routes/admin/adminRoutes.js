@@ -98,6 +98,7 @@ router.get(
     getExpensePaperListController
 );
 
+// - tested
 // punish user
 router.post(
     "/punishUser/:userId",
