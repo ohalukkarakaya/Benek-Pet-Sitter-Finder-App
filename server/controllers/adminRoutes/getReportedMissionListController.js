@@ -14,6 +14,7 @@ const getReportedMissionListController = async ( req, res ) => {
         const skip = parseInt( req.params.skip ) || 0;
         const limit = parseInt( req.params.limit ) || 15;
 
+        const reportedMissionsCount = await ReportMission.countDocuments();
         let reportedMissions = await ReportMission.find().skip( skip ).limit( limit ).lean();
 
         let reportedMissionList = await prepareReportedMissionHelper( reportedMissions );
@@ -26,6 +27,7 @@ const getReportedMissionListController = async ( req, res ) => {
                   .json({
                         error: false,
                         message: "List Prepared Succesfully",
+                        reportedMissionCount: reportedMissionsCount,
                         reportedMissionList: reportedMissionList
                   });
     }catch( err ){

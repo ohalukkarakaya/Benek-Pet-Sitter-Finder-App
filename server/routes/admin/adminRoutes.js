@@ -43,14 +43,14 @@ router.post(
 );
 
 // - tested
-// get Rreport by id
+// get Report by id
 router.get(
     "/reportedMissionById/:reportId",
     adminAuthEditor,
     getReportedMissionByIdController
 );
 
-// -  
+// -  tested
 // get all reports
 router.get(
     "/reportedMissionList/:skip/:limit",
