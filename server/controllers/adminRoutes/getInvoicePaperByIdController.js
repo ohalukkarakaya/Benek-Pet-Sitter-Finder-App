@@ -28,7 +28,7 @@ const getInvoicePaperByIdController = async ( req, res ) => {
             return res.status( 500 )
                   .json({ error: true, message: "Internal Server Error" });
         }
-        preparedInvoiceInfo = preparedInvoiceInfo.data;
+        preparedInvoiceInfo = preparedInvoiceInfo.data[0];
 
         return res.status( 200 )
                   .json({
