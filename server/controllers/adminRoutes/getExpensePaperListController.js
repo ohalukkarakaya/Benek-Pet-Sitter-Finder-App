@@ -14,13 +14,14 @@ const getExpensePaperListController = async ( req, res ) => {
         const skip = parseInt( req.params.skip ) || 0;
         const limit = parseInt( req.params.limit ) || 10;
 
-        let expenseRecordList = ExpenseRecord.find().skip( skip ).limit( limit ).lean();
+        const expenseRecordCount = await ExpenseRecord.countDocuments();
+        let expenseRecordList = await ExpenseRecord.find().skip( skip ).limit( limit ).lean();
         if( !expenseRecordList || expenseRecordList.length <= 0 ){
             return res.status( 404 )
                       .json({ error: false, message: "No Expense Record Found" })
         }
 
-        let expenseRecordInfoList = await prepareExpenseRecordHelper( new Set( expenseRecordList.map( record => record._id ) ).toList() );
+        let expenseRecordInfoList = await prepareExpenseRecordHelper( new Set( expenseRecordList.map( record => record._id ) ) );
         if( expenseRecordInfoList.error ){
             return res.status( 500 )
                       .json({ error: true, message: "Internal Server Error" });
@@ -32,6 +33,7 @@ const getExpensePaperListController = async ( req, res ) => {
                 .json({
                     error: false,
                     message: "List Prepared Succesfully",
+                    totalexpenseRecordCount: expenseRecordCount,
                     expenseRecordList: expenseRecordInfoList
                 })
 

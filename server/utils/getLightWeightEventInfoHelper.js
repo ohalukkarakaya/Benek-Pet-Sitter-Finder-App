@@ -51,35 +51,39 @@ const getRelevantUserInfo = async userId => {
 const getLightWeightEventInfoHelper = async ( event ) => {
     try{
         // veriyi hazırla
-        const willJoinList = await processUserList( event.willJoin );
-        const joinedList = await processUserList( event.joined );
-        const organizersList = await processUserList( event.eventOrganizers );
-        const eventAdminInfo = await getRelevantUserInfo( event.eventAdmin.toString() );
+        const willJoinList = event && event.willJoin ? await processUserList( event.willJoin ) : [];
+        const joinedList = event && event.joined ? await processUserList( event.joined ) : [];
+        const organizersList = event && event.eventOrganizers ? await processUserList( event.eventOrganizers ) : [];
+        const eventAdminInfo = event && event.eventAdmin ? await getRelevantUserInfo( event.eventAdmin.toString() ) : {};
 
         let lastAfterEventObject = null;
-        if( event.afterEvent.length > 0 ){
+        if( event && event.afterEvent && event.afterEvent.length > 0 ){
             lastAfterEventObject = await processAfterEventObject( event.afterEvent[ event.afterEvent.length - 1 ] );
         }
 
-        const remainedEventQuota = event.maxGuest
+        const remainedEventQuota = event
+                                   && event.maxGuest
                                     ? event.maxGuest - [...willJoinList, ...joinedList].length
                                     : "No Quota";
                                     
-        const ticketPrice = event.ticketPrice.priceType === "Free"
-                                ? event.ticketPrice.priceType
-                                : `${event.ticketPrice.price} ${event.ticketPrice.priceType}`;
+        const ticketPrice = event
+                            && event.ticketPrice
+                                ? event.ticketPrice.priceType === "Free"
+                                    ? event.ticketPrice.priceType
+                                    : `${event.ticketPrice.price} ${event.ticketPrice.priceType}`
+                                : "N/A";
 
         return {
-            eventId: event._id.toString(),
-            eventImg: event.imgUrl,
-            isPrivate: event.isPrivate,
+            eventId: event ? event._id.toString() : null,
+            eventImg: event && event.imgUrl ? event.imgUrl : null,
+            isPrivate: event ? event.isPrivate : false,
             eventAdmin: eventAdminInfo,
             organizers: organizersList,
             ticketPrice: ticketPrice,
-            maxGuestLimit: event.maxGuest,
+            maxGuestLimit: event && event.maxGuest ? event.maxGuest : "No Quota",
             remainedGuestQuota: remainedEventQuota,
-            eventDate: event.date,
-            eventAdress: event.adress,
+            eventDate: event && event.date ? event.date : "Date Not Found",
+            eventAdress: event && event.adress ? event.adress : "Adress Not Found",
             willJoin: willJoinList,
             joined: joinedList,
             lastAfterEvent: lastAfterEventObject
