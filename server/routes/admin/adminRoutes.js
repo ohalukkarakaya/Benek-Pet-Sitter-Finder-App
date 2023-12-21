@@ -18,7 +18,7 @@ import giveUserAuthorizationRoleController from "../../controllers/adminRoutes/g
 import getBannedUsersListController from "../../controllers/adminRoutes/getBannedUsersListController.js";
 import removeBanController from "../../controllers/adminRoutes/removeBanController.js";
 
-import adminAuth from "../../middleware/adminAuth";
+import { adminAuthAny, adminAuthSuperAdmin, adminAuthEditor, adminAuthAccounting } from "../../middleware/adminAuth";
 
 import dotenv from "dotenv";
 
@@ -36,102 +36,105 @@ router.get(
 // login
 router.post(
     "/login",
-    adminAuth,
+    adminAuthAny,
     adminLoginController
 );
 
 // get Rreport by id
 router.get(
     "/reportedMissionById/:reportId",
-    adminAuth,
+    adminAuthEditor,
     getReportedMissionByIdController
 );
 
 // get all reports
 router.get(
     "/reportedMissionList/:skip/:limit",
-    adminAuth,
+    adminAuthEditor,
     getReportedMissionListController
 );
 
 // reply report
 router.post(
     "/replyReport/:reportId/:response",
-    adminAuth,
+    adminAuthEditor,
     replyReportController
 );
 
 // get invoice paper and record info by id
 router.get(
     "/getInvoicePaperById/:invoiceId",
-    adminAuth,
+    adminAuthAccounting,
     getInvoicePaperByIdController
 );
 
 // get all invoice list
 router.get(
     "/getInvoicePaperList/:skip/:limit",
-    adminAuth,
+    adminAuthAccounting,
     getInvoicePaperListController
 );
 
 // get expense document by id
 router.get(
     "/getExpensePaperById/:expenseId",
-    adminAuth,
+    adminAuthAccounting,
     getExpensePaperByIdController
 );
 
 // get all expense documents
 router.get(
     "/getExpensePaperList/:skip/:limit",
-    adminAuth,
+    adminAuthAccounting,
     getExpensePaperListController
 );
 
 // punish user
 router.post(
     "/punishUser/:userId",
-    adminAuth,
+    adminAuthEditor,
     punishUserController
 );
 
 // ban user by userId
 router.post(
     "/banUser/:userId",
-    adminAuth,
+    adminAuthEditor,
     banUserController
 );
 
 // Count Active Users
 router.get(
     "/activeUserCount",
-    adminAuth,
+    adminAuthAny,
     getActiveUserCountController
 );
 
 // Count Payment Data Prices
 router.get(
     "/getPaymentsOnPool",
-    adminAuth,
+    adminAuthAccounting,
     getPaymentsOnPoolController
 );
 
+// Give User Authorization Role
 router.put(
     "/giveUserAuthorizationRole/:userId/:roleId",
-    adminAuth,
+    adminAuthSuperAdmin,
     giveUserAuthorizationRoleController
 );
 
+// Get Banned Users
 router.get(
     "/getBannedUsersList/:skip/:limit",
-    adminAuth,
+    adminAuthEditor,
     getBannedUsersListController
 )
 
+// Remove Ban
 router.delete(
     "/removeBan/:banId",
-    adminAuth,
+    adminAuthEditor,
     removeBanController
 )
 
