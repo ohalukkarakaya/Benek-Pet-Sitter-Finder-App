@@ -27,6 +27,8 @@ const getLightWeightMissionInfoHelper = (
         isExtra: mission.isExtra,
         content: missionContent,
     }
+
+    return missionInfo;
 }
 
 export default getLightWeightMissionInfoHelper;

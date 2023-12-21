@@ -4,7 +4,7 @@ import EventInvitation from "../models/Event/Invitations/InviteEvent.js";
 
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.js"
+import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.js";
 import nodeCanvas from "canvas";
 import { JSDOM } from "jsdom";
 import dotenv from "dotenv";
@@ -42,7 +42,7 @@ function generateQRCode( ticketData, ticket ){
             });
 
             qrCodeSvgWithBlobImage.getRawData( "svg" ).then(async (url) => {
-                ticket.ticketUrl = url;
+                ticket.ticketUrl = url.toString("base64");
                 ticket.markModified( "ticketUrl" );
                 const ticketToSend = await ticket.save();
                 resolve( ticketToSend );

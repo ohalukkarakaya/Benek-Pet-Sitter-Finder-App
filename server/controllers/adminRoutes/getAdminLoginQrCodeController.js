@@ -3,11 +3,12 @@ import AdminLoginCode from "../../models/Admin/AdminLoginCode.js";
 
 // Helpers
 import crypto from "node:crypto";
-import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.js"
+import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.js";
 import nodeCanvas from "canvas";
 import { JSDOM } from "jsdom";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config();
 
@@ -42,8 +43,10 @@ const getAdminLoginQrCodeController = async ( req, res ) => {
             height: 300,
             data: qrCodeData,
             image: path.resolve( './src/benek_amblem.png' ),
-            dotsOptions: { type: "dots" },
-        };
+            dotsOptions: {
+                type: "dots"
+            },
+        }
 
         const qrCodeSvgWithBlobImage = new QRCodeStyling({ 
             jsdom: JSDOM, // this is required
@@ -60,20 +63,31 @@ const getAdminLoginQrCodeController = async ( req, res ) => {
             cornersDotOptions: { type: 'extra-rounded' }
         });
 
-        qrCodeSvgWithBlobImage.getRawData("svg").then(async ( url ) => {
-            await new AdminLoginCode({
-                clientId: clientId,
-                codePassword: hashCodePassword
-            }).save();
+        let code;
+        await qrCodeSvgWithBlobImage.getRawData("svg").then(
+            async ( url ) => {
+               await new AdminLoginCode(
+                    {
+                        clientId: clientId,
+                        codePassword: hashCodePassword
+                    }
+                ).save();
 
-            return res.status( 200 ).json({
-                error: false,
-                clientId: clientId,
-                code: url,
-            });
-        });
+                code = url.toString("base64");
+            }
+        );
 
-        return res.status( 500 ).json({ error: true, message: "Internal Server Error" })
+        if( code ){
+            return res.status( 200 ).json( 
+                {
+                    error: false,
+                    clientId: clientId,
+                    code: code,
+                } 
+            );
+        }else{
+            return res.status( 500 ).json({ error: true, message: "Internal Server Error" })
+        }
         
     }catch( err ){
         console.log( "ERROR: getAdminLoginQrCodeController - ", err );

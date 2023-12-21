@@ -27,7 +27,7 @@ dotenv.config();
 
 const router = express.Router();
 
-// - 
+// - tested
 // get qr code
 router.get(
     "/getLoginQrCode/:clientId",

@@ -8,6 +8,7 @@ import crypto from "crypto";
 import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.js"
 import nodeCanvas from "canvas";
 import { JSDOM } from "jsdom";
+import path from "path";
 
 dotenv.config();
 

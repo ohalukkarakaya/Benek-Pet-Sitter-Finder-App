@@ -8,6 +8,7 @@ import { QRCodeStyling } from "qr-code-styling-node/lib/qr-code-styling.common.j
 import nodeCanvas from "canvas";
 import { JSDOM } from "jsdom";
 import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config();
 
