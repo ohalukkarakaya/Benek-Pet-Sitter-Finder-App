@@ -138,6 +138,7 @@ router.put(
     giveUserAuthorizationRoleController
 );
 
+// - tested
 // Get Banned Users
 router.get(
     "/getBannedUsersList/:skip/:limit",

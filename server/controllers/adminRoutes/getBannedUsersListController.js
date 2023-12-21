@@ -15,6 +15,7 @@ const getBannedUsersListController = async ( req, res ) => {
         let skip = parseInt( req.params.skip ) || 0;
         let limit = parseInt( req.params.limit ) || 15;
 
+        const totalBannedUserCount = await BannedUsers.countDocuments();
         let bannedUsersList = await BannedUsers.find().skip( skip ).limit( limit ).lean();
         if( !bannedUsersList || bannedUsersList.length <= 0 ){
             return res.status( 404 )
@@ -31,7 +32,12 @@ const getBannedUsersListController = async ( req, res ) => {
         }
 
         return res.status( 200 )
-                  .json({ error: false, message: "List Prepared Succesfully", banedUserList: bannedUsersList });
+                  .json({ 
+                    error: false, 
+                    message: "List Prepared Succesfully", 
+                    totalBannedUserCount: totalBannedUserCount, 
+                    banedUserList: bannedUsersList 
+                  });
     }catch( err ){
         console.log( "ERROR: getBannedUsersList - ", err );
         return res.status( 500 )
