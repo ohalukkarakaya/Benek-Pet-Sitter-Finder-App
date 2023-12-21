@@ -1,17 +1,14 @@
 const getLightWeightPetInfoHelper = ( pet ) => {
     try{
         return {
-            petId: pet._id
-                      .toString(),
-            petProfileImgUrl: pet.petProfileImg
-                                 .imgUrl,
+            petId: pet._id.toString(),
+            petProfileImgUrl: pet.petProfileImg && pet.petProfileImg.imgUrl ? pet.petProfileImg.imgUrl : null,
             petName: pet.name,
             sex: pet.sex,
             birthDay: pet.birthDay,
             kind: pet.kind,
             species: pet.species,
-            handoverCount: pet.handOverRecord
-                              .length
+            handoverCount: pet.handOverRecord ? pet.handOverRecord.length : 0
         };
     }catch( err ){
         console.log( "ERROR: user lightweight info - ", err );

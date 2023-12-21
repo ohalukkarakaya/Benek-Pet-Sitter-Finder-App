@@ -2,6 +2,7 @@ const getLightWeightMissionInfoHelper = (
     mission,
     careGiveRoleId,
     petInfo,
+    petOwnerInfo,
     careGiverInfo
 ) => {
     let missionContent;

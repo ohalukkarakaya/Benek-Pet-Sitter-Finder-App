@@ -22,7 +22,7 @@ const prepareReportedMissionHelper = async ( reportList ) => {
             let careGiveInfo;
             let missionInfo;
 
-            const reportingUser = await User.findById( report.reportingUser );
+            const reportingUser = await User.findById( report.reportingUserId );
             if( !reportingUser ){
                 reportingUserInfo = "User Not Found"
             }else{
@@ -40,14 +40,14 @@ const prepareReportedMissionHelper = async ( reportList ) => {
             if( !petOwner ){
                 petOwnerInfo = "User Not Found"
             }else{
-                petOwnerInfo = getLightWeightPetInfoHelper( petOwner ); 
+                petOwnerInfo = getLightWeightUserInfoHelper( petOwner ); 
             }
 
             const pet = await Pet.findById( report.petId );
             if( !pet ){
                 petInfo = "Pet Not Found"
             }else{
-                petInfo = getLightWeightUserInfoHelper( pet ); 
+                petInfo = getLightWeightPetInfoHelper( pet ); 
             }
 
             const careGive = await CareGive.findById( report.careGiveId );
@@ -68,12 +68,13 @@ const prepareReportedMissionHelper = async ( reportList ) => {
 
             const mission = careGive.missionCallender.filter(
                 mission =>
-                    mission._id.toString === report.missionId
+                    mission._id.toString() === report.missionId.toString()
             )[0];
             missionInfo = getLightWeightMissionInfoHelper(
                 mission,
                 0,
                 petInfo,
+                petOwnerInfo,
                 careGiverInfo
             );
 

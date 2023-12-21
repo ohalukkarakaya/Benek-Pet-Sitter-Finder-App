@@ -42,6 +42,7 @@ router.post(
     adminLoginController
 );
 
+// - tested
 // get Rreport by id
 router.get(
     "/reportedMissionById/:reportId",
@@ -49,6 +50,7 @@ router.get(
     getReportedMissionByIdController
 );
 
+// -  
 // get all reports
 router.get(
     "/reportedMissionList/:skip/:limit",
