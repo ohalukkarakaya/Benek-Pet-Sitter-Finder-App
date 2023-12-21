@@ -3,6 +3,7 @@ import BannedUsers from "../../models/Report/BannedUsers.js";
 
 // Helpers
 import sendBanEmailHelper from "../../utils/adminHelpers/sendBanEmailHelper.js";
+import getLightWeightUserInfoHelper from "../../utils/getLightWeightUserInfoHelper.js";
 
 //  *                *         .                      *            .   *           .    *
 //                                *                  *  .                .
@@ -27,7 +28,7 @@ const banUserController = async ( req, res ) => {
 
         const isUserAlreadyBanned = await BannedUsers.findOne({ userEmail: baningUser.email });
         if( !isUserAlreadyBanned ){
-            const baningUserInfo = getLightWeightUserInfoHelper( punishedUser );
+            const baningUserInfo = getLightWeightUserInfoHelper( baningUser );
             await new BannedUsers(
                 { 
                     adminId: req.user._id.toString(), 

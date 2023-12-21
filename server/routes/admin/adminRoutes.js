@@ -106,6 +106,7 @@ router.post(
     punishUserController
 );
 
+// - tested
 // ban user by userId
 router.post(
     "/banUser/:userId",

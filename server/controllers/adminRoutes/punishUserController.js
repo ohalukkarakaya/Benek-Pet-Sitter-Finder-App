@@ -3,6 +3,7 @@ import PunishmentRecord from "../../models/Report/PunishmentRecord.js";
 
 // Helpers
 import sendPunishmentEmailHelper from "../../utils/adminHelpers/sendPunishmentEmailHelper.js";
+import getLightWeightUserInfoHelper from "../../utils/getLightWeightUserInfoHelper.js";
 
 //  *                *         .                      *            .   *           .    *
 //                                *                  *  .                .
