@@ -1,7 +1,7 @@
 import InvoiceRecord from "../../models/PaymentData/InvoiceRecord.js";
 
 //helpers
-import prepareReportedMissionHelper from "../../utils/adminHelpers/prepareReportedMissionHelper.js";
+import prepareInvoiceRecordHelper from "../../utils/adminHelpers/prepareInvoiceRecordHelper.js";
 
 //  *                *         .                      *            .   *           .    *
 //                                *                  *  .                .
@@ -14,6 +14,7 @@ const getInvoicePaperListController = async ( req, res ) => {
         const skip = parseInt( req.params.skip ) || 0;
         const limit = parseInt( req.params.limit ) || 10;
 
+        const invoiceRecordsCount = await InvoiceRecord.countDocuments();
         const invoiceRecords = await InvoiceRecord.find().skip( skip ).limit( limit ).lean();
         if( !invoiceRecords ){
             return res.status( 404 )
@@ -31,6 +32,7 @@ const getInvoicePaperListController = async ( req, res ) => {
                   .json({
                     error: false,
                     message: "Invoice Data Prepared Succesfully",
+                    totalInvoiceRecordsCount: invoiceRecordsCount,
                     invoiceInfoList: preparedInvoiceInfoList
                   });
     }catch( err ){
