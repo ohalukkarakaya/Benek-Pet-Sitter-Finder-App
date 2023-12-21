@@ -1,5 +1,5 @@
 import express from "express";
-import { adminAuthDeveloper } from "../../middleware/adminAuth";
+import { adminAuthDeveloper } from "../../middleware/adminAuth.js";
 
 //controllers
 import getLogsByPeriodController from "../../controllers/logRoutesControllers/getLogsByPeriodController.js";
@@ -9,6 +9,8 @@ import getLogsByUserIdAndDatePeriodController from "../../controllers/logRoutesC
 import getLogsByRequestUrlAndDatePeriodController from "../../controllers/logRoutesControllers/getLogsByRequestUrlAndDatePeriodController.js";
 import getLogsByRequestUrlAndUserIdController from "../../controllers/logRoutesControllers/getLogsByRequestUrlAndUserIdController.js";
 import getLogsByRequestUrlUserIdAndPeriodController from "../../controllers/logRoutesControllers/getLogsByRequestUrlUserIdAndPeriodController.js";
+import getLogsByStatusCodeController from "../../controllers/logRoutesControllers/getLogsByStatusCodeController.js";
+import getErrorLogsController from "../../controllers/logRoutesControllers/getErrorLogsController.js";
 
 const router = express.Router();
 
@@ -66,6 +68,22 @@ router.post(
     "/byRequestUrlAndUserIdAndPeriod",
     adminAuthDeveloper,
     getLogsByRequestUrlUserIdAndPeriodController
+);
+
+// - tested
+// get logs by status code,
+router.get(
+    "/byStatusCode/:statusCode",
+    adminAuthDeveloper,
+    getLogsByStatusCodeController
+);
+
+// - tested
+// get logs not OK,
+router.get(
+    "/errorLogs",
+    adminAuthDeveloper,
+    getErrorLogsController
 );
 
 export default router;

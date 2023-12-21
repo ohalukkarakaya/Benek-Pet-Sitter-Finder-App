@@ -238,7 +238,7 @@ const adminAuthAccounting = async (req, res, next) => {
   }
 };
 
-export default {
+export {
   adminAuthAny,
   adminAuthSuperAdmin,
   adminAuthDeveloper,
