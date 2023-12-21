@@ -130,6 +130,7 @@ router.get(
     getPaymentsOnPoolController
 );
 
+// - tested
 // Give User Authorization Role
 router.put(
     "/giveUserAuthorizationRole/:userId/:roleId",
