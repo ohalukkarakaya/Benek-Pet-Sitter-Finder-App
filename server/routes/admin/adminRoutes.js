@@ -114,7 +114,7 @@ router.post(
     banUserController
 );
 
-// - 
+// - tested
 // Count Active Users
 router.get(
     "/activeUserCount",
@@ -122,6 +122,7 @@ router.get(
     getActiveUserCountController
 );
 
+// - tested
 // Count Payment Data Prices
 router.get(
     "/getPaymentsOnPool",
