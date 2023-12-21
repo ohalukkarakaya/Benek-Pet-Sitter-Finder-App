@@ -146,6 +146,7 @@ router.get(
     getBannedUsersListController
 )
 
+// - tested
 // Remove Ban
 router.delete(
     "/removeBan/:banId",
