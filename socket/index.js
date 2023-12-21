@@ -45,7 +45,7 @@ const addAdminClient = ( clientId, socketId ) => {
     !adminClients.some( adminClient => adminClient.clientId === clientId )
     && adminClients.push({ clientId, socketId });
 }
-const getAddAdminClient = ( clientId ) => { return adminClients.find( clint => clientId.clientId === clientId ); }
+const getAddAdminClient = ( clientId ) => { return adminClients.find( client => client.clientId === clientId ); }
 const removeAdminClient = ( socketId ) => { adminClients = adminClients.filter( adminClient => adminClient.socketId !== socketId ); }
 
 io.on(

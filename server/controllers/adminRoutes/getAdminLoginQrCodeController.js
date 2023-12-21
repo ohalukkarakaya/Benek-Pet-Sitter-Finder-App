@@ -34,7 +34,7 @@ const getAdminLoginQrCodeController = async ( req, res ) => {
         const hashCodePassword = await bcrypt.hash( generatedQrCodePassword, salt );
 
         //qr code data
-        const data = { qrCodePassword: generatedQrCodePassword };
+        const data = { clientId: clientId, qrCodePassword: generatedQrCodePassword };
         let qrCodeData = JSON.stringify( data );
 
         // qr code options

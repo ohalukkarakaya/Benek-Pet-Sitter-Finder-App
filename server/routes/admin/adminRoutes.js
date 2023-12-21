@@ -34,6 +34,7 @@ router.get(
     getAdminLoginQrCodeController
 );
 
+// - tested
 // login
 router.post(
     "/login",

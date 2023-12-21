@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import io from "socket.io-client";
 
 import generateTokens from "../../utils/bodyValidation/user/generateTokens.js";
+import verifyRefreshToken from "../../utils/verifyRefreshToken.js";
 
 dotenv.config();
 const socket = io( process.env.SOCKET_URL );
@@ -49,14 +50,14 @@ const adminLoginController = async ( req, res ) => {
         // kullanıcının kayıtlı refresh tokenını bul, yoksa generate et
         let refreshToken;
         let userToken = await UserToken.findOne({ userId: req.user._id.toString() });
-        const tokenDetails = await verifyRefreshToken( userToken );
+        const tokenDetails = await verifyRefreshToken( userToken.token );
 
         //tokenın geçerliliğini kontrol et eğer değilse token oluştur
         if( !userToken || tokenDetails.error ){ 
             const tokenGeneration = await generateTokens( user );
             refreshToken = tokenGeneration.refreshToken;
         }else{
-            refreshToken = userToken;
+            refreshToken = userToken.token;
         }
 
         // göndermek için veriyi hazırla
@@ -75,7 +76,8 @@ const adminLoginController = async ( req, res ) => {
         });
 
     }catch( err ){
-
+        console.log( "ERROR: adminLoginController - ", err );
+        return res.status( 500 ).json({ error: true, message: "Internal Server Error" });
     }
 }
 
