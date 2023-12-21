@@ -2,7 +2,7 @@ import User from "../../models/User.js";
 import BannedUsers from "../../models/Report/BannedUsers.js";
 
 // Helpers
-import getLightWeightUserInfoHelper from "../../utils/getLightWeightUserInfoHelper";
+import getLightWeightUserInfoHelper from "../../utils/getLightWeightUserInfoHelper.js";
 
 //  *                *         .                      *            .   *           .    *
 //                                *                  *  .                .

@@ -29,4 +29,4 @@ const getLightWeightMissionInfoHelper = (
     }
 }
 
-return getLightWeightMissionInfoHelper;
+export default getLightWeightMissionInfoHelper;

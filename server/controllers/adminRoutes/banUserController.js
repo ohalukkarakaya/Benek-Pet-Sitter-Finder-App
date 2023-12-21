@@ -1,5 +1,5 @@
 import User from "../../models/User.js";
-import BannedUsers from "../models/Report/BannedUsers.js";
+import BannedUsers from "../../models/Report/BannedUsers.js";
 
 // Helpers
 import sendBanEmailHelper from "../../utils/adminHelpers/sendBanEmailHelper.js";

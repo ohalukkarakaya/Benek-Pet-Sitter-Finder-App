@@ -60,7 +60,7 @@ const getAdminLoginQrCodeController = async ( req, res ) => {
             cornersDotOptions: { type: 'extra-rounded' }
         });
 
-        qrCodeSvgWithBlobImage.getRawData("svg").then(( url ) => {
+        qrCodeSvgWithBlobImage.getRawData("svg").then(async ( url ) => {
             await new AdminLoginCode({
                 clientId: clientId,
                 codePassword: hashCodePassword

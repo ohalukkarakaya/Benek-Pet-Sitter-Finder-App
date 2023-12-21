@@ -9,7 +9,6 @@ import getLightWeightUserInfoHelper from "../getLightWeightUserInfoHelper.js";
 import getLightWeightEventInfoHelper from "../getLightWeightEventInfoHelper.js";
 import getLightWeightCareGiveInfoHelper from "../getLightWeightCareGiveInfoHelper.js";
 import getLightWeightPetInfoHelper from "../getLightWeightPetInfoHelper.js";
-import Event from "../../models/Event/Event.js";
 
 const prepareExpenseRecordHelper = async ( expenseRecordIdList ) => {
     try{

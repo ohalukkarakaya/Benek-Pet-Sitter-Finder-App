@@ -38,7 +38,8 @@ import animalKeywordRoutes from './routes/key_words/animalCategory.js';
 import chatRoutes from './routes/chat/chat.js';
 import notificationRoutes from './routes/notification/notification.js';
 import logRoutes from './routes/log/log.js';
-import paymentRoutes from './routes/paymentRoutes.js'; 
+import paymentRoutes from './routes/paymentRoutes.js';
+import adminRoutes from './routes/admin/adminRoutes.js';
 
 import bodyParser from 'body-parser';
 
@@ -156,6 +157,7 @@ app.use("/api/keywords/animals", animalKeywordRoutes);
 app.use("/api/careGive", careGiveRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/notification", notificationRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((err, req, res, next) => {
   const status = err.status || 500;

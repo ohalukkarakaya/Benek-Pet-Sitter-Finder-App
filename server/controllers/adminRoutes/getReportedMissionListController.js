@@ -1,4 +1,4 @@
-import ReportMission from "../../models/Report/ReportMission";
+import ReportMission from "../../models/Report/ReportMission.js";
 
 //helpers
 import prepareReportedMissionHelper from "../../utils/adminHelpers/prepareReportedMissionHelper.js";

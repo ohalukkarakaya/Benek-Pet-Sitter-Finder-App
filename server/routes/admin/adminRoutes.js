@@ -18,7 +18,7 @@ import giveUserAuthorizationRoleController from "../../controllers/adminRoutes/g
 import getBannedUsersListController from "../../controllers/adminRoutes/getBannedUsersListController.js";
 import removeBanController from "../../controllers/adminRoutes/removeBanController.js";
 
-import { adminAuthAny, adminAuthSuperAdmin, adminAuthEditor, adminAuthAccounting } from "../../middleware/adminAuth";
+import { adminAuthAny, adminAuthSuperAdmin, adminAuthEditor, adminAuthAccounting } from "../../middleware/adminAuth.js";
 
 import dotenv from "dotenv";
 
@@ -27,6 +27,7 @@ dotenv.config();
 
 const router = express.Router();
 
+// - 
 // get qr code
 router.get(
     "/getLoginQrCode/:clientId",

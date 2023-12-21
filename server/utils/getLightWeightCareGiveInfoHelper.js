@@ -52,4 +52,4 @@ const getLightWeightCareGiveInfoHelper = async (
     return careGiveInfo;
 }
 
-return getLightWeightCareGiveInfoHelper;
+export default getLightWeightCareGiveInfoHelper;

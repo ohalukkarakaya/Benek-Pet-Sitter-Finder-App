@@ -1,7 +1,7 @@
 import User from "../../models/User.js";
 
 // Helpers
-import getLightWeightUserInfoHelper from "../getLightWeightUserInfoHelper";
+import getLightWeightUserInfoHelper from "../getLightWeightUserInfoHelper.js";
 import prepareExpenseRecordHelper from "./prepareExpenseRecordHelper.js";
 
 const prepareInvoiceRecordHelper = async ( invoiveRecordList ) => {
