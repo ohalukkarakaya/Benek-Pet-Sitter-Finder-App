@@ -1,0 +1,42 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Run on macOS",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "preLaunchTask": "build-macos"
+      },
+      {
+        "name": "Debug on macOS",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": ["--debug"],
+        "cwd": "${workspaceFolder}",
+        "preLaunchTask": "build-macos"
+      },
+      {
+        "name": "Profile on macOS",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": ["--profile"],
+        "cwd": "${workspaceFolder}",
+        "preLaunchTask": "build-macos"
+      },
+      {
+        "name": "Release on macOS",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/main.dart",
+        "args": ["--release"],
+        "cwd": "${workspaceFolder}",
+        "preLaunchTask": "build-macos"
+      }
+    ]
+  }
+  
