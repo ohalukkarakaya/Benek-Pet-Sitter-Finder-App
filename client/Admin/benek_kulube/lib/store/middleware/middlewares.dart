@@ -1,5 +1,5 @@
 import 'package:redux/redux.dart';
-import '../store.dart';
+import '../app_state.dart';
 
 void exampleMiddleware(
   Store<AppState> store,

@@ -1,33 +1,35 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'package:benek_kulube/common/utils/state_utils/change_app_screen_utils/change_app_screen_actions.dart';
+import 'package:benek_kulube/data/services/app_screens_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../app/router.dart';
-import '../../../store/store.dart';
-import 'redux/actions.dart';
-import '../../../config/app_config.dart';
+import '../../../../store/app_state.dart';
+import 'redux/auth_actions.dart';
+import '../../../../config/app_config.dart';
 
 class AuthUtils {
 
   // Set Refresh Token
-  static Future<void> setRefreshToken(Store<AppState> store, BuildContext context) async {
+  static Future<void> setRefreshToken(Store<AppState> store ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? refreshToken = prefs.getString('refreshToken');
     
     if (refreshToken != null) {
       await store.dispatch(SetRefreshTokenAction(refreshToken));
     } else {
-      removeCredentials(store, context);
+      await killUserSessionAndNavigate( store );
     }
   }
 
   // Get Access Token
-  static Future<void> getAccessToken(Store<AppState> store, BuildContext context) async {
+  static Future<void> getAccessToken(Store<AppState> store ) async {
     try {
-        if( store.state.userRefreshToken == null || store.state.userRefreshToken == '') {
-          removeCredentials(store, context);
+        if( store.state.userRefreshToken == '') {
+          await killUserSessionAndNavigate( store );
         }
 
         final response = await http.post(
@@ -46,43 +48,45 @@ class AuthUtils {
             await store.dispatch(SetAccessTokenAction(accessToken));
             await store.dispatch(SetUserRoleAction(userRole));
           }else{
-            removeCredentials(store, context);
+            await killUserSessionAndNavigate( store );
           }
         }else{
-          removeCredentials(store, context);
+          await killUserSessionAndNavigate( store );
         }
       } catch (e) {
-        print('ERROR: getAccessToken - $e');
-        removeCredentials(store, context);
+        log('ERROR: getAccessToken - $e');
+        await killUserSessionAndNavigate( store );
       }
   }
 
   static Future<void> setCredentials( Store<AppState> store, BuildContext context ) async {
     try {
-      await setRefreshToken(store, context);
-      await getAccessToken(store, context);
+      await setRefreshToken(store );
+      await getAccessToken(store );
     } catch (e) {
-      print('Hata oluştu: $e');
-      removeCredentials(store, context);
+      log('ERROR: getAccessToken - $e');
+      await killUserSessionAndNavigate(store );
     }
   }
 
-  static Future<void> removeCredentials( Store<AppState> store, BuildContext context ) async {
+  static Future<void> removeCredentials( Store<AppState> store ) async {
     // Remove Refresh Token
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('refreshToken');
 
     // Remove Access Token
-    if( store.state.userAccessToken != null || store.state.userAccessToken != '') {
+    if( store.state.userAccessToken != '') {
       await store.dispatch(SetAccessTokenAction(''));
     }
 
     // Remove User Role
-    if( store.state.userRoleId != null || store.state.userRoleId != 0 ) {
+    if( store.state.userRoleId != 0 ) {
       await store.dispatch(SetUserRoleAction(0));
     }
+  }
 
-    // Navigate to Login Page
-    AppRouter.navigateToRoute('/login', context, true);
+  static Future<void> killUserSessionAndNavigate( Store<AppState> store ) async {
+    await removeCredentials( store );
+    await store.dispatch(const ChangeScreenAction( AppScreens.LOGIN_SCREEN ));
   }
 }

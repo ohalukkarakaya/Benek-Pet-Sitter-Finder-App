@@ -15,8 +15,8 @@ class AppRouter {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(builder: (_) => KulubeHomePage());
-      case '/login':
-        return MaterialPageRoute(builder: (_) => LoginScreen());
+      case '/loginScreen':
+        return MaterialPageRoute(builder: (_) => KulubeHomePage()); //LoginScreen());
       default:
         return MaterialPageRoute(builder: (_) => KulubeHomePage());
     }

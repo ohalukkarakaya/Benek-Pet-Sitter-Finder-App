@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import '../store/store.dart';
+import '../presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
+import '../store/app_state.dart';
 import '../presentation/features/counter/components/counter_widget.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 
@@ -17,6 +18,7 @@ class KulubeApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Benek Klübe - Çalışan Portalı',
         debugShowCheckedModeBanner: false,
+        color: Colors.transparent,
         theme: ThemeData(
           splashFactory: InkRipple.splashFactory,
         ),
@@ -49,11 +51,14 @@ class KulubeHomePage extends StatelessWidget {
                 CounterWidget(),
               ],
             ),
-            Column(
+            const Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CounterWidget(),
+                BenekProcessIndicator(
+                  width: 100,
+                  height: 100,
+                ),
               ],
             ),
           ],

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import '../../../../store/store.dart';
-import '../redux/actions.dart';
+import '../../../../store/app_state.dart';
+import '../redux/counter_actions.dart';
 
 class CounterWidget extends StatelessWidget {
   @override
@@ -25,14 +25,14 @@ class CounterWidget extends StatelessWidget {
                   onPressed: () {
                     StoreProvider.of<AppState>(context).dispatch(IncrementCounterAction());
                   },
-                  child: Text('Increment'),
+                  child: const Text('Increment'),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: () {
                     StoreProvider.of<AppState>(context).dispatch(DecrementCounterAction());
                   },
-                  child: Text('Decrement'),
+                  child: const Text('Decrement'),
                 ),
               ],
             ),

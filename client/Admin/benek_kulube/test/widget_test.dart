@@ -8,7 +8,7 @@
 import 'package:redux/redux.dart';
 
 import 'package:benek_kulube/app/app.dart';
-import 'package:benek_kulube/store/store.dart';
+import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

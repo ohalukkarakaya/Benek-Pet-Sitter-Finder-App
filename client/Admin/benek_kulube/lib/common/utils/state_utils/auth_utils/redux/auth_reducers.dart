@@ -1,4 +1,4 @@
-import './actions.dart';
+import 'auth_actions.dart';
 
 dynamic authUtilsReducer(dynamic state, dynamic action) {
   if (action is SetRefreshTokenAction) {
@@ -8,5 +8,6 @@ dynamic authUtilsReducer(dynamic state, dynamic action) {
   } else if (action is SetUserRoleAction) {
     return state.copyWith(userRoleId: action.userRole);
   }
+
   return state;
 }
