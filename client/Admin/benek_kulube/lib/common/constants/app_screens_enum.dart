@@ -1,19 +1,19 @@
-enum AppScreens {
+enum AppScreenEnums {
   LOADING_SCREEN,
   LOGIN_SCREEN,
   HOME_SCREEN,
   ERROR_SCREEN,
 }
 
-String getRouteName( AppScreens activeScreen ){
+String getRouteName( AppScreenEnums activeScreen ){
   switch( activeScreen ){
-    case AppScreens.LOADING_SCREEN:
+    case AppScreenEnums.LOADING_SCREEN:
       return "/loadingScreen";
-    case AppScreens.LOGIN_SCREEN:
+    case AppScreenEnums.LOGIN_SCREEN:
       return "/loginScreen";
-    case AppScreens.HOME_SCREEN:
+    case AppScreenEnums.HOME_SCREEN:
       return "/homeScreen";
-    case AppScreens.ERROR_SCREEN:
+    case AppScreenEnums.ERROR_SCREEN:
       return "/errorScreen";
     default:
       return "/errorScreen";

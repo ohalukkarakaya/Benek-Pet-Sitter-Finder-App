@@ -1,4 +1,4 @@
-import 'package:benek_kulube/common/utils/state_utils/is_loading_utils/is_loading_state_actions.dart';
+import 'package:benek_kulube/common/utils/state_utils/is_loading_state_utils/is_loading_state_actions.dart';
 
 dynamic isLoadingStateReducer(dynamic state, dynamic action) {
   if (action is IsLoadingStateAction) {

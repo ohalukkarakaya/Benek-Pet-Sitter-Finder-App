@@ -1,14 +1,19 @@
 import 'dart:ui';
 
-String colorToHex(Color color) {
-  // Color nesnesinin değerini al
-  int value = color.value;
+extension HexColor on Color {
+  String _generateAlpha({required int alpha, required bool withAlpha}) {
+    if (withAlpha) {
+      return alpha.toRadixString(16).padLeft(2, '0');
+    } else {
+      return '';
+    }
+  }
 
-  // 0xFFFFFFFF ile and işlemi yaparak alpha kanalını temizle
-  value = value & 0xFFFFFFFF;
-
-  // value'yu hex formata çevir
-  String hexCode = value.toRadixString(16).toUpperCase().padLeft(8, '0');
-
-  return hexCode;
+  String toHex({bool leadingHashSign = false, bool withAlpha = false}) =>
+      '${leadingHashSign ? '#' : ''}'
+              '${_generateAlpha(alpha: alpha, withAlpha: withAlpha)}'                  
+              '${red.toRadixString(16).padLeft(2, '0')}'              
+              '${green.toRadixString(16).padLeft(2, '0')}'              
+           '${blue.toRadixString(16).padLeft(2, '0')}'
+          .toUpperCase();
 }

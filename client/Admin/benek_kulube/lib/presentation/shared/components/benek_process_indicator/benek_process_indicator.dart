@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
@@ -55,8 +56,8 @@ class _BenekProcessIndicatorState extends State<BenekProcessIndicator> {
   @override
   Widget build(BuildContext context) {
 
-    String svg = '<svg viewBox="${ processIndicatorSteps[currentState].viewBox }"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="${ processIndicatorSteps[currentState].path }" style="fill:#${colorToHex(widget.color!)}"/></g></g></svg>';
-    
+    String svg = '<svg viewBox="${ processIndicatorSteps[currentState].viewBox }"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="${ processIndicatorSteps[currentState].path }" style="fill:#${widget.color!.toHex(withAlpha: false)}"/></g></g></svg>';
+    log(svg);
     return SizedBox(
       width: widget.width,
       height: widget.height,

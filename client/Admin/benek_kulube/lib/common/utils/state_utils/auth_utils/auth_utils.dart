@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:benek_kulube/common/utils/state_utils/change_app_screen_utils/change_app_screen_actions.dart';
-import 'package:benek_kulube/data/services/app_screens_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../store/app_state.dart';
 import 'redux/auth_actions.dart';
-import '../../../../config/app_config.dart';
+import '../../../constants/app_config.dart';
 
 class AuthUtils {
 
@@ -87,6 +87,6 @@ class AuthUtils {
 
   static Future<void> killUserSessionAndNavigate( Store<AppState> store ) async {
     await removeCredentials( store );
-    await store.dispatch(const ChangeScreenAction( AppScreens.LOGIN_SCREEN ));
+    await store.dispatch(const ChangeScreenAction( AppScreenEnums.LOGIN_SCREEN ));
   }
 }

@@ -1,12 +1,12 @@
+import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:redux/redux.dart';
-import '../data/services/app_screens_enum.dart';
 import 'middleware/middlewares.dart';
 import 'reducers/app_reducers.dart';
 
 class AppState {
   final int counter;
 
-  final AppScreens activeScreen;
+  final AppScreenEnums activeScreen;
   final String userRefreshToken;
   final String userAccessToken;
   final int userRoleId;
@@ -26,7 +26,7 @@ class AppState {
     return AppState(
       counter: 0,
 
-      activeScreen: AppScreens.LOADING_SCREEN,
+      activeScreen: AppScreenEnums.LOADING_SCREEN,
       userRefreshToken: '',
       userAccessToken:  '',
       userRoleId: 0,
@@ -37,18 +37,20 @@ class AppState {
   AppState copyWith({
     int? counter,
 
+    AppScreenEnums? activeScreen,
     String? userRefreshToken,
     String? userAccessToken,
     int? userRoleId,
+    bool? isLoading
   }) {
     return AppState(
       counter: counter ?? this.counter,
 
-      activeScreen: activeScreen,
+      activeScreen: activeScreen ?? this.activeScreen,
       userRefreshToken: userRefreshToken ?? this.userRefreshToken,
       userAccessToken: userAccessToken ?? this.userAccessToken,
       userRoleId: userRoleId ?? this.userRoleId,
-      isLoading: isLoading
+      isLoading: isLoading ?? this.isLoading
     );
   }
 }
