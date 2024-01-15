@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:typed_data';
 
 import 'package:benek_kulube/common/constants/app_config.dart';
 import 'package:benek_kulube/common/utils/state_utils/login_qr_code_utils/redux/login_qr_code_actions.dart';

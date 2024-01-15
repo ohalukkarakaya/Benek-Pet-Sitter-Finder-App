@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:benek_kulube/presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 
 import '../../../common/constants/app_colors.dart';

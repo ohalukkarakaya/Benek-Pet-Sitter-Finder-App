@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 class KulubeLoginQrCodeModel {
   final String qrCode;
