@@ -1,8 +1,9 @@
+import '../../../constants/app_screens_enum.dart';
 import 'change_app_screen_actions.dart';
 
-dynamic changeAppScreenReducer(dynamic state, dynamic action) async {
+AppScreenEnums changeAppScreenReducer(dynamic state, dynamic action) {
   if (action is ChangeScreenAction) {
-    return state.copyWith(activeScreen: action.newScreen);
+    return action.newScreen;
   }
 
   return state;

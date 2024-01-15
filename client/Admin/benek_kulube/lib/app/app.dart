@@ -1,9 +1,11 @@
+import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek_kulube/common/widgets/Benek_loading_widget.dart';
 import 'package:benek_kulube/data/models/main_observing_states_view_models/main_observing_states_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import '../presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
+import '../presentation/shared/components/loading_components/benek_loading_component.dart';
 import '../store/app_state.dart';
 import '../presentation/features/counter/components/counter_widget.dart';
 
@@ -41,41 +43,47 @@ class KulubeHomePage extends StatelessWidget {
     return StoreConnector<AppState, MainObservingStatesViewModel>(
       converter: (store) {
         return MainObservingStatesViewModel(
+          store: store,
           activeScreen: store.state.activeScreen,
           isLoading: store.state.isLoading,
         );
       },
       builder: (BuildContext context, MainObservingStatesViewModel mainObservingStates) {
+        AuthUtils.setCredentials( mainObservingStates.store, context );
         return Stack(
           children: [
-            Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: AppBar( backgroundColor: Colors.transparent, ),
-              body: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
+            mainObservingStates.isLoading
+              ? const Center(
+                  child: BenekLoadingComponent(),
+                )
+              : Scaffold(
+                  backgroundColor: Colors.transparent,
+                  appBar: AppBar( backgroundColor: Colors.transparent, ),
+                  body: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      CounterWidget(),
-                    ],
-                  ),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      BenekProcessIndicator(
-                        width: 100,
-                        height: 100,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CounterWidget(),
+                        ],
+                      ),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          BenekProcessIndicator(
+                            width: 100,
+                            height: 100,
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            if( mainObservingStates.isLoading )
-              const BenekLoadingWidget(),
+                ),
+                if( mainObservingStates.isLoading )
+                  const BenekLoadingWidget(),
           ],
         );
       }

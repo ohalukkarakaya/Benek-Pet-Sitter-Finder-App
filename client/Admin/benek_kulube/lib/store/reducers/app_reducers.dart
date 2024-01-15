@@ -1,3 +1,4 @@
+import '../../common/utils/state_utils/login_qr_code_utils/redux/login_qr_code_reducers.dart';
 import '../app_state.dart';
 
 import '../../presentation/features/counter/redux/counter_reducers.dart' as counter;
@@ -10,6 +11,7 @@ AppState appReducer(AppState state, dynamic action) {
     counter: counter.counterReducer(state.counter, action),
 
     activeScreen: change_app_screen.changeAppScreenReducer(state, action),
+    loginQrCodeData: setLoginCodeReducer(state, action),
     userRefreshToken: auth_reducers.authUtilsReducer(state.userRefreshToken, action),
     userAccessToken:  auth_reducers.authUtilsReducer(state.userAccessToken, action),
     userRoleId: auth_reducers.authUtilsReducer(state.userRoleId, action),
