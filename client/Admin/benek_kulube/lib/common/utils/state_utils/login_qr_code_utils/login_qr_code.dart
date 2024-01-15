@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:benek_kulube/common/constants/app_config.dart';
 import 'package:benek_kulube/common/utils/state_utils/login_qr_code_utils/redux/login_qr_code_actions.dart';
@@ -13,7 +14,7 @@ import '../../../../data/models/kulube_login_qr_code_model.dart';
 Future<void> getLoginQrCode(Store<AppState> store, String clientId ) async {
   try {
 
-      final response = await http.post(
+      final response = await http.get(
         Uri.parse("${AppConfig.baseUrl}/api/admin/getLoginQrCode/$clientId"),
         headers: {'Content-Type': 'application/json'},
       );
@@ -21,7 +22,7 @@ Future<void> getLoginQrCode(Store<AppState> store, String clientId ) async {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-        if (data['error'] == false) {
+        if (data['error'] == false) { 
           String qrCode = data['code'];
           String clientId = data['clientId'];
           KulubeLoginQrCodeModel loginCodeData = KulubeLoginQrCodeModel(

@@ -6,5 +6,5 @@ AppScreenEnums changeAppScreenReducer(dynamic state, dynamic action) {
     return action.newScreen;
   }
 
-  return state;
+  return state.activeScreen;
 } 

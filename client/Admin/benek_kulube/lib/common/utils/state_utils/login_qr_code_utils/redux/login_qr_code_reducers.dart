@@ -2,9 +2,8 @@ import 'package:benek_kulube/common/utils/state_utils/login_qr_code_utils/redux/
 
 dynamic setLoginCodeReducer(dynamic state, dynamic action) {
   if (action is SetLoginCodeAction) {
-    print( action.loginCodeData.qrCode );
-    return state.copyWith(loginCodeData: action.loginCodeData);
+    return action.loginCodeData;
   }
 
-  return state;
+  return state.loginQrCodeData;
 }

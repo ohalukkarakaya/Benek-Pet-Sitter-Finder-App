@@ -19,22 +19,22 @@ class BenekLoadingComponent extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(5),
       child: BenekDottedBorder(
-      color: Colors.black,
-      borderType: BorderType.RRect,
-      radius: const Radius.circular(15.0),
-      padding: const EdgeInsets.all(6),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(15.0)),
-        child: Container(
-          height: 200,
-          width: 120,
-          padding: const EdgeInsets.all(20.0),
-          child: const BenekProcessIndicator(
-            color: Colors.black,
+        color: Colors.black,
+        borderType: BorderType.RRect,
+        radius: const Radius.circular(15.0),
+        padding: const EdgeInsets.all(6),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(15.0)),
+          child: Container(
+            height: 200,
+            width: 120,
+            padding: const EdgeInsets.all(20.0),
+            child: const BenekProcessIndicator(
+              color: Colors.black,
+            ),
           ),
         ),
-      ),
-    )
+      )
     );
   }
 }

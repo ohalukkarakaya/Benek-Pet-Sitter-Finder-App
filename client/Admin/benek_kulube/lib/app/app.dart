@@ -1,6 +1,8 @@
+import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek_kulube/common/widgets/Benek_loading_widget.dart';
 import 'package:benek_kulube/data/models/main_observing_states_view_models/main_observing_states_view_models.dart';
+import 'package:benek_kulube/presentation/shared/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -24,6 +26,7 @@ class KulubeApp extends StatelessWidget {
         color: Colors.transparent,
         theme: ThemeData(
           splashFactory: InkRipple.splashFactory,
+          fontFamily: 'Qanelas',
         ),
         darkTheme: ThemeData.dark().copyWith(
           splashFactory: InkRipple.splashFactory,
@@ -52,38 +55,45 @@ class KulubeHomePage extends StatelessWidget {
         AuthUtils.setCredentials( mainObservingStates.store, context );
         return Stack(
           children: [
-            mainObservingStates.isLoading
-              ? const Center(
-                  child: BenekLoadingComponent(),
-                )
-              : Scaffold(
+             Scaffold(
                   backgroundColor: Colors.transparent,
                   appBar: AppBar( backgroundColor: Colors.transparent, ),
-                  body: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CounterWidget(),
-                        ],
-                      ),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          BenekProcessIndicator(
-                            width: 100,
-                            height: 100,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                if( mainObservingStates.isLoading )
-                  const BenekLoadingWidget(),
+                  body: mainObservingStates.activeScreen == AppScreenEnums.LOADING_SCREEN
+                        && mainObservingStates.store.state.userRefreshToken == ''
+                            ? const Center( child: BenekLoadingComponent() )
+                            : mainObservingStates.activeScreen == AppScreenEnums.LOGIN_SCREEN
+                                ? LoginScreen( store: mainObservingStates.store )
+                                : mainObservingStates.activeScreen == AppScreenEnums.HOME_SCREEN
+                                  && mainObservingStates.store.state.userRefreshToken != ''
+                                  && mainObservingStates.store.state.userAccessToken != '' 
+                                      ? Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              CounterWidget(),
+                                            ],
+                                          ),
+                                          const Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              BenekProcessIndicator(
+                                                width: 100,
+                                                height: 100,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      )
+                                      : const SizedBox()
+                )
+
+              // mainObservingStates.isLoading
+              //   ? const BenekLoadingWidget()
+              //   : const SizedBox(),
           ],
         );
       }

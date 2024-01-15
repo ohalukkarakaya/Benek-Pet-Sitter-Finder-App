@@ -64,7 +64,7 @@ const getAdminLoginQrCodeController = async ( req, res ) => {
         });
 
         let code;
-        await qrCodeSvgWithBlobImage.getRawData("svg").then(
+        await qrCodeSvgWithBlobImage.getRawData("png").then(
             async ( url ) => {
                await new AdminLoginCode(
                     {
