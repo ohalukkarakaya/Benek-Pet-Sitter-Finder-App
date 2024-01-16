@@ -7,6 +7,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import '../presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
 import '../presentation/shared/components/loading_components/benek_loading_component.dart';
+import '../presentation/shared/screens/home_screen.dart';
 import '../store/app_state.dart';
 import '../presentation/features/counter/components/counter_widget.dart';
 
@@ -68,36 +69,12 @@ class KulubeHomePage extends StatelessWidget {
                         && mainObservingStates.store.state.userRefreshToken == ''
 
                             ? const Center( child: BenekLoadingComponent() )
-
                             : mainObservingStates.activeScreen == AppScreenEnums.LOGIN_SCREEN
 
                                 ? LoginScreen( store: mainObservingStates.store )
-
                                 : mainObservingStates.activeScreen == AppScreenEnums.HOME_SCREEN
 
-                                      ? Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              CounterWidget(),
-                                            ],
-                                          ),
-                                          const Column(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              BenekProcessIndicator(
-                                                width: 100,
-                                                height: 100,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      )
-
+                                      ? const HomeScreen()
                                       : const SizedBox()
                 )
 

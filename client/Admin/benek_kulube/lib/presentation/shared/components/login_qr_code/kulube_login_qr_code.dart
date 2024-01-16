@@ -63,7 +63,7 @@ class _KulubeLoginQrCodeState extends State<KulubeLoginQrCode> {
                           )
                         : Center(
                           child: IconButton(
-                            icon: Icon(BenekIcons.refresh, color: Colors.black), 
+                            icon: const Icon(BenekIcons.refreshdoublearrow, color: Colors.black), 
                             onPressed: () async {
                               KulubeLoginQrCodeModel resetQrCodeData = KulubeLoginQrCodeModel(
                                 qrCode: "",
