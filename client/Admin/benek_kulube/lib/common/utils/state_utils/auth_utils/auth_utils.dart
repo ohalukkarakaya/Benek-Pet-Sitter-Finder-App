@@ -14,15 +14,17 @@ import '../../../constants/app_config.dart';
 class AuthUtils {
 
   // Set Refresh Token
-  static Future<void> setRefreshToken(Store<AppState> store ) async {
+  static Future<bool> setRefreshToken(Store<AppState> store ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? refreshToken = prefs.getString('refreshToken');
     
     if (refreshToken != null) {
       await store.dispatch(SetRefreshTokenAction(refreshToken));
     } else {
-      await killUserSessionAndNavigate( store );
+      return false;
     }
+
+    return true;
   }
 
   // Get Access Token
@@ -59,12 +61,17 @@ class AuthUtils {
       }
   }
 
-  static Future<void> setCredentials( Store<AppState> store, BuildContext context ) async {
+  static Future<void> setCredentials( Store<AppState> store ) async {
     try {
-      await setRefreshToken(store );
-      await getAccessToken(store );
+      bool isRefreshTokenSet = await setRefreshToken(store );
+      if( isRefreshTokenSet ){
+        await getAccessToken(store );
+        await store.dispatch(const ChangeScreenAction( AppScreenEnums.HOME_SCREEN ));
+      }else{
+         await killUserSessionAndNavigate(store );
+      }
     } catch (e) {
-      log('ERROR: getAccessToken - $e');
+      log('ERROR: setCredentials - $e');
       await killUserSessionAndNavigate(store );
     }
   }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek_kulube/data/models/main_observing_states_view_models/main_observing_states_view_models.dart';
@@ -51,7 +53,23 @@ class KulubeHomePage extends StatelessWidget {
         );
       },
       builder: (BuildContext context, MainObservingStatesViewModel mainObservingStates) {
-        AuthUtils.setCredentials( mainObservingStates.store, context );
+        if( 
+          (
+            mainObservingStates.store.state.userRefreshToken == '' 
+            || mainObservingStates.store.state.userRefreshToken == null 
+          ) 
+          && (
+            mainObservingStates.store.state.userAccessToken == '' 
+            || mainObservingStates.store.state.userAccessToken == null
+          )
+          && mainObservingStates.activeScreen == AppScreenEnums.LOADING_SCREEN
+        ){ 
+          AuthUtils.setCredentials( mainObservingStates.store );
+        }
+
+        if( mainObservingStates.activeScreen == AppScreenEnums.HOME_SCREEN ){
+          log( mainObservingStates.store.state.userAccessToken );
+        }
         return Stack(
           children: [
              Scaffold(
@@ -59,12 +77,15 @@ class KulubeHomePage extends StatelessWidget {
                   appBar: AppBar( backgroundColor: Colors.transparent, ),
                   body: mainObservingStates.activeScreen == AppScreenEnums.LOADING_SCREEN
                         && mainObservingStates.store.state.userRefreshToken == ''
+
                             ? const Center( child: BenekLoadingComponent() )
+
                             : mainObservingStates.activeScreen == AppScreenEnums.LOGIN_SCREEN
+
                                 ? LoginScreen( store: mainObservingStates.store )
+
                                 : mainObservingStates.activeScreen == AppScreenEnums.HOME_SCREEN
-                                  && mainObservingStates.store.state.userRefreshToken != ''
-                                  && mainObservingStates.store.state.userAccessToken != '' 
+
                                       ? Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                                         children: [
@@ -87,6 +108,7 @@ class KulubeHomePage extends StatelessWidget {
                                           ),
                                         ],
                                       )
+
                                       : const SizedBox()
                 )
 

@@ -10,11 +10,11 @@ AppState appReducer(AppState state, dynamic action) {
   return AppState(
     counter: counter.counterReducer(state.counter, action),
 
-    activeScreen: change_app_screen.changeAppScreenReducer(state, action),
-    loginQrCodeData: setLoginCodeReducer(state, action),
-    userRefreshToken: auth_reducers.authUtilsReducer(state.userRefreshToken, action),
-    userAccessToken:  auth_reducers.authUtilsReducer(state.userAccessToken, action),
-    userRoleId: auth_reducers.authUtilsReducer(state.userRoleId, action),
+    activeScreen: change_app_screen.changeAppScreenReducer(state.activeScreen, action),
+    loginQrCodeData: setLoginCodeReducer(state.loginQrCodeData, action),
+    userRefreshToken: auth_reducers.setRefreshTokenReducer(state.userRefreshToken, action),
+    userAccessToken:  auth_reducers.setAccessTokenReducer(state.userAccessToken, action),
+    userRoleId: auth_reducers.setRoleReducer(state.userRoleId, action),
     isLoading: is_loading_state_reducers.isLoadingStateReducer(state.isLoading, action),
   );
 }

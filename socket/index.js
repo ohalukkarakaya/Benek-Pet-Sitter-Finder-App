@@ -51,12 +51,13 @@ const removeAdminClient = ( socketId ) => { adminClients = adminClients.filter( 
 io.on(
     "connection",
     ( socket ) => {
-        console.log( "connection happen" );
         //when connect
         socket.on( "addUser", ( userId ) => { addUser( userId, socket.id ); });
 
         //when admin client connects
-        socket.on( "addAdminClient", ( clientId ) => { addAdminClient( clientId, socket.id ); });
+        socket.on( "addAdminClient", ( clientId ) => {
+            addAdminClient( clientId, socket.id );
+         });
 
         //send message
         socket.on(

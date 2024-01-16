@@ -31,9 +31,9 @@ const adminLoginController = async ( req, res ) => {
         if( !adminLoginCode ){ return res.status( 404 ).json({ error: true, message: "There is no code for your user" }); }
 
         // bulunan kod bir saat önce ya da daha eski tarihte oluşturulduysa, kodu sil ve hata dön
-        const expiryTime = new Date();
-        expiryTime.setHours( expiryTime.getHours() - 1 );
-        if( adminLoginCode.createdAt <= expiryTime ){
+        const expiryTime = new Date(adminLoginCode.createdAt);
+        expiryTime.setHours( expiryTime.getHours() + 1 );
+        if( adminLoginCode.createdAt >= expiryTime ){
             await adminLoginCode.deleteOne();
             return res.status( 401 ).json({ error: true, message: "Code Expired" });
         }
@@ -61,7 +61,7 @@ const adminLoginController = async ( req, res ) => {
         }
 
         // göndermek için veriyi hazırla
-        let userInfoObject = { userId: req.user._id.toString(), authRole: user.authRole, refreshToken: refreshToken };
+        let userInfoObject = { "userId": `${req.user._id.toString()}`, "authRole": user.authRole, "refreshToken": `${refreshToken}` };
 
         // web sockete user bilgisini gönder
         socket.emit( "adminLogin", adminLoginCode.clientId.toString(), userInfoObject );

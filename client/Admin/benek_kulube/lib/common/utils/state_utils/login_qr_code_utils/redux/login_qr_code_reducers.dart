@@ -5,5 +5,5 @@ dynamic setLoginCodeReducer(dynamic state, dynamic action) {
     return action.loginCodeData;
   }
 
-  return state.loginQrCodeData;
+  return state;
 }

@@ -30,7 +30,7 @@ class AppState {
       counter: 0,
 
       activeScreen: AppScreenEnums.LOADING_SCREEN,
-      loginQrCodeData: KulubeLoginQrCodeModel(qrCode: '', clientId: ''),
+      loginQrCodeData: KulubeLoginQrCodeModel(qrCode: '', clientId: '', expireTime: null),
       userRefreshToken: '',
       userAccessToken:  '',
       userRoleId: 0,

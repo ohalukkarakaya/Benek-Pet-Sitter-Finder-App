@@ -22,11 +22,16 @@ Future<void> getLoginQrCode(Store<AppState> store, String clientId ) async {
         final data = jsonDecode(response.body);
 
         if (data['error'] == false) { 
+
+          DateTime now = DateTime.now();
+          DateTime expiration = now.add(const Duration(minutes: 60));
+
           String qrCode = data['code'];
           String clientId = data['clientId'];
           KulubeLoginQrCodeModel loginCodeData = KulubeLoginQrCodeModel(
             qrCode: qrCode,
-            clientId: clientId
+            clientId: clientId,
+            expireTime: expiration
           );
 
           await store.dispatch(SetLoginCodeAction(loginCodeData));
