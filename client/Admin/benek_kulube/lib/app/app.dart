@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek_kulube/data/models/main_observing_states_view_models/main_observing_states_view_models.dart';
@@ -60,10 +58,7 @@ class KulubeHomePage extends StatelessWidget {
         ){ 
           AuthUtils.setCredentials( mainObservingStates.store );
         }
-
-        if( mainObservingStates.activeScreen == AppScreenEnums.HOME_SCREEN ){
-          log( mainObservingStates.store.state.userAccessToken );
-        }
+        
         return Stack(
           children: [
              Scaffold(
