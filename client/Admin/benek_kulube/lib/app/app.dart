@@ -54,14 +54,8 @@ class KulubeHomePage extends StatelessWidget {
       },
       builder: (BuildContext context, MainObservingStatesViewModel mainObservingStates) {
         if( 
-          (
-            mainObservingStates.store.state.userRefreshToken == '' 
-            || mainObservingStates.store.state.userRefreshToken == null 
-          ) 
-          && (
-            mainObservingStates.store.state.userAccessToken == '' 
-            || mainObservingStates.store.state.userAccessToken == null
-          )
+          mainObservingStates.store.state.userRefreshToken == '' 
+          && mainObservingStates.store.state.userAccessToken == '' 
           && mainObservingStates.activeScreen == AppScreenEnums.LOADING_SCREEN
         ){ 
           AuthUtils.setCredentials( mainObservingStates.store );

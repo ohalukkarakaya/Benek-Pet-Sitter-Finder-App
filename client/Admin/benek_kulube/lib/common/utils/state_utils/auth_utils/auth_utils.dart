@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:benek_kulube/common/utils/state_utils/change_app_screen_utils/change_app_screen_actions.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,7 +34,7 @@ class AuthUtils {
         }
 
         final response = await http.post(
-          Uri.parse(AppConfig.baseUrl + "/api/refreshToken"),
+          Uri.parse("${AppConfig.baseUrl}/api/refreshToken"),
           body: jsonEncode({ 'refreshToken': store.state.userRefreshToken }),
           headers: {'Content-Type': 'application/json'},
         );
