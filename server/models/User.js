@@ -12,6 +12,14 @@ const UserSchema = new mongoose.Schema(
             enum: [ 0, 1, 2, 3, 4 ], // 0 - sıradan kullanıcı, 1 - super admin, 2 - developer, 3 - evaluator, 4 - muhasebe
             default: 0,
         },
+        gender: {
+            type: String,
+            enum: [ "Male", "Female" ]
+        },
+        defaultImage: {
+            type: String,
+            required: true
+        },
         identity: {
             "description": "idetitiy informations of the user",
             "type": "object",
@@ -249,5 +257,15 @@ const UserSchema = new mongoose.Schema(
         timestamps: true
     }
 );
+
+UserSchema.pre('save', function (){
+    if(this.profileImg.recordedImgName === ""){
+        this.profileImg.recordedImgName = this.defaultImage;
+    }
+
+    if(this.profileImg.imgUrl === ""){
+        this.profileImg.imgUrl = this.defaultImage;
+    }
+  })
 
 export default mongoose.model("User", UserSchema);

@@ -6,6 +6,7 @@ const signUpBodyValidation = (body) => {
         {
           userName: Joi.string().required().label("User Name"),
           email: Joi.string().email().required().label("Email"),
+          gender: Joi.string().required().valid('Male', 'Female').label("Gender"),
           identity: Joi.object().required().label("identity").keys(
             {
               firstName: Joi.string(),

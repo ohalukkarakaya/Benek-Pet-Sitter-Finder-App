@@ -10,9 +10,7 @@ class AppReduxStore {
     return Store<AppState>(
       appReducer,
       initialState: AppState.initial(),
-      middleware: [
-        thunkMiddleware,
-      ],
+      middleware: [ thunkMiddleware ],
     );
   }
 }

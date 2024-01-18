@@ -60,6 +60,7 @@ const getChatsController = async (req, res) => {
 
             member.userId = memberObject._id.toString();
             member.username = memberObject.userName;
+            isProfileImageDefault: memberObject.profileImg.isDefaultImg,
             member.profileImg = memberObject.profileImg.imgUrl;
           }
         }

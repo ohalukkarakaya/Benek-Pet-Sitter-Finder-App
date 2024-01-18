@@ -1,21 +1,20 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
-import 'package:benek_kulube/common/utils/state_utils/change_app_screen_utils/change_app_screen_actions.dart';
-import 'package:http/http.dart' as http;
+import 'package:benek_kulube/common/utils/shared_preferences_helper.dart';
+import 'package:benek_kulube/store/actions/app_actions.dart';
+import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:redux/redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../store/app_state.dart';
-import 'redux/auth_actions.dart';
-import '../../../constants/app_config.dart';
 
 class AuthUtils {
 
   // Set Refresh Token
-  static Future<bool> setRefreshToken(Store<AppState> store ) async {
+  static Future<bool> setRefreshToken() async {
+    Store<AppState> store = AppReduxStore.currentStore!;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? refreshToken = prefs.getString('refreshToken');
+    String? refreshToken = prefs.getString(SharedPreferencesKeys.refreshToken);
     
     if (refreshToken != null) {
       await store.dispatch(SetRefreshTokenAction(refreshToken));
@@ -27,51 +26,34 @@ class AuthUtils {
   }
 
   // Get Access Token
-  static Future<void> getAccessToken(Store<AppState> store ) async {
+  static Future<void> getAccessToken() async {
+    Store<AppState> store = AppReduxStore.currentStore!;
     try {
         if( store.state.userRefreshToken == '') {
           await killUserSessionAndNavigate( store );
         }
 
-        final response = await http.post(
-          Uri.parse("${AppConfig.baseUrl}/api/refreshToken"),
-          body: jsonEncode({ 'refreshToken': store.state.userRefreshToken }),
-          headers: {'Content-Type': 'application/json'},
-        );
-
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-
-          if (data['error'] == false) {
-            String accessToken = data['accessToken'];
-            int userRole = data['role'];
-
-            await store.dispatch(SetAccessTokenAction(accessToken));
-            await store.dispatch(SetUserRoleAction(userRole));
-          }else{
-            await killUserSessionAndNavigate( store );
-          }
-        }else{
-          await killUserSessionAndNavigate( store );
-        }
+        await store.dispatch(getAccessTokenAndRoleIdRequestAction());
       } catch (e) {
         log('ERROR: getAccessToken - $e');
         await killUserSessionAndNavigate( store );
       }
   }
 
-  static Future<void> setCredentials( Store<AppState> store ) async {
+  static Future<void> setCredentials() async {
+    Store<AppState> store = AppReduxStore.currentStore!;
     try {
-      bool isRefreshTokenSet = await setRefreshToken(store );
+      bool isRefreshTokenSet = await setRefreshToken();
       if( isRefreshTokenSet ){
-        await getAccessToken(store );
+        await getAccessToken();
+        await store.dispatch(getUserInfoRequestAction());
         await store.dispatch(const ChangeScreenAction( AppScreenEnums.HOME_SCREEN ));
       }else{
-         await killUserSessionAndNavigate(store );
+         await killUserSessionAndNavigate( store );
       }
     } catch (e) {
       log('ERROR: setCredentials - $e');
-      await killUserSessionAndNavigate(store );
+      await killUserSessionAndNavigate( store );
     }
   }
 
@@ -87,7 +69,7 @@ class AuthUtils {
 
     // Remove User Role
     if( store.state.userRoleId != 0 ) {
-      await store.dispatch(SetUserRoleAction(0));
+      await store.dispatch(SetRoleIdAction(0));
     }
   }
 

@@ -26,22 +26,11 @@ const getLightWeightUserInfoController = async ( req, res ) => {
             }
 
             const userInfo = {
-                userId: user._id
-                            .toString(),
-                userProfileImg: user.profileImg
-                                    .imgUrl,
+                userId: user._id.toString(),
+                isProfileImageDefault: user.profileImg.isDefaultImg,
+                userProfileImg: user.profileImg.imgUrl,
                 username: user.userName,
-                userFullName: `${
-                                  user.identity
-                                      .firstName
-                               } ${
-                                  user.identity
-                                      .middleName
-                               } ${
-                                  user.identity
-                                      .lastName
-                               }`.replaceAll("undefined", "")
-                                 .replaceAll("  ", " "),
+                userFullName: `${ user.identity.firstName } ${ user.identity.middleName } ${ user.identity.lastName }`.replaceAll("undefined", "").replaceAll("  ", " "),
             };
 
             updatedUserIdList.push( userInfo );

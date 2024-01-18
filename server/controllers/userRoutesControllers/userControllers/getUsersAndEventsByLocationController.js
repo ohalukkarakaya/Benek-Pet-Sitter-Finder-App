@@ -273,6 +273,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 const eventAdmin = await User.findById( item.eventAdmin.toString() );
                 const eventAdminInfo = {
                     userId: eventAdmin._id.toString(),
+                    isProfileImageDefault: eventAdmin.profileImg.isDefaultImg,
                     userProfileImg: eventAdmin.profileImg.imgUrl,
                     username: eventAdmin.userName,
                     userFullName: `${
@@ -295,6 +296,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                     const organizer = await User.finfById( organizerId.toString() );
                     const organizerInfo = {
                         userId: organizer._id.toString(),
+                        isProfileImageDefault: organizer.profileImg.isDefaultImg,
                         userProfileImg: organizer.profileImg.imgUrl,
                         username: organizer.userName,
                         userFullName: `${
@@ -327,6 +329,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                     const joiningUser = await User.findById( joiningUserId );
                     const usersWhoWillJoinInfo = {
                         userId: joiningUserId,
+                        isProfileImageDefault: joiningUser.profileImg.isDefaultImg,
                         userProfileImg: joiningUser.profileImg.imgUrl,
                         username: joiningUser.userName,
                         usersFullName: `${

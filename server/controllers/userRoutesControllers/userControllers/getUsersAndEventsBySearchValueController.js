@@ -379,6 +379,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
     
                 const eventAdminInfo = {
                     userId: eventAdmin._id.toString(),
+                    isProfileImageDefault: eventAdmin.profileImg.isDefaultImg,
                     userProfileImg: eventAdmin.profileImg.imgUrl,
                     username: eventAdmin.userName,
                     userFullName: `${
@@ -405,8 +406,8 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                     const organizerInfo = {
                         userId: organizer._id
                                          .toString(),
-                        userProfileImg: organizer.profileImg
-                                                 .imgUrl,
+                        isProfileImageDefault: organizer.profileImg.isDefaultImg,
+                        userProfileImg: organizer.profileImg.imgUrl,
                         username: organizer.userName,
                         userFullName: `${
                                 organizer.identity
@@ -437,8 +438,8 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                     const joiningUser = await User.findById( joiningUserId );
                     const usersWhoWillJoinInfo = {
                         userId: joiningUserId,
-                        userProfileImg: joiningUser.profileImg
-                                                   .imgUrl,
+                        isProfileImageDefault: joiningUser.profileImg.isDefaultImg,
+                        userProfileImg: joiningUser.profileImg.imgUrl,
                         username: joiningUser.userName,
                         usersFullName: `${
                                 joiningUser.identity

@@ -1,15 +1,13 @@
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
-import 'package:benek_kulube/data/models/main_observing_states_view_models/main_observing_states_view_models.dart';
 import 'package:benek_kulube/presentation/shared/screens/login_screen.dart';
+import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import '../presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
 import '../presentation/shared/components/loading_components/benek_loading_component.dart';
 import '../presentation/shared/screens/home_screen.dart';
 import '../store/app_state.dart';
-import '../presentation/features/counter/components/counter_widget.dart';
 
 class KulubeApp extends StatelessWidget {
   final Store<AppState> store;
@@ -43,21 +41,17 @@ class KulubeHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, MainObservingStatesViewModel>(
-      converter: (store) {
-        return MainObservingStatesViewModel(
-          store: store,
-          activeScreen: store.state.activeScreen,
-          isLoading: store.state.isLoading,
-        );
-      },
-      builder: (BuildContext context, MainObservingStatesViewModel mainObservingStates) {
+    return StoreConnector<AppState, AppState>(
+      converter: (store) => store.state,
+      builder: (BuildContext context, AppState state) {
+        var store = StoreProvider.of<AppState>( context );
+        AppReduxStore.currentStore = store;
         if( 
-          mainObservingStates.store.state.userRefreshToken == '' 
-          && mainObservingStates.store.state.userAccessToken == '' 
-          && mainObservingStates.activeScreen == AppScreenEnums.LOADING_SCREEN
+          state.userRefreshToken == '' 
+          && state.userAccessToken == '' 
+          && state.activeScreen == AppScreenEnums.LOADING_SCREEN
         ){ 
-          AuthUtils.setCredentials( mainObservingStates.store );
+          AuthUtils.setCredentials();
         }
         
         return Stack(
@@ -65,16 +59,16 @@ class KulubeHomePage extends StatelessWidget {
              Scaffold(
                   backgroundColor: Colors.transparent,
                   appBar: AppBar( backgroundColor: Colors.transparent, ),
-                  body: mainObservingStates.activeScreen == AppScreenEnums.LOADING_SCREEN
-                        && mainObservingStates.store.state.userRefreshToken == ''
+                  body: state.activeScreen == AppScreenEnums.LOADING_SCREEN
+                        && state.userRefreshToken == ''
 
                             ? const Center( child: BenekLoadingComponent() )
-                            : mainObservingStates.activeScreen == AppScreenEnums.LOGIN_SCREEN
+                            : state.activeScreen == AppScreenEnums.LOGIN_SCREEN
 
-                                ? LoginScreen( store: mainObservingStates.store )
-                                : mainObservingStates.activeScreen == AppScreenEnums.HOME_SCREEN
+                                ? LoginScreen()
+                                : store.state.activeScreen == AppScreenEnums.HOME_SCREEN
 
-                                      ? const HomeScreen()
+                                      ? HomeScreen( store: store)
                                       : const SizedBox()
                 )
 

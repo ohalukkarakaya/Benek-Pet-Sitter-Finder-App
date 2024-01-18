@@ -42,10 +42,8 @@ const uploadProfileAssetsHelper = async ( req, res, next ) => {
                     && user.profileImg.imgUrl !== ""
                     && !isDefaultProfileImg
                     && req.files !== undefined
-                    && req.files
-                          .profileImg !== undefined
-                    && req.files
-                          .profileImg[ 0 ]
+                    && req.files.profileImg !== undefined
+                    && req.files.profileImg[ 0 ]
                 ){
                     const deleteExistingImage = await deleteFileHelper( user.profileImg.imgUrl );
                     if( deleteExistingImage.error ){

@@ -1,0 +1,9 @@
+import 'package:benek_kulube/redux/is_loading_state/is_loading_state.action.dart';
+
+dynamic isLoadingStateReducer(dynamic state, dynamic action) {
+  if (action is IsLoadingStateAction) {
+    return state.copyWith(isLoading: action.isLoading);
+  }
+
+  return state;
+}

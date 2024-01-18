@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'app/app.dart';
@@ -38,7 +39,7 @@ void initWindowsAndLinuxWindow() async {
 }
 
 void main() async {
-  final Store<AppState> store = createStore();
+  final Store<AppState> store = AppReduxStore.getInitialStore();
   Size windowSize = const Size(1200,800);
 
   initWindowsAndLinuxWindow();
