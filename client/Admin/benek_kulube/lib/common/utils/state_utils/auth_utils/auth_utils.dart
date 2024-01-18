@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
+import 'package:benek_kulube/common/constants/tabs_enum.dart';
 import 'package:benek_kulube/common/utils/shared_preferences_helper.dart';
+import 'package:benek_kulube/data/models/kulube_login_qr_code_model.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:redux/redux.dart';
@@ -30,13 +32,13 @@ class AuthUtils {
     Store<AppState> store = AppReduxStore.currentStore!;
     try {
         if( store.state.userRefreshToken == '') {
-          await killUserSessionAndNavigate( store );
+          await killUserSessionAndRestartApp( store );
         }
 
         await store.dispatch(getAccessTokenAndRoleIdRequestAction());
       } catch (e) {
         log('ERROR: getAccessToken - $e');
-        await killUserSessionAndNavigate( store );
+        await killUserSessionAndRestartApp( store );
       }
   }
 
@@ -49,11 +51,11 @@ class AuthUtils {
         await store.dispatch(getUserInfoRequestAction());
         await store.dispatch(const ChangeScreenAction( AppScreenEnums.HOME_SCREEN ));
       }else{
-         await killUserSessionAndNavigate( store );
+         await killUserSessionAndRestartApp( store );
       }
     } catch (e) {
       log('ERROR: setCredentials - $e');
-      await killUserSessionAndNavigate( store );
+      await killUserSessionAndRestartApp( store );
     }
   }
 
@@ -73,8 +75,12 @@ class AuthUtils {
     }
   }
 
-  static Future<void> killUserSessionAndNavigate( Store<AppState> store ) async {
+  static Future<void> killUserSessionAndRestartApp( Store<AppState> store ) async {
+    KulubeLoginQrCodeModel resetQrCodeData = KulubeLoginQrCodeModel( qrCode: "", clientId: "", expireTime: null );
+    await store.dispatch(GetAdminLoginQrCodeAction(resetQrCodeData));
+    await store.dispatch( GetUserInfoRequestAction(null) );
     await removeCredentials( store );
+    await store.dispatch(const ChangeTabAction( AppTabsEnums.HOME_TAB ));
     await store.dispatch(const ChangeScreenAction( AppScreenEnums.LOGIN_SCREEN ));
   }
 }

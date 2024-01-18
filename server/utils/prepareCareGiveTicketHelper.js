@@ -100,7 +100,9 @@ const prepareCareGiveTicketHelper = async (
             careGiver: careGive.careGiver.careGiverId,
             startDate: careGive.startDate,
             endDate: careGive.endDate,
-            price: `${ careGive.prices.servicePrice } ${ careGive.prices.priceType }`
+            price: careGive.prices.priceType !== "Free" 
+                        ? `${ careGive.prices.servicePrice } ${ careGive.prices.priceType }`
+                        : careGive.prices.priceType
         }
 
         const pet = await Pet.findById( careGive.petId );

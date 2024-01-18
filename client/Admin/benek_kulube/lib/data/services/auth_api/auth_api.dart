@@ -29,7 +29,7 @@ class AuthApi {
 
         return { accessToken, userRole };
       }else{
-        await AuthUtils.killUserSessionAndNavigate( store );
+        await AuthUtils.killUserSessionAndRestartApp( store );
       }
 
     } catch (e) {

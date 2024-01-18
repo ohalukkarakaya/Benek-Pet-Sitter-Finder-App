@@ -34,17 +34,17 @@ class UserInfoApi {
         if ( hasFields ) postBody = mp;
       }
 
-      var response = await apiClient.invokeAPI(path, 'GET', queryParams, postBody!, headerParams, formParams, contentType, authNames);
+      var response = await apiClient.invokeAPI(path, 'GET', queryParams, postBody, headerParams, formParams, contentType, authNames);
       if (response.statusCode >= 400) {
         throw ApiException(code: response.statusCode, message: response.body);
       }else if( response.body != null ){
         return apiClient.deserialize( response.body, 'UserInfoModel' ) as UserInfo;
       }else{
-        await AuthUtils.killUserSessionAndNavigate( store );
+        await AuthUtils.killUserSessionAndRestartApp( store );
       }
     }catch( err ){
       log('ERROR: getUserInfoRequest - $err');
-      await AuthUtils.killUserSessionAndNavigate( store );
+      await AuthUtils.killUserSessionAndRestartApp( store );
     }
   }
 }

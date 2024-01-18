@@ -91,7 +91,7 @@ class ApiClient {
       String path,
       String method,
       List<QueryParam> queryParams,
-      Object body,
+      Object? body,
       Map<String, String> headerParams,
       Map<String, String> formParams,
       String contentType,
@@ -157,7 +157,7 @@ class ApiClient {
               || resp.statusCode == 400
               || resp.statusCode >= 500
             ){
-              AuthUtils.killUserSessionAndNavigate( store ).then(
+              AuthUtils.killUserSessionAndRestartApp( store ).then(
                 ( value ) => log("User Session Killed!!")
               );
             }
@@ -166,12 +166,12 @@ class ApiClient {
           ( exception ){
             var errorMessage = getApiExceptionMessage(path, method, exception);
             log(errorMessage);
-            AuthUtils.killUserSessionAndNavigate( store );
+            AuthUtils.killUserSessionAndRestartApp( store );
           }
         );
       } catch (exception) {
         log(getApiExceptionMessage(path, method, exception));
-        AuthUtils.killUserSessionAndNavigate( store );
+        AuthUtils.killUserSessionAndRestartApp( store );
       }
 
       return await response ?? Response('', 500);

@@ -21,7 +21,7 @@ ThunkAction<AppState> getAccessTokenAndRoleIdRequestAction() {
       await store.dispatch(SetRoleIdAction(userRole));
     } on ApiException catch (e) {
       log('ERROR: getUserInfoRequestAction - $e');
-      await AuthUtils.killUserSessionAndNavigate(store);
+      await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };
 }

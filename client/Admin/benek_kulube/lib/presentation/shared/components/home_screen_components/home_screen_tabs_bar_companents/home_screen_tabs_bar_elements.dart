@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
+import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:benek_kulube/store/app_state.dart';
@@ -33,7 +34,9 @@ class _TabsButonElementState extends State<TabsButonElement> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        await widget.store.dispatch(ChangeTabAction( widget.tab ) );
+         widget.tab == AppTabsEnums.LOGOUT_TAB
+          ? await AuthUtils.killUserSessionAndRestartApp( widget.store )
+          : await widget.store.dispatch(ChangeTabAction( widget.tab ) );
       },
       child: MouseRegion(
         onHover: ( event ){

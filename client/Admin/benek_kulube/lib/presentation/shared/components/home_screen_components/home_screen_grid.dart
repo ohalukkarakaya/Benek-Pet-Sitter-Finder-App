@@ -20,7 +20,7 @@ class HomeScreenGrid extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 100.0),
+                padding: const EdgeInsets.only(left: 150.0),
                 child: Container(
                   height: 45,
                   width: 500,
@@ -31,7 +31,57 @@ class HomeScreenGrid extends StatelessWidget {
                 ),
               ),
               const SizedBox( height: 100,),
-              Center(child: CounterWidget()),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Hoş Geldin",
+                        style: TextStyle(
+                          fontFamily: 'Qanelas',
+                          fontSize: 30.0,
+                          fontWeight: FontWeight.w100
+                        ),
+                      ),
+                      Text(
+                        " ${store.state.userInfo!.identity?.firstName} ${store.state.userInfo!.identity?.middleName} ${store.state.userInfo!.identity?.lastName?.toUpperCase()}",
+                        style: const TextStyle(
+                          fontFamily: 'Qanelas',
+                          fontSize: 30.0,
+                          fontWeight: FontWeight.w400
+                        ),
+                      ),
+                    ],
+                  ),
+              
+                  const SizedBox(height: 10.0),
+        
+                  const Text(
+                    "Giriş yapmak için aşağıdaki kodu Benek uygulamasına okut.",
+                    style: TextStyle(
+                      fontFamily: 'Qanelas',
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w400
+                    ),
+                  ),
+        
+                  const SizedBox(height: 40.0),
+        
+                  Text(
+                    store.state.loginQrCodeData.expireTime == null 
+                    || store.state.loginQrCodeData.expireTime!.isBefore(DateTime.now()) 
+                      ? "Yeni bi QR kod almak için butona tıkla :)"
+                      : "Bu kodun süresi, bir saat içinde dolar!",
+                    style: const TextStyle(
+                      fontFamily: 'Qanelas',
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.w400
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
           Column(
@@ -39,7 +89,7 @@ class HomeScreenGrid extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
-                padding: const EdgeInsets.only(right: 40.0),
+                padding: const EdgeInsets.only(right: 40.0, top: 5),
                 child: Container(
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all( Radius.circular( 100.0 ) ),

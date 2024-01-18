@@ -1,11 +1,9 @@
-import 'package:benek_kulube/data/models/price_info_model.dart';
-
 class UserPastCaregivers {
   String? pet;
   String? careGiver;
   String? startDate;
   String? endDate;
-  PriceInfo? price;
+  String? price;
 
   UserPastCaregivers(
     {
@@ -22,9 +20,7 @@ class UserPastCaregivers {
     careGiver = json['careGiver'];
     startDate = json['startDate'];
     endDate = json['endDate'];
-    price = json['price'] != null 
-              ? PriceInfo.fromJson( json['price'] ) 
-              : null;
+    price = json['price'];
   }
 
   Map<String, dynamic> toJson(){
@@ -34,7 +30,7 @@ class UserPastCaregivers {
     data['startDate'] = startDate;
     data['endDate'] = endDate;
     if( price != null ){
-      data['price'] = price!.toJson();
+      data['price'] = price;
     }
     return data;
   }

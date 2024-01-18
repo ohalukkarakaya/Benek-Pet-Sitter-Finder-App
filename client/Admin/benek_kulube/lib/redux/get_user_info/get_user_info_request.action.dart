@@ -20,13 +20,13 @@ ThunkAction<AppState> getUserInfoRequestAction() {
       await store.dispatch(GetUserInfoRequestAction(_userInfo));
     } on ApiException catch (e) {
       log('ERROR: getUserInfoRequestAction - $e');
-      await AuthUtils.killUserSessionAndNavigate(store);
+      await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };
 }
 
 class GetUserInfoRequestAction {
-  final UserInfo _userInfo;
-  UserInfo get userInfo => _userInfo;
+  final UserInfo? _userInfo;
+  UserInfo? get userInfo => _userInfo;
   GetUserInfoRequestAction(this._userInfo);
 }

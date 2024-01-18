@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:benek_kulube/common/constants/benek_icons.dart';
 import 'package:benek_kulube/data/models/kulube_login_qr_code_model.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
-import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
@@ -14,17 +13,17 @@ import '../benek_dashed_border/benek_dashed_border.dart';
 import '../benek_process_indicator/benek_process_indicator.dart';
 
 class KulubeLoginQrCode extends StatefulWidget {
-  const KulubeLoginQrCode({super.key});
+  final Store<AppState> store;
+  
+  const KulubeLoginQrCode({super.key, required this.store} );
 
   @override
   State<KulubeLoginQrCode> createState() => _KulubeLoginQrCodeState();
 }
 
 class _KulubeLoginQrCodeState extends State<KulubeLoginQrCode> {
-  Store<AppState> store = AppReduxStore.currentStore!;
   @override
   Widget build(BuildContext context) {
-
     return Container(
             width: 250,
             height: 250,
@@ -43,7 +42,7 @@ class _KulubeLoginQrCodeState extends State<KulubeLoginQrCode> {
                 borderRadius: const BorderRadius.all(Radius.circular(15.0)),
                 child: Container(
                   padding: const EdgeInsets.all(3.0),
-                  child: store.state.loginQrCodeData.qrCode == ''
+                  child: widget.store.state.loginQrCodeData.qrCode == ''
 
                     ? const Center(
                       child: BenekProcessIndicator(
@@ -53,10 +52,10 @@ class _KulubeLoginQrCodeState extends State<KulubeLoginQrCode> {
                         ),
                     )
                     
-                    : store.state.loginQrCodeData.expireTime != null 
-                    && !( store.state.loginQrCodeData.expireTime!.isBefore(DateTime.now()) )
+                    : widget.store.state.loginQrCodeData.expireTime != null 
+                    && !( widget.store.state.loginQrCodeData.expireTime!.isBefore(DateTime.now()) )
                         ? Image.memory(
-                            base64Decode(store.state.loginQrCodeData.qrCode),
+                            base64Decode(widget.store.state.loginQrCodeData.qrCode),
                             gaplessPlayback: true,
                             fit: BoxFit.cover,
                           )
@@ -70,9 +69,9 @@ class _KulubeLoginQrCodeState extends State<KulubeLoginQrCode> {
                                 expireTime: null
                               );
 
-                              await store.dispatch(GetAdminLoginQrCodeAction(resetQrCodeData));
+                              await widget.store.dispatch(GetAdminLoginQrCodeAction(resetQrCodeData));
                               String clientId = await getClientId();
-                              await store.dispatch(getAdminLoginQrCodeAction(clientId));
+                              await widget.store.dispatch(getAdminLoginQrCodeAction(clientId));
                             },
                             
                           ),

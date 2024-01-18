@@ -55,7 +55,6 @@ class _LoginScreenState extends State<LoginScreen> {
     socket.on('getUserInfo', (data) async {
         KulubeLoginQrCodeModel resetQrCodeData = KulubeLoginQrCodeModel( qrCode: "", clientId: "", expireTime: null );
         await store.dispatch(GetAdminLoginQrCodeAction(resetQrCodeData));
-        log('getUserInfo event received: $data');
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString(SharedPreferencesKeys.refreshToken, data['refreshToken']);
@@ -114,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
         
                   const SizedBox(height: 40.0),
               
-                  const KulubeLoginQrCode(),
+                  KulubeLoginQrCode( store: store),
         
                   const SizedBox(height: 40.0),
         
