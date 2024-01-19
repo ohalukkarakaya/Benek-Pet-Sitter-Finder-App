@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:benek_kulube/common/utils/shared_preferences_helper.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:benek_kulube/store/app_state.dart';

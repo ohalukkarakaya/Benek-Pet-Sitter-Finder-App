@@ -6,6 +6,10 @@ const PetSchema = new mongoose.Schema(
           type: String,
           required: true,
       },
+      defaultImage: {
+        type: String,
+        required: true
+      },
       petProfileImg: {
         isDefaultImg: {
             type: Boolean,
@@ -146,5 +150,15 @@ const PetSchema = new mongoose.Schema(
       timestamps: true
   }
 );
+
+PetSchema.pre('save', function (){
+    if(this.petProfileImg.recordedImgName === ""){
+        this.petProfileImg.recordedImgName = this.defaultImage;
+    }
+
+    if(this.petProfileImg.imgUrl === ""){
+        this.petProfileImg.imgUrl = this.defaultImage;
+    }
+})
 
 export default mongoose.model("Pet", PetSchema);

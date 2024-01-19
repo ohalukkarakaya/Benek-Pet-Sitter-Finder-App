@@ -1,5 +1,6 @@
 import Pet from "../../../models/Pet.js";
 import User from "../../../models/User.js";
+import generateRandomAvatarHelper from "../../../utils/defaultAvatarHelpers/generateRandomAvatarHelper.js";
 import { createPetReqBodyValidation } from "../../../utils/bodyValidation/pets/createPetValidationSchema.js";
 import { createRequire } from "module";
 
@@ -94,10 +95,18 @@ const createPetController = async (req, res) => {
             }
           );
         }
+
+        // default profile image oluştur
+        const assetIdiesJson = generateRandomAvatarHelper( true );
+        const avatarAssetId = assetIdiesJson.avatarId;
+        const backGroundAssetId = assetIdiesJson.backGroundId;
+
+        const defaultAvatar = `P/${backGroundAssetId}/${avatarAssetId}`;
     
         await new Pet(
           {
             name: req.body.name,
+            defaultImage: defaultAvatar,
             bio: req.body.petBio,
             sex: req.body.sex,
             birthDay: req.body.birthDay,

@@ -266,6 +266,6 @@ UserSchema.pre('save', function (){
     if(this.profileImg.imgUrl === ""){
         this.profileImg.imgUrl = this.defaultImage;
     }
-  })
+})
 
 export default mongoose.model("User", UserSchema);

@@ -259,8 +259,8 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
                 const pet = await Pet.findById( petId.toString() );
                 const petInfo = {
                     petId: petId.toString(),
-                    petProfileImgUrl: pet.petProfileImg
-                                         .imgUrl,
+                    isDefaultImg: pet.petProfileImg.isDefaultImg,
+                    petProfileImgUrl: pet.petProfileImg.imgUrl,
                     petName: pet.name
                 }
                 petId = petInfo;

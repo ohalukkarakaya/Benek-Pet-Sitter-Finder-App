@@ -42,7 +42,7 @@ const signUpController = async ( req, res ) => {
       const hashPassword = await bcrypt.hash( req.body.password, salt );
 
       // default profile image oluştur
-      const assetIdiesJson = generateRandomAvatarHelper();
+      const assetIdiesJson = generateRandomAvatarHelper( false );
       const avatarAssetId = assetIdiesJson.avatarId;
       const backGroundAssetId = assetIdiesJson.backGroundId;
 

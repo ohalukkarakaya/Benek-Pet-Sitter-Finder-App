@@ -217,6 +217,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                     const pet = await Pet.findById( petId.toString() );
                     const petInfo = {
                         petId: petId.toString(),
+                        isDefaultImg: pet.petProfileImg.isDefaultImg,
                         petProfileImgUrl: pet.petProfileImg.imgUrl,
                         petName: pet.name
                     }

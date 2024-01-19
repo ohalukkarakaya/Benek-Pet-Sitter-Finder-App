@@ -1,4 +1,4 @@
-import 'package:benek_kulube/presentation/features/counter/components/counter_widget.dart';
+import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:redux/redux.dart';
@@ -90,14 +90,13 @@ class HomeScreenGrid extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(right: 40.0, top: 5),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all( Radius.circular( 100.0 ) ),
-                    color: Colors.white,
-                  ),
-                  height: 40,
-                  width: 40,
-                ),
+                child: BenekCircleAvatar(
+                  width: 50,
+                  height: 50,
+                  radius: 100,
+                  isDefaultAvatar: store.state.userInfo!.profileImg!.isDefaultImg!,
+                  imageUrl: store.state.userInfo!.profileImg!.imgUrl!,
+                )
               ),
               Image.asset(
                 'assets/images/saluting_dog.png',

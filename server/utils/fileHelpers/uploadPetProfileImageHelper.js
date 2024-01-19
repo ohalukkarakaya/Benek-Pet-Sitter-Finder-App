@@ -42,20 +42,15 @@ const uploadPetProfileImageHelper = async ( req, res, next ) => {
                     && pet.petProfileImg.imgUrl !== ""
                     && !isDefaultProfileImg
                     && req.files !== undefined
-                    && req.files
-                          .petProfileImg !== undefined
-                    && req.files
-                          .petProfileImg[ 0 ]
+                    && req.files.petProfileImg !== undefined
+                    && req.files.petProfileImg[ 0 ]
                 ){
                     const deleteExistingImage = await deleteFileHelper( pet.petProfileImg.imgUrl );
                     if( deleteExistingImage.err ){
-                        return res.status( 500 )
-                                .json(
-                                    {
-                                        error: true,
-                                        message: "Internal Server Error"
-                                    }
-                                );
+                        return res.status( 500 ).json({
+                            error: true,
+                            message: "Internal Server Error"
+                        });
                     }
                 }
 
@@ -65,20 +60,15 @@ const uploadPetProfileImageHelper = async ( req, res, next ) => {
                     && pet.petCoverImg.imgUrl !== ""
                     && !isDefaultCoverImg
                     && req.files !== undefined
-                    && req.files
-                          .petCoverImg !== undefined
-                    && req.files
-                          .petCoverImg[ 0 ]
+                    && req.files.petCoverImg !== undefined
+                    && req.files.petCoverImg[ 0 ]
                 ){
                     const deleteExistingImage = await deleteFileHelper( pet.petCoverImg.imgUrl );
                     if( deleteExistingImage.err ){
-                        return res.status( 500 )
-                                .json(
-                                    {
-                                        error: true,
-                                        message: "Internal Server Error"
-                                    }
-                                );
+                        return res.status( 500 ).json({
+                            error: true,
+                            message: "Internal Server Error"
+                        });
                     }
                 }
 
@@ -87,22 +77,13 @@ const uploadPetProfileImageHelper = async ( req, res, next ) => {
                     //insert outputpath
                     const { originalname } = req.files.petProfileImg[ 0 ];
                     const splitedOriginalName = originalname.split( "." );
-                    const randId = crypto.randomBytes( 6 )
-                                         .toString( 'hex' );
-
-                    const newFileName = petId + "_petProfileImg_"
-                                              + randId;
-
+                    const randId = crypto.randomBytes( 6 ).toString( 'hex' );
+                    const newFileName = petId + "_petProfileImg_" + randId;
                     req.profileImgNewFileName = newFileName;
 
-                    const pathToSend =  "pets/" + petId
-                                                + "/petProfileAssets/"
-                                                + newFileName;
+                    const pathToSend =  "pets/" + petId + "/petProfileAssets/" + newFileName;
 
-                    req.profilePath = pathToSend + "."
-                                                 + splitedOriginalName[
-                                                     splitedOriginalName.length - 1
-                                                   ];
+                    req.profilePath = pathToSend + "." + splitedOriginalName[splitedOriginalName.length - 1];
 
                     try {
                         await fs.promises.writeFile(
@@ -114,39 +95,23 @@ const uploadPetProfileImageHelper = async ( req, res, next ) => {
                         console.error("Dosya yazma hatası:", err);
                     }
 
-                    const writenFile = fs.createReadStream( 
-                                                        newFileName + "."
-                                                                    + splitedOriginalName[
-                                                                        splitedOriginalName.length - 1
-                                                                      ] 
-                                          );
+                    const writenFile = fs.createReadStream( newFileName + "." + splitedOriginalName[splitedOriginalName.length - 1] );
 
                     const uploadProfileImage = await uploadFileHelper(
-                                                        writenFile,
-                                                        newFileName + "."
-                                                                    + splitedOriginalName[
-                                                                        splitedOriginalName.length - 1
-                                                                      ],
-                                                        'profile',
-                                                        pathToSend,
-                                                        res
-                                                    );
+                        writenFile,
+                        newFileName + "." + splitedOriginalName[splitedOriginalName.length - 1],
+                        'profile',
+                        pathToSend,
+                        res
+                    );
 
-                    fs.rmSync( 
-                        newFileName + "."
-                                    + splitedOriginalName[
-                                        splitedOriginalName.length - 1
-                                      ] 
-                       );
+                    fs.rmSync( newFileName + "." + splitedOriginalName[splitedOriginalName.length - 1] );
 
                     if( uploadProfileImage.error ){
-                        return res.status( 500 )
-                                .json(
-                                    {
-                                        error: true,
-                                        message: "Internal Server Error"
-                                    }
-                                );
+                        return res.status( 500 ).json({
+                            error: true,
+                            message: "Internal Server Error"
+                        });
                     }
                 }
 
@@ -155,36 +120,20 @@ const uploadPetProfileImageHelper = async ( req, res, next ) => {
                     //insert outputpath
                     const { originalname } = req.files.petCoverImg[ 0 ];
                     const splitedOriginalName = originalname.split( "." );
-                    const randId = crypto.randomBytes( 6 )
-                                         .toString( 'hex' );
+                    const randId = crypto.randomBytes( 6 ).toString( 'hex' );
 
-                    const newFileName = petId + "_petCoverImg_"
-                                              + randId;
+                    const newFileName = petId + "_petCoverImg_" + randId;
 
                     req.profileImgNewFileName = newFileName;
 
-                    const pathToSend =  "pets/" + petId
-                                                + "/petProfileAssets/"
-                                                + newFileName;
+                    const pathToSend =  "pets/" + petId + "/petProfileAssets/" + newFileName;
 
-                    req.coverPath = pathToSend + "."
-                                               + splitedOriginalName[
-                                                    splitedOriginalName.length - 1
-                                                 ];
+                    req.coverPath = pathToSend + "." + splitedOriginalName[splitedOriginalName.length - 1];
 
                     try {
-
                         await fs.promises.writeFile(
-
-                            newFileName + "." 
-                                        + splitedOriginalName[
-                                            splitedOriginalName.length - 1
-                                          ],
-
-                            req.files
-                               .petCoverImg[ 0 ]
-                               .buffer,
-
+                            newFileName + "." + splitedOriginalName[splitedOriginalName.length - 1],
+                            req.files.petCoverImg[ 0 ].buffer,
                             "binary"
                         );
 
@@ -192,88 +141,40 @@ const uploadPetProfileImageHelper = async ( req, res, next ) => {
                         console.error( "Dosya yazma hatası:", err );
                     }
 
-                    const writenFile = fs.createReadStream( 
-                                                        newFileName + "."
-                                                                    + splitedOriginalName[
-                                                                        splitedOriginalName.length - 1
-                                                                      ] 
-                                          );
+                    const writenFile = fs.createReadStream(newFileName + "." + splitedOriginalName[splitedOriginalName.length - 1]);
 
                     const uploadProfileImage = await uploadFileHelper(
-                                                        writenFile,
-                                                        newFileName + "."
-                                                                    + splitedOriginalName[
-                                                                        splitedOriginalName.length - 1
-                                                                      ],
-                                                        'cover',
-                                                        pathToSend,
-                                                        res
-                                                    );
+                        writenFile,
+                        newFileName + "." + splitedOriginalName[splitedOriginalName.length - 1],
+                        'cover',
+                        pathToSend,
+                        res
+                    );
 
-                    fs.rmSync( 
-                        newFileName + "."
-                                    + splitedOriginalName[
-                                        splitedOriginalName.length - 1
-                                      ] 
-                       );
+                    fs.rmSync( newFileName + "." + splitedOriginalName[splitedOriginalName.length - 1]);
 
                     if( uploadProfileImage.error ){
-                        return res.status( 500 )
-                                .json(
-                                    {
-                                        error: true,
-                                        message: "Internal Server Error"
-                                    }
-                                );
+                        return res.status( 500 ).json({
+                          error: true,
+                          message: "Internal Server Error"
+                        });
                     }
                 }
                 //images uploaded to server
 
 
-                if(
-                    req.files
-                        .petProfileImg !== undefined
-                    
-                    && req.files
-                            .petProfileImg[ 0 ]
-                ){
-                    req.pet
-                       .petProfileImg
-                       .imgUrl = req.profilePath;
-
-                    req.pet
-                        .petProfileImg
-                        .recordedImgName = req.profilePath;
-
-                    req.pet
-                        .petProfileImg
-                        .isDefaultImg = false;
-
-                    req.pet
-                        .markModified( 'petProfileImg' );
+                if( req.files.petProfileImg !== undefined && req.files.petProfileImg[ 0 ] ){
+                    req.pet.petProfileImg.imgUrl = req.profilePath;
+                    req.pet.petProfileImg.recordedImgName = req.profilePath;
+                    req.pet.petProfileImg.isDefaultImg = false;
+                    req.pet.markModified( 'petProfileImg' );
                 }
 
-                if(
-                    req.files
-                       .petCoverImg !== undefined
-
-                    && req.files
-                          .petCoverImg[ 0 ]
-                ){
-                    req.pet
-                       .petCoverImg
-                       .imgUrl = req.coverPath;
-
-                    req.pet
-                       .petCoverImg
-                       .recordedImgName = req.coverPath;
-
-                    req.pet
-                       .petCoverImg
-                       .isDefaultImg = false;
-
-                    req.pet
-                       .markModified( 'coverImg' );
+                if( req.files.petCoverImg !== undefined && req.files.petCoverImg[ 0 ] ){
+                    req.pet.petCoverImg.imgUrl = req.coverPath;
+                    req.pet.petCoverImg.recordedImgName = req.coverPath;
+                    req.pet.petCoverImg.isDefaultImg = false;
+                    req.pet.markModified( 'coverImg' );
                 }
 
                 next();
@@ -283,13 +184,10 @@ const uploadPetProfileImageHelper = async ( req, res, next ) => {
 
     }catch( err ){
         console.log( "ERROR: uploadPetProfileImageHelper - ", err );
-        return res.status( 500 )
-                  .json(
-                    {
-                        error: true,
-                        message: "Internal server error"
-                    }
-                  );
+        return res.status( 500 ).json({
+          error: true,
+          message: "Internal server error"
+        });
     }
 }
 
