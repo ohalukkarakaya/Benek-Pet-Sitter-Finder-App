@@ -55,7 +55,7 @@ router.put(
 // - tested
 //get mission list by careGiveId
 router.get(
-    "/getMissionCalenderByCareGiveId/:careGiveId/:skip/:limit",
+    "/getMissionCalenderByCareGiveId/:careGiveId/:lastItemId/:limit",
     auth,
     getMissionListByCareGiveIdController
 );
@@ -63,7 +63,7 @@ router.get(
 // - tested
 //get releated missions by userId
 router.get(
-    "/getMissionCalender/:skip/:limit",
+    "/getMissionCalender/:lastItemId/:limit",
     auth,
     getMissionCallenderController
 );
@@ -71,7 +71,7 @@ router.get(
 // - tested
 //get missions by pet id
 router.get(
-    "/getMissionCalenderByPetId/:petId/:skip/:limit",
+    "/getMissionCalenderByPetId/:petId/:lastItemId/:limit",
     auth,
     getMissionCallenderByPetIdController
 );

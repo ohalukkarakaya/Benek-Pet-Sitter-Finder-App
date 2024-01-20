@@ -7,33 +7,31 @@ import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoH
 const getPetSendedHandOverInvitationsController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const skip = parseInt( req.params.skip ) || 0;
+        const lastItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
         const invitationQuery = { from: userId };
-        const invitations = await PetHandOverInvitation.find( invitationQuery )
-                                                       .skip( skip )
-                                                       .limit( limit )
-                                                       .lean();
+        const invitationFilter = { from: userId };
 
-        const totalInvitationCount = await PetHandOverInvitation.countDocuments( invitationQuery );
-        if( invitations.length <= 0 ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "No Invitation Found"
-                }
-            );
+        if( lastItemId !== 'null' ){
+            const lastItem = await PetHandOverInvitation.findById(lastItemId);
+            if(lastItem){
+                invitationFilter.createdAt = { $gt: lastItem.createdAt };
+            }
         }
 
-        for(
-            let invitation
-            of invitations
-        ){
-            const secondaryOwner = await User.findById( 
-                                                    invitation.to
-                                                              .toString() 
-                                              );
+        const totalInvitationCount = await PetHandOverInvitation.countDocuments( invitationQuery );
+        const invitations = await PetHandOverInvitation.find( invitationFilter ).sort({ createdAt: 1 }).limit( limit ).lean();
+
+        if( invitations.length <= 0 ){
+            return res.status( 404 ).json({
+                error: true,
+                message: "No Invitation Found"
+            });
+        }
+
+        for( let invitation of invitations ){
+            const secondaryOwner = await User.findById( invitation.to.toString() );
             const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
 
             invitation.to = secondaryOwnerInfo;
@@ -43,25 +41,21 @@ const getPetSendedHandOverInvitationsController = async ( req, res ) => {
 
             invitation.pet = petInfo;
             delete invitation.petId;
-
         }
 
-        return res.status( 200 ).json(
-            {
-                error: true,
-                message: "Sended Invitation List Prepared Succesfully",
-                totalInvitationCount: totalInvitationCount,
-                invitations: invitations
-            }
-        );
+        return res.status( 200 ).json({
+            error: true,
+            message: "Sended Invitation List Prepared Succesfully",
+            totalInvitationCount: totalInvitationCount,
+            invitations: invitations
+        });
+
     }catch( err ){
         console.log("ERROR: getSecondaryOwnerInvitationsController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+        return res.status(500).json({
+            error: true,
+            message: "Internal Server Error"
+        });
     }
 }
 

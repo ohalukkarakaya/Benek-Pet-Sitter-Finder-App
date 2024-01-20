@@ -8,39 +8,35 @@ import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoH
 const getSendedSecondaryOwnerInvitationsController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const skip = parseInt( req.params.skip ) || 0;
+        const lastItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
-        const invitationQuery = { from: userId }
-        const invitations = await SecondaryOwnerInvitation.find( invitationQuery )
-                                                          .skip( skip )
-                                                          .limit( limit )
-                                                          .lean();
-                                                        
-        const totalInvitationCount = await SecondaryOwnerInvitation.countDocuments( invitationQuery );
+        const invitationQuery = { from: userId };
+        const invitationFilter = { from: userId };
 
-        if( invitations.length <= 0 ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "No Invitation Found"
-                            }
-                      );
+        if( lastItemId !== 'null' ){
+            const lastItem = await SecondaryOwnerInvitation.findById(lastItemId);
+            if(lastItem){
+                invitationFilter.createdAt = { $gt: lastItem.createdAt };
+            }
         }
 
-        for(
-            let invitation
-            of invitations
-        ){
+        const totalInvitationCount = await SecondaryOwnerInvitation.countDocuments( invitationQuery );
+        const invitations = await SecondaryOwnerInvitation.find( invitationFilter ).sort({ createdAt: 1 }).limit( limit ).lean();
 
-            const secondaryOwner = await User.findById( 
-                                                invitation.to
-                                                          .toString() 
-                                              );
+        if( invitations.length <= 0 ){
+            return res.status( 404 ).json({
+                error: true,
+                message: "No Invitation Found"
+            });
+        }
+
+        for( let invitation of invitations ){
+            const secondaryOwner = await User.findById( invitation.to.toString() );
             if( !secondaryOwner ){
                 continue;
             }
+
             const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
             invitation.to = secondaryOwnerInfo;
 
@@ -48,6 +44,7 @@ const getSendedSecondaryOwnerInvitationsController = async ( req, res ) => {
             if (!pet) {
                 continue; 
             }
+
             const petInfo = getLightWeightPetInfoHelper( pet );
             invitation.pet = petInfo;
             delete invitation.petId;
@@ -55,24 +52,19 @@ const getSendedSecondaryOwnerInvitationsController = async ( req, res ) => {
             delete invitation.__v;
         }
 
-        return res.status( 200 )
-                  .json(
-                        {
-                            error: true,
-                            message: "Sended Invitation List Prepared Succesfully",
-                            totalInvitationCount: totalInvitationCount,
-                            invitations: invitations
-                        }
-                  );
+        return res.status( 200 ).json({
+            error: true,
+            message: "Sended Invitation List Prepared Succesfully",
+            totalInvitationCount: totalInvitationCount,
+            invitations: invitations
+        });
+
     }catch( err ){
         console.log( "ERROR: getSendedSecondaryOwnerInvitationsController - ", err );
-        res.status( 500 )
-           .json(
-                {
-                    error: true,
-                    message: "Internal Server Error"
-                }
-            );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal Server Error"
+        });
     }
 }
 

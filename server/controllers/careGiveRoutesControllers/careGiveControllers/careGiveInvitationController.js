@@ -121,12 +121,12 @@ const careGiveInvitationController = async ( req, res ) => {
         }
 
         const isPetAlreadyInCareGive = await CareGive.findOne(
-                                                            {
-                                                                petId: pet._id.toString(),
-                                                                endDate: { $gt: new Date() },
-                                                                'finishProcess.isFinished': false
-                                                            }
-                                                      );
+            {
+                petId: pet._id.toString(),
+                endDate: { $gt: new Date() },
+                'finishProcess.isFinished': false
+            }
+        );
 
         if( isPetAlreadyInCareGive ){
             return res.status( 403 )

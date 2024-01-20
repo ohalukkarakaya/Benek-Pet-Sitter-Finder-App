@@ -6,20 +6,14 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
         const lat = parseFloat( req.body.lat );
         const lng = parseFloat( req.body.lng );
         const limit = req.params.limit || 10;
-        const skip = req.params.skip || 0;
+        const lastItemId = req.body.lastItemId || 'null';
         const userId = req.user._id.toString();
 
-        if(
-            !lat
-            || !lng
-        ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "missing params"
-                            }
-                      );
+        if( !lat || !lng ){
+            return res.status( 400 ).json({
+                error: true,
+                message: "missing params"
+            });
         }
     
         let users = await User.aggregate(
@@ -118,11 +112,9 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
                 {
                     $match: {
-                        "deactivation.isDeactive": false,
-                        blockedUsers: { 
-                            $nin: [
-                                userId
-                            ] 
+                        $match: {
+                            "deactivation.isDeactive": false,
+                            blockedUsers: { $nin: [ userId ] },
                         },
                     },
                 },
@@ -139,15 +131,9 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
         const events = await Event.find(
             {
                 isPrivate: false,
-                "adress.lat": { 
-                    $exists: true 
-                },
-                "adress.long": { 
-                    $exists: true 
-                },
-                date: { 
-                    $gte: new Date() 
-                }
+                "adress.lat": { $exists: true },
+                "adress.long": { $exists: true },
+                date: { $gte: new Date() }
             }
         ).sort(
             {
@@ -157,32 +143,19 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
             }
         );
 
-        events.filter(
+        events = events.filter(
             ( event ) => {
-
                 if( event.maxGuests !== -1 ){
-
-                    return event.maxGuests >= event.willJoin
-                                                   .length;
-
+                    return event.maxGuests >= event.willJoin.length;
                 }else{
-
                     return true
-
                 }
             }
         );
 
         const sortedEvents = events.map(
             ( event ) => {
-                const distance = Math.pow(
-                                    event.adress.lat - lat, 
-                                    2
-                                ) 
-                                + Math.pow(
-                                    event.adress.long - lng, 
-                                    2
-                                );
+                const distance = Math.pow( event.adress.lat - lat, 2 ) + Math.pow( event.adress.long - lng, 2 );
                 return { ...event.toObject(), distance };
             }
         ).sort(
@@ -192,28 +165,13 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
 
         const mergedList = [...users, ...sortedEvents];
 
-        for(
-            let item
-            of mergedList
-        ){
+        for( let item of mergedList ){
             if( item instanceof User ) {
                 const { location } = item;
-                const distance = Math.sqrt(
-                    Math.pow(
-                            location.lat - lat, 
-                            2
-                        ) 
-                    + Math.pow(
-                            location.lng - lng, 
-                            2
-                        )
-                );
+                const distance = Math.sqrt( Math.pow( location.lat - lat, 2 ) + Math.pow( location.lng - lng, 2 ) );
                 item.distance = distance;
                 
-                for(
-                    let petId
-                    of item.pets
-                ){
+                for( let petId of item.pets ){
                     const pet = await Pet.findById( petId.toString() );
                     const petInfo = {
                         petId: petId.toString(),
@@ -235,10 +193,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 delete item.phone;
                 delete item.email;
     
-                for(
-                    let dependedId
-                    of item.dependedUsers
-                ){
+                for( let dependedId  of item.dependedUsers ){
                     const depended = await User.findById( dependedId );
                     const dependedInfo = getLightWeightUserInfoHelper( depended );
                     
@@ -250,8 +205,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                     ( acc, curr ) =>
                             acc + curr, 0
                 );
-                const starCount = item.stars
-                                      .length;
+                const starCount = item.stars.length;
                 const starAvarage = totalStarValue / starCount;
     
                 item.totalStar = starCount;
@@ -259,16 +213,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
     
             }else if( item instanceof Event ) {
                 const { adress } = item;
-                const distance = Math.sqrt(
-                    Math.pow(
-                            adress.lat - lat, 
-                            2
-                        ) 
-                    + Math.pow(
-                            adress.long - lng, 
-                            2
-                        )
-                );
+                const distance = Math.sqrt(  Math.pow( adress.lat - lat, 2 ) + Math.pow( adress.long - lng, 2 ) );
                 item.distance = distance;
     
                 const eventAdmin = await User.findById( item.eventAdmin.toString() );
@@ -277,79 +222,39 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                     isProfileImageDefault: eventAdmin.profileImg.isDefaultImg,
                     userProfileImg: eventAdmin.profileImg.imgUrl,
                     username: eventAdmin.userName,
-                    userFullName: `${
-                            eventAdmin.identity
-                                      .firstName
-                        } ${
-                            eventAdmin.identity
-                                      .middleName
-                        } ${
-                            eventAdmin.identity
-                                      .lastName
-                        }`.replaceAll( "  ", " ")
+                    userFullName: `${eventAdmin.identity.firstName} ${eventAdmin.identity.middleName} ${eventAdmin.identity.lastName}`.replaceAll( "  ", " ")
                 }
                 item.eventAdmin = eventAdminInfo;
     
-                for(
-                    let organizerId
-                    of item.eventOrganizers
-                ){
+                for( let organizerId of item.eventOrganizers ){
                     const organizer = await User.finfById( organizerId.toString() );
                     const organizerInfo = {
                         userId: organizer._id.toString(),
                         isProfileImageDefault: organizer.profileImg.isDefaultImg,
                         userProfileImg: organizer.profileImg.imgUrl,
                         username: organizer.userName,
-                        userFullName: `${
-                                organizer.identity
-                                         .firstName
-                            } ${
-                                organizer.identity
-                                         .middleName
-                            } ${
-                                organizer.identity
-                                         .lastName
-                            }`.replaceAll( "  ", " ")
+                        userFullName: `${organizer.identity.firstName} ${organizer.identity.middleName} ${organizer.identity.lastName }`.replaceAll( "  ", " " )
                     }
-                    item.organizers
-                        .push( organizerInfo );
+                    item.organizers.push( organizerInfo );
                 }
     
-                if( 
-                    item.organizers
-                        .length === item.eventOrganizers
-                                        .length 
-                ){
+                if( item.organizers.length === item.eventOrganizers.length ){
                     delete item.eventOrganizers
                 }
     
-                for(
-                    let joiningUserId
-                    of item.willJoin
-                ){
+                for( let joiningUserId of item.willJoin ){
                     const joiningUser = await User.findById( joiningUserId );
                     const usersWhoWillJoinInfo = {
                         userId: joiningUserId,
                         isProfileImageDefault: joiningUser.profileImg.isDefaultImg,
                         userProfileImg: joiningUser.profileImg.imgUrl,
                         username: joiningUser.userName,
-                        usersFullName: `${
-                            joiningUser.identity.firstName
-                            } ${
-                                joiningUser.identity.middleName
-                            } ${
-                                joiningUser.identity.lastName
-                            }`.replaceAll( "  ", " ")
+                        usersFullName: `${joiningUser.identity.firstName} ${joiningUser.identity.middleName} ${joiningUser.identity.lastName}`.replaceAll( "  ", " " )
                     }
-                    item.usersWhoWillJoin
-                        .push( usersWhoWillJoinInfo );
+                    item.usersWhoWillJoin.push( usersWhoWillJoinInfo );
                 }
                 
-                if( 
-                    item.usersWhoWillJoin
-                        .length === item.willJoin
-                                        .length 
-                ){
+                if( item.usersWhoWillJoin.length === item.willJoin.length ){
                     delete item.willJoin;
                 }
             }
@@ -360,20 +265,15 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 a.distance - b.distance
         );
     
-        const resultList = mergedList.slice(
-                                            skip, 
-                                            skip + limit
-                                      );
+        const skip = lastItemId !== 'null' ? mergedList.findIndex( event => event._id.toString() === lastItemId ) + 1 : 0;
+        const resultList = mergedList.slice( skip, skip + limit );
 
-        return res.status( 200 )
-                  .json(
-                    {
-                        error: false,
-                        message: "discover screen users and events list is prepared succesfully",
-                        totalDataCount: mergedList.length,
-                        dataList: resultList,
-                    }
-                  );
+        return res.status( 200 ).json({
+            error: false,
+            message: "discover screen users and events list is prepared succesfully",
+            totalDataCount: mergedList.length,
+            dataList: resultList,
+        });
 
     }catch( err ){
         console.log( "ERROR: getUsersAndEventsByLocationController - ", err );

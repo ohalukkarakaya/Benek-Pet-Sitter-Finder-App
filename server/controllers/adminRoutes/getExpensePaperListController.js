@@ -11,11 +11,18 @@ import prepareExpenseRecordHelper from "../../utils/adminHelpers/prepareExpenseR
 
 const getExpensePaperListController = async ( req, res ) => {
     try{
-        const skip = parseInt( req.params.skip ) || 0;
+        const lastItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 10;
 
+        const expenseDocumentFilter = {};
+        if( lastItemId !== 'null' ){
+            const lastItem = await ExpenseRecord.findById(lastItemId);
+            if(lastItem){
+                expenseDocumentFilter.createdAt = { $gt: lastItem.createdAt };
+            }
+        }
         const expenseRecordCount = await ExpenseRecord.countDocuments();
-        let expenseRecordList = await ExpenseRecord.find().skip( skip ).limit( limit ).lean();
+        let expenseRecordList = await ExpenseRecord.find( expenseDocumentFilter ).sort({ createdAt: 1 }).limit( limit ).lean();
         if( !expenseRecordList || expenseRecordList.length <= 0 ){
             return res.status( 404 )
                       .json({ error: false, message: "No Expense Record Found" })

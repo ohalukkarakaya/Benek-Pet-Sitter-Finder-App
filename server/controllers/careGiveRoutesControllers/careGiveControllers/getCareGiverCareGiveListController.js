@@ -8,7 +8,7 @@ import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoH
 const getCareGiverCareGiveListController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const skip = parseInt( req.params.skip ) || 0;
+        const lasItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
         const careGiveQuery = {
@@ -18,30 +18,31 @@ const getCareGiverCareGiveListController = async ( req, res ) => {
             ] 
         };
 
-        const careGives = await CareGive.find( careGiveQuery )
-                                        .skip( skip )
-                                        .limit( limit )
-                                        .lean();
+        const careGiveFilter = {
+            $and: [
+                { "careGiver.careGiverId": userId },
+                { "finishProcess.isFinished": false }
+            ] 
+        };
 
-        const totalCareGiveCount= await CareGive.countDocuments( careGiveQuery );
-        if(
-            !careGives
-            || careGives.length <= 0
-        ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "CareGive Not Found"
-                            }
-                       );
+        if(lasItemId !== 'null'){
+            const lastItem = await CareGive.findById(lasItemId);
+            if(lastItem){
+                careGiveFilter.createdAt = { $gt: lastItem.createdAt };
+            }
+        }
+
+        const totalCareGiveCount = await CareGive.countDocuments( careGiveQuery );
+        const careGives = await CareGive.find( careGiveFilter ).sort({ createdAt: -1 }).limit( limit ).lean();
+        if( !careGives || careGives.length <= 0 ){
+            return res.status( 404 ).json({
+                error: true,
+                message: "CareGive Not Found"
+            });
         }
 
         let carGiveList = [];
-        for(
-            let careGive
-            of careGives
-        ){
+        for( let careGive of careGives ){
             const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );
             const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
 
@@ -60,14 +61,8 @@ const getCareGiverCareGiveListController = async ( req, res ) => {
 
             let code;
             if(
-                (
-                    careGive.invitation.actionCode.codeType === "Start"
-                    && userId === petOwner._id.toString()
-                )
-                || (
-                    careGive.invitation.actionCode.codeType === "Finish"
-                    && userId === careGiver._id.toString()
-                )
+                ( careGive.invitation.actionCode.codeType === "Start" && userId === petOwner._id.toString() )
+                || ( careGive.invitation.actionCode.codeType === "Finish" && userId === careGiver._id.toString() )
             ){
                 code = {
                     codeType: careGive.invitation.actionCode.codeType,
@@ -85,8 +80,7 @@ const getCareGiverCareGiveListController = async ( req, res ) => {
             const careGiveInfo = {
                 id: careGive._id.toString(),
                 careGiveRoleId: careGiveRoleId,
-                petOwnerContact: careGive.petOwner
-                                            .petOwnerContact,
+                petOwnerContact: careGive.petOwner.petOwnerContact,
                 careGiver: careGiverInfo,
                 petOwner: petOwnerInfo,
                 pet: petInfo,
@@ -96,31 +90,24 @@ const getCareGiverCareGiveListController = async ( req, res ) => {
                 actionCode: code,
                 isStarted: careGive.isStarted,
                 price: price,
-                missionCount: careGive.missionCallender
-                                        .length
+                missionCount: careGive.missionCallender.length
             }
 
             carGiveList.push( careGiveInfo );
         }
 
-        return res.status( 200 )
-                  .json(
-                        {
-                            error: false,
-                            message: "CareGive List Prepared Succesfully",
-                            totalCareGiveCount: totalCareGiveCount,
-                            careGiveList: carGiveList,
-                        }
-                   );
+        return res.status( 200 ).json({
+            error: false,
+            message: "CareGive List Prepared Succesfully",
+            totalCareGiveCount: totalCareGiveCount,
+            careGiveList: carGiveList,
+        });
     }catch( err ){
         console.log( "ERROR: getCareGiverCareGiveListController - ", err );
-        res.status( 500 )
-           .json(
-                {
-                    error: true,
-                    message: "Internal Server Error"
-                }
-            );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal Server Error"
+        });
     }
 }
 

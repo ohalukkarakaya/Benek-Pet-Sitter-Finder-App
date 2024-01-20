@@ -49,7 +49,7 @@ router.put(
 // - tested
 //get comment list by afterEvent Id
 router.get(
-    "/getComments/:eventId/:contentId/:skip/:limit",
+    "/getComments/:eventId/:contentId/:lastItemId/:limit",
     auth,
     getAfterEventCommentsController
 );
@@ -57,7 +57,7 @@ router.get(
 // - tested
 //comment replies
 router.get(
-    "/getReplies/:eventId/:contentId/:commentId/:skip/:limit",
+    "/getReplies/:eventId/:contentId/:commentId/:lastItemId/:limit",
     auth,
     getRepliesOfAfterEventCommentController
 );

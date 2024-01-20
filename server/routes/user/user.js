@@ -57,7 +57,7 @@ router.get(
 // - tested
 // get invitations
 router.get(
-  "/allInvitations/:skip/:limit",
+  "/allInvitations/:lastItemId/:limit",
   auth,
   getAllInvitationsController
 );
@@ -65,7 +65,7 @@ router.get(
 // - tested
 //get users and events by location data
 router.post(
-  "/getUsersAndEventsByLocation/:skip/:limit", 
+  "/getUsersAndEventsByLocation/:lastItemId/:limit", 
   auth,
   getUsersAndEventsByLocationController
 );
@@ -73,7 +73,7 @@ router.post(
 // - tested
 //get users and events with search value
 router.post(
-  "/getUsersAndEventsBySearchValue/:skip/:limit", 
+  "/getUsersAndEventsBySearchValue/:lastItemId/:limit", 
   auth,
   getUsersAndEventsBySearchValueController
 );
@@ -81,7 +81,7 @@ router.post(
 // - tested
 //get careGivers by location
 router.post(
-  "/getCareGiversByLocation/:skip/:limit",
+  "/getCareGiversByLocation/:lastItemId/:limit",
   auth,
   getCareGiversByLocationController
 );
@@ -89,7 +89,7 @@ router.post(
 // - tested
 //get careGiver by search value
 router.post(
-  "/getCareGiversBySearchValue/:skip/:limit",
+  "/getCareGiversBySearchValue/:lastItemId/:limit",
   auth,
   getCareGiversBySearchValueController
 );

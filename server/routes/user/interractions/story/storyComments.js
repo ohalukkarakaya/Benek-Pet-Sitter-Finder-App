@@ -39,7 +39,7 @@ router.delete(
 // - tested
 //get comments
 router.get(
-    "/:storyId/:skip/:limit",
+    "/:storyId/:lastElementId/:limit",
     auth,
     getStoryCommentsController
 );
@@ -47,7 +47,7 @@ router.get(
 // - tested
 //get replies
 router.get(
-    "/getReplies/:storyId/:commentId/:skip/:limit",
+    "/getReplies/:storyId/:commentId/:lastElementId/:limit",
     auth,
     getStoryCommentRepliesController
 );

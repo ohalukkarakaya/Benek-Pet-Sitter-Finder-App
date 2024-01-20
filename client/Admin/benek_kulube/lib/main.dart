@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'app/app.dart';
 import 'store/app_state.dart';
 import 'package:redux/redux.dart';
@@ -39,6 +40,9 @@ void initWindowsAndLinuxWindow() async {
 }
 
 void main() async {
+  
+  await dotenv.load(fileName: ".env");
+
   final Store<AppState> store = AppReduxStore.getInitialStore();
   Size windowSize = const Size(1200,800);
 

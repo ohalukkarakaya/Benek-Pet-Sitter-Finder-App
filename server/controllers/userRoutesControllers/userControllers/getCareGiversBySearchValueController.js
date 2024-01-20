@@ -3,82 +3,36 @@ import User from "../../../models/User.js";
 const getCareGiversBySearchValueController = async ( req, res ) => {
     try{
         
-        const userId = req.user 
-                          ._id
-                          .toString();
-
+        const userId = req.user._id.toString();
         const lat = parseFloat( req.body.lat );
         const lng = parseFloat( req.body.lng );
-        const searchTerm = req.body
-                              .searchValue
-                              .toString();
-
+        const searchTerm = req.body.searchValue.toString();
         const limit = req.params.limit || 15;
         const skip = req.params.skip || 0;
+        const lastItemId = req.body.lastItemId || 'null';
 
-        if( 
-            !lat
-            || !lng
-            || !searchTerm
-        ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "Missing param"
-                }
-            );
+        if( !lat || !lng || !searchTerm ){
+            return res.status( 400 ).json( {
+                error: true,
+                message: "Missing param"
+            });
         }
 
         const totalCount = await User.countDocuments(
             {
                 $and: [
-                    {
-                        "deactivation.isDeactive": false
-                    },
-                    {
-                        blockedUsers: {
-                            $nin: [
-                                userId
-                            ]
-                        }
-                    },
+                    { "deactivation.isDeactive": false },
+                    { blockedUsers: { $nin: [ userId ] } },
                     {
                         $or: [
-                            {
-                                "userName": {
-                                    $regex: searchTerm,
-                                    $options: "i"
-                                }
-                            },
-                            {
-                                "identity.firstName": {
-                                    $regex: searchTerm,
-                                    $options: "i"
-                                }
-                            },
-                            {
-                                "identity.middleName": {
-                                    $regex: searchTerm,
-                                    $options: "i"
-                                }
-                            },
-                            {
-                                "identity.lastName": {
-                                    $regex: searchTerm,
-                                    $options: "i"
-                                }
-                            },
-                            {
-                                "identity.openAdress": {
-                                    $regex: searchTerm,
-                                    $options: "i"
-                                }
-                            }
+                            { "userName": { $regex: searchTerm, $options: "i" } },
+                            { "identity.firstName": { $regex: searchTerm, $options: "i" } },
+                            { "identity.middleName": { $regex: searchTerm, $options: "i" } },
+                            {  "identity.lastName": { $regex: searchTerm, $options: "i" } },
+                            { "identity.openAdress": { $regex: searchTerm, $options: "i" } }
                         ]
                     },
-                    {
-                        isCareGiver: true
-                    }
+                    { isCareGiver: true }
                 ]
             }
         );
@@ -139,123 +93,58 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
                     // İstek yapılan konum ile kullanıcı konumları arasındaki mesafeyi hesapla
                     $addFields: {
                         distance: {
-                        $sqrt: {
-                            $add: [
-                            { 
-                                $pow: [ 
-                                    { 
-                                        $subtract: 
-                                            [
-                                                lat, 
-                                                "$location.lat"
-                                            ] 
-                                    }, 
-                                    2 
-                                ] 
+                            $sqrt: {
+                                $add: [
+                                { 
+                                    $pow: [ 
+                                        {$subtract: [ lat, "$location.lat" ]}, 
+                                        2 
+                                    ] 
+                                },
+                                {
+                                    $pow: [ 
+                                        { $subtract: [ lng, "$location.lng" ] },
+                                        2 
+                                    ] 
+                                },
+                                ],
                             },
-                            {
-                                $pow: [ 
-                                    { 
-                                        $subtract: 
-                                            [
-                                                lng, 
-                                                "$location.lng"
-                                            ] 
-                                    },
-                                    2 
-                                ] 
-                            },
-                            ],
-                        },
                         },
                     },
                 },
                 // En yakın kullanıcılara öncelik ver
-                { 
-                    $sort: { 
-                        distance: 1 
-                    } 
-                },
+                {$sort: { distance: 1 }},
+
                 // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
                 {
                     $match: {
                         $and: [
-                            {
-                                "deactivation.isDeactive": false
-                            },
-                            {
-                                blockedUsers: {
-                                    $nin: [
-                                        userId
-                                    ]
-                                }
-                            },
+                            {"deactivation.isDeactive": false},
+                            {blockedUsers: { $nin: [ userId ] }},
                             {
                                 $or: [
-                                    {
-                                        "userName": {
-                                            $regex: searchTerm,
-                                            $options: "i"
-                                        }
-                                    },
-                                    {
-                                        "identity.firstName": {
-                                            $regex: searchTerm,
-                                            $options: "i"
-                                        }
-                                    },
-                                    {
-                                        "identity.middleName": {
-                                            $regex: searchTerm,
-                                            $options: "i"
-                                        }
-                                    },
-                                    {
-                                        "identity.lastName": {
-                                            $regex: searchTerm,
-                                            $options: "i"
-                                        }
-                                    },
-                                    {
-                                        "identity.openAdress": {
-                                            $regex: searchTerm,
-                                            $options: "i"
-                                        }
-                                    }
+                                    {"userName": { $regex: searchTerm, $options: "i" }},
+                                    {"identity.firstName": { $regex: searchTerm, $options: "i"}},
+                                    {"identity.middleName": { $regex: searchTerm, $options: "i" }},
+                                    {"identity.lastName": { $regex: searchTerm, $options: "i" }},
+                                    {"identity.openAdress": { $regex: searchTerm, $options: "i" }}
                                 ]
                             },
-                            {
-                                isCareGiver: true
-                            }
+                            {isCareGiver: true},
+                            { "_id": { $lt: lastItemId } }
                         ]
                     },
                 },
-                { $skip: parseInt( skip ) },
                 { $limit: parseInt( limit ) }
             ]
         );
 
-        for(
-            let item
-            of users
-        ){
+        for( let item of users ){
             const { location } = item;
-            const distance = Math.sqrt(
-                                    Math.pow(
-                                            location.lat - lat, 
-                                            2
-                                        ) 
-                                    + Math.pow(
-                                            location.lng - lng, 
-                                            2
-                                        )
-                                  );
+            const distance = Math.sqrt( Math.pow( location.lat - lat, 2 ) + Math.pow( location.lng - lng, 2 ) );
             item.distance = distance;
     
-            for(
-                var petId
-                of item.pets
-            ){
+            for( var petId of item.pets ){
                 const pet = await Pet.findById( petId.toString() );
                 const petInfo = {
                     petId: petId.toString(),
@@ -277,23 +166,16 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
             delete item.phone;
             delete item.email;
     
-            for(
-                let dependedId
-                of item.dependedUsers
-            ){
+            for( let dependedId of item.dependedUsers ){
                 const depended = await User.findById( dependedId );
                 const dependedInfo = getLightWeightUserInfoHelper( depended );
                 
                 dependedId = dependedInfo;
             }
     
-            const starValues = item.stars
-                                   .map( starObject => starObject.star );
+            const starValues = item.stars.map( starObject => starObject.star );
     
-            const totalStarValue = starValues.reduce(
-                                                    ( acc, curr ) =>
-                                                            acc + curr, 0
-                                              );
+            const totalStarValue = starValues.reduce( ( acc, curr ) => acc + curr, 0 );
     
             const starCount = item.stars.length;
             const starAvarage = totalStarValue / starCount;
@@ -302,15 +184,12 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
             item.stars = starAvarage;
         }
 
-        return res.status( 200 )
-                  .json(
-                    {
-                        error: false,
-                        message: "careGiver list prepared succesfully",
-                        totalCount: totalCount,
-                        careGiverList: users
-                    }
-                  );
+        return res.status( 200 ).json({
+            error: false,
+            message: "careGiver list prepared succesfully",
+            totalCount: totalCount,
+            careGiverList: users
+        });
 
     }catch( err ){
         console.log( "ERROR: getCareGiversByLocationController - ", err );

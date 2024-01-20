@@ -36,7 +36,7 @@ router.post(
 // - tested
 //get messages
 router.get(
-    "/get/:chatId/:skip/:limit",
+    "/get/:chatId/:lastItemId/:limit",
     auth,
     getMessagesController
 );

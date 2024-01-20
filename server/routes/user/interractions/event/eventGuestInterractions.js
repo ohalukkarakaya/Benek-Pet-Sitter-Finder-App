@@ -55,7 +55,7 @@ router.put(
 // - tested
 //get after event content list by event Id
 router.get(
-    "/get/:eventId/:skip/:limit",
+    "/get/:eventId/:lastItemId/:limit",
     auth,
     getAfterEventContentListController
 );

@@ -139,7 +139,7 @@ router.get(
 // - tested
 //get image comments
 router.get(
-  "/getImageComments/:petId/:imageId/:skip/:limit",
+  "/getImageComments/:petId/:imageId/:lastItemId/:limit",
   auth,
   getPetImageCommentsController
 );
@@ -147,7 +147,7 @@ router.get(
 // - tested
 //get image comment replies
 router.get(
-  "/getImageCommentsReplies/:petId/:imageId/:commentId/:skip/:limit",
+  "/getImageCommentsReplies/:petId/:imageId/:commentId/:lastItemId/:limit",
   auth,
   getPetImageCommentsRepliesController
 );

@@ -8,7 +8,7 @@ import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoH
 const getCareGiveListController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const skip = parseInt( req.params.skip ) || 0;
+        const lastItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
         const careGiveQuery = {
@@ -28,17 +28,34 @@ const getCareGiveListController = async ( req, res ) => {
             ]
         };
 
-        const careGives = await CareGive.find( careGiveQuery )
-                                        .skip( skip )
-                                        .limit( limit )
-                                        .lean();
+        const careGiveFilter = {
+            $or: [
+                { 
+                    $and: [
+                        { "invitation.from": userId },
+                        { "finishProcess.isFinished": false }
+                    ] 
+                },
+                { 
+                    $and: [
+                        { "invitation.to": userId },
+                        { "finishProcess.isFinished": false }
+                    ] 
+                },
+            ]
+        };
+
+        if(lastItemId !== 'null'){
+            const lastItem = await CareGive.findById(lastItemId);
+            if(lastItem){
+                careGiveFilter.createdAt = { $gt: lastItem.createdAt };
+            }
+        }
 
         const totalCareGiveCount= await CareGive.countDocuments( careGiveQuery );
+        const careGives = await CareGive.find( careGiveFilter ).sort({ createdAt: 1 }).limit( limit ).lean();
 
-        if(
-            !careGives
-            || careGives.length <= 0
-        ){
+        if( !careGives || careGives.length <= 0 ){
             return res.status( 404 ).json(
                 {
                     error: true,
@@ -70,18 +87,8 @@ const getCareGiveListController = async ( req, res ) => {
 
             let code;
             if( 
-                (
-                    careGive.invitation
-                            .actionCode
-                            .codeType === "Start"
-                    && userId === petOwner._id.toString()
-                )
-                || (
-                    careGive.invitation
-                        .actionCode
-                        .codeType === "Finish"
-                    && userId === careGiver._id.toString()
-                )
+                ( careGive.invitation.actionCode.codeType === "Start" && userId === petOwner._id.toString() )
+                || ( careGive.invitation.actionCode.codeType === "Finish" && userId === careGiver._id.toString() )
             ){
                 code = {
                     codeType: careGive.invitation.actionCode.codeType,
@@ -90,9 +97,7 @@ const getCareGiveListController = async ( req, res ) => {
             }
 
             let price;
-            if(
-                careGive.prices.priceType !== "Free"
-            ){
+            if( careGive.prices.priceType !== "Free" ){
                 price = `${careGive.prices.servicePrice} ${careGive.prices.priceType}`;
             }else{
                 price = careGive.prices.priceType;
@@ -101,10 +106,8 @@ const getCareGiveListController = async ( req, res ) => {
             const careGiveInfo = {
                 id: careGive._id.toString(),
                 careGiveRoleId: careGiveRoleId,
-                careGiverContact: careGive.careGiver
-                                    .careGiverContact,
-                petOwnerContact: careGive.petOwner
-                                        .petOwnerContact,
+                careGiverContact: careGive.careGiver.careGiverContact,
+                petOwnerContact: careGive.petOwner.petOwnerContact,
                 careGiver: careGiverInfo,
                 petOwner: petOwnerInfo,
                 pet: petInfo,
@@ -120,14 +123,12 @@ const getCareGiveListController = async ( req, res ) => {
             careGiveList.push( careGiveInfo );
         }
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "CareGive List Prepared Succesfully",
-                totalCareGiveCount: totalCareGiveCount,
-                careGiveList: careGiveList,
-            }
-        );
+        return res.status( 200 ).json({
+            error: false,
+            message: "CareGive List Prepared Succesfully",
+            totalCareGiveCount: totalCareGiveCount,
+            careGiveList: careGiveList,
+        });
     }catch( err ){
         console.log("ERROR: getCareGiveListController - ", err);
         res.status(500).json(

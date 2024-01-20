@@ -52,7 +52,7 @@ router.put(
 // - tested
 //get event invitations by user id
 router.get(
-    "/getInvitationList/:skip/:limit",
+    "/getInvitationList/:lastElementId/:limit",
     auth,
     getEventInvitationsController
 );
@@ -60,7 +60,7 @@ router.get(
 // - tested
 //get sended event invitations by user id
 router.get(
-    "/getSendedInvitationList/:skip/:limit",
+    "/getSendedInvitationList/:lastElementId/:limit",
     auth,
     getSendedEventInvitationsController
 );
@@ -84,7 +84,7 @@ router.get(
 // - tested
 //get tickets by eventId
 router.get(
-    "/getTicketsByEventId/:eventId/:skip/:limit",
+    "/getTicketsByEventId/:eventId/:lastElementId/:limit",
     auth,
     getTicketsByEventIdController
 );

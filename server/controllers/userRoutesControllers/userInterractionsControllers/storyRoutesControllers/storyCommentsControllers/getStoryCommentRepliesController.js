@@ -8,64 +8,45 @@ const getStoryCommentRepliesController = async ( req, res ) => {
         const userId = req.user._id.toString();
         const storyId = req.params.storyId.toString();
         const commentId = req.params.commentId.toString();
-        let skip = parseInt( req.params.skip ) || 0;
+        let lastElementId = req.params.lastElementId || 'null';
         let limit = parseInt( req.params.limit ) || 15;
 
-        if( 
-            !storyId
-            || !commentId
-        ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "Missing Param"
-                }
-            );
+        if( !storyId || !commentId ){
+            return res.status( 400 ).json({
+                error: true,
+                message: "Missing Param"
+            });
         }
 
-        const story = await Story.findById( storyId )
-                                 .lean();
+        const story = await Story.findById( storyId ).lean();
         if( !story ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "Story Not Found"
-                }
-            );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Story Not Found"
+            });
         }
 
-        const storyOwner = await User.findById( 
-                                            story.userId
-                                                 .toString() 
-                                      );
-        if(
-            !storyOwner
-            || storyOwner.blockedUsers.includes( req.user._id.toString() )
-        ){
-            return res.status( 401 ).json(
-                {
-                    error: true,
-                    message: "Unauthorized"
-                }
-            );
+        const storyOwner = await User.findById( story.userId.toString() );
+        if( !storyOwner || storyOwner.blockedUsers.includes( req.user._id.toString() ) ){
+            return res.status( 401 ).json({
+                error: true,
+                message: "Unauthorized"
+            });
         }
 
-        const comment = story.comments
-                              .find(
-                                  commentObject =>
-                                    commentObject._id
-                                                 .toString() === commentId
-                               );
+        const comment = story.comments.find(
+            commentObject =>
+                commentObject._id.toString() === commentId
+        );
 
         if( !comment ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "Comment Not Found"
-                }
-            );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Comment Not Found"
+            });
         }
 
+        let skip = lastElementId !== 'null' ? comment.replies.findIndex( replyObject => replyObject._id.toString() === lastElementId ) + 1 : 0;
         let replies = [];
         if( skip === 0 ){
             const usersReplies = comment.replies.filter(
@@ -80,12 +61,10 @@ const getStoryCommentRepliesController = async ( req, res ) => {
         }
 
         if( limit >= 0 ){
-            const replyList = comment.replies
-                                     .reverse()
-                                     .filter(
-                                        replyObject =>
-                                            replyObject.userId.toString() !== userId
-                                      );
+            const replyList = comment.replies.reverse().filter(
+                replyObject =>
+                    replyObject.userId.toString() !== userId
+            );
             const startIndex = replyList.length - skip - 1;
             const endIndex = startIndex + limit;
 
@@ -98,46 +77,27 @@ const getStoryCommentRepliesController = async ( req, res ) => {
         }
 
         if( replies.length > 0 ){
-            for(
-                let replyObject
-                of replies
-            ){
-                const repliedUser = await User.findById( 
-                                                    replyObject.userId
-                                                               .toString() 
-                                               );
+            for( let replyObject of replies ){
+                const repliedUser = await User.findById( replyObject.userId.toString() );
                 const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
                 replyObject.user = repliedUserInfo;
                 delete replyObject.userId;
 
                 let firstFiveOfLikeLimit = 5;
 
-                if( 
-                    replyObject.likes
-                               .length < 5 
-                ){
-                    firstFiveOfLikeLimit = replyObject.likes
-                                                      .length;
+                if( replyObject.likes.length < 5 ){
+                    firstFiveOfLikeLimit = replyObject.likes.length;
                 }
 
                 replyObject.firstFiveLikedUser = [];
-                for( 
-                    let i = 0; 
-                    i < firstFiveOfLikeLimit; 
-                    i++ 
-                ){
-                    const likedUser = await User.findById( 
-                                                    replyObject.likes[ i ]
-                                                               .toString() 
-                                                );
+                for( let i = 0; i < firstFiveOfLikeLimit; i++ ){
+                    const likedUser = await User.findById( replyObject.likes[ i ].toString() );
                     const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
 
                     replyObject.firstFiveLikedUser.push( likedUserInfo );
                 }
 
-                replyObject.likeCount = replyObject.likes
-                                                   .length;
-
+                replyObject.likeCount = replyObject.likes.length;
                 delete replyObject.likes;
             }
 

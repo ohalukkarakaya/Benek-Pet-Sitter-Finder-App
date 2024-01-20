@@ -11,11 +11,20 @@ import prepareInvoiceRecordHelper from "../../utils/adminHelpers/prepareInvoiceR
 
 const getInvoicePaperListController = async ( req, res ) => {
     try{ 
-        const skip = parseInt( req.params.skip ) || 0;
+        const lasItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 10;
 
+        const invoiceDocumentFilter = {};
+        if( lasItemId !== 'null' ){
+            const lastItem = await InvoiceRecord.findById(lasItemId);
+            if(lastItem){
+                invoiceDocumentFilter.createdAt = { $gt: lastItem.createdAt };
+            }
+            
+        }
+
         const invoiceRecordsCount = await InvoiceRecord.countDocuments();
-        const invoiceRecords = await InvoiceRecord.find().skip( skip ).limit( limit ).lean();
+        const invoiceRecords = await InvoiceRecord.find( invoiceDocumentFilter ).sort({ createdAt: 1 }).limit( limit ).lean();
         if( !invoiceRecords ){
             return res.status( 404 )
                       .json({ error: false, message: "No Invoice Record Found" })

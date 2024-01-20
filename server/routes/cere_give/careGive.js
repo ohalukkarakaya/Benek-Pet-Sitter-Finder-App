@@ -39,7 +39,7 @@ router.post(
 // - tested
 //get care give invitations
 router.get(
-    "/invitations/:skip/:limit",
+    "/invitations/:lastItemId/:limit",
     auth,
     getCareGiveInvitationsController
 );
@@ -47,7 +47,7 @@ router.get(
 // - tested
 //get sended care give invitations
 router.get(
-    "/sendedInvitations/:skip/:limit",
+    "/sendedInvitations/:lastItemId/:limit",
     auth,
     getSendedCareGiveInvitationsController
 );
@@ -63,7 +63,7 @@ router.put(
 // - tested
 //get careGive list
 router.get(
-    "/getCareGiveList/:skip/:limit",
+    "/getCareGiveList/:lastItemId/:limit",
     auth,
     getCareGiveListController
 );
@@ -71,7 +71,7 @@ router.get(
 // - tested
 //get finished careGive List
 router.get(
-    "/getFinishedCareGiveList/:skip/:limit",
+    "/getFinishedCareGiveList/:lastItemId/:limit",
     auth,
     getFinishedCareGiveListController
 );
@@ -87,7 +87,7 @@ router.get(
 // - tested
 //get petOwner careGive List
 router.get(
-    "/getPetOwnerCareGiveList/:skip/:limit",
+    "/getPetOwnerCareGiveList/:lastItemId/:limit",
     auth,
     getPetOwnerCareGiveListController
 );
@@ -95,7 +95,7 @@ router.get(
 // - tested
 //get petOwner Finished careGive List
 router.get(
-    "/getPetOwnerFinishedCareGiveList/:skip/:limit",
+    "/getPetOwnerFinishedCareGiveList/:lastItemId/:limit",
     auth,
     getPetOwnerFinishedCareGiveListController
 );
@@ -103,7 +103,7 @@ router.get(
 // - tested
 //get CareGiver careGive List
 router.get(
-    "/getCareGiverCareGiveList/:skip/:limit",
+    "/getCareGiverCareGiveList/:lastItemId/:limit",
     auth,
     getCareGiverCareGiveListController
 );
@@ -111,7 +111,7 @@ router.get(
 // - tested
 //get CareGiver Finished careGive List
 router.get(
-    "/getCareGiverFinishedCareGiveList/:skip/:limit",
+    "/getCareGiverFinishedCareGiveList/:lastItemId/:limit",
     auth,
     getCareGiverFinishedCareGiveListController
 );

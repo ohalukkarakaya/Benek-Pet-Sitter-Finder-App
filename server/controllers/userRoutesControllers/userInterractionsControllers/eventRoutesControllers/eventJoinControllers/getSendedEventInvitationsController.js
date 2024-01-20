@@ -7,42 +7,36 @@ import getLightWeightEventInfoHelper from "../../../../../utils/getLightWeightEv
 const getSendedEventInvitationsController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const skip = parseInt( req.body.skip ) || 0;
+        const lastElementId = req.body.lastElementId || 'null';
         const limit = parseInt( req.body.limit ) || 15;
 
         const invitationQuery = { eventAdminId: userId };
-        const invitations = await EventInvitation.find(
-            invitationQuery
-        ).skip( skip )
-         .limit( limit )
-         .lean();
+        let invitationFilter = { eventAdminId: userId };
 
-        const totalInvitationCount = await EventInvitation.countDocuments( invitationQuery ); 
-        if( invitations.length <= 0 ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "No Invitation Found"
-                }
-            );
+        if( lastElementId !== 'null' ){
+            const lastItem = await EventInvitation.findById( lastElementId );
+            if( lastItem ){
+                invitationFilter.createdAt = { $gt: lastItem.createdAt };
+            }
         }
 
-        for(
-            let invitation
-            of invitations
-        ){
-            const invitedUser = await User.findById( 
-                                                invitation.invitedId
-                                                          .toString() 
-                                           );
+        const totalInvitationCount = await EventInvitation.countDocuments( invitationQuery ); 
+        const invitations = await EventInvitation.find(invitationFilter).sort({ createdAt: 1 }).limit( limit ).lean();
 
+        if( invitations.length <= 0 ){
+            return res.status( 404 ).json({
+                error: true,
+                message: "No Invitation Found"
+            });
+        }
+
+        for( let invitation of invitations ){
+            const invitedUser = await User.findById( invitation.invitedId.toString() );
             const invitedUserInfo = getLightWeightUserInfoHelper( invitedUser );
-
             invitation.invitedUser = invitedUserInfo;
             delete invitation.invitedId;
 
             const invitedEvent = await Event.findById( invitation.eventId );
-
             const eventInfo = await getLightWeightEventInfoHelper( invitedEvent );
 
             invitation.event = eventInfo;
@@ -55,22 +49,18 @@ const getSendedEventInvitationsController = async ( req, res ) => {
             delete invitation.updatedAt;
         }
 
-        return res.status( 200 ).json(
-            {
-                error: true,
-                message: "Sended Invitation List Prepared Succesfully",
-                totalInvitationCount: totalInvitationCount,
-                invitations: invitations
-            }
-        );
+        return res.status( 200 ).json({
+            error: true,
+            message: "Sended Invitation List Prepared Succesfully",
+            totalInvitationCount: totalInvitationCount,
+            invitations: invitations
+        });
     }catch( err ){
         console.log("ERROR: getSendedEventInvitationsController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal Server Error"
+        });
     }
 }
 

@@ -54,7 +54,7 @@ router.get(
 // - tested
 // get all reports
 router.get(
-    "/reportedMissionList/:skip/:limit",
+    "/reportedMissionList/:lastItemId/:limit",
     adminAuthEvaluator,
     getReportedMissionListController
 );
@@ -78,7 +78,7 @@ router.get(
 // - tested
 // get all invoice list
 router.get(
-    "/getInvoicePaperList/:skip/:limit",
+    "/getInvoicePaperList/:lastItemId/:limit",
     adminAuthAccounting,
     getInvoicePaperListController
 );
@@ -94,7 +94,7 @@ router.get(
 // - tested
 // get all expense documents
 router.get(
-    "/getExpensePaperList/:skip/:limit",
+    "/getExpensePaperList/:lastItemId/:limit",
     adminAuthAccounting,
     getExpensePaperListController
 );
@@ -142,7 +142,7 @@ router.put(
 // - tested
 // Get Banned Users
 router.get(
-    "/getBannedUsersList/:skip/:limit",
+    "/getBannedUsersList/:lastItemId/:limit",
     adminAuthEvaluator,
     getBannedUsersListController
 )
@@ -158,7 +158,7 @@ router.delete(
 // - tested
 // Get Employees
 router.get(
-    "/getEmployees/:skip/:limit",
+    "/getEmployees/:lasItemId/:limit",
     adminAuthAny,
     getAllEmployeesController
 )

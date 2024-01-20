@@ -8,26 +8,22 @@ const getMissionCallenderByPetIdController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
         const petId = req.params.petId.toString();
-        const skip = parseInt( req.params.skip );
+        const lasItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit );
 
         if( !petId ){
-            return res.statu( 400 ).json(
-                {
-                    error: true,
-                    message: "Missing Params"
-                }
-            );
+            return res.statu( 400 ).json({
+                error: true,
+                message: "Missing Params"
+            });
         }
 
         const pet = await Pet.findById( petId );
         if( !pet ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "Pet Not Found"
-                }
-            );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Pet Not Found"
+            });
         }
 
         let careGiveQuery;
@@ -46,28 +42,17 @@ const getMissionCallenderByPetIdController = async ( req, res ) => {
         }
         
         const careGives = await CareGive.find( careGiveQuery ).lean();
-        if(
-            !careGives
-            || careGives.length <= 0
-        ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "No Mission Found For This Pet"
-                }
-            );
+        if( !careGives || careGives.length <= 0 ){
+            return res.status( 404 ).json({
+                error: true,
+                message: "No Mission Found For This Pet"
+            });
         }
 
         let missionCalenderList = [];
-        for(
-            let careGive
-            of careGives
-        ){
+        for( let careGive of careGives ){
             let missionList = [];
-            for(
-                let mission
-                of careGive.missionCallender
-            ){
+            for( let mission of careGive.missionCallender ){
                 const pet = await Pet.findById( careGive.petId.toString() );
                 const petInfo = getLightWeightPetInfoHelper( pet );
 
@@ -116,37 +101,29 @@ const getMissionCallenderByPetIdController = async ( req, res ) => {
             }
         }
 
-        const allMissions = [].concat(...missionCalenderList)
-                              .sort(
-                                 ( a, b ) => 
-                                      b.date - a.date
-                               );
+        const allMissions = [].concat(...missionCalenderList).sort(
+            ( a, b ) => 
+                b.date - a.date
+        );
 
-        const startIndex = skip > 0
-                            ? skip - 1
-                            : skip;
-
+        const startIndex = lasItemId === 'null' ? 0 : allMissions.findIndex( ( mission ) => mission.id === lasItemId ) + 1;
         const endIndex = startIndex + limit;
 
         const limitedMissionCallender = allMissions.slice( startIndex, endIndex );
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "Pets Mission List Prepared Succesfully",
-                totalMissionCount: allMissions.length,
-                missions: limitedMissionCallender
-            }
-        );
+        return res.status( 200 ).json({
+            error: false,
+            message: "Pets Mission List Prepared Succesfully",
+            totalMissionCount: allMissions.length,
+            missions: limitedMissionCallender
+        });
 
     }catch( err ){
-        console.log("ERROR: getMissionCallenderController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+        console.log("ERROR: getMissionCallenderByPetIdController - ", err);
+        return res.status(500).json({
+            error: true,
+            message: "Internal Server Error"
+        });
     }
 }
 

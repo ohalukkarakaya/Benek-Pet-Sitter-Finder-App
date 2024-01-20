@@ -12,7 +12,7 @@ const router = express.Router();
 // - tested
 //Get Notifications
 router.get(
-    "/:skip/:limit",
+    "/:lastItemId/:limit",
     auth,
     getNotificationController
 );

@@ -8,7 +8,7 @@ import getLightWeightUserInfoHelper from "../../../../utils/getLightWeightUserIn
 const getMissionCallenderController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const skip = parseInt( req.params.skip ) || 0;
+        const lasItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
         const releatedPetList = await Pet.find({ allOwners: { $in: [ userId ] }}).lean();
@@ -26,28 +26,17 @@ const getMissionCallenderController = async ( req, res ) => {
             }
         ).lean();
 
-        if(
-            !careGiveList
-            || careGiveList.length <= 0
-        ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "No Mission Found For This Pet"
-                }
-            );
+        if( !careGiveList || careGiveList.length <= 0 ){
+            return res.status( 404 ).json({
+                error: true,
+                message: "No Mission Found For This Pet"
+            });
         }
 
         let missionCallendersList = [];
-        for(
-            let careGive
-            of careGiveList
-        ){
+        for( let careGive of careGiveList ){
             let missionList = [];
-            for(
-                let mission
-                of careGive.missionCallender
-            ){
+            for( let mission of careGive.missionCallender ){
                 const pet = await Pet.findById( careGive.petId.toString() );
                 const petInfo = getLightWeightPetInfoHelper( pet );
 
@@ -96,28 +85,22 @@ const getMissionCallenderController = async ( req, res ) => {
             }
         }
 
-        const allMissions = [].concat(...missionCallendersList)
-                              .sort(
-                                 ( a, b ) => 
-                                      b.date - a.date
-                               );
+        const allMissions = [].concat(...missionCallendersList).sort(
+            ( a, b ) => 
+                b.date - a.date
+        );
 
-        const startIndex = skip > 0
-                            ? skip - 1
-                            : skip;
-                            
+        const startIndex = lasItemId === 'null' ? 0 : allMissions.findIndex( mission => mission.id === lasItemId ) + 1;
         const endIndex = startIndex + limit;
 
         const limitedMissionCallender = allMissions.slice( startIndex, endIndex );
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "Mission List Prepared Succesfully",
-                totalMissionCount: allMissions.length,
-                missions: limitedMissionCallender
-            }
-        );
+        return res.status( 200 ).json({
+            error: false,
+            message: "Mission List Prepared Succesfully",
+            totalMissionCount: allMissions.length,
+            missions: limitedMissionCallender
+        });
         
     }catch( err ){
         console.log("ERROR: getMissionCallenderController - ", err);

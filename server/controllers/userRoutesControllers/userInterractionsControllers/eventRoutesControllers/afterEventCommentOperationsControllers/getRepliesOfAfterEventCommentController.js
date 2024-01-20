@@ -8,85 +8,60 @@ const getRepliesOfAfterEventCommentController = async ( req, res ) => {
         const eventId = req.params.eventId.toString();
         const afterEventId = req.params.contentId.toString();
         const commentId = req.params.commentId.toString();
-        let skip = parseInt( req.params.skip ) || 0;
+        const lastItemId = req.params.lastItemId || 'null';
         let limit = parseInt( req.params.limit ) || 15;
-        if(
-            !eventId
-            || !afterEventId
-            || !commentId
-        ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Missing Params"
-                            }
-                       );
+
+        if( !eventId || !afterEventId || !commentId ){
+            return res.status( 400 ).json({
+                error: true,
+                message: "Missing Params"
+            });
         }
 
-        const searchedEvent = await Event.findById( eventId )
-                                         .lean();
+        const searchedEvent = await Event.findById( eventId ).lean();
         if(
             !searchedEvent 
             || (
                 searchedEvent.isPrivate
                 && (
                     searchedEvent.eventAdmin !== userId
-                    && !(
-                            searchedEvent.eventOrganizers
-                                         .includes( userId )
-                        )
-                    && !(
-                        searchedEvent.willJoin
-                                     .includes( userId )
-                       )
-                    && !(
-                        searchedEvent.joined
-                                     .includes( userId )
-                       )
+                    && !( searchedEvent.eventOrganizers.includes( userId ) )
+                    && !( searchedEvent.willJoin.includes( userId ) )
+                    && !( searchedEvent.joined.includes( userId ) )
                 )
             )
         ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Event not found"
-                            }
-                       );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Event not found"
+            });
         }
 
-        const afterEvent = searchedEvent.afterEvent
-                                        .find(
-                                            afterEventObject =>
-                                                afterEventObject._id
-                                                                .toString() === afterEventId
-                                        );
+        const afterEvent = searchedEvent.afterEvent.find(
+            afterEventObject =>
+                afterEventObject._id.toString() === afterEventId
+        );
+
         if( !afterEvent ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "AfterEvent Not Found"
-                            }
-                       );
+            return res.status( 404 ).json({
+                error: true,
+                message: "AfterEvent Not Found"
+            });
         }
 
-        const comment = afterEvent.comments
-                                  .find(
-                                     commentObject =>
-                                         commentObject._id
-                                                      .toString() === commentId
-                                   );
+        const comment = afterEvent.comments.find(
+            commentObject =>
+                commentObject._id.toString() === commentId
+        );
+
         if( !comment ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Comment Not Found"
-                            }
-                       );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Comment Not Found"
+            });
         }
+
+        let skip = lastItemId !== 'null' ? comment.replies.findIndex(reply => reply._id.toString() === lastItemId) + 1 : 0;
 
         let replies = [];
         if( skip === 0 ){
@@ -102,12 +77,10 @@ const getRepliesOfAfterEventCommentController = async ( req, res ) => {
         }
 
         if( limit >= 0 ){
-            const replyList = comment.replies
-                                     .reverse()
-                                     .filter(
-                                        replyObject =>
-                                            replyObject.userId.toString() !== userId
-                                      );
+            const replyList = comment.replies.reverse().filter(
+                replyObject =>
+                    replyObject.userId.toString() !== userId
+            );
             const startIndex = replyList.length - skip - 1;
             const endIndex = startIndex + limit;
 
@@ -123,41 +96,25 @@ const getRepliesOfAfterEventCommentController = async ( req, res ) => {
                 let replyObject
                 of replies
             ){
-                const repliedUser = await User.findById( 
-                                                    replyObject.userId
-                                                               .toString() 
-                                               );
+                const repliedUser = await User.findById( replyObject.userId.toString() );
                 const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
                 replyObject.user = repliedUserInfo;
                 delete replyObject.userId;
 
                 let firstFiveOfLikeLimit = 5;
 
-                if( 
-                    replyObject.likes
-                               .length < 5 
-                ){
-                    firstFiveOfLikeLimit = replyObject.likes
-                                                      .length;
+                if( replyObject.likes.length < 5 ){
+                    firstFiveOfLikeLimit = replyObject.likes.length;
                 }
 
-                for( 
-                    let i = 0; 
-                    i < firstFiveOfLikeLimit; 
-                    i++ 
-                ){
-                    const likedUser = await User.findById( 
-                                                    replyObject.likes[ i ]
-                                                               .toString() 
-                                                 );
+                for( let i = 0; i < firstFiveOfLikeLimit; i++ ){
+                    const likedUser = await User.findById( replyObject.likes[ i ].toString() );
                     const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
 
                     replyObject.firstFiveLikedUser.push( likedUserInfo );
                 }
 
-                replyObject.likeCount = replyObject.likes
-                                                   .length;
-
+                replyObject.likeCount = replyObject.likes.length;
                 delete replyObject.likes;
             }
 
@@ -182,33 +139,24 @@ const getRepliesOfAfterEventCommentController = async ( req, res ) => {
             }
 
             const resultreplyData = [...usersReplies, ...otherReplies];
-            return res.status( 200 )
-                      .json(
-                            {
-                                error: false,
-                                message: "reply Prepared succesfully",
-                                replyCount: replies.length,
-                                replies: resultreplyData
-                            }
-                       );
+            return res.status( 200 ).json({
+                error: false,
+                message: "reply Prepared succesfully",
+                replyCount: replies.length,
+                replies: resultreplyData
+            });
         }else{
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "No Comment Found"
-                            }
-                       );
+            return res.status( 404 ).json({
+                error: true,
+                message: "No Comment Found"
+            });
         }
     }catch( err ){
         console.log( "ERROR: getAfterEventListController - ", err );
-        return res.status( 500 )
-                  .json(
-                        {
-                            error: true,
-                            message: "Internal Server Error",
-                        }
-                   );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal Server Error",
+        });
     }
 }
 

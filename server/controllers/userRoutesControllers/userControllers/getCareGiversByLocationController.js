@@ -1,48 +1,29 @@
 import User from "../../../models/User.js";
+import Pet from "../../../models/Pet.js";
 import mongoose from "mongoose";
 
 const getCareGiversByLocationController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
         const limit = req.params.limit || 10;
-        const skip = req.params.skip || 0;
+        const lastItemId = req.params.lastItemId || 'null';
         const lat = parseFloat( req.body.lat );
         const lng = parseFloat( req.body.lng );
 
-        if( 
-            !lat
-            || !lng
-        ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "Missing param"
-                }
-            );
+        if( !lat || !lng ){
+            return res.status( 400 ).json({
+                error: true,
+                message: "Missing param"
+            });
         }
         
         const totalCount = await User.countDocuments( 
             {
                 $and: [
-                    {
-                        "_id": { 
-                            $ne: mongoose.Types
-                                         .ObjectId( userId ) 
-                        }
-                    },
-                    {
-                        "deactivation.isDeactive": false
-                    },
-                    {
-                        blockedUsers: {
-                            $nin: [
-                                userId
-                            ]
-                        }
-                    },
-                    {
-                        isCareGiver: true
-                    }
+                    { "_id": { $ne: mongoose.Types.ObjectId( userId ) } },
+                    { "deactivation.isDeactive": false },
+                    { blockedUsers: { $nin: [ userId ] } },
+                    { isCareGiver: true }
                 ]
             }
          );
@@ -105,93 +86,37 @@ const getCareGiversByLocationController = async ( req, res ) => {
                         distance: {
                             $sqrt: {
                                 $add: [
-                                { 
-                                    $pow: [ 
-                                        { 
-                                            $subtract: 
-                                                [
-                                                    lat, 
-                                                    "$location.lat"
-                                                ] 
-                                        }, 
-                                        2 
-                                    ] 
-                                },
-                                {
-                                    $pow: [ 
-                                        { 
-                                            $subtract: 
-                                                [
-                                                    lng, 
-                                                    "$location.lng"
-                                                ] 
-                                        },
-                                        2 
-                                    ] 
-                                },
+                                    { $pow: [ {$subtract: [ lat, "$location.lat" ]}, 2 ] },
+                                    { $pow: [ {$subtract: [lng, "$location.lng"]}, 2 ] },
                                 ],
                             },
                         },
                     },
                 },
                 // En yakın kullanıcılara öncelik ver
-                { 
-                    $sort: { 
-                        distance: 1 
-                    } 
-                },
+                {$sort: { distance: 1 }},
                 // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
                 {
                     $match: {
                         $and: [
-                            {
-                                "_id": { 
-                                    $ne: mongoose.Types
-                                                 .ObjectId( userId ) 
-                                }
-                            },
-                            {
-                                "deactivation.isDeactive": false
-                            },
-                            {
-                                blockedUsers: {
-                                    $nin: [
-                                        userId
-                                    ]
-                                }
-                            },
-                            {
-                                isCareGiver: true
-                            }
+                            lastItemId !== 'null' ? { "_id": { $lt: mongoose.Types.ObjectId(lastItemId) } } : {},
+                            { "_id": { $ne: mongoose.Types.ObjectId( userId ) } },
+                            { "deactivation.isDeactive": false },
+                            { blockedUsers: { $nin: [ userId ] } },
+                            { isCareGiver: true }
                         ]
                     },
                 },
-                { $skip: parseInt( skip ) },
                 { $limit: parseInt( limit ) }
             ]
         );
 
-        for(
-            let item
-            of users
-        ){
+        for( let item of users ){
             const { location } = item;
-            const distance = Math.sqrt(
-                Math.pow(
-                        location.lat - lat, 
-                        2
-                    ) 
-                + Math.pow(
-                        location.lng - lng, 
-                        2
-                    )
-            );
+            const distance = Math.sqrt( Math.pow( location.lat - lat, 2 ) + Math.pow( location.lng - lng, 2 ) );
             item.distance = distance;
             
-            for(
-                let petId
-                of item.pets
-            ){
+            for( let petId of item.pets ){
                 const pet = await Pet.findById( petId.toString() );
                 const petInfo = {
                     petId: petId.toString(),
@@ -212,25 +137,15 @@ const getCareGiversByLocationController = async ( req, res ) => {
             delete item.phone;
             delete item.email;
 
-            for(
-                let dependedId
-                of item.dependedUsers
-            ){
+            for( let dependedId of item.dependedUsers ){
                 const depended = await User.findById( dependedId );
                 const dependedInfo = getLightWeightUserInfoHelper( depended );
                 
                 dependedId = dependedInfo;
             };
 
-            const starValues = item.stars
-                                   .map( 
-                                        starObject => 
-                                                starObject.star 
-                                    );
-            const totalStarValue = starValues.reduce(
-                                                ( acc, curr ) =>
-                                                            acc + curr, 0
-                                              );
+            const starValues = item.stars.map( starObject => starObject.star );
+            const totalStarValue = starValues.reduce( ( acc, curr ) => acc + curr, 0 );
             const starCount = item.stars.length;
             const starAvarage = totalStarValue / starCount;
 
@@ -238,24 +153,19 @@ const getCareGiversByLocationController = async ( req, res ) => {
             item.stars = starAvarage;
         }
 
-        return res.status( 200 )
-                  .json(
-                    {
-                        error: false,
-                        message: "careGiver list prepared succesfully",
-                        totalDataCount: totalCount,
-                        careGiverList: users
-                    }
-                  );
+        return res.status( 200 ).json({
+            error: false,
+            message: "careGiver list prepared succesfully",
+            totalDataCount: totalCount,
+            careGiverList: users
+        });
         
     }catch( err ){
         console.log( "ERROR: getCareGiversByLocationController - ", err );
-        return res.status( 500 ).json(
-            {
-                error: true,
-                message: "Internal server error"
-            }
-        );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
 }
 

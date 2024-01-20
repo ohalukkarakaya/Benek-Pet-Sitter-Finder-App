@@ -12,11 +12,20 @@ import getLightWeightUserInfoHelper from "../../utils/getLightWeightUserInfoHelp
 
 const getBannedUsersListController = async ( req, res ) => {
     try{
-        let skip = parseInt( req.params.skip ) || 0;
+        let lastItemId = req.params.lastItemId || 'null';
         let limit = parseInt( req.params.limit ) || 15;
 
+        bannedUserFilter = {};
+        if( lastItemId !== 'null' ){
+            const lastItem = await BannedUsers.findById(lastItemId);
+            if(lastItem){
+                bannedUserFilter.createdAt = { $gt: lastItem.createdAt };
+            }
+        }
+
         const totalBannedUserCount = await BannedUsers.countDocuments();
-        let bannedUsersList = await BannedUsers.find().skip( skip ).limit( limit ).lean();
+        let bannedUsersList = await BannedUsers.find( bannedUserFilter ).sort({ createdAt: 1 }).limit( limit ).lean();
+        
         if( !bannedUsersList || bannedUsersList.length <= 0 ){
             return res.status( 404 )
                       .json({ error: false, message: "No Banned User Found"});

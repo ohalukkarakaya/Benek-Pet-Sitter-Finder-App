@@ -21,7 +21,7 @@ router.post(
 // - tested
 //get organizer invitations by user Id
 router.get(
-    "/getInvitations/:skip/:limit",
+    "/getInvitations/:lastElementId/:limit",
     auth,
     getOrganizerInvitationsController
 );
@@ -29,7 +29,7 @@ router.get(
 // - tested
 //get sended organizer invitations by user id
 router.get(
-    "/getSendedInvitations/:skip/:limit",
+    "/getSendedInvitations/:lastElementId/:limit",
     auth,
     getSendedOrganizerInvitationsController
 );

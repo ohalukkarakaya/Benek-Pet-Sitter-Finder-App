@@ -8,7 +8,7 @@ import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoH
 const getCareGiverFinishedCareGiveListController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const skip = parseInt( req.params.skip ) || 0;
+        const lastItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
         const careGiveQuery = {
@@ -18,12 +18,22 @@ const getCareGiverFinishedCareGiveListController = async ( req, res ) => {
             ] 
         };
 
-        const careGives = await CareGive.find( careGiveQuery )
-                                        .skip( skip )
-                                        .limit( limit )
-                                        .lean();
+        const careGiveFilter = {
+            $and: [
+                { "careGiver.careGiverId": userId },
+                { "finishProcess.isFinished": true }
+            ] 
+        };
+
+        if( lastItemId !== 'null' ){
+            const lastItem = await CareGive.findById(lastItemId);
+            if(lastItem){
+                careGiveFilter.createdAt = { $gt: lastItem.createdAt };
+            }
+        }
 
         const totalCareGiveCount= await CareGive.countDocuments( careGiveQuery );
+        const careGives = await CareGive.find( careGiveFilter ).sort({ createdAt: -1 }).limit( limit ).lean();
 
         if(
             !careGives

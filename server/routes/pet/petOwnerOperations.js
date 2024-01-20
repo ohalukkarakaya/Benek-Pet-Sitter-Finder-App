@@ -33,7 +33,7 @@ router.put(
 // - tested
 //get secondary pet owner invitations
 router.get(
-  "/secondaryOwnerInvitations/:skip/:limit",
+  "/secondaryOwnerInvitations/:lastItemId/:limit",
   auth,
   getSecondaryOwnerInvitationsController
 );
@@ -41,7 +41,7 @@ router.get(
 // - tested
 //get sended secondary pet owner invitations
 router.get(
-  "/sendedSecondaryOwnerInvitations/:skip/:limit",
+  "/sendedSecondaryOwnerInvitations/:lastItemId/:limit",
   auth,
   getSendedSecondaryOwnerInvitationsController
 );
@@ -73,7 +73,7 @@ router.put(
 // - tested
 //get hand over invitations
 router.get(
-  "/petHandOverInvitations/:skip/:limit",
+  "/petHandOverInvitations/:lastItemId/:limit",
   auth,
   getPetHandOverInvitationsController
 );
@@ -81,7 +81,7 @@ router.get(
 // - tested
 //get sended hand over invitations
 router.get(
-  "/petSendedHandOverInvitations/:skip/:limit",
+  "/petSendedHandOverInvitations/:lastItemId/:limit",
   auth,
   getPetSendedHandOverInvitationsController
 );

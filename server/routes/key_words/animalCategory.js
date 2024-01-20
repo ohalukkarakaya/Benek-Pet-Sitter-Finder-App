@@ -24,7 +24,7 @@ router.post(
 
 //get users by Keyword
 router.post(
-    "/getUsersByTag/:skip/:limit",
+    "/getUsersByTag/:lastItemId/:limit",
     auth,
     getUsersByTagController
 )

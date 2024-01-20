@@ -5,25 +5,18 @@ import Pet from "../../../models/Pet.js";
 const getUsersAndEventsBySearchValueController = async ( req, res ) => {
     try{
         const limit = req.params.limit || 10;
-        const skip = req.params.skip || 0;
+        const lastItemId = req.params.lastItemId || 'null';
         const lat = parseFloat( req.body.lat );
         const lng = parseFloat( req.body.lng );
         const searchTerm = req.body.searchValue.toString();
         const userId = req.user._id.toString();
         const filter = req.body.filter;
 
-        if(
-            !lat
-            || !lng
-            || !searchTerm
-        ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "missing params"
-                            }
-                      );
+        if( !lat || !lng || !searchTerm ){
+            return res.status( 400 ).json({
+                error: true,
+                message: "missing params"
+            });
         }
 
         if( 
@@ -149,24 +142,11 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                     {
                         $match: {
                             $and: [
-                                {
-                                    "deactivation.isDeactive": false
-                                },
-                                {
-                                    blockedUsers: {
-                                        $nin: [
-                                            userId
-                                        ]
-                                    }
-                                },
+                                { "deactivation.isDeactive": false },
+                                { blockedUsers: { $nin: [ userId ] } },
                                 {
                                     $or: [
-                                        {
-                                            "userName": {
-                                                $regex: searchTerm,
-                                                $options: "i"
-                                            }
-                                        },
+                                        { "userName": { $regex: searchTerm, $options: "i" } },
                                         {
                                             "identity.firstName": {
                                                 $regex: searchTerm,
@@ -472,21 +452,16 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                         ( a, b ) => 
                                 a.distance - b.distance
                    );
-    
-        const resultList = mergedList.slice(
-                                            skip, 
-                                            skip + limit
-                                      );
 
-        return res.status( 200 )
-                  .json(
-                    {
-                        error: false,
-                        message: "discover screen users and events list is prepared succesfully",
-                        totalDataCount: mergedList.length,
-                        dataList: resultList,
-                    }
-                  );
+        const skip = lastItemId !== 'null' ? mergedList.findIndex( item => item._id.toString() === lastItemId ) + 1 : 0;
+        const resultList = mergedList.slice( skip, skip + limit );
+
+        return res.status( 200 ).json({
+            error: false,
+            message: "discover screen users and events list is prepared succesfully",
+            totalDataCount: mergedList.length,
+            dataList: resultList,
+        });
 
     }catch( err ){
         console.log( "ERROR: getUsersAndEventsBySearchValueController - ", err );

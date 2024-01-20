@@ -8,66 +8,51 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
         const careGiveId = req.params.careGiveId.toString();
-        const skip = parseInt( req.params.skip ) || 0;
+        const lastItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
         if( !careGiveId ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Missing Params"
-                            }
-                       );
+            return res.status( 400 ).json({
+                error: true,
+                message: "Missing Params"
+            });
         }
 
         const careGive = await CareGive.findById( careGiveId ).lean();
         if( !careGive ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "CareGive Not Found"
-                            }
-                       );
+            return res.status( 404 ).json({
+                error: true,
+                message: "CareGive Not Found"
+            });
         }
 
         const pet = await Pet.findById( careGive.petId.toString() ).lean();
         if( !pet ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Pet Not Found"
-                            }
-                       );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Pet Not Found"
+            });
         }
 
         if(
             !( pet.allOwners.includes( userId ) )
             && careGive.careGiver.careGiverId !== userId
         ){
-            return res.statu( 401 )
-                      .json(
-                            {
-                                error: true,
-                                message: "UnAuthorized"
-                            }
-                       );
+            return res.statu( 401 ).json({
+                error: true,
+                message: "UnAuthorized"
+            });
         }
 
         const missionCallender = careGive.missionCallender;
         if( missionCallender.length <= 0 ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                messae: "No Mission Found In This CareGive"
-                            }
-                       );
+            return res.status( 404 ).json({
+                error: true,
+                messae: "No Mission Found In This CareGive"
+            });
         }
 
-        const startIndex = missionCallender.length - skip - 1;
+        const startIndex = lastItemId === 'null' ? 0 : missionCallender.findIndex( mission => mission._id.toString() === lastItemId ) + 1;
         const endIndex = startIndex + limit;
 
         const petInfo = getLightWeightPetInfoHelper( pet );
@@ -91,10 +76,7 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
         let missionList = [];
         for( let mission of limitedMissionCallender ){
             let missionContent;
-            if( 
-                mission.missionContent
-                && mission.missionContent.videoUrl
-            ){
+            if( mission.missionContent && mission.missionContent.videoUrl ){
                 missionContent = {
                     videoUrl: mission.missionContent.videoUrl,
                     timeCode: mission.missionContent.timeSignature.timePassword,
@@ -117,15 +99,12 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
             missionList.push( missionInfo );
         }
 
-        return res.status( 200 ).json(
-            {
+        return res.status( 200 ).json({
                 error: true,
                 message: "Mission List prepared succesfully",
                 totalMissionCount: missionCallender.length,
                 missions: missionList
-            }
-        );
-
+            });
     }catch( err ){
         console.log("ERROR: getFinishedCareGiveListController - ", err);
         res.status(500).json(

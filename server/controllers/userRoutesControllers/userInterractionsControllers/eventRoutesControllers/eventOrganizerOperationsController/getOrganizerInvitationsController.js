@@ -5,30 +5,31 @@ import prepareInviteOrganizerDataHelper from "../../../../../utils/invitations/i
 const getOrganizerInvitationsController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const skip = parseInt( req.params.skip ) || 0;
+        const lastElementId = req.params.lastElementId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
         const invitationQuery = { invitedId: userId };
-        const organizerInvitations = await OrganizerInvitation.find( invitationQuery )
-                                                              .skip( skip )
-                                                              .limit( limit )
-                                                              .lean();
+        let invitationFilter = { invitedId: userId };
+
+        if( lastElementId !== 'null' ){
+            const lastItem = await OrganizerInvitation.findById( lastElementId );
+            if( lastItem ){
+                invitationFilter.createdAt = { $gt: lastItem.createdAt };
+            }
+        }
 
         const totalInvitationCount = await OrganizerInvitation.countDocuments( invitationQuery );
+        const organizerInvitations = await OrganizerInvitation.find( invitationFilter ).sort({ createdAt: 1 }).limit( limit ).lean();
+
         if( organizerInvitations.length <= 0 ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "No Organizer Invitation Found"
-                }
-            );
+            return res.status( 404 ).json({
+                error: true,
+                message: "No Organizer Invitation Found"
+            });
         }
 
         let newInvitationList = [];
-        for(
-            let invitation
-            of organizerInvitations
-        ){
+        for( let invitation of organizerInvitations ){
             const preparedInvitationData = await prepareInviteOrganizerDataHelper( invitation );
             if(
                 !preparedInvitationData
@@ -36,36 +37,28 @@ const getOrganizerInvitationsController = async ( req, res ) => {
                 || preparedInvitationData.length <= 0
                 || preparedInvitationData.error
             ){
-                return res.status( 500 )
-                          .json(
-                            {
-                                error: true,
-                                message: preparedInvitationData.message
-                            }
-                          );
+                return res.status( 500 ).json({
+                    error: true,
+                    message: preparedInvitationData.message
+                });
             }
 
             newInvitationList.push( preparedInvitationData.data );
         }
 
-        return res.status( 200 )
-                  .json(
-                        {
-                            error: false,
-                            message: "Invitation list prepared succesfully",
-                            totalInvitationCount: totalInvitationCount,
-                            organizerInvitations: newInvitationList
-                        }
-                  );
+        return res.status( 200 ).json({
+            error: false,
+            message: "Invitation list prepared succesfully",
+            totalInvitationCount: totalInvitationCount,
+            organizerInvitations: newInvitationList
+        });
 
     }catch( err ){
         console.log("ERROR: getOrganizerInvitationsController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+        return res.status(500).json({
+            error: true,
+            message: "Internal Server Error"
+        });
     }
 }
 

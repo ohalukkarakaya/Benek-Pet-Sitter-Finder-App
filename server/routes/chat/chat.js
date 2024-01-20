@@ -70,7 +70,7 @@ router.post(
 // - tested
 //get chats
 router.get(
-    "/get/:skip/:limit",
+    "/get/:lastItemId/:limit",
     auth,
     getChatsController
 );

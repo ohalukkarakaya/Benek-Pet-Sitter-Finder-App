@@ -51,7 +51,7 @@ router.get(
 // - tested
 //get recomended stories
 router.get(
-    "/getRecomendedStoryList/:skip/:limit",
+    "/getRecomendedStoryList/:lastElementId/:limit",
     auth,
     getRecomendedStoryListController
 );

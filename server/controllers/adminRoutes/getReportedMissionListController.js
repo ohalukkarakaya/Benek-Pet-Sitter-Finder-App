@@ -11,11 +11,20 @@ import prepareReportedMissionHelper from "../../utils/adminHelpers/prepareReport
 
 const getReportedMissionListController = async ( req, res ) => {
     try{
-        const skip = parseInt( req.params.skip ) || 0;
+        const lasItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
+        const reportedMissionFilter = {};
+        if( lasItemId !== 'null' ){
+            const lastItem = await ReportMission.findById(lasItemId);
+            if(lastItem){
+                reportedMissionFilter.createdAt = { $gt: lasItem.createdAt };
+            }
+            
+        }
+
         const reportedMissionsCount = await ReportMission.countDocuments();
-        let reportedMissions = await ReportMission.find().skip( skip ).limit( limit ).lean();
+        let reportedMissions = await ReportMission.find( reportedMissionFilter ).sort({ createdAt: 1 }).limit( limit ).lean();
 
         let reportedMissionList = await prepareReportedMissionHelper( reportedMissions );
         if( !reportedMissionList || reportedMissionList.length <= 0 ){

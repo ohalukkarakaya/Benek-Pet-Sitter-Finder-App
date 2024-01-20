@@ -5,18 +5,28 @@ import prepareCareGiveInvitationDataHelper from "../../../utils/invitations/invi
 const getCareGiveInvitationsController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
-        const skip = parseInt( req.params.skip ) || 0;
+        const lasItem = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
         const invitationQuery = {
             "invitation.to": userId,
             "invitation.isAccepted": false
         };
-        const invitedCareGives = await CareGive.find( invitationQuery )
-                                               .skip( skip )
-                                               .limit( limit );
+
+        const invitationFilter = {
+            "invitation.to": userId,
+            "invitation.isAccepted": false
+        }
+
+        if( lasItem !== 'null' ){
+            const lastItem = await CareGive.findById(lasItem);
+            if(lastItem){
+                invitationFilter.createdAt = { $gt: lastItem.createdAt };
+            }
+        }
 
         const totalInvitationCount = await CareGive.countDocuments( invitationQuery );
+        const invitedCareGives = await CareGive.find( invitationFilter ).sort({ createdAt: 1 }).limit( limit );
 
         if( 
             !invitedCareGives

@@ -6,42 +6,33 @@ const getStoryCommentsController = async ( req, res ) => {
     try{
         const userId = req.user._id.toString();
         const storyId = req.params.storyId.toString();
-        let skip = parseInt( req.params.skip ) || 0;
+        const lastElementId = req.params.lastElementId || 'null';
         let limit = parseInt( req.params.limit ) || 15;
  
         if( !storyId ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "Missing Param"
-                }
-            );
+            return res.status( 400 ).json({
+                error: true,
+                message: "Missing Param"
+            });
         }
 
-        const story = await Story.findById( storyId )
-                                 .lean();
+        const story = await Story.findById( storyId ).lean();
         if( !story ){
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "Story Not Found"
-                }
-            );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Story Not Found"
+            });
         }
 
         const storyOwner = await User.findById( story.userId.toString() );
-        if(
-            !storyOwner
-            || storyOwner.blockedUsers.includes( req.user._id.toString() )
-        ){
-            return res.status( 401 ).json(
-                {
-                    error: true,
-                    message: "Unauthorized"
-                }
-            );
+        if( !storyOwner || storyOwner.blockedUsers.includes( req.user._id.toString() ) ){
+            return res.status( 401 ).json({
+                error: true,
+                message: "Unauthorized"
+            });
         }
 
+        let skip = lastElementId !== 'null' ? story.comments.findIndex( commentObject => commentObject._id.toString() === lastElementId ) + 1 : 0;
         let comments = [];
         if( skip === 0 ){
             const usersComments = story.comments.filter(
@@ -56,12 +47,10 @@ const getStoryCommentsController = async ( req, res ) => {
         }
 
         if( limit >= 0 ){
-            const commentList = story.comments
-                                     .reverse()
-                                     .filter(
-                                        commentObject =>
-                                            commentObject.userId.toString() !== userId
-                                      );
+            const commentList = story.comments.reverse().filter(
+                commentObject =>
+                    commentObject.userId.toString() !== userId
+            );
             const startIndex = commentList.length - skip - 1;
             const endIndex = startIndex + limit;
 
@@ -73,14 +62,8 @@ const getStoryCommentsController = async ( req, res ) => {
         }
 
         if( comments.length > 0 ){
-            for(
-                let commentObject
-                of comments
-            ){
-                const commentedUser = await User.findById( 
-                                                    commentObject.userId
-                                                                 .toString() 
-                                                 );
+            for( let commentObject of comments ){
+                const commentedUser = await User.findById( commentObject.userId.toString() );
                 const commentedUserInfo = getLightWeightUserInfoHelper( commentedUser );
 
                 commentObject.user = commentedUserInfo;
@@ -88,25 +71,13 @@ const getStoryCommentsController = async ( req, res ) => {
 
                 let firstFiveOfLikeLimit = 5;
                 
-                if( 
-                    commentObject.likes
-                                 .length < 5 
-                ){
-                    firstFiveOfLikeLimit = commentObject.likes
-                                                        .length;
+                if( commentObject.likes.length < 5 ){
+                    firstFiveOfLikeLimit = commentObject.likes.length;
                 }
 
                 commentObject.firstFiveLikedUser = [];
-                for(
-                    let i = 0; 
-                    i < firstFiveOfLikeLimit; 
-                    i++ 
-                ){
-                    const likedUser = await User.findById( 
-                                                    commentObject.likes[ i ]
-                                                                 .toString() 
-                                                );
-
+                for( let i = 0; i < firstFiveOfLikeLimit; i++ ){
+                    const likedUser = await User.findById( commentObject.likes[ i ].toString());
                     const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
 
                     commentObject.firstFiveLikedUser.push( likedUserInfo );
@@ -118,9 +89,7 @@ const getStoryCommentsController = async ( req, res ) => {
                                     : {};
 
                 if( lastReply.likes ){
-                    lastReply.likeCount = lastReply.likes
-                                                   .length;
-
+                    lastReply.likeCount = lastReply.likes.length;
                     delete lastReply.likes;
                 }
                 
@@ -138,52 +107,41 @@ const getStoryCommentsController = async ( req, res ) => {
 
             if( comments.length > 0 ){
                 usersComments = comments.filter(
-                                            commentObject =>
-                                                commentObject.user
-                                                             .userId
-                                                             .toString() === userId
-                                         ).sort(
-                                            ( a, b ) => 
-                                                b.createdAt - a.createdAt
-                                         );
+                    commentObject =>
+                        commentObject.user.userId.toString() === userId
+                ).sort(
+                    ( a, b ) => 
+                        b.createdAt - a.createdAt
+                );
 
                 otherComments = comments.filter(
-                                            commentObject =>
-                                                commentObject.user
-                                                             .userId
-                                                             .toString() !== userId
-                                         ).sort(
-                                            ( a, b ) => 
-                                                b.createdAt - a.createdAt
-                                         );
+                    commentObject =>
+                        commentObject.user.userId.toString() !== userId
+                ).sort(
+                    ( a, b ) => 
+                        b.createdAt - a.createdAt
+                );
             }
 
             const resultCommentData = [...usersComments, ...otherComments];
-            return res.status( 200 )
-                      .json(
-                            {
-                                error: false,
-                                message: "Comments Prepared succesfully",
-                                commentCount: comments.length,
-                                comments: resultCommentData
-                            }
-                       );
+            return res.status( 200 ).json({
+                error: false,
+                message: "Comments Prepared succesfully",
+                commentCount: comments.length,
+                comments: resultCommentData
+            });
         }else{
-            return res.status( 404 ).json(
-                {
-                    error: true,
-                    message: "No Comment Found"
-                }
-            );
+            return res.status( 404 ).json({
+                error: true,
+                message: "No Comment Found"
+            });
         }
     }catch( err ){
         console.log("ERROR: getStoryCommentsController - ", err);
-        return res.status(500).json(
-            {
-                error: true,
-                message: "Internal server error"
-            }
-        );
+        return res.status(500).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
 }
 
