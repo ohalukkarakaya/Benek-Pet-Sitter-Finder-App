@@ -5,35 +5,30 @@ const petLikeImageCommentController = async (req, res) => {
     try{
         const { error } = petImageCommentLikeValidation( req.body );
         if(error){
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: error.details[0].message
-                }
-            );
+            return res.status(400).json( {
+                error: true,
+                message: error.details[0].message
+            });
         }
 
         const pet = await Pet.findById( req.body.petId );
         if(!pet){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "Pet couldn't found"
-                }
-            );
+            return res.status(404).json({
+                error: true,
+                message: "Pet couldn't found"
+            });
         }
 
         const image = pet.images.find(
             imageObject => 
                 imageObject._id.toString() === req.body.imgId.toString()
         );
+
         if(!image){
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "image couldn't found"
-                }
-            );
+            return res.status(404).json({
+                error: true,
+                message: "image couldn't found"
+            });
         }
 
         const comment = image.comments.find(
@@ -42,13 +37,10 @@ const petLikeImageCommentController = async (req, res) => {
         );
 
         if( !comment ){
-            return res.status( 404 )
-                      .json(
-                        {
-                            error: true,
-                            message: "Comment not found"
-                        }
-                      );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Comment not found"
+            });
         }
 
         const isReply = req.body.replyId !== undefined && req.body.replyId !== null;
@@ -60,13 +52,10 @@ const petLikeImageCommentController = async (req, res) => {
             );
 
             if( !reply ){
-                return res.status( 404 )
-                          .json(
-                            {
-                                error: true,
-                                message: "Reply Not Found"
-                            }
-                          );
+                return res.status( 404 ).json({
+                    error: true,
+                    message: "Reply Not Found"
+                });
             }
             
             const isAlreadyLiked = reply.likes.find(
@@ -105,31 +94,25 @@ const petLikeImageCommentController = async (req, res) => {
             (err) => {
                 if(err) {
                     console.error('ERROR: While Inserting Comment!');
-                    return res. status(500).json(
-                        {
-                            error: true,
-                            message: "ERROR: While Inserting Comment!"
-                        }
-                    );
+                    return res. status(500).json({
+                        error: true,
+                        message: "ERROR: While Inserting Comment!"
+                    });
                 }
             }
         );
 
-        return res.status(200).json(
-            {
-                error: false,
-                message: "comment or reply has been liked or like has been removed"
-            }
-        );
+        return res.status(200).json({
+            error: false,
+            message: "comment or reply has been liked or like has been removed"
+        });
 
     }catch(err){
         console.log("error - like comment", err);
-        return res.status(500).json(
-            {
-                error: true,
-                message: "Internal server error"
-            }
-        );
+        return res.status(500).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
 }
 

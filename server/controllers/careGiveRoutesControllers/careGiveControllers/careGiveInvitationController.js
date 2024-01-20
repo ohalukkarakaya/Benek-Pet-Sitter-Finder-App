@@ -44,41 +44,31 @@ const careGiveInvitationController = async ( req, res ) => {
                 || !price.serviceTypeCode 
                 || !price.type
             ){
-                return res.status( 400 )
-                          .json(
-                               {
-                                  error: true,
-                                  message: "missing params"
-                               }
-                           );
+                return res.status( 400 ).json({
+                    error: true,
+                    message: "missing params"
+                });
             }
-            const petTypePricingModel = pricingDataset.prices
-                                                      .find(
-                                                          pricingObject =>
-                                                              pricingObject.id === price.petTypeCode
-                                                       );
+            const petTypePricingModel = pricingDataset.prices.find(
+                pricingObject =>
+                    pricingObject.id === price.petTypeCode
+            );
             if( !petTypePricingModel ){
-                return res.status( 404 )
-                          .json(
-                               {
-                                   error: true,
-                                   message: "pricing pet type model not found"
-                               }
-                           );
+                return res.status( 404 ).json({
+                    error: true,
+                    message: "pricing pet type model not found"
+                });
             }
 
-            const pricing = petTypePricingModel.servicePackages
-                                               .find(
-                                                    petTypeObject =>
-                                                        petTypeObject.id === price.serviceTypeCode
-                                                );
+            const pricing = petTypePricingModel.servicePackages.find(
+                petTypeObject =>
+                    petTypeObject.id === price.serviceTypeCode
+            );
             if( !pricing ){
-                return res.status(404).json(
-                    {
-                        error: true,
-                        message: "pricing not found"
-                    }
-                );
+                return res.status(404).json({
+                    error: true,
+                    message: "pricing not found"
+                });
             }
 
             const pricingType = price.type;
@@ -98,83 +88,56 @@ const careGiveInvitationController = async ( req, res ) => {
 
         const pet = await Pet.findById( petId );
         if( !pet ){
-            return res.status( 404 )
-                      .json(
-                          {
-                            error: true,
-                            message: "Pet not found"
-                          }
-                      );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Pet not found"
+            });
         }
 
-        if(
-            pet.primaryOwner
-               .toString() === req.user._id.toString()
-        ){
-            return res.status( 400 )
-                      .json(
-                           {
-                               error: true,
-                               message: "Pet belongs to you"
-                           }
-                       );
+        if( pet.primaryOwner.toString() === req.user._id.toString() ){
+            return res.status( 400 ).json({
+                error: true,
+                message: "Pet belongs to you"
+            });
         }
 
-        const isPetAlreadyInCareGive = await CareGive.findOne(
-            {
-                petId: pet._id.toString(),
-                endDate: { $gt: new Date() },
-                'finishProcess.isFinished': false
-            }
-        );
+        const isPetAlreadyInCareGive = await CareGive.findOne({
+            petId: pet._id.toString(),
+            endDate: { $gt: new Date() },
+            'finishProcess.isFinished': false
+        });
 
         if( isPetAlreadyInCareGive ){
-            return res.status( 403 )
-                      .json(
-                           {
-                               error: true,
-                               message: "pet is already with a care giver currently"
-                           }
-                       );
+            return res.status( 403 ).json({
+                error: true,
+                message: "pet is already with a care giver currently"
+            });
         }
 
         if(
             Date.parse( startDate ) < Date.now() 
             || Date.parse( endDate ) < Date.parse( startDate )
         ){
-            return res.status( 400 )
-                      .json(
-                           {
-                               error: true,
-                               message: "invalid start or end date"
-                           }
-                       );
+            return res.status( 400 ).json({
+                error: true,
+                message: "invalid start or end date"
+            });
         }
 
         const careGiver = await User.findById( req.user._id.toString() );
-        const owner = await User.findById(
-                                    pet.primaryOwner
-                                       .toString()
-                                );
+        const owner = await User.findById( pet.primaryOwner.toString() );
         if(
             !owner
             || !careGiver
             || owner.deactivation.isDeactive 
             || careGiver.deactivation.isDeactive
-            || careGiver.blockedUsers.includes( 
-                                        owner._id.toString() 
-                                      )
-            || owner.blockedUsers.includes( 
-                                    careGiver._id.toString() 
-                                  )
+            || careGiver.blockedUsers.includes( owner._id.toString() )
+            || owner.blockedUsers.includes( careGiver._id.toString() )
         ){
-            return res.status( 404 )
-                      .json(
-                          {
-                              error: true,
-                              messsage: "user not found"
-                          }
-                      );
+            return res.status( 404 ).json({
+                error: true,
+                messsage: "user not found"
+            });
         }
         const isOwnerVerified = owner.email;
         const isCareGiverVerified = careGiver.isCareGiver 
@@ -184,15 +147,11 @@ const careGiveInvitationController = async ( req, res ) => {
                                     && careGiver.careGiveGUID;
 
         if( !isCareGiverVerified ){
-            return res.status( 403 )
-                      .json(
-                           {
-                               error: true,
-                               message: "you need to verify your phone number, email and bank accounts iban number"
-                           }
-                       );
+            return res.status( 403 ).json({
+                error: true,
+                message: "you need to verify your phone number, email and bank accounts iban number"
+            });
         }else{
-
             const parcalanmisBitisTarih = endDate.split('.');
             const jsBitisTarih = new Date(
                 parseInt( parcalanmisBitisTarih[ 2 ] ), // Yıl
@@ -217,8 +176,7 @@ const careGiveInvitationController = async ( req, res ) => {
             }
             
 
-            await new CareGive(
-                {
+            await new CareGive({
                     invitation: {
                         from: req.user._id.toString(),
                         to: owner._id.toString(),
@@ -259,38 +217,29 @@ const careGiveInvitationController = async ( req, res ) => {
                         null, null, null, null, null, null
                     );
 
-                    return res.status( 200 )
-                              .json(
-                                   {
-                                       error: false,
-                                       message: `user with the id "${ owner._id.toString() }" invented to careGive`
-                                   }
-                               );
+                    return res.status( 200 ).json({
+                        error: false,
+                        message: `user with the id "${ owner._id.toString() }" invented to careGive`
+                    });
                 }
             ).catch(
                 ( error ) => {
                     if( error ){
                         console.log("Error: while creating CareGiveObject - ", error);
-                        return res.status( 500 )
-                                  .json(
-                                       {
-                                           error: true,
-                                           message: "Internal server error"
-                                       }
-                                   );
+                        return res.status( 500 ).json({
+                            error: true,
+                            message: "Internal server error"
+                        });
                     }
                 }
             );
         }
     }catch( err ){
         console.log( "Error: care give", err );
-        return res.status( 500 )
-                  .json(
-                       {
-                           error: true,
-                           message: "Internal server error"
-                       }
-                   );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
 }
 

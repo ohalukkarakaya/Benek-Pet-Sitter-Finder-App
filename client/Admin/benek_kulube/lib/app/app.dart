@@ -1,6 +1,10 @@
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
+import 'package:benek_kulube/common/constants/tabs_enum.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
+import 'package:benek_kulube/presentation/shared/components/loading_components/benek_blured_modal_barier.dart';
 import 'package:benek_kulube/presentation/shared/screens/login_screen.dart';
+import 'package:benek_kulube/presentation/shared/screens/user_search_screen.dart';
+import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -70,11 +74,7 @@ class KulubeHomePage extends StatelessWidget {
 
                                       ? HomeScreen( store: store)
                                       : const SizedBox()
-                )
-
-              // mainObservingStates.isLoading
-              //   ? const BenekLoadingWidget()
-              //   : const SizedBox(),
+                ),
           ],
         );
       }

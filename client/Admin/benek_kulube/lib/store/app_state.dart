@@ -39,7 +39,7 @@ class AppState {
       userAccessToken:  '',
       userRoleId: 0,
       userInfo: null,
-      isLoading: true
+      isLoading: false
     );
   }
 

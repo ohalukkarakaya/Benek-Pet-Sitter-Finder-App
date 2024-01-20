@@ -29,10 +29,7 @@ const sendNotification = async (
             || contentType === "missionUpload"
             || contentType === "missionAprove"
         ){
-            if(
-                !parentContentId
-                || !parentContentType
-            ){
+            if( !parentContentId || !parentContentType ){
                 return data = {
                     error: true,
                     errorStatusCode: 400,
@@ -52,14 +49,8 @@ const sendNotification = async (
                     contentType: parentContentType
                 }
             }
-        }else if(
-            contentType === "petImageReply"
-            || contentType === "eventReply"
-        ){
-            if( 
-                !thirdParentContentType
-                || !thirdParentContentId 
-            ){
+        }else if( contentType === "petImageReply" || contentType === "eventReply" ){
+            if( !thirdParentContentType || !thirdParentContentId ){
                 return data = {
                     error: true,
                     errorStatusCode: 400,

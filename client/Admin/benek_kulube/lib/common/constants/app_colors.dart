@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   static const Color benekWhite = Colors.white;
+  static const Color benekBlack = Colors.black;
+  static Color benekBlackWithOpacity = Colors.black.withOpacity(0.2);
   static const Color benekLightBlue = Color(0xffD1EBF3);
   static const Color benekBlue = Color(0xffB1DCE1);
   static const Color benekLightBeige = Color(0xffFFF1E2);

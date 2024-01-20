@@ -83,33 +83,22 @@ const replyCareGiveInvitationController = async ( req, res ) => {
             //accept invitation
             const pet = await Pet.findById( invitedCareGive.petId.toString() );
             if( !pet ){
-                return res.status( 404 )
-                          .json(
-                                {
-                                    error: true,
-                                    message: "pet not found"
-                                }
-                           );
+                return res.status( 404 ).json({
+                    error: true,
+                    message: "pet not found"
+                });
             }
 
             const careGiver = await User.findById( invitedCareGive.careGiver.careGiverId.toString() );
             if(
                 !careGiver 
                 || careGiver.deactivation.isDeactive
-                || careGiver.blockedUsers
-                            .includes(
-                                invitedCareGive.petOwner
-                                               .petOwnerId
-                                               .toString() 
-                            )
+                || careGiver.blockedUsers.includes( invitedCareGive.petOwner.petOwnerId.toString() )
             ){
-                return res.status( 404 )
-                          .json(
-                                {
-                                    error: false,
-                                    message: "user not found"
-                                }
-                           );
+                return res.status( 404 ).json({
+                    error: false,
+                    message: "user not found"
+                });
             }
 
             const petOwner = await User.findById( invitedCareGive.petOwner.petOwnerId.toString() );
@@ -118,31 +107,19 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                 || petOwner.deactivation.isDeactive
                 || petOwner.blockedUsers.includes( invitedCareGive.careGiver.careGiverId.toString() )
             ){
-                return res.status( 404 )
-                          .json(
-                                {
-                                    error: true,
-                                    message: "user not found"
-                                }
-                           );
+                return res.status( 404 ).json({
+                    error: true,
+                    message: "user not found"
+                });
             }
 
-            const isPetOwner = req.user
-                                  ._id
-                                  .toString() === invitedCareGive.petOwner
-                                                                 .petOwnerId
-                                                                 .toString();
-
+            const isPetOwner = req.user._id.toString() === invitedCareGive.petOwner.petOwnerId.toString();
             const isEmailValid = petOwner.email;
-
             if( !isEmailValid ){
-                return res.status( 400 )
-                          .json(
-                                {
-                                    error: true,
-                                    message: "please verify your email firstly"
-                                }
-                           );
+                return res.status( 400 ).json({
+                    error: true,
+                    message: "please verify your email firstly"
+                });
             }
 
             if( isPetOwner ){
@@ -155,13 +132,10 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                         didAlreadyPay
                         || invitedCareGive.invitation.isAccepted
                     ){
-                        return res.status( 400 )
-                                  .json(
-                                    {
-                                        error: true,
-                                        message: "Already Paid"
-                                    }
-                                  );
+                        return res.status( 400 ).json({
+                            error: true,
+                            message: "Already Paid"
+                        });
                     }
 
                     const cardGuid = req.body.cardGuid 
@@ -196,14 +170,11 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                     );
         
                     if( paymentData.message === 'Daily Limit Exceeded' ){
-                        return res.status( 500 )
-                                  .json(
-                                    {
-                                        error: true,
-                                        message: "CareGiver Daily Limit Exceeded",
-                                        payError: paymentData
-                                    }
-                                  );
+                        return res.status( 500 ).json({
+                            error: true,
+                            message: "CareGiver Daily Limit Exceeded",
+                            payError: paymentData
+                        });
                     }
         
                     if(
@@ -214,25 +185,19 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                         || paymentData.payData === null 
                         || paymentData.payData === undefined
                     ){
-                        return res.status( 500 )
-                                  .json(
-                                    {
-                                        error: true,
-                                        message: "Error While Payment",
-                                        payError: paymentData
-                                    }
-                                  );
+                        return res.status( 500 ).json({
+                            error: true,
+                            message: "Error While Payment",
+                            payError: paymentData
+                        });
                     }
         
-                    return res.status( 200 )
-                              .json(
-                                {
-                                    error: false,
-                                    message: "Waiting for 3d payment approve",
-                                    payData: paymentData.payData,
-                                    code: null
-                                }
-                              );
+                    return res.status( 200 ).json({
+                        error: false,
+                        message: "Waiting for 3d payment approve",
+                        payData: paymentData.payData,
+                        code: null
+                    });
                 }
             }
             // Get the base64 url
@@ -247,60 +212,44 @@ const replyCareGiveInvitationController = async ( req, res ) => {
                 !careGiveTicketData
                 || careGiveTicketData.error
             ){
-                return res.status( 500 )
-                            .json(
-                                {
-                                    error: true,
-                                    message: "Internal Server Error"
-                                }
-                            );
+                return res.status( 500 ).json({
+                    error: true,
+                    message: "Internal Server Error"
+                });
             }
 
-            return res.status( 200 )
-                        .json(
-                            {
-                                error: false,
-                                message: "careGive accepted",
-                                code: careGiveTicketData.url
-                            }
-                        );
+            return res.status( 200 ).json({
+                error: false,
+                message: "careGive accepted",
+                code: careGiveTicketData.url
+            });
         }else{
             //reject invitation
-            invitedCareGive.deleteOne()
-                           .then(
-                                (_) => {
-                                    return res.status( 200 )
-                                            .json(
-                                                    {
-                                                        error: false,
-                                                        message: "Invitation rejected succesfully"
-                                                    }
-                                            );
-                                }
-                            ).catch(
-                                ( error ) => {
-                                    if( error ){
-                                        console.log( error );
-                                        return res.status( 500 )
-                                                  .json(
-                                                        {
-                                                            error: true,
-                                                            message: "Internal server error"
-                                                        }
-                                                   );
-                                    }
-                                }
-                            );
+            invitedCareGive.deleteOne().then(
+                (_) => {
+                    return res.status( 200 ).json({
+                        error: false,
+                        message: "Invitation rejected succesfully"
+                    });
+                }
+            ).catch(
+                ( error ) => {
+                    if( error ){
+                        console.log( error );
+                        return res.status( 500 ).json({
+                            error: true,
+                            message: "Internal server error"
+                        });
+                    }
+                }
+            );
         }
     }catch( err ){
         console.log( "Error: care give", err );
-        return res.status( 500 )
-                  .json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                   );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
 }
 

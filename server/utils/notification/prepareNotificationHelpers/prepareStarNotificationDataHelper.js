@@ -5,10 +5,7 @@ import getLightWeightUserInfoHelper from "../../getLightWeightUserInfoHelper.js"
 
 const prepareStarNotificationDataHelper = async ( notification ) => {
     try{
-        const votedUser = await User.findById( 
-                                        notification.from
-                                                    .toString()
-                                     );
+        const votedUser = await User.findById( notification.from.toString() );
 
         if( !votedUser ){
             return {
@@ -17,11 +14,7 @@ const prepareStarNotificationDataHelper = async ( notification ) => {
             }
         }
 
-        const user = await User.findById( 
-                                    notification.to[0]
-                                                .toString()
-                                );
-
+        const user = await User.findById( notification.to[0].toString() );
         if( !user ){
             return {
                 error: true,
@@ -31,14 +24,10 @@ const prepareStarNotificationDataHelper = async ( notification ) => {
                         
         const votedUserInfo = getLightWeightUserInfoHelper( votedUser );
 
-        const starObject = user.stars
-                                .find(
-                                    starObject =>
-                                        starObject._id
-                                                  .toString() === notification.releatedContent
-                                                                              .id
-                                                                              .toString()
-                                );
+        const starObject = user.stars.find(
+            starObject =>
+                starObject._id.toString() === notification.releatedContent.id.toString()
+        );
 
         if( !user ){
             return {
@@ -47,11 +36,7 @@ const prepareStarNotificationDataHelper = async ( notification ) => {
             }
         }
 
-        const pet = await Pet.findById(
-                                starObject.petId
-                                            .toString()
-                                );
-
+        const pet = await Pet.findById( starObject.petId.toString() );
         if( !pet ){
             return {
                 error: true,

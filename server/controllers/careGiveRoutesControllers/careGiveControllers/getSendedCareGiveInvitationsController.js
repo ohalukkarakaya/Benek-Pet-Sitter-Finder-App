@@ -10,7 +10,6 @@ const getSendedCareGiveInvitationsController = async ( req, res ) => {
     try{
 
         const userId = req.user._id.toString();
-        const skip = parseInt( req.params.skip ) || 0;
         const lasItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 

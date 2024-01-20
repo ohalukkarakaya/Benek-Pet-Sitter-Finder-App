@@ -10,8 +10,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: HomeScreenGrid( store: store )
-    );
+    return HomeScreenGrid( store: store );
   }
 }

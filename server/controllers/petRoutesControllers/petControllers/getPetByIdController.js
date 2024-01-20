@@ -6,41 +6,26 @@ const getPetByIdController = async ( req, res ) => {
     try{
         const petId = req.params.petId.toString();
         if( !petId ){
-            return res.status( 400 ).json(
-                {
-                    error: true,
-                    message: "Missing Params"
-                }
-            );
+            return res.status( 400 ).json({
+                error: true,
+                message: "Missing Params"
+            });
         }
 
-        const pet = await Pet.findById( petId )
-                             .lean();
+        const pet = await Pet.findById( petId ).lean();
 
-        const owner = await User.findById( 
-                                        pet.primaryOwner
-                                           .toString() 
-                                );
+        const owner = await User.findById( pet.primaryOwner.toString() );
 
         if( 
             !pet
             || !owner
-            || owner.deactivation
-                    .isDeactive
-            || owner.blockedUsers
-                    .includes( 
-                                req.user
-                                   ._id
-                                   .toString() 
-                             )
+            || owner.deactivation.isDeactive
+            || owner.blockedUsers.includes( req.user._id.toString() )
         ){
-            return res.status( 404 )
-                      .json(
-                        {
-                            error: true,
-                            message: "Pet not found"
-                        }
-                      );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Pet not found"
+            });
         }
 
         const primaryOwnerInfo = getLightWeightUserInfoHelper( owner );
@@ -48,50 +33,33 @@ const getPetByIdController = async ( req, res ) => {
         pet.primaryOwner = primaryOwnerInfo;
 
         pet.allOwnerInfoList = [];
-        for(
-            let ownerId
-            of pet.allOwners
-        ){
-            const secondaryOwner = await User.findById( 
-                                                    ownerId.toString() 
-                                              );
-                                              
+        for( let ownerId of pet.allOwners ){
+            const secondaryOwner = await User.findById( ownerId.toString() );                      
             const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
                 
-            pet.allOwnerInfoList
-               .push( secondaryOwnerInfo );
+            pet.allOwnerInfoList.push( secondaryOwnerInfo );
         };
 
-        if( 
-            pet.allOwnerInfoList
-               .length === pet.allOwners
-                              .length 
-        ){
+        if(  pet.allOwnerInfoList.length === pet.allOwners.length ){
             delete pet.allOwners
         }
 
-        pet.images.forEach(
-            ( image ) => {
-                image = image.imgUrl
-            }
-        );
+        for( let image of pet.images ){
+            image = image.imgUrl
+        };
 
-        return res.status( 200 ).json(
-            {
-                error: false,
-                message: "Pet found succesfully",
-                pet: pet
-            }
-        );
+        return res.status( 200 ).json({
+            error: false,
+            message: "Pet found succesfully",
+            pet: pet
+        });
 
     }catch( err ){
         console.log("ERROR: getPetByIdController - ", err);
-        res.status(500).json(
-            {
-                error: true,
-                message: "Internal Server Error"
-            }
-        );
+        return res.status(500).json({
+            error: true,
+            message: "Internal Server Error"
+        });
     }
 }
 

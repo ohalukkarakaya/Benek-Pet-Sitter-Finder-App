@@ -5,12 +5,10 @@ const petImageDeleteCommentOrReplyController = async (req, res) => {
     try{
         const { error } = petDeleteImageCommentValidation( req.body );
         if(error)
-            return res.status(400).json(
-                {
-                    error: true,
-                    message: error.details[0].message
-                }
-            );
+            return res.status(400).json({
+                error: true,
+                message: error.details[0].message
+            });
     
         const isReply = req.body.replyId !== undefined && req.body.replyId !== null;
 
@@ -18,12 +16,10 @@ const petImageDeleteCommentOrReplyController = async (req, res) => {
 
         if(!pet){
             console.log("pet couldn't found");
-            return res.status(404).json(
-                {
-                    error: true,
-                    message: "Pet couldn't founs"
-                }
-            );
+            return res.status(404).json({
+                error: true,
+                message: "Pet couldn't founs"
+            });
         }
             
         const image = pet.images.find(

@@ -8,7 +8,6 @@ const getCareGiversBySearchValueController = async ( req, res ) => {
         const lng = parseFloat( req.body.lng );
         const searchTerm = req.body.searchValue.toString();
         const limit = req.params.limit || 15;
-        const skip = req.params.skip || 0;
         const lastItemId = req.body.lastItemId || 'null';
 
         if( !lat || !lng || !searchTerm ){

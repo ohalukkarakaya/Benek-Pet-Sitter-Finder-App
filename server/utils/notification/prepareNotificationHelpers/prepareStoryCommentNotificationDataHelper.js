@@ -4,12 +4,7 @@ import getLightWeightUserInfoHelper from "../../getLightWeightUserInfoHelper.js"
 
 const prepareStoryCommentNotificationDataHelper = async ( notification ) => {
     try{
-        const story = await Story.findById( 
-                                        notification.parentContent
-                                                    .id
-                                                    .toString()
-                                          );
-
+        const story = await Story.findById( notification.parentContent.id.toString() );
         if( !story ){
             return {
                 error: true,
@@ -17,14 +12,10 @@ const prepareStoryCommentNotificationDataHelper = async ( notification ) => {
             }
         }
         
-        const comment = story.comments
-                             .find(
-                                commentObject =>
-                                    commentObject._id
-                                                 .toString() === notification.releatedContent
-                                                                             .id
-                                                                             .toString()
-                             );
+        const comment = story.comments.find(
+            commentObject =>
+                commentObject._id.toString() === notification.releatedContent.id.toString()
+        );
 
         if( !comment ){
             return {
@@ -33,11 +24,7 @@ const prepareStoryCommentNotificationDataHelper = async ( notification ) => {
             }
         }
 
-        const commentUser = await User.findById(
-                                            comment.userId
-                                                   .toString()
-                                       );
-
+        const commentUser = await User.findById( comment.userId.toString() );
         if( !commentUser ){
             return {
                 error: true,
@@ -46,16 +33,13 @@ const prepareStoryCommentNotificationDataHelper = async ( notification ) => {
         }
 
         const commentUserInfo = getLightWeightUserInfoHelper( commentUser );
-
         const notificationData = {
             error: false,
             contentType: "storyComment",
             notificationId: notification._id.toString(),
             user: commentUserInfo,
-            storyId: story._id
-                          .toString(),
-            commentId: comment._id
-                              .toString(),
+            storyId: story._id.toString(),
+            commentId: comment._id.toString(),
             comment: comment.comment,
             date: notification.date
         };
