@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 part of benek.api;
 
 class QueryParam {
@@ -37,6 +39,8 @@ class ApiClient {
           return value is double ? value : double.parse('$value');
         case 'UserInfoModel':
           return UserInfo.fromJson(value['user']);
+        case 'UserSearchResultModel':
+          return UserSearchResult.fromJson(value);
         // case 'List<OKRUserParentUserObjectiveComplianceViewModel>':
         //   List<dynamic> jsonList = value;
         //   List<OKRUserParentUserObjectiveComplianceViewModel> list = jsonList.map((item) => OKRUserParentUserObjectiveComplianceViewModel.fromJson(item)).toList();

@@ -23,15 +23,11 @@ class BenekLoadingComponent extends StatelessWidget {
         borderType: BorderType.RRect,
         radius: const Radius.circular(15.0),
         padding: const EdgeInsets.all(6),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(15.0)),
-          child: Container(
-            height: 200,
-            width: 120,
-            padding: const EdgeInsets.all(20.0),
-            child: const BenekProcessIndicator(
-              color: Colors.black,
-            ),
+        child: Center(
+          child: BenekProcessIndicator(
+            color: Colors.black,
+            width: width / 2.5,
+            height: height / 2.5,
           ),
         ),
       )

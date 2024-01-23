@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 enum AppScreenEnums {
   LOADING_SCREEN,
   LOGIN_SCREEN,

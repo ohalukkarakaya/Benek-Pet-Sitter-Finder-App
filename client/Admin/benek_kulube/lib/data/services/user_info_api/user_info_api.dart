@@ -31,12 +31,14 @@ class UserInfoApi {
       if( contentType.startsWith("multipart/form-data") ){
         bool hasFields = false;
         MultipartRequest mp = MultipartRequest("", Uri.parse(""));
+        // ignore: dead_code
         if ( hasFields ) postBody = mp;
       }
 
       var response = await apiClient.invokeAPI(path, 'GET', queryParams, postBody, headerParams, formParams, contentType, authNames);
       if (response.statusCode >= 400) {
         throw ApiException(code: response.statusCode, message: response.body);
+      // ignore: unnecessary_null_comparison
       }else if( response.body != null ){
         return apiClient.deserialize( response.body, 'UserInfoModel' ) as UserInfo;
       }else{

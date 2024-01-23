@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'app/app.dart';
 import 'store/app_state.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:desktop_window/desktop_window.dart';

@@ -6,7 +6,7 @@ import 'package:benek_kulube/common/constants/benek_icons.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 
 class UserSearchBarTextFieldWidget extends StatefulWidget {
@@ -19,24 +19,14 @@ class UserSearchBarTextFieldWidget extends StatefulWidget {
 class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWidget> {
   Store<AppState> store = AppReduxStore.currentStore!;
   final TextEditingController _controller = TextEditingController();
-  bool shouldPop = false;
+  
   Timer? _timer;
   bool _isTextChanged = false;
   String textToSendServer = '';
-  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _focusNode.addListener(_onFocusChanged);
-  }
-
-  void _onFocusChanged(){
-    if (!_focusNode.hasFocus){
-       setState(() {
-         shouldPop = true;
-       });
-    }
   }
 
   void _startTimer() {
@@ -44,7 +34,7 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
       _timer!.cancel();
       log('reset fonksiyonu (?) gerekirse');
     }
-    _timer = Timer(Duration(seconds: 1), () {
+    _timer = Timer( const Duration(seconds: 1), () {
       _isTextChanged = false;
 
       if (!_isTextChanged) {
@@ -70,35 +60,19 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
 
   @override
   Widget build(BuildContext context) {
-    if( shouldPop ){
-      setState(() {
-        shouldPop = false;
-      });
-
-      Navigator.pop(context);
-    }
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: RawKeyboardListener(
-          focusNode: FocusNode(),
-          onKey: (RawKeyEvent event){
-            if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-                setState(() {
-                  shouldPop = true;
-                });
-            }
-          },
-          child: TextField(
-            enableSuggestions: false,
+    
+    return Expanded(
+      flex: 1,
+      child: Hero(
+        tag: 'user_search_text_field',
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: TextField(
             autofocus: true,
             controller: _controller,
-            focusNode: _focusNode,
             onChanged: (String value) {
               if(
-                value.trim() != null
-                && value.trim() != ""
+                value.trim() != ""
                 && value.trim() != " "
               ){
                 setState(() {

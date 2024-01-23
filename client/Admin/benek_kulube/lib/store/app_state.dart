@@ -1,6 +1,8 @@
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:benek_kulube/common/constants/tabs_enum.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
+import 'package:benek_kulube/data/models/user_profile_models/user_search_result_model.dart';
+import 'package:geolocator/geolocator.dart';
 import '../data/models/kulube_login_qr_code_model.dart';
 
 class AppState {
@@ -14,6 +16,9 @@ class AppState {
   final int userRoleId;
   final UserInfo? userInfo;
   final bool isLoading;
+  final Position? currentLocation;
+  final UserSearchResult? userSearchemptyStateList;
+  final UserSearchResult? userSearchResultList;
 
   AppState({
     required this.counter,
@@ -25,7 +30,10 @@ class AppState {
     required this.userAccessToken,
     required this.userRoleId,
     required this.userInfo,
-    required this.isLoading
+    required this.isLoading,
+    required this.currentLocation,
+    required this.userSearchemptyStateList,
+    required this.userSearchResultList
   });
 
   factory AppState.initial() {
@@ -39,7 +47,10 @@ class AppState {
       userAccessToken:  '',
       userRoleId: 0,
       userInfo: null,
-      isLoading: false
+      isLoading: false,
+      currentLocation: null,
+      userSearchemptyStateList: null,
+      userSearchResultList: null
     );
   }
 
@@ -52,7 +63,11 @@ class AppState {
     String? userRefreshToken,
     String? userAccessToken,
     int? userRoleId,
-    bool? isLoading
+    UserInfo? userInfo,
+    bool? isLoading,
+    Position? currentLocation,
+    UserSearchResult? userSearchemptyStateList,
+    UserSearchResult? userSearchResultList
   }) {
     return AppState(
       counter: counter ?? this.counter,
@@ -64,7 +79,10 @@ class AppState {
       userAccessToken: userAccessToken ?? this.userAccessToken,
       userRoleId: userRoleId ?? this.userRoleId,
       userInfo: userInfo ?? this.userInfo,
-      isLoading: isLoading ?? this.isLoading
+      isLoading: isLoading ?? this.isLoading,
+      currentLocation: currentLocation ?? this.currentLocation,
+      userSearchemptyStateList: userSearchemptyStateList ?? this.userSearchemptyStateList,
+      userSearchResultList: userSearchResultList ?? this.userSearchResultList
     );
   }
 }

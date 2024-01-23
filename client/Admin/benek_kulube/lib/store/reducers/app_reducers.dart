@@ -10,6 +10,9 @@ import '../../redux/change_screen_tab/change_screen_tab.reducer.dart' as change_
 import '../../redux/is_loading_state/is_loading_state.reducer.dart' as is_loading_state;
 import '../../redux/get_user_info/get_user_info_request.reducer.dart' as get_user_info_request;
 import '../../redux/admin_login_qr_code/admin_login_qr_code.reducer.dart' as get_admin_login_qr_code;
+import '../../redux/set_current_location/set_current_location.reducer.dart' as set_current_location;
+import '../../redux/user_search/user_search_request.reducer.dart' as user_search;
+import '../../redux/get_recomended_users/get_recomended_users.reducer.dart' as get_recomended_users;
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
@@ -23,5 +26,8 @@ AppState appReducer(AppState state, dynamic action) {
     userRoleId: set_role_id.setRoleIdReducer(state.userRoleId, action),
     userInfo: get_user_info_request.getUserInfoRequestReducer(state.userInfo, action),
     isLoading: is_loading_state.isLoadingStateReducer(state.isLoading, action),
+    currentLocation: set_current_location.setCurrentLocationReducer(state.currentLocation, action),
+    userSearchemptyStateList: get_recomended_users.userSearchRequestReducer(state.userSearchemptyStateList, action),
+    userSearchResultList: user_search.userSearchRequestReducer(state.userSearchResultList, action),
   );
 }

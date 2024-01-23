@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import '../app_state.dart';
 
@@ -6,6 +9,6 @@ void exampleMiddleware(
   dynamic action,
   NextDispatcher next,
 ) {
-  print('Action: ${action.toString()}');
+  log('Action: ${action.toString()}');
   next(action);
 }

@@ -28,7 +28,7 @@ class UserInfo {
   List<String>? saved;
   List<String>? dependedUsers;
   UserDeactivation? deactivation;
-  List<UserStars>? stars;
+  dynamic stars;
   List<UserInterestingPetTags>? interestingPetTags;
   String? gender;
   String? defaultImage;
@@ -105,14 +105,27 @@ class UserInfo {
         }
       );
     }
-    blockedUsers = json['blockedUsers'].cast<String>();
-    followers = json['followers'].cast<String>();
-    saved = json['saved'].cast<String>();
-    dependedUsers = json['dependedUsers'].cast<String>();
+    blockedUsers = json['blockedUsers'] != null
+                      ? json['blockedUsers'].cast<String>()
+                      : <String>[];
+    followers = json['followers'] != null
+                    ? json['followers'].cast<String>()
+                    : <String>[];
+    saved = json['saved'] != null
+              ? json['saved'].cast<String>()
+              : <String>[];
+    dependedUsers = json['dependedUsers'] != null
+                      ? json['dependedUsers'].cast<String>()
+                      : <String>[];
     deactivation = json['deactivation'] != null
         ? UserDeactivation.fromJson(json['deactivation'])
         : null;
-    if( json['stars'] != null ){
+    if( json['stars'] == null ){
+      stars = null;
+    }
+    else if( json['stars'].runtimeType == int ){
+      stars = json['stars'];
+    }else{
       stars = <UserStars>[];
       json['stars'].forEach(
         ( v ){
@@ -178,10 +191,7 @@ class UserInfo {
       data['deactivation'] = deactivation!.toJson();
     }
     if( stars != null){
-      data['stars'] = stars!.map(
-        ( v ) => 
-              v.toJson()
-      ).toList();
+      data['stars'] = stars;
     }
     if( interestingPetTags != null ){
       data['interestingPetTags'] = interestingPetTags!.map(

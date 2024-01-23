@@ -2,6 +2,7 @@ import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:benek_kulube/store/app_state.dart';
 
 import '../../../common/constants/tabs_enum.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 
 

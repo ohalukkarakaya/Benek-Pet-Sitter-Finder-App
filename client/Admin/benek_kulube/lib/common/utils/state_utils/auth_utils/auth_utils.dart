@@ -5,6 +5,7 @@ import 'package:benek_kulube/common/utils/shared_preferences_helper.dart';
 import 'package:benek_kulube/data/models/kulube_login_qr_code_model.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

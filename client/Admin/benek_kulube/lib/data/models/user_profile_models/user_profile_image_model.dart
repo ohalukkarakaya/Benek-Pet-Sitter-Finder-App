@@ -13,7 +13,7 @@ class UserProfileImg {
 
   UserProfileImg.fromJson( Map<String, dynamic> json ){
     imgUrl = json['imgUrl'];
-    isDefaultImg = json['isDefaultImg'];
+    isDefaultImg = json['isDefaultImg'] ?? json['isDefault'];
     recordedImgName = json['recordedImgName'];
   }
 

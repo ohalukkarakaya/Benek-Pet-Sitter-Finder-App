@@ -14,11 +14,11 @@ class AppRouter {
   static Route onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => KulubeHomePage());
+        return MaterialPageRoute(builder: (_) => const KulubeHomePage());
       case '/loginScreen':
-        return MaterialPageRoute(builder: (_) => KulubeHomePage()); //LoginScreen());
+        return MaterialPageRoute(builder: (_) => const KulubeHomePage()); //LoginScreen());
       default:
-        return MaterialPageRoute(builder: (_) => KulubeHomePage());
+        return MaterialPageRoute(builder: (_) => const KulubeHomePage());
     }
   }
 }

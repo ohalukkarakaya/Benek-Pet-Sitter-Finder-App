@@ -1,5 +1,6 @@
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:benek_kulube/store/reducers/app_reducers.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 

@@ -2,6 +2,7 @@ import 'package:benek_kulube/common/constants/tabs_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:benek_kulube/store/app_state.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 
 import '../../../../../common/constants/benek_icons.dart';

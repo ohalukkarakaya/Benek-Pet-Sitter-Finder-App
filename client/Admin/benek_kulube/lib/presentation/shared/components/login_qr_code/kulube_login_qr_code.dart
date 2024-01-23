@@ -5,6 +5,7 @@ import 'package:benek_kulube/data/models/kulube_login_qr_code_model.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 
 import '../../../../common/constants/app_colors.dart';

@@ -5,6 +5,8 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:benek_kulube/store/app_redux_store.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 
 import 'package:benek_kulube/app/app.dart';
@@ -15,7 +17,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    final Store<AppState> store = createStore();
+    final Store<AppState> store = AppReduxStore.getInitialStore();
     await tester.pumpWidget(KulubeApp(store));
 
     // Verify that our counter starts at 0.

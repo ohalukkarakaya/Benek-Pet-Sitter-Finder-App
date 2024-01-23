@@ -1,5 +1,8 @@
 import User from "../../../models/User.js";
 import Event from "../../../models/Event/Event.js";
+import Pet from "../../../models/Pet.js";
+import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
+import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
 const getUsersAndEventsByLocationController = async ( req, res) => {
     try{
@@ -112,10 +115,8 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 // deactivation kaydı kontrol et ve geçersiz kullanıcıları atla
                 {
                     $match: {
-                        $match: {
-                            "deactivation.isDeactive": false,
-                            blockedUsers: { $nin: [ userId ] },
-                        },
+                        "deactivation.isDeactive": false,
+                        blockedUsers: { $nin: [ userId ] },
                     },
                 },
             ]
@@ -126,9 +127,13 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 user._id
                     .toString() != userId
         );
+
+        for(let user of users ){
+            user.type = 'user';
+        }
         
         // prepare events
-        const events = await Event.find(
+        let events = await Event.find(
             {
                 isPrivate: false,
                 "adress.lat": { $exists: true },
@@ -153,6 +158,10 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
             }
         );
 
+        for(let event of events ){
+            event.type = 'event';
+        }
+
         const sortedEvents = events.map(
             ( event ) => {
                 const distance = Math.pow( event.adress.lat - lat, 2 ) + Math.pow( event.adress.long - lng, 2 );
@@ -166,19 +175,14 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
         const mergedList = [...users, ...sortedEvents];
 
         for( let item of mergedList ){
-            if( item instanceof User ) {
+            if( item.type === 'user' ){
                 const { location } = item;
                 const distance = Math.sqrt( Math.pow( location.lat - lat, 2 ) + Math.pow( location.lng - lng, 2 ) );
                 item.distance = distance;
                 
                 for( let petId of item.pets ){
                     const pet = await Pet.findById( petId.toString() );
-                    const petInfo = {
-                        petId: petId.toString(),
-                        isDefaultImg: pet.petProfileImg.isDefaultImg,
-                        petProfileImgUrl: pet.petProfileImg.imgUrl,
-                        petName: pet.name
-                    }
+                    const petInfo = getLightWeightPetInfoHelper( pet );
                     petId = petInfo;
                 }
     
@@ -192,6 +196,22 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 delete item.identity.openAdress;
                 delete item.phone;
                 delete item.email;
+
+                delete item.careGiveGUID;
+                delete item.__v;
+                delete item.createdAt;
+                delete item.updatedAt;
+                delete item.type;
+                delete item.isLoggedInIpTrusted;
+                delete item.deactivation;
+                delete item.isEmailVerified;
+                delete item.isPhoneVerified;
+                delete item.location;
+
+                delete item.identity.nationalId;
+                delete item.identity.openAdress;
+                delete item.identity.birthday;
+
     
                 for( let dependedId  of item.dependedUsers ){
                     const depended = await User.findById( dependedId );
@@ -211,7 +231,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
                 item.totalStar = starCount;
                 item.stars = starAvarage;
     
-            }else if( item instanceof Event ) {
+            }else if( item.type == 'event' ) {
                 const { adress } = item;
                 const distance = Math.sqrt(  Math.pow( adress.lat - lat, 2 ) + Math.pow( adress.long - lng, 2 ) );
                 item.distance = distance;

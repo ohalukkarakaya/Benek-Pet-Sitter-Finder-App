@@ -11,6 +11,7 @@ class BenekCircleAvatar extends StatefulWidget {
   final double? width;
   final double? height;
   final double radius;
+  final Color? bgColor;
   const BenekCircleAvatar(
     {
       super.key, 
@@ -18,7 +19,8 @@ class BenekCircleAvatar extends StatefulWidget {
       required this.imageUrl, 
       this.width = 40.0, 
       this.height = 40.0, 
-      this.radius = 100.0
+      this.radius = 100.0,
+      this.bgColor = AppColors.benekWhite
     }
   );
 
@@ -50,7 +52,7 @@ class _BenekCircleAvatarState extends State<BenekCircleAvatar> {
       padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all( Radius.circular( widget.radius ) ),
-        color: AppColors.benekWhite,
+        color: widget.bgColor,
       ),
       child: widget.isDefaultAvatar && !isErrorOccured
               ? BenekDefaultAvatar(

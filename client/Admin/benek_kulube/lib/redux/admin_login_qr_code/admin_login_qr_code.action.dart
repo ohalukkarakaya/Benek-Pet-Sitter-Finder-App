@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:benek_kulube/data/models/kulube_login_qr_code_model.dart';
 import 'package:benek_kulube/data/services/api_exception.dart';
 
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 
 import 'package:benek_kulube/store/app_state.dart';
@@ -15,6 +16,7 @@ ThunkAction<AppState> getAdminLoginQrCodeAction( String clientId ) {
     AdminLoginQrCodeApi api = AdminLoginQrCodeApi();
 
     try {
+      // ignore: no_leading_underscores_for_local_identifiers
       KulubeLoginQrCodeModel _qrCode = await api.getAdminLoginQrCodeRequest(clientId);
       
       await store.dispatch(GetAdminLoginQrCodeAction(_qrCode));

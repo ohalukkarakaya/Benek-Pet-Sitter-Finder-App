@@ -1,6 +1,7 @@
 import User from "../../../models/User.js";
 import Event from "../../../models/Event/Event.js";
 import Pet from "../../../models/Pet.js";
+import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
 const getUsersAndEventsBySearchValueController = async ( req, res ) => {
     try{
@@ -12,7 +13,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
         const userId = req.user._id.toString();
         const filter = req.body.filter;
 
-        if( !lat || !lng || !searchTerm ){
+        if( !lat || !lng ){
             return res.status( 400 ).json({
                 error: true,
                 message: "missing params"
@@ -179,6 +180,9 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                 ]
             );
 
+            for(let user of users ){
+                user.type = 'user';
+            }
             userList = users;
         }
 
@@ -229,8 +233,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
 
                     if( event.maxGuests !== -1 ){
 
-                        return event.maxGuests >= event.willJoin
-                                                    .length;
+                        return event.maxGuests >= event.willJoin.length;
 
                     }else{
 
@@ -240,16 +243,13 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                 }
             );
 
+            for(let event of events ){
+                event.type = 'event';
+            }
+
             const sortedEvents = events.map(
                 ( event ) => {
-                    const distance = Math.pow(
-                                        event.adress.lat - lat, 
-                                        2
-                                    ) 
-                                    + Math.pow(
-                                        event.adress.long - lng, 
-                                        2
-                                    );
+                    const distance = Math.pow(event.adress.lat - lat, 2) + Math.pow(event.adress.long - lng, 2);
                     return { ...event.toObject(), distance };
                 }
             ).sort(
@@ -262,34 +262,18 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
 
         const mergedList = [...userList, ...eventList];
 
-        for(
-            var item
-            of mergedList
-        ){
-            if( item instanceof User ) {
+        for( var item of mergedList ){
+            if( item.type === 'user' ) {
                 const { location } = item;
-                const distance = Math.sqrt(
-                                        Math.pow(
-                                                location.lat - lat, 
-                                                2
-                                            ) 
-                                        + Math.pow(
-                                                location.lng - lng, 
-                                                2
-                                              )
-                                      );
+                const distance = Math.sqrt( Math.pow(location.lat - lat, 2) + Math.pow(location.lng - lng, 2) );
                 item.distance = distance;
                 
-                for(
-                    let petId
-                    of item.pets
-                ){
+                for( let petId of item.pets ){
                     const pet = await Pet.findById( petId.toString() );
                     const petInfo = {
                         petId: petId.toString(),
                         isDefaultImg: pet.petProfileImg.isDefaultImg,
-                        petProfileImgUrl: pet.petProfileImg
-                                             .imgUrl,
+                        petProfileImgUrl: pet.petProfileImg.imgUrl,
                         petName: pet.name
                     }
                     petId = petInfo;
@@ -302,156 +286,87 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                 delete item.blockedUsers;
                 delete item.saved;
                 
-                delete item.identity
-                           .nationalId;
+                delete item.identity.nationalId;
     
-                delete item.identity
-                           .openAdress;
+                delete item.identity.openAdress;
     
                 delete item.phone;
                 delete item.email;
+                delete item.careGiveGUID;
+                delete item.__v;
+                delete item.createdAt;
+                delete item.updatedAt;
+                delete item.type;
+                delete item.isLoggedInIpTrusted;
+                delete item.deactivation;
+                delete item.isEmailVerified;
+                delete item.isPhoneVerified;
+                delete item.location;
+
+
     
-                for(
-                    let dependedId
-                    of item.dependedUsers
-                ){
+                for( let dependedId  of item.dependedUsers ){
                     const depended = await User.findById( dependedId );
                     const dependedInfo = getLightWeightUserInfoHelper( depended );
                     dependedId = dependedInfo;
                 }
     
-                const starValues = item.stars
-                                       .map(
-                                            starObject => 
-                                                    starObject.star 
-                                        );
+                const starValues = item.stars.map(
+                    starObject => 
+                            starObject.star 
+                );
     
                 const totalStarValue = starValues.reduce(
-                                                    ( acc, curr ) =>
-                                                                acc + curr, 
-                                                                0
-                                                  );
-                const starCount = item.stars
-                                      .length;
-    
+                    ( acc, curr ) =>
+                                acc + curr, 0
+                );
+
+                const starCount = item.stars.length;
                 const starAvarage = totalStarValue / starCount;
     
                 item.totalStar = starCount;
                 item.stars = starAvarage;
     
-            }else if( item instanceof Event ) {
+            }else if( item.type === 'event' ) {
                 const { adress } = item;
-                const distance = Math.sqrt(
-                    Math.pow(
-                            adress.lat - lat, 
-                            2
-                        ) 
-                    + Math.pow(
-                            adress.long - lng, 
-                            2
-                        )
-                );
+                const distance = Math.sqrt( Math.pow(adress.lat - lat, 2) + Math.pow(adress.long - lng, 2) );
                 item.distance = distance;
     
-                const eventAdmin = await User.findById( 
-                                                    item.eventAdmin
-                                                        .toString() 
-                                              );
+                const eventAdmin = await User.findById( item.eventAdmin.toString() );
     
-                const eventAdminInfo = {
-                    userId: eventAdmin._id.toString(),
-                    isProfileImageDefault: eventAdmin.profileImg.isDefaultImg,
-                    userProfileImg: eventAdmin.profileImg.imgUrl,
-                    username: eventAdmin.userName,
-                    userFullName: `${
-                            eventAdmin.identity
-                                      .firstName
-                        } ${
-                            eventAdmin.identity
-                                      .middleName
-                        } ${
-                            eventAdmin.identity
-                                      .lastName
-                        }`.replaceAll( "  ", " ")
-                }
+                const eventAdminInfo = getLightWeightUserInfoHelper( eventAdmin );
                 item.eventAdmin = eventAdminInfo;
     
-                for(
-                    let organizerId
-                    of item.eventOrganizers
-                ){
-                    const organizer = await User.finfById( 
-                                                    organizerId.toString() 
-                                                 );
-    
-                    const organizerInfo = {
-                        userId: organizer._id
-                                         .toString(),
-                        isProfileImageDefault: organizer.profileImg.isDefaultImg,
-                        userProfileImg: organizer.profileImg.imgUrl,
-                        username: organizer.userName,
-                        userFullName: `${
-                                organizer.identity
-                                         .firstName
-                            } ${
-                                organizer.identity
-                                         .middleName
-                            } ${
-                                organizer.identity
-                                         .lastName
-                            }`.replaceAll( "  ", " ")
-                    }
+                for( let organizerId of item.eventOrganizers ){
+                    const organizer = await User.finfById( organizerId.toString() );
+                    const organizerInfo = getLightWeightUserInfoHelper( organizer );
+
                     item.organizers.push( organizerInfo );
                 }
     
-                if( 
-                    item.organizers
-                        .length === item.eventOrganizers
-                                        .length 
-                ){
+                if( item.organizers.length === item.eventOrganizers.length ){
                     delete item.eventOrganizers
                 }
     
-                for(
-                    let joiningUserId
-                    of item.willJoin
-                ){
+                for( let joiningUserId of item.willJoin ){
                     const joiningUser = await User.findById( joiningUserId );
-                    const usersWhoWillJoinInfo = {
-                        userId: joiningUserId,
-                        isProfileImageDefault: joiningUser.profileImg.isDefaultImg,
-                        userProfileImg: joiningUser.profileImg.imgUrl,
-                        username: joiningUser.userName,
-                        usersFullName: `${
-                                joiningUser.identity
-                                           .firstName
-                            } ${
-                                joiningUser.identity
-                                           .middleName
-                            } ${
-                                joiningUser.identity
-                                           .lastName
-                            }`.replaceAll( "  ", " ")
-                    }
+                    const usersWhoWillJoinInfo = getLightWeightUserInfoHelper( joiningUser );
     
-                    item.usersWhoWillJoin
-                        .push( usersWhoWillJoinInfo );
+                    item.usersWhoWillJoin.push( usersWhoWillJoinInfo );
                 }
                 
-                if( 
-                    item.usersWhoWillJoin
-                        .length === item.willJoin
-                                        .length 
-                ){
+                if( item.usersWhoWillJoin.length === item.willJoin.length ){
                     delete item.willJoin;
                 }
+
+                delete item.__v;
+                delete item.createdAt;
+                delete item.updatedAt;
+                delete item.type;
             }
         }
     
-        mergedList.sort(
-                        ( a, b ) => 
-                                a.distance - b.distance
-                   );
+        mergedList.sort( ( a, b ) => a.distance - b.distance );
 
         const skip = lastItemId !== 'null' ? mergedList.findIndex( item => item._id.toString() === lastItemId ) + 1 : 0;
         const resultList = mergedList.slice( skip, skip + limit );
@@ -465,13 +380,10 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
 
     }catch( err ){
         console.log( "ERROR: getUsersAndEventsBySearchValueController - ", err );
-        return res.status( 500 )
-                  .json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                  );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
 }
 

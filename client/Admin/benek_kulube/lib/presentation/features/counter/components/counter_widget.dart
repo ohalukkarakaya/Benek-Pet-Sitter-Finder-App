@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import '../../../../store/app_state.dart';
 import '../redux/counter_actions.dart';
 
 class CounterWidget extends StatelessWidget {
+  const CounterWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, int>(
@@ -15,9 +18,9 @@ class CounterWidget extends StatelessWidget {
           children: [
             Text(
               'Counter Value: $counter',
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

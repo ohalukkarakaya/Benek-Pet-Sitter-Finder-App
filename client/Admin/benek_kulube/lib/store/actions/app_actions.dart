@@ -7,3 +7,6 @@ export '../../redux/change_screen_tab/change_screen_tab.action.dart';
 export '../../redux/is_loading_state/is_loading_state.action.dart';
 export '../../redux/admin_login_qr_code/admin_login_qr_code.action.dart';
 export '../../redux/get_user_info/get_user_info_request.action.dart';
+export '../../redux/set_current_location/set_current_location.action.dart';
+export '../../redux/user_search/user_search_request.action.dart';
+export '../../redux/get_recomended_users/get_recomended_users.action.dart';

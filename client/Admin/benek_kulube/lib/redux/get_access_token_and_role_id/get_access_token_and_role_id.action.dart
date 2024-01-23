@@ -1,8 +1,11 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'dart:developer';
 
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek_kulube/data/services/api.dart';
 import 'package:benek_kulube/data/services/api_exception.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 
 import 'package:benek_kulube/store/app_state.dart';

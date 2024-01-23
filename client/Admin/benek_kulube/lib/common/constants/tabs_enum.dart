@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 enum AppTabsEnums {
   HOME_TAB,
   LOGS_TAB,

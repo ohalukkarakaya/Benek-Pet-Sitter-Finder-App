@@ -26,6 +26,7 @@ class BenekDashedPainter extends CustomPainter {
   }
 
   @override
+  // ignore: avoid_renaming_method_parameters
   void paint(Canvas canvas, Size originalSize) {
     final Size size;
     if (padding == EdgeInsets.zero) {
