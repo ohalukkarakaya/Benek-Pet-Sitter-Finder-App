@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
+import 'package:benek_kulube/common/constants/benek_icons.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:flutter/material.dart';
@@ -6,11 +7,9 @@ import 'package:flutter/material.dart';
 class KulubeUserCard extends StatefulWidget {
   const KulubeUserCard({
     super.key,
-    required this.itemKey,
     required this.resultData,
   });
 
-  final GlobalKey<State<StatefulWidget>> itemKey;
   final UserInfo resultData;
 
   @override
@@ -37,7 +36,6 @@ class _KulubeUserCardState extends State<KulubeUserCard> {
           });
         },
       child: Container(
-        key: widget.itemKey,
         decoration: BoxDecoration(
           color: isHovering ? AppColors.benekLightBlue : AppColors.benekBlack,
           borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
@@ -82,6 +80,24 @@ class _KulubeUserCardState extends State<KulubeUserCard> {
               color: isHovering ? Colors.black : null
             ),
           ),
+          trailing: widget.resultData.isCareGiver != null
+            && widget.resultData.isCareGiver!
+                ? Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+                    border: Border.all(
+                      color: isHovering ? AppColors.benekBlack : AppColors.benekWhite,
+                      width: 2.0
+                    )
+                  ),
+                  padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, left: 9.0, right: 11.0),
+                  child: Icon(
+                    BenekIcons.paw,
+                    size: 17.0,
+                    color: isHovering ? AppColors.benekBlack : AppColors.benekWhite,
+                  ),
+                )
+                : null,
         ),
       ),
     );

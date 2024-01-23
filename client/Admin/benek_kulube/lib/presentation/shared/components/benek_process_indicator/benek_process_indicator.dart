@@ -7,7 +7,7 @@ import '../../../../common/utils/color_to_hex_converter.dart';
 import 'benek_process_indicator_steps.dart';
 
 class BenekProcessIndicator extends StatefulWidget {
-  final Color? color;
+  final Color color;
   final double? width;
   final double? height;
 
@@ -55,7 +55,7 @@ class _BenekProcessIndicatorState extends State<BenekProcessIndicator> {
   @override
   Widget build(BuildContext context) {
 
-    String svg = '<svg viewBox="${ processIndicatorSteps[currentState].viewBox }"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="${ processIndicatorSteps[currentState].path }" style="fill:#${widget.color!.toHex(withAlpha: false)}"/></g></g></svg>';
+    String svg = '<svg viewBox="${ processIndicatorSteps[currentState].viewBox }"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="${ processIndicatorSteps[currentState].path }" style="fill:#${widget.color.toHex(withAlpha: false)}"/></g></g></svg>';
     // log(svg);
     return SizedBox(
       width: widget.width,

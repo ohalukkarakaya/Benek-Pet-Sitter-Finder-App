@@ -20,7 +20,7 @@ class KulubeUserSearchScreen extends StatefulWidget {
 
 class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
   bool shouldPop = false;
-  bool didRequesrDone = false;
+  bool didRequestDone = false;
   final FocusNode _focusNode = FocusNode();
 
   Future<void> getRecomendedUsersRequestAsync(Function callback) async {
@@ -37,7 +37,7 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
     getRecomendedUsersRequestAsync(
       (){
         setState(() {
-          didRequesrDone = true;
+          didRequestDone = true;
         });
       }
     );
@@ -87,17 +87,29 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
               children: [
                 const UserSearchBarTextFieldWidget(),
                 const SizedBox(height: 16.0),
-                didRequesrDone
-                  ? UserSearchResultList( store: store )
-                  : const Expanded(
-                    flex: 9,
-                    child: Center(
-                      child: BenekLoadingComponent(
-                        width: 100,
-                        height: 100,
+                (
+                  (
+                    store.state.userSearchResultList != null
+                    && store.state.userSearchResultList!.users != null
+                    && store.state.userSearchResultList!.users!.isNotEmpty
+                  ) 
+                  || (
+                    store.state.userSearchemptyStateList != null
+                    && store.state.userSearchemptyStateList!.users != null
+                    && store.state.userSearchemptyStateList!.users!.isNotEmpty
+                  )
+                )
+                    ? UserSearchResultList( store: store )
+                    : const Expanded(
+                      flex: 9,
+                      child: Center(
+                        child: BenekLoadingComponent(
+                          isDark: true,
+                          width: 140.0,
+                          height: 140.0,
+                        ),
                       ),
                     ),
-                  ),
               ],
             )
           ),
