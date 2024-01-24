@@ -26,7 +26,9 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
   Future<void> getRecomendedUsersRequestAsync(Function callback) async {
     Store<AppState> store = AppReduxStore.currentStore!;
     await store.dispatch(getRecomendedUsersRequestAction(false));
-    callback();
+    if( mounted ){
+      callback();
+    }
   }
 
   @override

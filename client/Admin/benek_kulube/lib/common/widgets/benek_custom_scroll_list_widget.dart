@@ -1,6 +1,14 @@
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 import 'package:benek_kulube/presentation/shared/components/user_search_companents/user_search_result_list/user_search_user_card.dart';
+import 'package:benek_kulube/store/actions/app_actions.dart';
+import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+
+// ignore: depend_on_referenced_packages
+import 'package:redux/redux.dart';
 
 class BenekCustomScrollListWidget extends StatefulWidget {
   final double lastChildHeight;
@@ -20,6 +28,9 @@ class _BenekCustomScrollListWidgetState extends State<BenekCustomScrollListWidge
   late ScrollController _controller;
   var rate = 1.0;
   var old = 0.0;
+  int revealAnimationLastIndex = -1;
+  bool shoudSendPaginationRequest = false;
+  bool isWaitingForAsyncRequest = false;
 
   @override
   void initState() {
@@ -27,8 +38,33 @@ class _BenekCustomScrollListWidgetState extends State<BenekCustomScrollListWidge
     _controller = ScrollController();
   }
 
+  Future<void> getRecomendedUsersNextPageRequest( Function? callBack ) async {
+    Store<AppState> store = StoreProvider.of<AppState>(context);
+    await store.dispatch(getRecomendedUsersRequestAction(true));
+    if( callBack != null && mounted ){
+      callBack();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    Store<AppState> store = StoreProvider.of<AppState>(context);
+
+    if( shoudSendPaginationRequest ){
+      setState(() {
+        shoudSendPaginationRequest = false;
+        isWaitingForAsyncRequest = true;
+      });
+      getRecomendedUsersNextPageRequest(
+        (){
+          setState(() {
+            isWaitingForAsyncRequest = false;
+          });
+        }
+      );
+    }
+
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollNotification) {
         var curent = scrollNotification.metrics.pixels;
@@ -59,25 +95,53 @@ class _BenekCustomScrollListWidgetState extends State<BenekCustomScrollListWidge
         slivers: [
           SliverList(
             delegate: SliverChildBuilderDelegate(
+              childCount: widget.resultData?.length ?? 0,
               (context, index) {
                 if (widget.resultData != null && index < widget.resultData!.length) {
                   return AnimatedPadding(
                     padding: EdgeInsets.only(
                       left: 10.0,
                       right: 10.0,
-                      top: ((rate + 10).abs() > 80.0) ? 80.0 : (rate + 10.0).abs(),
+                      top: _controller.position.userScrollDirection == ScrollDirection.forward
+                        ? ((rate + 10).abs() > 80.0) ? 80.0 : (rate + 10.0).abs()
+                        : 10.0,
+                      bottom: _controller.position.userScrollDirection == ScrollDirection.reverse
+                        ? ((rate + 10).abs() > 80.0) ? 80.0 : (rate + 10.0).abs()
+                        : 10.0
                     ),
                     duration: const Duration(milliseconds: 375),
                     curve: Curves.easeOut,
-                    child: KulubeUserCard(
-                      resultData: widget.resultData![index],
+                    child: VisibilityDetector(
+                      key: Key(index.toString()),
+                      onVisibilityChanged: (visibilityInfo) {
+                        if (
+                          index == widget.resultData!.length - 3 
+                          && visibilityInfo.visibleFraction == 1.0
+                          && store.state.userSearchemptyStateList?.totalDataInServer != null
+                          && store.state.userSearchemptyStateList!.totalDataInServer! > widget.resultData!.length
+                          && !isWaitingForAsyncRequest
+                        ){
+                          setState(() {
+                            shoudSendPaginationRequest = true;
+                          });
+                        }
+                      },
+                      child: KulubeUserCard(
+                        index: index,
+                        indexOfLastRevealedItem: revealAnimationLastIndex,
+                        onAnimationComplete: () {
+                          setState(() {
+                            revealAnimationLastIndex = index;
+                          });
+                        },
+                        resultData: widget.resultData![index]
+                      ),
                     ),
                   );
                 } else {
-                  return const SizedBox.shrink(); // Veri yoksa boş bir widget döndür
+                  return const SizedBox.shrink();
                 }
-              },
-              childCount: widget.resultData?.length ?? 0, // resultData null ise 0 döndür
+              }
             ),
           )
         ],

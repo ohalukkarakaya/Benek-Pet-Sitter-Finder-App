@@ -30,9 +30,9 @@ ThunkAction<AppState> getRecomendedUsersRequestAction( bool isPagination ) {
       UserSearchResult _dataList = await api.postUserSearchRequest( lastItemId, latitude, longitude );
       if( isPagination ){
         store.state.userSearchemptyStateList!.addNewPage(_dataList);
-      } else {
-        await store.dispatch(GetRecomendedUsersRequestAction(_dataList));
-      }
+        _dataList = store.state.userSearchemptyStateList!;
+      } 
+      await store.dispatch(GetRecomendedUsersRequestAction(_dataList));
       
     } on ApiException catch (e) {
       log('ERROR: userSearchRequestAction - $e');

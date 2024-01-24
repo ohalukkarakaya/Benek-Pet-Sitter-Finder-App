@@ -62,9 +62,25 @@ class UserSearchResult {
 
   dynamic addNewPage( UserSearchResult result ){
     users?.addAll( result.users! );
+
+    removeDuplicateUsers();
   }
 
   dynamic setSearchValue( String value ){
     searchValue = value;
+  }
+
+  void removeDuplicateUsers() {
+    if (users != null) {
+      Map<String, UserInfo> userMap = {};
+
+      for (UserInfo user in users!) {
+        if (user.userId != null) {
+          userMap[user.userId!] = user;
+        }
+      }
+      users!.clear();
+      users!.addAll(userMap.values);
+    }
   }
 }

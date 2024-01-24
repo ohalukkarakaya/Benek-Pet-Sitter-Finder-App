@@ -9,7 +9,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
         const lat = parseFloat( req.body.lat );
         const lng = parseFloat( req.body.lng );
         const limit = req.params.limit || 10;
-        const lastItemId = req.body.lastItemId || 'null';
+        const lastItemId = req.params.lastItemId || 'null';
         const userId = req.user._id.toString();
 
         if( !lat || !lng ){

@@ -59,7 +59,7 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
 
           totalHeight = 64.0 * itemCount;
 
-          double lastChildHeight = totalHeight + 50 + (10 * (itemCount - 1));
+          double lastChildHeight = totalHeight + 50 + (20 * (itemCount - 1));
 
           if (resultData == null || resultData.isEmpty) {
             return const SizedBox.shrink();
@@ -85,6 +85,7 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
                 padding: const EdgeInsets.all(10.0),
                 child: ScrollConfiguration(
                   behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                  // ignore: unnecessary_null_comparison
                   child: resultData != null 
                     && resultData.isNotEmpty
                       ? BenekCustomScrollListWidget(
