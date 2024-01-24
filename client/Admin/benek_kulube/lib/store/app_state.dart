@@ -1,7 +1,7 @@
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:benek_kulube/common/constants/tabs_enum.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
-import 'package:benek_kulube/data/models/user_profile_models/user_search_result_model.dart';
+import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:geolocator/geolocator.dart';
 import '../data/models/kulube_login_qr_code_model.dart';
 
@@ -17,8 +17,8 @@ class AppState {
   final UserInfo? userInfo;
   final bool isLoading;
   final Position? currentLocation;
-  final UserSearchResult? userSearchemptyStateList;
-  final UserSearchResult? userSearchResultList;
+  final UserList? recomendedUsersList;
+  final UserList? userSearchResultList;
 
   AppState({
     required this.counter,
@@ -32,7 +32,7 @@ class AppState {
     required this.userInfo,
     required this.isLoading,
     required this.currentLocation,
-    required this.userSearchemptyStateList,
+    required this.recomendedUsersList,
     required this.userSearchResultList
   });
 
@@ -49,7 +49,7 @@ class AppState {
       userInfo: null,
       isLoading: false,
       currentLocation: null,
-      userSearchemptyStateList: null,
+      recomendedUsersList: null,
       userSearchResultList: null
     );
   }
@@ -66,8 +66,8 @@ class AppState {
     UserInfo? userInfo,
     bool? isLoading,
     Position? currentLocation,
-    UserSearchResult? userSearchemptyStateList,
-    UserSearchResult? userSearchResultList
+    UserList? recomendedUsersList,
+    UserList? userSearchResultList
   }) {
     return AppState(
       counter: counter ?? this.counter,
@@ -81,7 +81,7 @@ class AppState {
       userInfo: userInfo ?? this.userInfo,
       isLoading: isLoading ?? this.isLoading,
       currentLocation: currentLocation ?? this.currentLocation,
-      userSearchemptyStateList: userSearchemptyStateList ?? this.userSearchemptyStateList,
+      recomendedUsersList: recomendedUsersList ?? this.recomendedUsersList,
       userSearchResultList: userSearchResultList ?? this.userSearchResultList
     );
   }

@@ -39,8 +39,8 @@ class ApiClient {
           return value is double ? value : double.parse('$value');
         case 'UserInfoModel':
           return UserInfo.fromJson(value['user']);
-        case 'UserSearchResultModel':
-          return UserSearchResult.fromJson(value);
+        case 'UserSearchResult':
+          return UserList.fromJson(value);
         // case 'List<OKRUserParentUserObjectiveComplianceViewModel>':
         //   List<dynamic> jsonList = value;
         //   List<OKRUserParentUserObjectiveComplianceViewModel> list = jsonList.map((item) => OKRUserParentUserObjectiveComplianceViewModel.fromJson(item)).toList();

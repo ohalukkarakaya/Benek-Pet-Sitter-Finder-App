@@ -38,32 +38,94 @@ class _BenekCustomScrollListWidgetState extends State<BenekCustomScrollListWidge
     _controller = ScrollController();
   }
 
-  Future<void> getRecomendedUsersNextPageRequest( Function? callBack ) async {
-    Store<AppState> store = StoreProvider.of<AppState>(context);
+  void checkPagination(Store<AppState> store, int index) {
+    if (
+      _isPaginationNeeded(store, index)
+      && !isWaitingForAsyncRequest
+    ) {
+      setState(() {
+        shoudSendPaginationRequest = true;
+      });
+    }
+  }
+
+  bool _isPaginationNeeded( Store<AppState> store, int index ){
+    return index == widget.resultData!.length - 3 &&
+        store.state.recomendedUsersList?.totalDataInServer != null &&
+        store.state.recomendedUsersList!.totalDataInServer! > widget.resultData!.length;
+  }
+
+  void requestNextPageIfNeeded( Store<AppState> store ){
+    if (shoudSendPaginationRequest) {
+      setState(() {
+        shoudSendPaginationRequest = false;
+        isWaitingForAsyncRequest = true;
+      });
+
+      getRecomendedUsersNextPageRequest(
+        () {
+          setState(() {
+            isWaitingForAsyncRequest = false;
+          });
+        },
+        store
+      );
+    }
+  }
+
+  Future<void> getRecomendedUsersNextPageRequest( Function? callBack, Store<AppState> store ) async {
     await store.dispatch(getRecomendedUsersRequestAction(true));
     if( callBack != null && mounted ){
       callBack();
     }
   }
 
+   Widget _buildAnimatedPadding( Widget? child ){
+    return AnimatedPadding(
+      padding: EdgeInsets.only(
+        left: 10.0,
+        right: 10.0,
+        top: _controller.position.userScrollDirection == ScrollDirection.forward
+          ? ((rate + 10).abs() > 80.0) ? 80.0 : (rate + 10.0).abs()
+          : 10.0,
+        bottom: _controller.position.userScrollDirection == ScrollDirection.reverse
+          ? ((rate + 10).abs() > 80.0) ? 80.0 : (rate + 10.0).abs()
+          : 10.0
+      ),
+      duration: const Duration(milliseconds: 375),
+      curve: Curves.easeOut,
+      child: child ?? const SizedBox(),
+    );
+  }
+
+  Widget _buildVisibilityDetector(Store<AppState> store, Widget child, int index) {
+    return VisibilityDetector(
+      key: Key(index.toString()),
+      onVisibilityChanged: (visibilityInfo) {
+        checkPagination(store, index);
+      },
+      child: child,
+    );
+  }
+
+  Widget _buildKulubeUserCard(int index) {
+    return KulubeUserCard(
+      index: index,
+      indexOfLastRevealedItem: revealAnimationLastIndex,
+      onAnimationComplete: () {
+        setState(() {
+          revealAnimationLastIndex = index;
+        });
+      },
+      resultData: widget.resultData![index]
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-
     Store<AppState> store = StoreProvider.of<AppState>(context);
 
-    if( shoudSendPaginationRequest ){
-      setState(() {
-        shoudSendPaginationRequest = false;
-        isWaitingForAsyncRequest = true;
-      });
-      getRecomendedUsersNextPageRequest(
-        (){
-          setState(() {
-            isWaitingForAsyncRequest = false;
-          });
-        }
-      );
-    }
+    requestNextPageIfNeeded( store );
 
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollNotification) {
@@ -98,45 +160,12 @@ class _BenekCustomScrollListWidgetState extends State<BenekCustomScrollListWidge
               childCount: widget.resultData?.length ?? 0,
               (context, index) {
                 if (widget.resultData != null && index < widget.resultData!.length) {
-                  return AnimatedPadding(
-                    padding: EdgeInsets.only(
-                      left: 10.0,
-                      right: 10.0,
-                      top: _controller.position.userScrollDirection == ScrollDirection.forward
-                        ? ((rate + 10).abs() > 80.0) ? 80.0 : (rate + 10.0).abs()
-                        : 10.0,
-                      bottom: _controller.position.userScrollDirection == ScrollDirection.reverse
-                        ? ((rate + 10).abs() > 80.0) ? 80.0 : (rate + 10.0).abs()
-                        : 10.0
+                  return _buildVisibilityDetector(
+                    store,
+                    _buildAnimatedPadding(
+                      _buildKulubeUserCard(index)
                     ),
-                    duration: const Duration(milliseconds: 375),
-                    curve: Curves.easeOut,
-                    child: VisibilityDetector(
-                      key: Key(index.toString()),
-                      onVisibilityChanged: (visibilityInfo) {
-                        if (
-                          index == widget.resultData!.length - 3 
-                          && visibilityInfo.visibleFraction == 1.0
-                          && store.state.userSearchemptyStateList?.totalDataInServer != null
-                          && store.state.userSearchemptyStateList!.totalDataInServer! > widget.resultData!.length
-                          && !isWaitingForAsyncRequest
-                        ){
-                          setState(() {
-                            shoudSendPaginationRequest = true;
-                          });
-                        }
-                      },
-                      child: KulubeUserCard(
-                        index: index,
-                        indexOfLastRevealedItem: revealAnimationLastIndex,
-                        onAnimationComplete: () {
-                          setState(() {
-                            revealAnimationLastIndex = index;
-                          });
-                        },
-                        resultData: widget.resultData![index]
-                      ),
-                    ),
+                    index,
                   );
                 } else {
                   return const SizedBox.shrink();

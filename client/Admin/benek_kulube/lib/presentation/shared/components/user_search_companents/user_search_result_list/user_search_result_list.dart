@@ -31,10 +31,10 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
         widget.store.state.userSearchResultList!.users != null &&
         widget.store.state.userSearchResultList!.users!.isNotEmpty
         ? widget.store.state.userSearchResultList!.users
-        : widget.store.state.userSearchemptyStateList != null &&
-            widget.store.state.userSearchemptyStateList!.users != null &&
-            widget.store.state.userSearchemptyStateList!.users!.isNotEmpty
-            ? widget.store.state.userSearchemptyStateList!.users
+        : widget.store.state.recomendedUsersList != null &&
+            widget.store.state.recomendedUsersList!.users != null &&
+            widget.store.state.recomendedUsersList!.users!.isNotEmpty
+            ? widget.store.state.recomendedUsersList!.users
             : null;
 
     itemCount = resultData?.length ?? 0;
@@ -48,7 +48,7 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
         converter: (store) {
           final List<UserInfo>? resultData =
               store.state.userSearchResultList?.users ??
-              store.state.userSearchemptyStateList?.users;
+              store.state.recomendedUsersList?.users;
 
           return resultData;
         },

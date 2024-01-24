@@ -38,7 +38,7 @@ class UserSearchApi {
         throw ApiException(code: response.statusCode, message: response.body);
       // ignore: unnecessary_null_comparison
       }else if( response.body != null ){
-        UserSearchResult deserializedResult = apiClient.deserialize( response.body, 'UserSearchResultModel' );
+        UserList deserializedResult = apiClient.deserialize( response.body, 'UserSearchResult' );
         deserializedResult.setSearchValue(searchValue);
 
         return deserializedResult;

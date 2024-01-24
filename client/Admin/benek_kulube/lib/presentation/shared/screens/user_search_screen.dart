@@ -96,9 +96,9 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
                     && store.state.userSearchResultList!.users!.isNotEmpty
                   ) 
                   || (
-                    store.state.userSearchemptyStateList != null
-                    && store.state.userSearchemptyStateList!.users != null
-                    && store.state.userSearchemptyStateList!.users!.isNotEmpty
+                    store.state.recomendedUsersList != null
+                    && store.state.recomendedUsersList!.users != null
+                    && store.state.recomendedUsersList!.users!.isNotEmpty
                   )
                 )
                     ? UserSearchResultList( store: store )

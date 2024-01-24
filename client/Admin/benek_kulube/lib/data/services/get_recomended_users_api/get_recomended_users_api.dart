@@ -7,7 +7,7 @@ class RecomendedUsersApi {
   RecomendedUsersApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
 
   // Get Logged In User Info
-  Future<dynamic> postUserSearchRequest(String? lastItemId, double latitude, double longitude) async {
+  Future<dynamic> postRecomendedUsersRequest(String? lastItemId, double latitude, double longitude) async {
     Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
@@ -36,7 +36,7 @@ class RecomendedUsersApi {
         throw ApiException(code: response.statusCode, message: response.body);
       // ignore: unnecessary_null_comparison
       }else if( response.body != null ){
-        return apiClient.deserialize( response.body, 'UserSearchResultModel' ) as UserSearchResult;
+        return apiClient.deserialize( response.body, 'UserSearchResult' ) as UserList;
       }else{
         await AuthUtils.killUserSessionAndRestartApp( store );
       }

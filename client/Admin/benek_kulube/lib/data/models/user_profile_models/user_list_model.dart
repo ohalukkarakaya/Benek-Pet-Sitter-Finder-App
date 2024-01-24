@@ -2,13 +2,13 @@ import 'dart:developer';
 
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 
-class UserSearchResult {
+class UserList {
   int? totalDataInServer;
   String? searchValue;
   List<UserInfo>? recentlySeenUsers;
   List<UserInfo>? users;
 
-  UserSearchResult(
+  UserList(
     {
       this.totalDataInServer,
       this.searchValue,
@@ -17,7 +17,7 @@ class UserSearchResult {
     }
   );
 
-  UserSearchResult.fromJson( Map<String, dynamic> json ){
+  UserList.fromJson( Map<String, dynamic> json ){
     try{
       totalDataInServer = json['totalDataCount'];
       if( json['dataList'] != null ){
@@ -29,7 +29,7 @@ class UserSearchResult {
         );
       }
     }catch(err){
-      log('ERROR: UserSearchResult.fromJson - $err');
+      log('ERROR: UserList.fromJson - $err');
     }
   }
 
@@ -60,7 +60,7 @@ class UserSearchResult {
     recentlySeenUsers?.add( user );
   }
 
-  dynamic addNewPage( UserSearchResult result ){
+  dynamic addNewPage( UserList result ){
     users?.addAll( result.users! );
 
     removeDuplicateUsers();

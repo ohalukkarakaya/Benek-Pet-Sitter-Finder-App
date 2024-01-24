@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:benek_kulube/data/models/kulube_login_qr_code_model.dart';
-import 'package:benek_kulube/data/models/user_profile_models/user_search_result_model.dart';
+import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:benek_kulube/store/app_state.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';

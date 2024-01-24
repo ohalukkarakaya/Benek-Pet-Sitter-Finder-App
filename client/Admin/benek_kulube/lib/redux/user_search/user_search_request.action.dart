@@ -4,7 +4,7 @@ import 'dart:developer';
 
 import 'package:benek_kulube/common/utils/get_current_location_helper.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
-import 'package:benek_kulube/data/models/user_profile_models/user_search_result_model.dart';
+import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:benek_kulube/data/services/api.dart';
 import 'package:benek_kulube/data/services/api_exception.dart';
 // ignore: depend_on_referenced_packages
@@ -32,7 +32,7 @@ ThunkAction<AppState> userSearchRequestAction(String searchValue) {
                               ? store.state.userSearchResultList!.users!.last.userId!
                               : "null";
 
-      UserSearchResult _searchListData = await api.postUserSearchRequest( lastItemId, searchValue, latitude, longitude );
+      UserList _searchListData = await api.postUserSearchRequest( lastItemId, searchValue, latitude, longitude );
       if( isPagination ){
         store.state.userSearchResultList!.addNewPage(_searchListData);
       } else {
@@ -47,7 +47,7 @@ ThunkAction<AppState> userSearchRequestAction(String searchValue) {
 }
 
 class UserSearchRequestAction {
-  final UserSearchResult? _searchListData;
-  UserSearchResult? get searchListData => _searchListData;
+  final UserList? _searchListData;
+  UserList? get searchListData => _searchListData;
   UserSearchRequestAction(this._searchListData);
 }

@@ -27,7 +27,7 @@ AppState appReducer(AppState state, dynamic action) {
     userInfo: get_user_info_request.getUserInfoRequestReducer(state.userInfo, action),
     isLoading: is_loading_state.isLoadingStateReducer(state.isLoading, action),
     currentLocation: set_current_location.setCurrentLocationReducer(state.currentLocation, action),
-    userSearchemptyStateList: get_recomended_users.userSearchRequestReducer(state.userSearchemptyStateList, action),
+    recomendedUsersList: get_recomended_users.userSearchRequestReducer(state.recomendedUsersList, action),
     userSearchResultList: user_search.userSearchRequestReducer(state.userSearchResultList, action),
   );
 }
