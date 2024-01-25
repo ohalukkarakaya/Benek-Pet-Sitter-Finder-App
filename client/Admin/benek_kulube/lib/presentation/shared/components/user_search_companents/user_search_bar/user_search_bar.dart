@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/constants/benek_icons.dart';
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:benek_kulube/store/app_state.dart';
@@ -40,9 +41,9 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
 
       if (!_isTextChanged) {
         if (textToSendServer != '' && textToSendServer != " " && textToSendServer.length > 1){
-          store.dispatch(userSearchRequestAction(textToSendServer, false));
+          store.dispatch(userSearchRequestAction(BenekStringHelpers.trimSpaces(textToSendServer), false));
           // store.dispatch(getAnalyzeForSecondsAction(analyzeText));
-          log('The Value: $textToSendServer Searched...');
+          log('The Value: ${BenekStringHelpers.trimSpaces(textToSendServer)} Searched...');
           setState(() {
             textToSendServer = '';
           });

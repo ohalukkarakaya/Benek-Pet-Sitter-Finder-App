@@ -1,3 +1,5 @@
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/widgets/benek_time_widget.dart';
 import 'package:flutter/material.dart';
 
 class KulubeHomeTabWidget extends StatelessWidget {
@@ -16,10 +18,13 @@ class KulubeHomeTabWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    dynamic  middleNameAsString = middleName != null ? "${middleName!} " : "";
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const BenekTime(
+          timeFontSize: 90.0,
+        ),
+        const SizedBox(height: 10.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -27,15 +32,15 @@ class KulubeHomeTabWidget extends StatelessWidget {
               "Hoş Geldin",
               style: TextStyle(
                 fontFamily: 'Qanelas',
-                fontSize: 30.0,
+                fontSize: 15.0,
                 fontWeight: FontWeight.w100
               ),
             ),
             Text(
-              " $firstName $middleNameAsString${lastName.toUpperCase()}",
+              " ${BenekStringHelpers.getUsersFullName(firstName, lastName, middleName)}",
               style: const TextStyle(
                 fontFamily: 'Qanelas',
-                fontSize: 30.0,
+                fontSize: 15.0,
                 fontWeight: FontWeight.w400
               ),
             ),
