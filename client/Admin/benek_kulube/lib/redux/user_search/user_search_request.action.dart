@@ -13,7 +13,7 @@ import 'package:redux/redux.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-ThunkAction<AppState> userSearchRequestAction(String searchValue) {
+ThunkAction<AppState> userSearchRequestAction(String searchValue, bool isPagination) {
   return (Store<AppState> store) async {
     UserSearchApi api = UserSearchApi();
 
@@ -23,24 +23,31 @@ ThunkAction<AppState> userSearchRequestAction(String searchValue) {
       double latitude = store.state.currentLocation!.latitude;
       double longitude = store.state.currentLocation!.longitude;
 
-      bool isPagination = store.state.userSearchResultList != null 
-                          && store.state.userSearchResultList!.users != null 
-                          && store.state.userSearchResultList!.users!.isNotEmpty
-                          && store.state.userSearchResultList!.searchValue == searchValue;
-
       String lastItemId = isPagination
                               ? store.state.userSearchResultList!.users!.last.userId!
                               : "null";
 
       UserList _searchListData = await api.postUserSearchRequest( lastItemId, searchValue, latitude, longitude );
-      if( isPagination ){
-        store.state.userSearchResultList!.addNewPage(_searchListData);
-      } else {
-        await store.dispatch(UserSearchRequestAction(_searchListData));
+      if( isPagination &&   store.state.userSearchResultList != null){
+        store.state.userSearchResultList?.addNewPage(_searchListData);
+        _searchListData = store.state.userSearchResultList!;
       }
+      await store.dispatch(UserSearchRequestAction(_searchListData));
 
     } on ApiException catch (e) {
       log('ERROR: userSearchRequestAction - $e');
+      await AuthUtils.killUserSessionAndRestartApp(store);
+    }
+  };
+}
+
+ThunkAction<AppState> resetUserSearchDataAction() {
+  return (Store<AppState> store) async {
+    try {
+      UserList? _resetData;
+      await store.dispatch(UserSearchRequestAction(_resetData));
+    } on ApiException catch (e) {
+      log('ERROR: resetUserSearchDataAction - $e');
       await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };

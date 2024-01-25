@@ -59,6 +59,7 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
     final Store<AppState> store = StoreProvider.of<AppState>(context);
 
     if( shouldPop ){
+      store.dispatch(resetUserSearchDataAction());
       setState(() {
         shouldPop = false;
       });

@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/constants/benek_icons.dart';
+import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
@@ -32,21 +33,21 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
   void _startTimer() {
     if (_timer != null) {
       _timer!.cancel();
-      log('reset fonksiyonu (?) gerekirse');
+      store.dispatch(resetUserSearchDataAction());
     }
     _timer = Timer( const Duration(seconds: 1), () {
       _isTextChanged = false;
 
       if (!_isTextChanged) {
-        if (textToSendServer != '' && textToSendServer.length >= 10) {
+        if (textToSendServer != '' && textToSendServer != " " && textToSendServer.length > 1){
+          store.dispatch(userSearchRequestAction(textToSendServer, false));
           // store.dispatch(getAnalyzeForSecondsAction(analyzeText));
-          log('Send Text to Server: $textToSendServer');
+          log('The Value: $textToSendServer Searched...');
           setState(() {
             textToSendServer = '';
           });
         } else {
-          // store.dispatch(resetAnalyzeForSecondsAction());
-          log('reset fonksiyonu (?) gerekirse');
+          store.dispatch(resetUserSearchDataAction());
         }
       }
     });
@@ -60,7 +61,6 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
 
   @override
   Widget build(BuildContext context) {
-    
     return Expanded(
       flex: 1,
       child: Hero(
@@ -71,10 +71,7 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
             autofocus: true,
             controller: _controller,
             onChanged: (String value) {
-              if(
-                value.trim() != ""
-                && value.trim() != " "
-              ){
+              if( value.trim() != "" && value.trim() != " "  ){
                 setState(() {
                   _isTextChanged = true;
                   textToSendServer = value;

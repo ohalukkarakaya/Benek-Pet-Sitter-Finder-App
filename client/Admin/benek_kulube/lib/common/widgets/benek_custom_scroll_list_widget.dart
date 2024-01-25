@@ -1,23 +1,19 @@
-import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
-import 'package:benek_kulube/presentation/shared/components/user_search_companents/user_search_result_list/user_search_user_card.dart';
-import 'package:benek_kulube/store/actions/app_actions.dart';
-import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-// ignore: depend_on_referenced_packages
-import 'package:redux/redux.dart';
-
 class BenekCustomScrollListWidget extends StatefulWidget {
-  final double lastChildHeight;
-  final List<UserInfo>? resultData;
+  final bool isShouldNotBeScrollable; // This Condition Makes Physic to NeverScrollable
+  final List<dynamic>? itemDataList; // Data list which you gonna pass to child. Like List of User data extc. 
+  final Widget Function(int) child; // Child widget builder. It has to be builder because we need to pass data in it like index
+  final void Function(VisibilityInfo visibilityInfo, int index)? onVisibilityChangedCB; // It trigers this function when a widgets visibility gets changed.
 
   const BenekCustomScrollListWidget({
     Key? key,
-    required this.lastChildHeight,
-    required this.resultData,
+    this.isShouldNotBeScrollable = false,
+    required this.itemDataList,
+    required this.child,
+    this.onVisibilityChangedCB,
   }) : super(key: key);
 
   @override
@@ -28,56 +24,11 @@ class _BenekCustomScrollListWidgetState extends State<BenekCustomScrollListWidge
   late ScrollController _controller;
   var rate = 1.0;
   var old = 0.0;
-  int revealAnimationLastIndex = -1;
-  bool shoudSendPaginationRequest = false;
-  bool isWaitingForAsyncRequest = false;
 
   @override
   void initState() {
     super.initState();
     _controller = ScrollController();
-  }
-
-  void checkPagination(Store<AppState> store, int index) {
-    if (
-      _isPaginationNeeded(store, index)
-      && !isWaitingForAsyncRequest
-    ) {
-      setState(() {
-        shoudSendPaginationRequest = true;
-      });
-    }
-  }
-
-  bool _isPaginationNeeded( Store<AppState> store, int index ){
-    return index == widget.resultData!.length - 3 &&
-        store.state.recomendedUsersList?.totalDataInServer != null &&
-        store.state.recomendedUsersList!.totalDataInServer! > widget.resultData!.length;
-  }
-
-  void requestNextPageIfNeeded( Store<AppState> store ){
-    if (shoudSendPaginationRequest) {
-      setState(() {
-        shoudSendPaginationRequest = false;
-        isWaitingForAsyncRequest = true;
-      });
-
-      getRecomendedUsersNextPageRequest(
-        () {
-          setState(() {
-            isWaitingForAsyncRequest = false;
-          });
-        },
-        store
-      );
-    }
-  }
-
-  Future<void> getRecomendedUsersNextPageRequest( Function? callBack, Store<AppState> store ) async {
-    await store.dispatch(getRecomendedUsersRequestAction(true));
-    if( callBack != null && mounted ){
-      callBack();
-    }
   }
 
    Widget _buildAnimatedPadding( Widget? child ){
@@ -98,35 +49,20 @@ class _BenekCustomScrollListWidgetState extends State<BenekCustomScrollListWidge
     );
   }
 
-  Widget _buildVisibilityDetector(Store<AppState> store, Widget child, int index) {
+  Widget _buildVisibilityDetector(Widget child, int index) {
     return VisibilityDetector(
       key: Key(index.toString()),
       onVisibilityChanged: (visibilityInfo) {
-        checkPagination(store, index);
+        if(widget.onVisibilityChangedCB != null && mounted){
+          widget.onVisibilityChangedCB!(visibilityInfo, index);
+        }
       },
       child: child,
     );
   }
 
-  Widget _buildKulubeUserCard(int index) {
-    return KulubeUserCard(
-      index: index,
-      indexOfLastRevealedItem: revealAnimationLastIndex,
-      onAnimationComplete: () {
-        setState(() {
-          revealAnimationLastIndex = index;
-        });
-      },
-      resultData: widget.resultData![index]
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    Store<AppState> store = StoreProvider.of<AppState>(context);
-
-    requestNextPageIfNeeded( store );
-
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollNotification) {
         var curent = scrollNotification.metrics.pixels;
@@ -135,16 +71,16 @@ class _BenekCustomScrollListWidgetState extends State<BenekCustomScrollListWidge
         var min = scrollNotification.metrics.minScrollExtent;
 
         setState(() {
-          if (curent > 10) {
+          if( curent > 10 ){
             rate = (curent - old).abs();
             old = curent;
           }
 
-          if (pixels >= max - 50) {
+          if( pixels >= max - 50 ){
             rate = 0.0;
           }
 
-          if (pixels <= min + 50) {
+          if( pixels <= min + 50 ){
             rate = 0.0;
           }
         });
@@ -152,18 +88,22 @@ class _BenekCustomScrollListWidgetState extends State<BenekCustomScrollListWidge
         return true;
       },
       child: CustomScrollView(
-        physics: widget.lastChildHeight <= 678.6 ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+        physics: widget.isShouldNotBeScrollable
+                    ? const NeverScrollableScrollPhysics() 
+                    : const BouncingScrollPhysics(),
         controller: _controller,
         slivers: [
           SliverList(
             delegate: SliverChildBuilderDelegate(
-              childCount: widget.resultData?.length ?? 0,
+              childCount: widget.itemDataList?.length ?? 0,
               (context, index) {
-                if (widget.resultData != null && index < widget.resultData!.length) {
+                if(
+                  widget.itemDataList != null 
+                  && index < widget.itemDataList!.length
+                ){
                   return _buildVisibilityDetector(
-                    store,
                     _buildAnimatedPadding(
-                      _buildKulubeUserCard(index)
+                      widget.child(index)
                     ),
                     index,
                   );

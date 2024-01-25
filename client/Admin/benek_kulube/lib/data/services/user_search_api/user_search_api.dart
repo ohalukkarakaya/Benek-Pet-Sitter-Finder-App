@@ -46,7 +46,7 @@ class UserSearchApi {
         await AuthUtils.killUserSessionAndRestartApp( store );
       }
     }catch( err ){
-      log('ERROR: getUserInfoRequest - $err');
+      log('ERROR: postUserSearchRequest - $err');
       await AuthUtils.killUserSessionAndRestartApp( store );
     }
   }

@@ -1,6 +1,7 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
-import 'package:benek_kulube/common/widgets/benek_custom_scroll_list_widget.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
+import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
+import 'package:benek_kulube/presentation/shared/components/user_search_companents/user_search_result_list/user_search_result_list_custom_scroll_view.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -27,36 +28,41 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
   }
 
   void _updateResultData() {
-    resultData = widget.store.state.userSearchResultList != null &&
-        widget.store.state.userSearchResultList!.users != null &&
-        widget.store.state.userSearchResultList!.users!.isNotEmpty
+    resultData = checkIfUserSearch()
         ? widget.store.state.userSearchResultList!.users
-        : widget.store.state.recomendedUsersList != null &&
-            widget.store.state.recomendedUsersList!.users != null &&
-            widget.store.state.recomendedUsersList!.users!.isNotEmpty
+        : isRecomendedUserNotEmpty()
             ? widget.store.state.recomendedUsersList!.users
             : null;
 
     itemCount = resultData?.length ?? 0;
   }
 
+  bool checkIfUserSearch(){
+    return widget.store.state.userSearchResultList != null 
+        && widget.store.state.userSearchResultList!.users != null 
+        && widget.store.state.userSearchResultList!.users!.isNotEmpty;
+  }
+
+  bool isRecomendedUserNotEmpty(){
+    return widget.store.state.recomendedUsersList != null 
+          && widget.store.state.recomendedUsersList!.users != null 
+          &&  widget.store.state.recomendedUsersList!.users!.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
       flex: 9,
-      child: StoreConnector<AppState, List<UserInfo>?>(
+      child: StoreConnector<AppState, UserList?>(
         converter: (store) {
-          final List<UserInfo>? resultData =
-              store.state.userSearchResultList?.users ??
-              store.state.recomendedUsersList?.users;
+          final UserList? resultDataObject = store.state.userSearchResultList ?? store.state.recomendedUsersList;
 
-          return resultData;
+          return resultDataObject;
         },
-        builder: (context, resultData) {
+        builder: (context, resultDataObject) {
+          List<UserInfo>? resultData = resultDataObject?.users;
           _updateResultData();
-
           double totalHeight = 0.0;
-
           totalHeight = 64.0 * itemCount;
 
           double lastChildHeight = totalHeight + 50 + (20 * (itemCount - 1));
@@ -64,6 +70,8 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
           if (resultData == null || resultData.isEmpty) {
             return const SizedBox.shrink();
           }
+
+          bool isUserSearch = checkIfUserSearch();
 
           return Column(
             children: [
@@ -88,9 +96,11 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
                   // ignore: unnecessary_null_comparison
                   child: resultData != null 
                     && resultData.isNotEmpty
-                      ? BenekCustomScrollListWidget(
+                      ? UserSearchResultListCustomScrollViewWidget(
                           lastChildHeight: lastChildHeight,
                           resultData: resultData,
+                          searchValue: isUserSearch ? resultDataObject?.searchValue : null,
+                          isUserSearchList: isUserSearch,
                         )
                       : const SizedBox(),
                 ),
