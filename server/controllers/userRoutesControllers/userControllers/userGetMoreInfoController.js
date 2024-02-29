@@ -67,39 +67,39 @@ const userGetMoreInfoController = async (req, res, next) => {
 
         //check what did updated
         if(
-        profileImageSucces !== null
-        || coverImageSucces !== null
-        || jobSucces !== null
-        || bioSucces !== null
+            profileImageSucces !== null
+            || coverImageSucces !== null
+            || jobSucces !== null
+            || bioSucces !== null
         ){
-        successResponse = {
-            error: false,
-            profileImageUrl: profileImageSucces,
-            coverImageUrl: coverImageSucces,
-            job: jobSucces,
-            bio: bioSucces
-        };
-        next();
+            successResponse = {
+                error: false,
+                profileImageUrl: profileImageSucces,
+                coverImageUrl: coverImageSucces,
+                job: jobSucces,
+                bio: bioSucces
+            };
+            next();
         }
 
         if(successResponse !== null){
-        await req.user.save(
-            function (err) {
-            if(err) {
-                console.error('ERROR: While Update!');
-            }
-            }
-        );
-        return res.status(200).json(
-            successResponse
-        );
+            await req.user.save(
+                function (err) {
+                    if(err) {
+                        console.error('ERROR: While Update!');
+                    }
+                }
+            );
+            return res.status(200).json(
+                successResponse
+            );
         }else{
-        return res.status(400).json(
-            {
-            error: true,
-            message: "Empty Request Body"
-            }
-        );
+            return res.status(400).json(
+                {
+                error: true,
+                message: "Empty Request Body"
+                }
+            );
         }
     }catch(err){
         console.log("ERROR: get more info of the user after first login - ", err);

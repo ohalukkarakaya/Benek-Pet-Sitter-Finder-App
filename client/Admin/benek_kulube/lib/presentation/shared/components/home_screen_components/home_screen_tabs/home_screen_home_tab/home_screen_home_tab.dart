@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/common/widgets/benek_time_widget.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_buttons/home_screen_buton_widget.dart';
 import 'package:flutter/material.dart';
 
 class KulubeHomeTabWidget extends StatelessWidget {
@@ -24,7 +25,29 @@ class KulubeHomeTabWidget extends StatelessWidget {
         const BenekTime(
           timeFontSize: 90.0,
         ),
-        const SizedBox(height: 10.0),
+    
+        const SizedBox(height: 30.0),
+
+        const SizedBox(
+          height: 200,
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                HomeScreenButon(),
+                SizedBox( width: 20 ),
+                HomeScreenButon(),
+                SizedBox( width: 20 ),
+                HomeScreenButon(),
+                SizedBox( width: 20 ),
+                HomeScreenButon(),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 150.0),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -45,28 +68,6 @@ class KulubeHomeTabWidget extends StatelessWidget {
               ),
             ),
           ],
-        ),
-    
-        const SizedBox(height: 10.0),
-
-        const Text(
-          "Giriş yapmak için aşağıdaki kodu Benek uygulamasına okut.",
-          style: TextStyle(
-            fontFamily: 'Qanelas',
-            fontSize: 15.0,
-            fontWeight: FontWeight.w400
-          ),
-        ),
-
-        const SizedBox(height: 40.0),
-
-        const Text(
-          "Yeni bi QR kod almak için butona tıkla :)",
-          style: TextStyle(
-            fontFamily: 'Qanelas',
-            fontSize: 12.0,
-            fontWeight: FontWeight.w400
-          ),
         ),
       ],
     );

@@ -13,6 +13,7 @@ import '../../redux/admin_login_qr_code/admin_login_qr_code.reducer.dart' as get
 import '../../redux/set_current_location/set_current_location.reducer.dart' as set_current_location;
 import '../../redux/user_search/user_search_request.reducer.dart' as user_search;
 import '../../redux/get_recomended_users/get_recomended_users.reducer.dart' as get_recomended_users;
+import '../../redux/selected_user/selected_user.reducer.dart' as selected_user;
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
@@ -29,5 +30,6 @@ AppState appReducer(AppState state, dynamic action) {
     currentLocation: set_current_location.setCurrentLocationReducer(state.currentLocation, action),
     recomendedUsersList: get_recomended_users.userSearchRequestReducer(state.recomendedUsersList, action),
     userSearchResultList: user_search.userSearchRequestReducer(state.userSearchResultList, action),
+    selectedUserInfo: selected_user.setSelectedUserReducer(state.selectedUserInfo, action),
   );
 }

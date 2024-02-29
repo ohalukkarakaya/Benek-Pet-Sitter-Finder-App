@@ -19,6 +19,7 @@ class AppState {
   final Position? currentLocation;
   final UserList? recomendedUsersList;
   final UserList? userSearchResultList;
+  final UserInfo? selectedUserInfo;
 
   AppState({
     required this.counter,
@@ -33,7 +34,8 @@ class AppState {
     required this.isLoading,
     required this.currentLocation,
     required this.recomendedUsersList,
-    required this.userSearchResultList
+    required this.userSearchResultList,
+    required this.selectedUserInfo,
   });
 
   factory AppState.initial() {
@@ -50,7 +52,8 @@ class AppState {
       isLoading: false,
       currentLocation: null,
       recomendedUsersList: null,
-      userSearchResultList: null
+      userSearchResultList: null,
+      selectedUserInfo: null,
     );
   }
 
@@ -67,7 +70,8 @@ class AppState {
     bool? isLoading,
     Position? currentLocation,
     UserList? recomendedUsersList,
-    UserList? userSearchResultList
+    UserList? userSearchResultList,
+    UserInfo? selectedUserInfo,
   }) {
     return AppState(
       counter: counter ?? this.counter,
@@ -82,7 +86,8 @@ class AppState {
       isLoading: isLoading ?? this.isLoading,
       currentLocation: currentLocation ?? this.currentLocation,
       recomendedUsersList: recomendedUsersList ?? this.recomendedUsersList,
-      userSearchResultList: userSearchResultList ?? this.userSearchResultList
+      userSearchResultList: userSearchResultList ?? this.userSearchResultList,
+      selectedUserInfo: selectedUserInfo ?? this.selectedUserInfo,
     );
   }
 }

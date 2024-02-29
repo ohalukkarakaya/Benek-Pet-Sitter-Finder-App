@@ -72,25 +72,28 @@ class _BenekTimeState extends State<BenekTime> {
           ],
         ),
         const SizedBox(height: 5.0),
-        Row(
-          children: [
-            Text(
-              "${currentTime['day']} ${currentTime['month']} ",
-              style: TextStyle(
-                fontFamily: 'Qanelas',
-                fontSize: widget.dateFontSize,
-                fontWeight: FontWeight.w100
+        Padding(
+          padding: const EdgeInsets.only(left:8.0),
+          child: Row(
+            children: [
+              Text(
+                "${currentTime['day']} ${currentTime['month']} ",
+                style: TextStyle(
+                  fontFamily: 'Qanelas',
+                  fontSize: widget.dateFontSize,
+                  fontWeight: FontWeight.w100
+                ),
               ),
-            ),
-            Text(
-              "${currentTime['dayOfWeek']}",
-              style: TextStyle(
-                fontFamily: 'Qanelas',
-                fontSize: widget.dateFontSize,
-                fontWeight: FontWeight.w400
+              Text(
+                "${currentTime['dayOfWeek']}",
+                style: TextStyle(
+                  fontFamily: 'Qanelas',
+                  fontSize: widget.dateFontSize,
+                  fontWeight: FontWeight.w400
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );

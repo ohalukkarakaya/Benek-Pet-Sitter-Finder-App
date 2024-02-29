@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/constants/benek_icons.dart';
 import 'package:benek_kulube/presentation/shared/screens/user_search_screen.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,7 @@ class KulubeSearchBarButon extends StatelessWidget {
               width: 500,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all( Radius.circular( 5.0 ) ),
-                color: Colors.black.withOpacity(0.2),
+                color: AppColors.benekBlack.withOpacity(0.2),
               ),
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),

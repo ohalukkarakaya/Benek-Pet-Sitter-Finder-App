@@ -1,5 +1,6 @@
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_home_tab/home_screen_home_tab.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/home_screen_profile_tab.dart';
 import 'package:benek_kulube/presentation/shared/components/user_search_companents/user_search_bar/user_search_bar_buton.dart';
 import 'package:flutter/material.dart';
 import 'package:benek_kulube/store/app_state.dart';
@@ -24,11 +25,13 @@ class HomeScreenGrid extends StatelessWidget {
             children: [
               const KulubeSearchBarButon(),
               const SizedBox( height: 100 ),
-              KulubeHomeTabWidget(
-                firstName: store.state.userInfo!.identity!.firstName!,
-                middleName: store.state.userInfo!.identity!.middleName,
-                lastName: store.state.userInfo!.identity!.lastName!,
-              )
+              store.state.selectedUserInfo == null
+                ? KulubeHomeTabWidget(
+                    firstName: store.state.userInfo!.identity!.firstName!,
+                    middleName: store.state.userInfo!.identity!.middleName,
+                    lastName: store.state.userInfo!.identity!.lastName!,
+                  )
+                : const ProfileTab()
             ],
           ),
           Column(
