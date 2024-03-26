@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:benek_kulube/common/widgets/benek_custom_scroll_list_widget.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 import 'package:benek_kulube/presentation/shared/components/user_search_companents/user_search_result_list/user_search_user_card.dart';
@@ -18,13 +16,17 @@ class UserSearchResultListCustomScrollViewWidget extends StatefulWidget {
   final List<UserInfo>? resultData; // Search Result User List
   final String? searchValue;
   final bool isUserSearchList; // it also can be recomended users list
+  final Function( UserInfo ) onUserHoverCallback;
+  final Function() onUserHoverExitCallback;
 
   const UserSearchResultListCustomScrollViewWidget({
     Key? key,
     required this.lastChildHeight,
     required this.resultData,
     this.searchValue,
-    required this.isUserSearchList,
+    required this.isUserSearchList, 
+    required this.onUserHoverCallback, 
+    required this.onUserHoverExitCallback,
   }) : super(key: key);
 
   @override
@@ -114,29 +116,23 @@ class _UserSearchResultListCustomScrollViewWidgetState extends State<UserSearchR
   }
 
   Widget _buildKulubeUserCard(int index) {
-    return GestureDetector(
-      onTap: (){
-        // TODO: Add User Selection (SOLVE THE ON TAP PROBLEM !!!DAMN!!!)
-        log('User Selection Is Working!');
-        // Store<AppState> store = StoreProvider.of<AppState>(context);
-        // store.dispatch(setSelectedUserAction(widget.resultData![index]));
+    return KulubeUserCard(
+      index: index,
+      indexOfLastRevealedItem: revealAnimationLastIndex,
+      // userInfo in this case
+      resultData: widget.resultData![index],
+      onAnimationComplete: () {
+        setState(() {
+          // If we don't keep index value of list element which
+          // done it's animation, we can't make one by one animation
+          // smoothly when new element inserted from server side. And
+          // also we can't keep this data in widget because we have to 
+          // pass this data to all of list elements
+          revealAnimationLastIndex = index;
+        });
       },
-      child: KulubeUserCard(
-        index: index,
-        indexOfLastRevealedItem: revealAnimationLastIndex,
-        // userInfo in this case
-        resultData: widget.resultData![index],
-        onAnimationComplete: () {
-          setState(() {
-            // If we don't keep index value of list element which
-            // done it's animation, we can't make one by one animation
-            // smoothly when new element inserted from server side. And
-            // also we can't keep this data in widget because we have to 
-            // pass this data to all of list elements
-            revealAnimationLastIndex = index;
-          });
-        },
-      ),
+      onUserHoverCallback: widget.onUserHoverCallback,
+      onUserHoverExitCallback: widget.onUserHoverExitCallback
     );
   }
 

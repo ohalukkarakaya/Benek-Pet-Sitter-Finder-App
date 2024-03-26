@@ -11,7 +11,14 @@ import 'package:redux/redux.dart';
 
 class UserSearchResultList extends StatefulWidget {
   final Store<AppState> store;
-  const UserSearchResultList({Key? key, required this.store}) : super(key: key);
+  final Function( UserInfo ) onUserHoverCallback;
+  final Function() onUserHoverExitCallback;
+  const UserSearchResultList({
+    Key? key, 
+    required this.store,
+    required this.onUserHoverCallback,
+    required this.onUserHoverExitCallback
+  }) : super(key: key);
 
   @override
   State<UserSearchResultList> createState() => _UserSearchResultListState();
@@ -101,6 +108,8 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
                           resultData: resultData,
                           searchValue: isUserSearch ? resultDataObject?.searchValue : null,
                           isUserSearchList: isUserSearch,
+                          onUserHoverCallback: widget.onUserHoverCallback,
+                          onUserHoverExitCallback: widget.onUserHoverExitCallback
                         )
                       : const SizedBox(),
                 ),

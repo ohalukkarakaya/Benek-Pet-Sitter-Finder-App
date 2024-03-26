@@ -4,45 +4,29 @@ import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoH
 
 const getUserByIdController = async ( req, res ) => {
     try{
-        const userId = req.user
-                          ._id
-                          .toString();
-        const searchedUserId = req.params
-                                  .userId
-                                  .toString();
+        const userId = req.user._id.toString();
+        const searchedUserId = req.params.userId.toString();
         if( !searchedUserId ){
-            return res.status( 400 )
-                      .json(
-                        {
-                            error: true,
-                            message: "Missing Params"
-                        }
-                      );
+            return res.status( 400 ).json({
+                error: true,
+                message: "Missing Params"
+            });
         }
 
-        const searchedUser = await User.findById( searchedUserId )
-                                       .lean();
+        const searchedUser = await User.findById( searchedUserId ).lean();
         if( 
             !searchedUser 
-            || searchedUser.deactivation
-                           .isDeactive
-            || searchedUser.blockedUsers
-                           .includes( userId )
+            || searchedUser.deactivation.isDeactive
+            || searchedUser.blockedUsers.includes( userId )
         ){
-            return res.status( 404 )
-                      .json(
-                        {
-                            error: true,
-                            message: "User Not Found"
-                        }
-                      );
+            return res.status( 404 ).json({
+                error: true,
+                message: "User Not Found"
+            });
         }
 
         let petInfoList = [];
-        for( 
-            var petId 
-            of searchedUser.pets 
-        ){
+        for( let petId of searchedUser.pets ){
             const pet = await Pet.findById( petId.toString() );
             const petInfo = {
                 petId: petId.toString(),
@@ -62,15 +46,11 @@ const getUserByIdController = async ( req, res ) => {
         delete searchedUser.blockedUsers;
         delete searchedUser.saved;
         delete searchedUser.identity.nationalId;
-        delete searchedUser.identity.openAdress;
         delete searchedUser.phone;
         delete searchedUser.email;
         
         let dependedUserList = [];
-        for( 
-            var dependedId 
-            of searchedUser.dependedUsers 
-        ){
+        for( let dependedId of searchedUser.dependedUsers ){
             const depended = await User.findById( dependedId );
             const dependedInfo = getLightWeightUserInfoHelper( depended );
                 
@@ -78,41 +58,33 @@ const getUserByIdController = async ( req, res ) => {
         }
         searchedUser.dependedUsers = dependedUserList;
 
-        const starValues = searchedUser.stars
-                                       .map( 
-                                            starObject => 
-                                                    starObject.star 
-                                        );
+        const starValues = searchedUser.stars.map(
+            starObject =>
+              starObject.star
+        );
 
         const totalStarValue = starValues.reduce(
             ( acc, curr ) =>
                     acc + curr, 0
         );
-        const starCount = searchedUser.stars
-                                      .length;
+        const starCount = searchedUser.stars.length;
 
         const starAverage = totalStarValue / starCount;
 
         searchedUser.totalStar = starCount;
         searchedUser.stars = starAverage;
 
-        return res.status( 200 )
-                  .json(
-                      {
-                          error: false,
-                          message: "User Info Prepared Succesfully",
-                          user: searchedUser
-                      }
-                  );
+        return res.status( 200 ).json({
+          error: false,
+          message: "User Info Prepared Succesfully",
+          user: searchedUser
+        });
     }catch( err ){
         console.log( "ERROR: getUserByIdController - ", err );
-        return res.status( 500 )
-                  .json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                  );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
 }
 

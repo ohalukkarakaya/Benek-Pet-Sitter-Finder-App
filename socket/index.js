@@ -22,53 +22,87 @@
 // |__ Cumhuriyet Fazilettir! ________________________________________________________________________|
 
 
-const io = require("socket.io")(
-    8900,
-    {
-        cors:{
-            origin: '*'
-        }
-    }
-);
+const io = require("socket.io")(8900, {cors:{ origin: '*' } });
 
 let users = [];
 let adminClients = [];
+let evaluators = [];
 
-const addUser = ( userId, socketId ) => {
-    !users.some( user => user.userId === userId ) 
-    && users.push({ userId, socketId });
-}
+// User Operations
+const addUser = ( userId, socketId ) => { !users.some( user => user.userId === userId ) && users.push({ userId, socketId }); }
 const getUser = ( userId ) => { return users.find( user => user.userId === userId ); }
 const removeUser = ( socketId ) => { users = users.filter( user => user.socketId !== socketId ); }
 
-const addAdminClient = ( clientId, socketId ) => {
-    !adminClients.some( adminClient => adminClient.clientId === clientId )
-    && adminClients.push({ clientId, socketId });
-}
+// Admin Client Operations
+const addAdminClient = ( clientId, socketId ) => { !adminClients.some( adminClient => adminClient.clientId === clientId ) && adminClients.push({ clientId, socketId }); }
 const getAddAdminClient = ( clientId ) => { return adminClients.find( client => client.clientId === clientId ); }
 const removeAdminClient = ( socketId ) => { adminClients = adminClients.filter( adminClient => adminClient.socketId !== socketId ); }
 
+
+// Evaluator Operations
+const addEvaluator = ( userId, evaluatingUserId, socketId ) => { !evaluators.some( evaluator => evaluator.userId === userId ) && evaluators.push({ userId, evaluatingUserId, socketId }); }
+const getEvaluatorsOnChat = ( evaluatingUserId ) => { return evaluators.filter(evaluator => evaluator.evaluatingUserId === evaluatingUserId); }
+const removeEvaluator = ( socketId ) => {
+    evaluator = evaluators.find( evaluator => evaluator.socketId === socketId );
+    if( evaluator ){
+        let user = getUser(evaluator.evaluatingUserId);
+        if (user) {
+            io.to(user.socketId).emit("evaluatorDisConnected", evaluator.userId);
+        }
+    }
+    evaluators = evaluators.filter( evaluator => evaluator.socketId !== socketId );
+}
+
+// Logic
 io.on(
     "connection",
     ( socket ) => {
         //when connect
-        socket.on( "addUser", ( userId ) => { addUser( userId, socket.id ); });
+        socket.on( "addUser", ( userId ) => {
+            addUser( userId, socket.id );
+            let connectedEvaluators = [...new Set(getEvaluatorsOnChat( userId ))];
+            if( connectedEvaluators.length > 0 ){
+                let connectedEvaluatorIdies = connectedEvaluators.map( evaluator => evaluator.userId );
+                io.to( socket.id ).emit( "evaluatorConnected", connectedEvaluatorIdies );
+            }
+        });
 
         //when admin client connects
-        socket.on( "addAdminClient", ( clientId ) => {
-            addAdminClient( clientId, socket.id );
-         });
+        socket.on( "addAdminClient", ( clientId ) => { addAdminClient( clientId, socket.id ); });
+
+        //when evaluator starts to view a chat
+        socket.on( "addEvaluatorToChat", ( userId, evaluatingUserId ) => {
+          addEvaluator( userId, evaluatingUserId, socket.id );
+
+          let eveluatingUser = getUser( evaluatingUserId );
+          if( eveluatingUser ){
+            io.to( eveluatingUser.socketId ).emit( "evaluatorConnected", userId );
+          }
+        });
 
         //send message
         socket.on(
             "sendMessage",
             ( chatObject, receiverIdList ) => {
-                for( let receiverUserId of [...new Set( receiverIdList )] ){
-                    let user = getUser( receiverUserId );
-                    if( user ){ 
-                        io.to( user.socketId ).emit( "getMessage", chatObject ) 
+                let rawEvaluatorsList = [];
+                for (let receiverUserId of [...new Set(receiverIdList)]) {
+                    let user = getUser(receiverUserId);
+                    if (user) {
+                        io.to(user.socketId).emit("getMessage", chatObject)
+                    }
+
+                    let evaluators = [...new Set(getEvaluatorsOnChat(receiverUserId))];
+                    rawEvaluatorsList = rawEvaluatorsList.concat(evaluators);
+                }
+
+                //send message to evaluators
+                let evaluators = [...new Set(rawEvaluatorsList)];
+                if( evaluators.length > 0 ){
+                    for (let evaluator of evaluators) {
+                        io.to(evaluator.socketId).emit("getMessage", chatObject);
                     }
                 }
+
             }
         );
 
@@ -77,9 +111,7 @@ io.on(
             "sendNotification",
             ( to, notificationObject ) => {
                 let user = getUser( to );
-                if( user ){
-                    io.to(user.socketId).emit( "getMessage", notificationObject )
-                }
+                if( user ){ io.to(user.socketId).emit( "getNotification", notificationObject ) }
             }
         );
 
@@ -100,6 +132,7 @@ io.on(
             () => { 
                 removeUser( socket.id );
                 removeAdminClient( socket.id );
+                removeEvaluator( socket.id );
             } 
         );
     }

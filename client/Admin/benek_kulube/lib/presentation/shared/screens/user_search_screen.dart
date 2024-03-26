@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 import 'package:benek_kulube/presentation/shared/components/loading_components/benek_blured_modal_barier.dart';
 import 'package:benek_kulube/presentation/shared/components/loading_components/benek_loading_component.dart';
 import 'package:benek_kulube/presentation/shared/components/user_search_companents/user_search_bar/user_search_bar.dart';
@@ -21,7 +24,22 @@ class KulubeUserSearchScreen extends StatefulWidget {
 class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
   bool shouldPop = false;
   bool didRequestDone = false;
+  UserInfo? hoveringUser;
   final FocusNode _focusNode = FocusNode();
+
+  Function()? _onUserHoverCallback(UserInfo user){
+      setState(() {
+        hoveringUser = user;
+      });
+      return null;
+  }
+
+  Function()? _onUserHoverExitCallback(){
+      setState(() {
+        hoveringUser = null;
+      });
+      return null;
+  }
 
   Future<void> getRecomendedUsersRequestAsync(Function callback) async {
     Store<AppState> store = AppReduxStore.currentStore!;
@@ -64,18 +82,28 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
         shouldPop = false;
       });
 
+      if( hoveringUser != null ){
+        Store<AppState> store = StoreProvider.of<AppState>(context);
+        store.dispatch(setSelectedUserAction(hoveringUser!));
+      }
+
       Navigator.pop(context);
     }
 
     return BenekBluredModalBarier(
       isDismissible: true,
       onDismiss: () async {
+        log("on dismiss");
         Navigator.pop(context);
       },
+
       child: RawKeyboardListener(
         focusNode: _focusNode,
         onKey: (RawKeyEvent event){
-          if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+          if(
+            event is RawKeyDownEvent 
+            && event.logicalKey == LogicalKeyboardKey.escape
+          ){
               setState(() {
                 shouldPop = true;
               });
@@ -102,7 +130,11 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
                     && store.state.recomendedUsersList!.users!.isNotEmpty
                   )
                 )
-                    ? UserSearchResultList( store: store )
+                    ? UserSearchResultList(
+                      store: store,
+                      onUserHoverCallback: _onUserHoverCallback,
+                      onUserHoverExitCallback: _onUserHoverExitCallback,
+                    )
                     : const Expanded(
                       flex: 9,
                       child: Center(

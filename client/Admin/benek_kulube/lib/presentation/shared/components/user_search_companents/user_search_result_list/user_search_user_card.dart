@@ -11,12 +11,16 @@ class KulubeUserCard extends StatefulWidget {
     required this.indexOfLastRevealedItem,
     required this.resultData,
     this.onAnimationComplete,
+    this.onUserHoverCallback,
+    this.onUserHoverExitCallback
   });
 
   final int index;
   final int indexOfLastRevealedItem;
   final UserInfo resultData;
   final void Function()? onAnimationComplete;
+  final Function( UserInfo )? onUserHoverCallback;
+  final Function()? onUserHoverExitCallback;
 
   @override
   State<KulubeUserCard> createState() => _KulubeUserCardState();
@@ -48,11 +52,13 @@ class _KulubeUserCardState extends State<KulubeUserCard> {
 
     return MouseRegion(
         onHover: ( event ){
+          widget.onUserHoverCallback!(widget.resultData);
           setState(() { 
               isHovering = true;
           });
         },
         onExit: (event) {
+          widget.onUserHoverExitCallback!();
           setState(() {
               isHovering = false;
           });
@@ -73,13 +79,32 @@ class _KulubeUserCardState extends State<KulubeUserCard> {
             widget.onAnimationComplete!();
           },
           child: ListTile(
-            leading: BenekCircleAvatar(
-              imageUrl: widget.resultData.profileImg!.imgUrl!,
-              width: 40.0,
-              height: 40.0,
-              radius: 20.0,
-              isDefaultAvatar: widget.resultData.profileImg!.isDefaultImg!,
-              bgColor: isHovering ? AppColors.benekBlack : AppColors.benekWhite,
+            leading: Hero(
+              tag: 'user_avatar_${widget.resultData.userId}',
+              createRectTween: (begin, end) {
+                return RectTween(begin: begin, end: end);
+              },
+              flightShuttleBuilder: (
+                  BuildContext flightContext,
+                  Animation<double> animation,
+                  HeroFlightDirection flightDirection,
+                  BuildContext fromHeroContext,
+                  BuildContext toHeroContext,
+                  ){
+                final Widget heroWidget = flightDirection == HeroFlightDirection.pop
+                    ? fromHeroContext.widget
+                    : toHeroContext.widget;
+
+                return heroWidget is Hero ? heroWidget : Container();
+              },
+              child: BenekCircleAvatar(
+                imageUrl: widget.resultData.profileImg!.imgUrl!,
+                width: 40.0,
+                height: 40.0,
+                radius: 20.0,
+                isDefaultAvatar: widget.resultData.profileImg!.isDefaultImg!,
+                bgColor: isHovering ? AppColors.benekBlack : AppColors.benekWhite,
+              ),
             ),
             title: Row(
               children: [
