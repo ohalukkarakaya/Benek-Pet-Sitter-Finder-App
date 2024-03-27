@@ -11,3 +11,4 @@ export '../../redux/set_current_location/set_current_location.action.dart';
 export '../../redux/user_search/user_search_request.action.dart';
 export '../../redux/get_recomended_users/get_recomended_users.action.dart';
 export '../../redux/selected_user/selected_user.action.dart';
+export '../../redux/get_user_info_by_user_id/get_user_info_by_user_id_request.action.dart';

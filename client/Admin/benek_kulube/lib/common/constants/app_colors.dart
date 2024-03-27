@@ -14,4 +14,8 @@ class AppColors {
   static const Color benekBrick = Color(0xffEF7C80);
   static const Color benekDarkBrick = Color(0xffED6A58);
   static const Color benekRed = Color(0xffE8402E);
+  static const Color benekSuccessGreen = Colors.green;
+  static const Color benek = Colors.yellow;
+  static const Color benekWarningOrange = Colors.orange;
+  static const Color benekPurple = Colors.purple;
 }

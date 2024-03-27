@@ -42,7 +42,7 @@ class KulubeSearchBarButon extends StatelessWidget {
             },
             child: Container(
               height: 45,
-              width: 500,
+              width: 450,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all( Radius.circular( 5.0 ) ),
                 color: AppColors.benekBlack.withOpacity(0.2),

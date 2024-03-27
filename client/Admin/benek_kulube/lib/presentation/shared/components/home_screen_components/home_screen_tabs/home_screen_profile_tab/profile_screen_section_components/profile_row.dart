@@ -1,8 +1,11 @@
+import 'package:benek_kulube/presentation/features/user_profile_helpers/auth_role_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../common/constants/benek_icons.dart';
 import '../../../../../../../common/utils/benek_string_helpers.dart';
+import '../../../../../../../data/models/user_profile_models/auth_role_model.dart';
 import '../../../../benek_circle_avatar/benek_circle_avatar.dart';
 import '../benek_profile_stars_widget/benek_profile_star_widget.dart';
 import 'package:benek_kulube/store/app_state.dart';
@@ -18,6 +21,9 @@ class ProfileRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    AuthRoleData authRoleData = AuthRoleHelper.getAuthRoleDataFromId( store.state.selectedUserInfo!.authRole! );
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -69,12 +75,29 @@ class ProfileRowWidget extends StatelessWidget {
         ),
 
         Container(
+          padding: const EdgeInsets.all(15.0),
+          decoration: BoxDecoration(
+            color: AppColors.benekBlack.withOpacity(0.2),
+            borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+          ),
+          child: Text(
+            authRoleData.authRoleText,
+            style: TextStyle(
+              fontFamily: 'Qanelas',
+              fontSize: 12.0,
+              color: authRoleData.authRoleColor,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+
+        Container(
           padding: const EdgeInsets.all(10.0),
           decoration: BoxDecoration(
             color: AppColors.benekBlack.withOpacity(0.2),
             borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
           ),
-          width: 200,
+          width: 150,
           height: 50,
         ),
       ],

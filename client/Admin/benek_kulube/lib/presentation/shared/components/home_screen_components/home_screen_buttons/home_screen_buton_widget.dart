@@ -32,13 +32,13 @@ class _HomeScreenButonState extends State<HomeScreenButon> {
             });
           }
         },
-        onExit: (event) {
-          if( isHovering ){
-            setState(() {
-              isHovering = false;
-            });
-          }
-        },
+      onExit: (event) {
+        if( isHovering ){
+          setState(() {
+            isHovering = false;
+          });
+        }
+      },
       child: Container(
         width: 130,
         height: 130,

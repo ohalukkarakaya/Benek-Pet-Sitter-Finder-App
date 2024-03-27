@@ -11,6 +11,7 @@ import 'package:benek_kulube/data/models/user_profile_models/user_star_model.dar
 class UserInfo {
   String? userId;
   String? userName;
+  int? authRole;
   UserIdentity? identity;
   String? email;
   String? phone;
@@ -38,6 +39,7 @@ class UserInfo {
     {
       this.userId,
       this.userName,
+      this.authRole,
       this.identity,
       this.email,
       this.phone,
@@ -66,6 +68,7 @@ class UserInfo {
   UserInfo.fromJson( Map<String, dynamic> json ){
     userId = json['_id'];
     userName = json['userName'];
+    authRole = json['authRole'];
     identity = json['identity'] != null
         ? UserIdentity.fromJson( json['identity'] )
         : null;
@@ -152,6 +155,9 @@ class UserInfo {
     data['userName'] = userName;
     if( identity != null ){
       data['identity'] = identity!.toJson();
+    }
+    if( authRole != null ){
+      data['authRole'] = authRole;
     }
     data['email'] = email;
     data['phone'] = phone;

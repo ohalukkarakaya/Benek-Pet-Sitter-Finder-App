@@ -20,6 +20,7 @@ import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dar
 part 'api_client.dart';
 part 'authentication.dart';
 part 'user_info_api/user_info_api.dart';
+part 'get_user_info_by_user_id_api/get_user_info_by_user_id_api.dart';
 part 'auth_api/auth_api.dart';
 part 'admin_login_qr_code_api/admin_login_qr_code_api.dart';
 part 'user_search_api/user_search_api.dart';
