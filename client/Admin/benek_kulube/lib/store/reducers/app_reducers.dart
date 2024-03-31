@@ -14,11 +14,14 @@ import '../../redux/set_current_location/set_current_location.reducer.dart' as s
 import '../../redux/user_search/user_search_request.reducer.dart' as user_search;
 import '../../redux/get_recomended_users/get_recomended_users.reducer.dart' as get_recomended_users;
 import '../../redux/selected_user/selected_user.reducer.dart' as selected_user;
+import '../../redux/get_stories_by_user_id/get_stories_by_user_id.reducer.dart' as get_stories_by_user_id;
+import '../../redux/set_device_language/set_device_language.reducer.dart' as set_device_language;
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
     counter: counter.counterReducer(state.counter, action),
 
+    deviceLanguage: set_device_language.setDeviceLanguageReducer(state.deviceLanguage, action),
     activeTab: change_screen_tab.changeTabReducer(state.activeTab, action),
     activeScreen: change_app_screen.changeAppScreenReducer(state.activeScreen, action),
     loginQrCodeData: get_admin_login_qr_code.setLoginCodeReducer(state.loginQrCodeData, action),
@@ -31,5 +34,6 @@ AppState appReducer(AppState state, dynamic action) {
     recomendedUsersList: get_recomended_users.userSearchRequestReducer(state.recomendedUsersList, action),
     userSearchResultList: user_search.userSearchRequestReducer(state.userSearchResultList, action),
     selectedUserInfo: selected_user.setSelectedUserReducer(state.selectedUserInfo, action),
+    storiesToDisplay: get_stories_by_user_id.getStoriesByUserIdRequestReducer(state.storiesToDisplay, action),
   );
 }

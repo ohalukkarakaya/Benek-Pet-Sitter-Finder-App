@@ -1,10 +1,10 @@
 const getLightWeightPetInfoHelper = ( pet ) => {
     try{
         return {
-            petId: pet._id.toString(),
+            id: pet._id.toString(),
             isDefaultImg: pet.petProfileImg.isDefaultImg,
-            petProfileImgUrl: pet.petProfileImg && pet.petProfileImg.imgUrl ? pet.petProfileImg.imgUrl : pet.defaultImage,
-            petName: pet.name,
+            petProfileImg: pet.petProfileImg && pet.petProfileImg.imgUrl ? pet.petProfileImg.imgUrl : pet.defaultImage,
+            name: pet.name,
             sex: pet.sex,
             birthDay: pet.birthDay,
             kind: pet.kind,

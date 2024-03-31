@@ -1,3 +1,7 @@
+import '../constants/app_static_texts/app_static_texts.en.dart';
+import '../constants/app_static_texts/app_static_texts.tr.dart';
+import 'dart:ui' as ui;
+
 class BenekStringHelpers {
   static String trimSpaces(String input) {
     // Başındaki boşluk karakterlerini temizle
@@ -19,19 +23,19 @@ class BenekStringHelpers {
   static String getDayOfWeekAsString(int day) {
     switch (day - 1) {
       case 0:
-        return "Pazartesi";
+        return locale('monday');
       case 1:
-        return "Salı";
+        return locale('tuesday');
       case 2:
-        return "çarşamba";
+        return locale('wednesday');
       case 3:
-        return "Perşembe";
+        return locale('thursday');
       case 4:
-        return "Cuma";
+        return locale('friday');
       case 5:
-        return "Cumartesi";
+        return locale('saturday');
       case 6:
-        return "Pazar";
+        return locale('sunday');
       default:
         return "";
     }
@@ -40,29 +44,29 @@ class BenekStringHelpers {
   static getMonthAsString(int month) {
     switch (month) {
       case 1:
-        return "Ocak";
+        return locale('january');
       case 2:
-        return "Subat";
+        return locale('february');
       case 3:
-        return "Mart";
+        return locale('march');
       case 4:
-        return "Nisan";
+        return locale('april');
       case 5:
-        return "Mayıs";
+        return locale('may');
       case 6:
-        return "Haziran";
+        return locale('june');
       case 7:
-        return "Temmuz";
+        return locale('july');
       case 8:
-        return "Agustos";
+        return locale('august');
       case 9:
-        return "Eylül";
+        return locale('september');
       case 10:
-        return "Ekim";
+        return locale('october');
       case 11:
-        return "Kasım";
+        return locale('november');
       case 12:
-        return "Aralık";
+        return locale('december');
       default:
         return "";
     }
@@ -71,5 +75,17 @@ class BenekStringHelpers {
   static String getUsersFullName( String firstName, String lastName, String? middleName){
     String  middleNameAsString = middleName != null ? "$middleName " : "";
     return "$firstName $middleNameAsString${lastName.toUpperCase()}";
+  }
+
+  static String locale(String key){
+     String language = ui.window.locale.languageCode;
+     //  String language = 'en';
+     if( language == 'tr' || language == 'tr_TR' || language == 'TR' || language == 'Tr' ){
+       String? localizedText = AppStaticTextsTr.texts[key];
+        return localizedText ?? key;
+     }else{
+       String? localizedText = AppStaticTextsEn.texts[key];
+        return localizedText ?? key;
+     }
   }
 }

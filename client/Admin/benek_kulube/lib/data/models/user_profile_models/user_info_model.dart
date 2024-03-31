@@ -1,3 +1,4 @@
+import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_care_giver_career_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_deactivation_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_following_users_or_pets_model.dart';
@@ -19,7 +20,7 @@ class UserInfo {
   bool? isPhoneVerified;
   UserLocation? location;
   UserProfileImg? profileImg;
-  List<String>? pets;
+  List<dynamic>? pets;
   bool? isCareGiver;
   List<UserPastCaregivers>? pastCaregivers;
   List<UserCaregiverCareer>? caregiverCareer;
@@ -66,12 +67,18 @@ class UserInfo {
   );
 
   UserInfo.fromJson( Map<String, dynamic> json ){
-    userId = json['_id'];
-    userName = json['userName'];
-    authRole = json['authRole'];
+    userId = json ['_id'] ?? json['userId'];
+    userName = json['userName'] ?? json['username'];
+    authRole = json['authRole'] ?? 0;
     identity = json['identity'] != null
         ? UserIdentity.fromJson( json['identity'] )
-        : null;
+        : json[ 'userFullName' ] != null
+          ? UserIdentity(
+              firstName: json['userFullName'].toString().split(" ")[0],
+              middleName: json['userFullName'].toString().split(" ").length > 2 ? json['userFullName'].toString().split(" ")[1] : null,
+              lastName: json['userFullName'].toString().split(" ").length > 2 ? json['userFullName'].toString().split(" ")[2] : json['userFullName'].toString().split(" ")[1],
+            )
+          : null;
     email = json['email'];
     phone = json['phone'];
     isEmailVerified = json['isEmailVerified'];
@@ -81,8 +88,13 @@ class UserInfo {
         : null;
     profileImg = json['profileImg'] != null
         ? UserProfileImg.fromJson( json['profileImg'] )
-        : null;
-    pets = json['pets'].cast<String>();
+        : json['userProfileImg'] != null
+          ? UserProfileImg(
+              imgUrl: json['userProfileImg'],
+              isDefaultImg: json['isProfileImageDefault'],
+          )
+          : null;
+    pets = json['pets'] != null ? json['pets'].cast<dynamic>() : <dynamic>[];
     isCareGiver = json['isCareGiver'];
     if( json['pastCaregivers'] != null ){
       pastCaregivers = <UserPastCaregivers>[];
@@ -125,8 +137,7 @@ class UserInfo {
         : null;
     if( json['stars'] == null ){
       stars = null;
-    }
-    else if( json['stars'].runtimeType == int ){
+    }else if( json['stars'].runtimeType == int ){
       stars = json['stars'];
     }else{
       stars = <UserStars>[];
@@ -145,7 +156,7 @@ class UserInfo {
       );
     }
     gender = json['gender'];
-    defaultImage = json['defaultImage'];
+    defaultImage = json['defaultImage'] ?? json['userProfileImg'];
     totalStar = json['totalStar'];
   }
 
@@ -209,5 +220,9 @@ class UserInfo {
     data['defaultImage'] = defaultImage;
     data['totalStar'] = totalStar;
     return data;
+  }
+
+  dynamic addPets( List<PetModel> petDataList ){
+    pets = petDataList;
   }
 }

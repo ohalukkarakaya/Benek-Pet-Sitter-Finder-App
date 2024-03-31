@@ -11,6 +11,7 @@ const auth = require( './miidleWare/auth' );
 const uploadController = require( './controllers/uploadController' );
 const getAssetController = require( './controllers/getAssetController' );
 const deleteAssetController = require( './controllers/deleteAssetController' );
+const getVideoThumbnailController = require( './controllers/getVideoThumbnailController' );
 
 // Middleware
 app.use( bodyParser.json() );
@@ -64,6 +65,12 @@ app.delete(
     auth,
     deleteAssetController
 );
+// Get Video Thumbnail End Point
+app.get(
+    '/getVideoThumbnail',
+    auth,
+    getVideoThumbnailController
+)
 
 // Serveri dinle
 const PORT = 3000;

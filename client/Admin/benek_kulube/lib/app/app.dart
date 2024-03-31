@@ -59,7 +59,7 @@ class KulubeHomePage extends StatelessWidget {
           children: [
              Scaffold(
                   backgroundColor: Colors.transparent,
-                  appBar: AppBar( backgroundColor: Colors.transparent, ),
+                  appBar: null,
                   body: state.activeScreen == AppScreenEnums.LOADING_SCREEN
                         && state.userRefreshToken == ''
 

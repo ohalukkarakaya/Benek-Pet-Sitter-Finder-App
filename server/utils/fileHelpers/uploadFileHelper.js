@@ -2,6 +2,7 @@ import fs from "fs";
 import axios from "axios";
 import FormData from "form-data";
 import dotenv from "dotenv";
+import mediaServerUrlHelper from "./mediaServerUrlHelper.js";
 
 dotenv.config();
 const env = process.env;
@@ -20,7 +21,7 @@ const uploadFileHelper = async ( file, fileName, fileType, pathToSend, res ) => 
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: env.BENEK_MEDIA_BASE_URL + "upload",
+            url: mediaServerUrlHelper() + "upload",
             headers: header
         };
 

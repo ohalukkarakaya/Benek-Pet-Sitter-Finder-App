@@ -1,6 +1,7 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/utils/parse_default_avatar_url.dart';
 import 'package:benek_kulube/data/models/default_avatar_url_model.dart';
+import 'package:benek_kulube/presentation/features/image_video_helpers/image_video_helpers.dart';
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_default_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -12,6 +13,8 @@ class BenekCircleAvatar extends StatefulWidget {
   final double? height;
   final double radius;
   final Color? bgColor;
+  final double borderWidth;
+
   const BenekCircleAvatar(
     {
       super.key, 
@@ -20,7 +23,8 @@ class BenekCircleAvatar extends StatefulWidget {
       this.width = 40.0, 
       this.height = 40.0, 
       this.radius = 100.0,
-      this.bgColor = AppColors.benekWhite
+      this.bgColor = AppColors.benekWhite,
+      this.borderWidth = 4.0
     }
   );
 
@@ -49,7 +53,7 @@ class _BenekCircleAvatarState extends State<BenekCircleAvatar> {
     return Container(
       height: widget.height,
       width: widget.width,
-      padding: const EdgeInsets.all(4.0),
+      padding: EdgeInsets.all( widget.borderWidth ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all( Radius.circular( widget.radius ) ),
         color: widget.bgColor,
@@ -67,7 +71,7 @@ class _BenekCircleAvatarState extends State<BenekCircleAvatar> {
                   : ClipRRect(
                     borderRadius: BorderRadius.all( Radius.circular( widget.radius ) ),
                     child: Image.network(
-                      widget.imageUrl,
+                      '${ImageVideoHelpers.mediaServerBaseUrlHelper()}getAsset?assetPath=${widget.imageUrl}',
                       headers: { "private-key": dotenv.env['MEDIA_SERVER_API_KEY']! },
                       fit: BoxFit.cover,
                     ),

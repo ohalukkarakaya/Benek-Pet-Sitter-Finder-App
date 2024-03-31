@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'app/app.dart';
 import 'store/app_state.dart';
+import 'store/actions/app_actions.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:desktop_window/desktop_window.dart';
+import 'dart:ui' as ui;
 
 void initMacOSWindow(Size size) async {
   if (Platform.isMacOS) {
@@ -48,7 +50,9 @@ void main() async {
   Size windowSize = const Size(1200,800);
 
   initWindowsAndLinuxWindow();
-  
+
+  String deviceLanguage = ui.window.locale.languageCode;
+  await store.dispatch(SetDeviceLanguageAction(deviceLanguage));
   runApp(KulubeApp(store));
 
   initMacOSWindow(windowSize);

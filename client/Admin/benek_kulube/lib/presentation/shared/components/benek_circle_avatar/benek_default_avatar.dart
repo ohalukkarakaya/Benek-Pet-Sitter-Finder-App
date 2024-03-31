@@ -41,6 +41,12 @@ class BenekDefaultAvatar extends StatelessWidget {
               width: width,
               height: height,
               fit: BoxFit.cover,
+              errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                if(error != null){
+                  print('Error: $error');
+                }
+                return const SizedBox();
+              }
             ),
           ),
         ],

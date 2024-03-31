@@ -41,6 +41,18 @@ class ApiClient {
           return UserInfo.fromJson(value['user']);
         case 'UserSearchResult':
           return UserList.fromJson(value);
+        case 'StoryModel':
+          return StoryModel.fromJson(value);
+        case 'List<StoryModel>':
+          List<dynamic> jsonList = value['stories'];
+          List<StoryModel> list = jsonList.map((item) => StoryModel.fromJson(item)).toList();
+          return list;
+        case 'PetModel':
+          return PetModel.fromJson(value);
+        case 'List<PetModel>':
+          List<dynamic> jsonList = value['pets'];
+          List<PetModel> list = jsonList.map((item) => PetModel.fromJson(item)).toList();
+          return list;
         // case 'List<OKRUserParentUserObjectiveComplianceViewModel>':
         //   List<dynamic> jsonList = value;
         //   List<OKRUserParentUserObjectiveComplianceViewModel> list = jsonList.map((item) => OKRUserParentUserObjectiveComplianceViewModel.fromJson(item)).toList();

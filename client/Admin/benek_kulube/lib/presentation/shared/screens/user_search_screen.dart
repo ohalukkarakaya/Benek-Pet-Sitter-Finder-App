@@ -71,6 +71,14 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
     }
   }
 
+  void _updateSelectedUser(UserInfo user) async {
+    Store<AppState> store = StoreProvider.of<AppState>(context);
+    await store.dispatch(setSelectedUserAction(null));
+    Navigator.pop(context);
+    await Future.delayed(const Duration(milliseconds: 100));
+    await store.dispatch(setSelectedUserAction(user));
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -83,11 +91,12 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
       });
 
       if( hoveringUser != null ){
-        Store<AppState> store = StoreProvider.of<AppState>(context);
-        store.dispatch(setSelectedUserAction(hoveringUser!));
+        _updateSelectedUser(hoveringUser!);
+      }else{
+        Navigator.pop(context);
       }
 
-      Navigator.pop(context);
+
     }
 
     return BenekBluredModalBarier(

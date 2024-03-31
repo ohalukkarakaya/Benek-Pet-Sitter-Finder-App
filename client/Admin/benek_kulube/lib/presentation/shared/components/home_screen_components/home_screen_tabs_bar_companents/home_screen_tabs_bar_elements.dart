@@ -35,6 +35,8 @@ class _TabsButonElementState extends State<TabsButonElement> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
+        await widget.store.dispatch(setSelectedUserAction(null));
+
          widget.tab == AppTabsEnums.LOGOUT_TAB
           ? await AuthUtils.killUserSessionAndRestartApp( widget.store )
           : await widget.store.dispatch(ChangeTabAction( widget.tab ) );

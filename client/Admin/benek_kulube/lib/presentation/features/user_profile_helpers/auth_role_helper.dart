@@ -1,15 +1,16 @@
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:flutter/material.dart';
 import '../../../common/constants/app_colors.dart';
 import '../../../data/models/user_profile_models/auth_role_model.dart';
 
 class AuthRoleHelper {
   // String Values
-  static const String regularUser = 'Yetkisiz Kullanıcı';
-  static const String superAdmin = 'Super Admin';
-  static const String developer = 'Geliştirici';
-  static const String moderator = 'Modaratör';
-  static const String accountant = 'Muhasebe';
-  static const String unauthorizedUser = 'Kayıt Bulunamadı';
+  static String regularUser = BenekStringHelpers.locale('regularUser');
+  static String superAdmin = BenekStringHelpers.locale('superAdmin');
+  static String developer = BenekStringHelpers.locale('developer');
+  static String moderator = BenekStringHelpers.locale('moderator');
+  static String accountant = BenekStringHelpers.locale('accountant');
+  static String unauthorizedUser = BenekStringHelpers.locale('unauthorizedUser');
 
   // Text Color Values
   static const Color regularUserColor = AppColors.benekRed;

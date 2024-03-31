@@ -8,7 +8,6 @@ class UserInfoByUserIdApi {
 
   // Get Logged In User Info
   Future<dynamic> getUserInfoByUserIdRequest(String userId) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 

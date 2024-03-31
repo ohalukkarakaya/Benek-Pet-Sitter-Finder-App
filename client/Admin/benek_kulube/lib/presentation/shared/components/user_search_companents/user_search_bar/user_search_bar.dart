@@ -94,7 +94,7 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
               fillColor: AppColors.benekBlack.withOpacity(0.9),
               contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
               filled: true,
-              hintText: 'Bir Kullanıcı Ara',
+              hintText: BenekStringHelpers.locale('searchAUser'),
               enabledBorder: InputBorder.none,
               border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all( Radius.circular( 6.0 ) ),

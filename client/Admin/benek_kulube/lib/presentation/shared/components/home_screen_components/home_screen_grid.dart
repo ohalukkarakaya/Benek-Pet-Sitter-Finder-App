@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_home_tab/home_screen_home_tab.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/home_screen_profile_tab.dart';
@@ -11,7 +13,10 @@ import 'home_screen_tabs_bar_companents/home_screen_tabs_bar.dart';
 
 class HomeScreenGrid extends StatelessWidget {
   final Store<AppState> store;
-  const HomeScreenGrid({super.key, required this.store});
+  const HomeScreenGrid({
+    super.key,
+    required this.store
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +28,35 @@ class HomeScreenGrid extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const KulubeSearchBarButon(),
-              const SizedBox( height: 100 ),
-              store.state.selectedUserInfo == null
-                ? KulubeHomeTabWidget(
-                    firstName: store.state.userInfo!.identity!.firstName!,
-                    middleName: store.state.userInfo!.identity!.middleName,
-                    lastName: store.state.userInfo!.identity!.lastName!,
-                  )
-                : const ProfileTab()
+              Expanded(
+                child: SizedBox(
+                  width: 600,
+                  child: ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(
+                      scrollbars: false,
+                      overscroll: false,
+                      physics: const BouncingScrollPhysics(),
+                    ),
+                    child: ListView(
+                      shrinkWrap: true,
+                      physics: store.state.selectedUserInfo == null
+                          ? const NeverScrollableScrollPhysics()
+                          : const BouncingScrollPhysics(),
+                      children: [
+                        const KulubeSearchBarButon(),
+                        const SizedBox( height: 100 ),
+                        store.state.selectedUserInfo == null
+                          ? KulubeHomeTabWidget(
+                              firstName: store.state.userInfo!.identity!.firstName!,
+                              middleName: store.state.userInfo!.identity!.middleName,
+                              lastName: store.state.userInfo!.identity!.lastName!,
+                            )
+                          : const ProfileTab()
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
           Column(
@@ -41,7 +66,7 @@ class HomeScreenGrid extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(
                   right: 40.0, 
-                  top: 5
+                  top: 50.0
                 ),
                 child: BenekCircleAvatar(
                   width: 50,

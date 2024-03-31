@@ -1,12 +1,13 @@
 import axios from "axios";
 import dotenv from "dotenv";
+import mediaServerUrlHelper from "./mediaServerUrlHelper.js";
 
 dotenv.config();
 const env = process.env;
 
 const deleteFileHelper = async ( fileUrl ) => {
     try{
-        const deleteApiUrl = env.BENEK_MEDIA_BASE_URL + `deleteAsset?assetPath=${ fileUrl }`;
+        const deleteApiUrl = mediaServerUrlHelper() + `deleteAsset?assetPath=${ fileUrl }`;
         const header = { 
             'private-key': env.BENEK_MEDIA_SERVER_API_KEY
         };

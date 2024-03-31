@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/widgets.dart';
 
@@ -28,8 +29,8 @@ class _CareGiverBadgeState extends State<CareGiverBadge> {
         position: ElTooltipPosition.bottomCenter,
         content:  Text(
             widget.isCareGiver
-                ? 'Bakıcı'
-                : 'Bakıcı Değil',
+                ? BenekStringHelpers.locale('userIsCareGiver')
+                : BenekStringHelpers.locale('userIsNotCareGiver'),
             style: const TextStyle(
                 color: AppColors.benekBlack,
                 fontSize: 12.0,
@@ -41,7 +42,6 @@ class _CareGiverBadgeState extends State<CareGiverBadge> {
         child: MouseRegion(
           onHover: (event) {
             setState(() {
-              print(_tooltipController.value);
               if( _tooltipController.value != ElTooltipStatus.showing ){
                 _tooltipController.show();
               }
@@ -64,7 +64,9 @@ class _CareGiverBadgeState extends State<CareGiverBadge> {
                   decoration: BoxDecoration(
                   borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
                   border: Border.all(
-                      color: AppColors.benekWhite,
+                      color: widget.isCareGiver
+                              ? AppColors.benekWhite
+                              : AppColors.benekRed,
                       width: 2.0
                   )),
                 padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, left: 9.0, right: 11.0),
@@ -73,7 +75,7 @@ class _CareGiverBadgeState extends State<CareGiverBadge> {
                   size: 15.0,
                   color: widget.isCareGiver
                       ? AppColors.benekWhite
-                      : AppColors.benekBlack,
+                      : AppColors.benekRed,
                 )
             ),
           ),

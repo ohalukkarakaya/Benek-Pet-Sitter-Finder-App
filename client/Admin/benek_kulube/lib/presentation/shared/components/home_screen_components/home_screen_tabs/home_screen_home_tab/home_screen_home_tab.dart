@@ -51,9 +51,9 @@ class KulubeHomeTabWidget extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Text(
-              "Hoş Geldin",
-              style: TextStyle(
+            Text(
+              BenekStringHelpers.locale('welcome'),
+              style: const TextStyle(
                 fontFamily: 'Qanelas',
                 fontSize: 15.0,
                 fontWeight: FontWeight.w100

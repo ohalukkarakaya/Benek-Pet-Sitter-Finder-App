@@ -6,6 +6,9 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
     return action.selectedUserInfo;
   }else if( action is GetUserInfoByUserIdAction ){
     return action.userData;
+  }else if( action is GetPetsByUserIdRequestAction ){
+    userInfo!.addPets(action.pets!);
+    return userInfo;
   }
 
   return userInfo;
