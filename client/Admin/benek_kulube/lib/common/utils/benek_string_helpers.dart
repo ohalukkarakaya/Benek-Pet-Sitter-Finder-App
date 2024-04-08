@@ -72,6 +72,10 @@ class BenekStringHelpers {
     }
   }
 
+  static String getDateAsString(DateTime date) {
+    return "${date.day} ${getMonthAsString(date.month)} ${date.year}";
+  }
+
   static String getUsersFullName( String firstName, String lastName, String? middleName){
     String  middleNameAsString = middleName != null ? "$middleName " : "";
     return "$firstName $middleNameAsString${lastName.toUpperCase()}";
@@ -87,5 +91,13 @@ class BenekStringHelpers {
        String? localizedText = AppStaticTextsEn.texts[key];
         return localizedText ?? key;
      }
+  }
+
+  static String formatPhoneNumber(String phoneNumber) {
+    String formattedNumber = phoneNumber.replaceAllMapped(RegExp(r'^(\+\d{2})(\d{3})(\d{3})(\d{2})(\d{2})$'),
+            (Match match) {
+          return '${match[1]} ${match[2]} ${match[3]} ${match[4]} ${match[5]}';
+        });
+    return formattedNumber;
   }
 }

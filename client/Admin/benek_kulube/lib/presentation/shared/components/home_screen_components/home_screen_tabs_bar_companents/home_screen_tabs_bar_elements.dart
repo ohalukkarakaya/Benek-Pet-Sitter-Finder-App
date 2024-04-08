@@ -68,19 +68,22 @@ class _TabsButonElementState extends State<TabsButonElement> {
           width: 150,
           padding: const EdgeInsets.symmetric( vertical: 15.0, horizontal: 20.0 ),
           decoration: isHovering 
-                      || widget.store.state.activeTab == widget.tab
-                        ? BoxDecoration(
-                            color: AppColors.benekLightBlue,
-                            borderRadius: const BorderRadius.all( Radius.circular( 5.0 ) ),
-                            boxShadow:[
-                              BoxShadow(
-                                color:  AppColors.benekLightBlue.withOpacity(0.3),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ]
-                          )
-                          : null,
+            || (
+              widget.store.state.activeTab == widget.tab
+              && widget.store.state.selectedUserInfo == null
+            )
+              ? BoxDecoration(
+                  color: AppColors.benekLightBlue,
+                  borderRadius: const BorderRadius.all( Radius.circular( 5.0 ) ),
+                  boxShadow:[
+                    BoxShadow(
+                      color:  AppColors.benekLightBlue.withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                )
+                : null,
           child: Row(
             children: [
               MouseRegion(
@@ -93,22 +96,33 @@ class _TabsButonElementState extends State<TabsButonElement> {
                   widget.icon, 
                   size: 20.0, 
                   color: isHovering
-                         || widget.store.state.activeTab == widget.tab
-                          ? Colors.black 
+                         || (
+                              widget.store.state.activeTab == widget.tab
+                              && widget.store.state.selectedUserInfo == null
+                          )
+                      ? Colors.black
                           : null,
                 ),
               ),
               const SizedBox( width: 10,),
-              widget.store.state.activeTab == widget.tab
-              || widget.shouldShowTextWhenDeActive
+              widget.shouldShowTextWhenDeActive
               || isHovering
-                ? Text(
+              || (
+                  widget.store.state.activeTab == widget.tab
+                  && widget.store.state.selectedUserInfo == null
+              )
+                  ? Text(
                   widget.title,
                   style: TextStyle(
                     fontFamily: 'Qanelas',
                     fontSize: 15.0,
                     fontWeight: FontWeight.w500,
-                    color: isHovering || widget.store.state.activeTab == widget.tab ? Colors.black : null
+                    color: isHovering
+                      || (
+                          widget.store.state.activeTab == widget.tab
+                              && widget.store.state.selectedUserInfo == null
+                      )
+                        ? Colors.black : null
                   ),
                 )
                 : const SizedBox()

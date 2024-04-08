@@ -8,11 +8,14 @@ import '../../../../../../../common/utils/benek_string_helpers.dart';
 import '../../../../../../../data/models/user_profile_models/auth_role_model.dart';
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../benek_circle_avatar/benek_circle_avatar.dart';
+import 'give_auth_role_button.dart';
 
 class ProfileRowWidget extends StatelessWidget {
+  final int authRoleId;
   final UserInfo selectedUserInfo;
   const ProfileRowWidget({
     super.key,
+    required this.authRoleId,
     required this.selectedUserInfo
   });
 
@@ -72,19 +75,40 @@ class ProfileRowWidget extends StatelessWidget {
         ),
 
         Container(
-          padding: const EdgeInsets.all(18.0),
           decoration: BoxDecoration(
             color: AppColors.benekBlack.withOpacity(0.2),
             borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
           ),
-          child: Text(
-            authRoleData.authRoleText,
-            style: TextStyle(
-              fontFamily: 'Qanelas',
-              fontSize: 12.0,
-              color: authRoleData.authRoleColor,
-              fontWeight: FontWeight.w900,
-            ),
+          child: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(
+                    left: 17.0,
+                    top: 17.0,
+                    bottom: 17.0,
+                    right: !(AuthRoleHelper.checkIfRequiredRole(
+                      authRoleId,
+                      [ AuthRoleHelper.getAuthRoleIdFromRoleName( 'superAdmin' ) ]
+                    )) ? 17.0
+                       : 0.0
+                ),
+                child: Text(
+                  authRoleData.authRoleText,
+                  style: TextStyle(
+                    fontFamily: 'Qanelas',
+                    fontSize: 12.0,
+                    color: authRoleData.authRoleColor,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 10.0,),
+
+              AuthRoleHelper.checkIfRequiredRole( authRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName( 'superAdmin' ) ] )
+                  ? const GiveAuthRoleButton()
+                  : const SizedBox(),
+            ],
           ),
         ),
 

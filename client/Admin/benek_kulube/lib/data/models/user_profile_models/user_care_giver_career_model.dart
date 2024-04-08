@@ -1,7 +1,13 @@
+import 'package:intl/intl.dart';
+
+import '../pet_models/pet_model.dart';
+
 class UserCaregiverCareer {
-  String? pet;
-  String? startDate;
-  String? endDate;
+  DateFormat format = DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ');
+
+  dynamic pet;
+  DateTime? startDate;
+  DateTime? endDate;
   String? price;
 
   UserCaregiverCareer(
@@ -15,8 +21,8 @@ class UserCaregiverCareer {
 
   UserCaregiverCareer.fromJson( Map<String, dynamic> json ){
     pet = json['pet'];
-    startDate = json['startDate'];
-    endDate = json['endDate'];
+    startDate = format.parse(json['startDate']);
+    endDate = format.parse(json['endDate']);
     price = json['price'];
   }
 
@@ -27,5 +33,9 @@ class UserCaregiverCareer {
     data['endDate'] = endDate;
     data['price'] = price;
     return data;
+  }
+
+  dynamic initPet( PetModel petAsPetModel ){
+    pet = petAsPetModel;
   }
 }

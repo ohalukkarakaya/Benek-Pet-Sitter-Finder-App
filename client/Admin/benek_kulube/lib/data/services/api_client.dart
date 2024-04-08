@@ -53,6 +53,10 @@ class ApiClient {
           List<dynamic> jsonList = value['pets'];
           List<PetModel> list = jsonList.map((item) => PetModel.fromJson(item)).toList();
           return list;
+        case 'List<UserInfoModel>':
+          List<dynamic> jsonList = value['userList'];
+          List<UserInfo> list = jsonList.map((item) => UserInfo.fromJson(item)).toList();
+          return list;
         // case 'List<OKRUserParentUserObjectiveComplianceViewModel>':
         //   List<dynamic> jsonList = value;
         //   List<OKRUserParentUserObjectiveComplianceViewModel> list = jsonList.map((item) => OKRUserParentUserObjectiveComplianceViewModel.fromJson(item)).toList();

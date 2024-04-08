@@ -65,6 +65,7 @@ class _BenekCircleAvatarState extends State<BenekCircleAvatar> {
                 width: widget.width!,
                 height: widget.height!,
                 borderRadius: widget.radius,
+                isPet: widget.imageUrl.startsWith('P/'),
               )
               : !( widget.isDefaultAvatar) || isErrorOccured
                   ? const SizedBox()

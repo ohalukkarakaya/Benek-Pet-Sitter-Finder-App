@@ -6,6 +6,7 @@ class BenekDefaultAvatar extends StatelessWidget {
   final double width;
   final double height;
   final double borderRadius;
+  final bool isPet;
 
   const BenekDefaultAvatar(
     {
@@ -15,6 +16,7 @@ class BenekDefaultAvatar extends StatelessWidget {
     required this.width,
     required this.height,
     required this.borderRadius,
+    this.isPet = false
     }
   );
 
@@ -38,8 +40,8 @@ class BenekDefaultAvatar extends StatelessWidget {
             bottom: 0,
             child: Image.asset(
               avatarImagePath,
-              width: width,
-              height: height,
+              width: isPet ? width - 5 : width,
+              height: isPet ? height - 5 : height,
               fit: BoxFit.cover,
               errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
                 if(error != null){

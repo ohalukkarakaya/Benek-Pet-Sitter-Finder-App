@@ -65,12 +65,16 @@ class StoryElement extends StatelessWidget {
                           imageUrl: story!.about!.pet!.petProfileImg!.imgUrl!
                       ),
                       const SizedBox(width: 5,),
-                      Text(
-                        story!.about!.pet!.name!,
-                        style: const TextStyle(
-                            fontFamily: 'Qanelas',
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.w500
+                      OverflowBox(
+                        maxWidth: 75,
+                        child: Text(
+                          story!.about!.pet!.name!,
+                          style: const TextStyle(
+                              fontFamily: 'Qanelas',
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.w500
+                          ),
+                          overflow: TextOverflow.fade,
                         ),
                       ),
                     ],

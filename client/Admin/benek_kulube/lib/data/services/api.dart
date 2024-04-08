@@ -23,12 +23,13 @@ import '../models/story_models/story_model.dart';
 part 'api_client.dart';
 part 'authentication.dart';
 part 'user_info_api/user_info_api.dart';
-part 'get_user_info_by_user_id_api/get_user_info_by_user_id_api.dart';
+part 'get_user_info_apies/get_user_info_by_user_id_api.dart';
 part 'auth_api/auth_api.dart';
 part 'admin_login_qr_code_api/admin_login_qr_code_api.dart';
 part 'user_search_api/user_search_api.dart';
 part 'get_recomended_users_api/get_recomended_users_api.dart';
 part 'story_api/story_api.dart';
 part 'pet_api/pet_api.dart';
+part 'get_user_info_apies/get_light_weight_user_info_by_user_id_list.dart';
 
 ApiClient defaultApiClient = ApiClient();

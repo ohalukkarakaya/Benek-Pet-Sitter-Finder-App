@@ -96,21 +96,19 @@ class UserInfo {
           : null;
     pets = json['pets'] != null ? json['pets'].cast<dynamic>() : <dynamic>[];
     isCareGiver = json['isCareGiver'];
-    if( json['pastCaregivers'] != null ){
-      pastCaregivers = <UserPastCaregivers>[];
-      json['pastCaregivers'].forEach(
-        ( v ){
-          pastCaregivers!.add( UserPastCaregivers.fromJson( v ) );
-        }
-      );
+    if( json['pastCaregivers'] != null || json['pastCareGivers'] != null ){
+      List<dynamic> jsonList = json['pastCaregivers'] != null && json['pastCaregivers'].length > 0
+          ? json['pastCaregivers']
+          : json['pastCareGivers'] ?? <dynamic>[];
+      List <UserPastCaregivers> list = jsonList.map((item) => UserPastCaregivers.fromJson(item)).toList();
+      pastCaregivers = list;
     }
-    if( json['caregiverCareer'] != null ){
-      caregiverCareer = <UserCaregiverCareer>[];
-      json['caregiverCareer'].forEach(
-        ( v ){
-          caregiverCareer!.add( UserCaregiverCareer.fromJson( v ) );
-        }
-      );
+    if( json['caregiverCareer'] != null || json['careGiverCareer'] != null ){
+      List<dynamic> jsonList = json['caregiverCareer'] != null && json['caregiverCareer'].length > 0
+          ? json['caregiverCareer']
+          : json['careGiverCareer'] ?? <dynamic>[];
+      List <UserCaregiverCareer> list = jsonList.map((item) => UserCaregiverCareer.fromJson(item)).toList();
+      caregiverCareer = list;
     }
     if( json['followingUsersOrPets'] != null ){
       followingUsersOrPets = <UserFollowingUsersOrPets>[];
@@ -224,5 +222,13 @@ class UserInfo {
 
   dynamic addPets( List<PetModel> petDataList ){
     pets = petDataList;
+  }
+
+  dynamic addPastCareGivers( List<UserPastCaregivers> pastCareGiversDataList ){
+    pastCaregivers = pastCareGiversDataList;
+  }
+
+  dynamic addCareGiveCareer( List<UserCaregiverCareer> careGiverCareerDataList ){
+    caregiverCareer = careGiverCareerDataList;
   }
 }

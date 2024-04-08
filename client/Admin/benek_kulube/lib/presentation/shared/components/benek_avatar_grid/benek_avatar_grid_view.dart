@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -24,11 +25,11 @@ class BenekAvatarGridViewWidget extends StatefulWidget {
 class _BenekAvatarGridViewWidgetState extends State<BenekAvatarGridViewWidget> {
   @override
   Widget build(BuildContext context) {
-    int itemCount = widget.list.length;
-    int gridCount = itemCount > 9 ? 9 : itemCount;
+    int itemCount = widget.list.isNotEmpty ? widget.list.length : 0;
+    int gridCount = itemCount > 6 ? 6 : itemCount;
 
     return itemCount > 0
-    ? widget.shouldEnableShimmer
+    ? widget.shouldEnableShimmer || widget.list[0] is! PetModel
       ? Shimmer.fromColors(
           baseColor: AppColors.benekBlack.withOpacity(0.5),
           highlightColor: AppColors.benekBlack.withOpacity(0.2),
@@ -40,12 +41,13 @@ class _BenekAvatarGridViewWidgetState extends State<BenekAvatarGridViewWidget> {
                 crossAxisSpacing: 10.0,
                 mainAxisSpacing: 10.0,
               ),
-              itemCount: gridCount < 9 ? gridCount : 9,
+              itemCount: gridCount < 6 ? gridCount : 6,
               itemBuilder: (BuildContext context, int index) {
-                return BenekAvatarGridViewBulder(
+                return BenekAvatarGridViewBuilder(
                   index: index,
                   itemCount: itemCount,
-                  item: widget.list[index] is PetModel ? widget.list[index] : null,
+                  item: widget.list[index],
+                  shouldEnableShimmer: widget.shouldEnableShimmer || widget.list[index] is String,
                 );
               }
 
@@ -58,30 +60,37 @@ class _BenekAvatarGridViewWidgetState extends State<BenekAvatarGridViewWidget> {
               crossAxisSpacing: 10.0,
               mainAxisSpacing: 10.0,
             ),
-            itemCount: gridCount < 9 ? gridCount : 9,
+            itemCount: gridCount < 6 ? gridCount : 6,
             itemBuilder: (BuildContext context, int index) {
-              return widget.list[index] is PetModel
-              ? BenekAvatarGridViewBulder(
+              return BenekAvatarGridViewBuilder(
                 index: index,
                 itemCount: itemCount,
                 item: widget.list[index],
                 shouldEnableShimmer: widget.shouldEnableShimmer || widget.list[index] is String,
-              )
-              : const SizedBox();
+              );
             }
 
         )
-    : widget.emptyMessage != null
-      ? Center(
-          child: Text(
-            widget.emptyMessage!,
-            style: const TextStyle(
-              color: AppColors.benekWhite,
-              fontFamily: 'Qanelas',
-              fontSize: 16,
+    : SizedBox(
+      width: 200,
+      height: 140,
+      child: Center(
+        child: Wrap(
+          children: [
+            Text(
+              widget.emptyMessage != null
+                  ? widget.emptyMessage!
+                  : BenekStringHelpers.locale('notFoundMessage'),
+              style: const TextStyle(
+                color: AppColors.benekWhite,
+                fontFamily: 'Qanelas',
+                fontSize: 15,
+                fontWeight: FontWeight.w200,
+              ),
             ),
-          ),
-        )
-      : const SizedBox();
+          ],
+        ),
+      ),
+    );
   }
 }

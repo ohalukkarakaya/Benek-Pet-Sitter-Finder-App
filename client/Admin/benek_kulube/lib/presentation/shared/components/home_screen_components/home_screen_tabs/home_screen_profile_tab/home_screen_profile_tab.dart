@@ -1,8 +1,13 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/common/widgets/benek_message_box_widget/benek_message_box_triangle_widget.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/care_give_career_preview_widget/care_give_preview_widget.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_preview_widget.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/adress_row/adress_map.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/care_giver_badge.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_contact_row.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/kulube_stories_board.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_adress_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_bio_widget.dart';
@@ -20,7 +25,11 @@ import '../../../../../../common/constants/app_colors.dart';
 import '../../../../../../common/constants/benek_icons.dart';
 import '../../../../../../common/widgets/benek_message_box_widget/benek_message_box_widget.dart';
 import '../../../../../../data/models/user_profile_models/user_info_model.dart';
+import '../../../../../../data/models/user_profile_models/user_past_care_givers_model.dart';
 import '../../../benek_avatar_grid/benek_avatar_grid_widget.dart';
+import '../../../benek_pet_avatars_horizontal_list/benek_horizontal_avatar_stack.dart';
+import '../../../benek_pet_avatars_horizontal_list/benek_pet_avatars_horizontal_list.dart';
+import '../../../benek_pet_avatars_horizontal_list/benek_pet_stack_widget.dart';
 import 'benek_profile_stars_widget/benek_profile_star_widget.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 
@@ -45,6 +54,8 @@ class _ProfileTabState extends State<ProfileTab> {
         await store.dispatch(getUserInfoByUserIdAction( store.state.selectedUserInfo!.userId! ));
         await store.dispatch(getStoriesByUserIdRequestAction( store.state.selectedUserInfo!.userId! ));
         await store.dispatch(getPetsByUserIdRequestAction( store.state.selectedUserInfo!.userId! ));
+        await store.dispatch(initPastCareGiversAction());
+        await store.dispatch(initCareGiveDataAction());
       }
       updateStoryBoardSize();
     });
@@ -52,7 +63,7 @@ class _ProfileTabState extends State<ProfileTab> {
 
   void updateStoryBoardSize() {
     setState(() {
-      storyBoardSize = calculateStoryBoardSize(); // storyBoardSize'ı güncellemek için setState() kullandık
+      storyBoardSize = calculateStoryBoardSize();
     });
   }
 
@@ -72,6 +83,9 @@ class _ProfileTabState extends State<ProfileTab> {
         converter: (Store<AppState> store) => store.state.selectedUserInfo,
         builder: (BuildContext context, UserInfo? selectedUserInfo) {
           bool isCareGiver = selectedUserInfo!.isCareGiver != null && selectedUserInfo.isCareGiver!;
+
+          // log('selectedUserInfo-careGive-history: ${selectedUserInfo.pastCaregivers?.length}');
+          Store<AppState> store = StoreProvider.of<AppState>(context);
           return Container(
             padding: const EdgeInsets.only(left: 60.0, bottom: 20.0),
             child: Column(
@@ -86,14 +100,24 @@ class _ProfileTabState extends State<ProfileTab> {
                   ],
                 ),
 
-                ProfileRowWidget(selectedUserInfo: selectedUserInfo),
+                ProfileRowWidget(
+                    authRoleId: store.state.userRoleId,
+                    selectedUserInfo: selectedUserInfo,
+                ),
+
+                ProfileContactRowWidget(
+                  userId: selectedUserInfo.userId,
+                  email: selectedUserInfo.email,
+                  phoneNumber: selectedUserInfo.phone,
+                ),
+
                 selectedUserInfo != null
                 && selectedUserInfo.identity != null
                 && selectedUserInfo.identity!.bio != null
                     ? Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        ProfileBioWidget(text: '" ${selectedUserInfo.identity!.bio!} "',),
+                        ProfileBioWidget( text: '" ${selectedUserInfo.identity!.bio!} "' ),
                       ],
                     )
                     : const SizedBox(),
@@ -103,35 +127,60 @@ class _ProfileTabState extends State<ProfileTab> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ProfileAdressWidget(
-                        location: selectedUserInfo.location,
-                      ),
+
+                      CareGiverBadge(isCareGiver: isCareGiver),
 
                       BenekProfileStarWidget(
                         star: selectedUserInfo.stars ?? 0,
                         starCount: selectedUserInfo.totalStar ?? 0,
                       ),
 
-                      CareGiverBadge(isCareGiver: isCareGiver),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      BenekAvatarGridWidget(
-                          list: selectedUserInfo.pets ?? [],
-                          emptyMessage: BenekStringHelpers.locale('noPets'),
-                          shouldEnableShimmer: selectedUserInfo != null
-                                               && selectedUserInfo.pets != null
-                                               && selectedUserInfo.pets!.isNotEmpty
-                                               && selectedUserInfo.pets![0] is String,
+                      BenekPetStackWidget(
+                        petList: selectedUserInfo.pets,
                       ),
                     ],
                   ),
                 ),
+
+                Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      PastCareGiverPreviewWidget(
+                        title: BenekStringHelpers.locale('pastCareGiversTitle'),
+                        pastCareGiversEmptyStateTitle: BenekStringHelpers.locale('pastCareGiversEmptyMessage'),
+                        pastCareGiveList: selectedUserInfo.pastCaregivers,
+                      ),
+
+                      CareGivePreviewWidget(
+                        title: BenekStringHelpers.locale('givenCareGivesTitle'),
+                        emptyStateTitle: BenekStringHelpers.locale('givenCareGivesEmptyMessage'),
+                        careGiveList: selectedUserInfo.caregiverCareer,
+                      ),
+                    ],
+                  ),
+                ),
+
+                selectedUserInfo.location != null
+                    ? Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ProfileAdresMapWidget(
+                        userLocation: selectedUserInfo.location!,
+                      ),
+
+                      ProfileAdressWidget(
+                        openAdress: selectedUserInfo.identity?.openAdress,
+                        location: selectedUserInfo.location,
+                      ),
+                    ],
+                  ),
+                )
+                    : const SizedBox(),
+
               ],
             ),
           );

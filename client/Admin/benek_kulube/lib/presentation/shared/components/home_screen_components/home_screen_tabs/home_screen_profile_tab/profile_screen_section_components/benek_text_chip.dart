@@ -1,0 +1,71 @@
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:el_tooltip/el_tooltip.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../../../../../../../../common/constants/app_colors.dart';
+import 'benek_chip.dart';
+
+class BenekTextChip extends StatefulWidget {
+  final bool enableHoverEffect;
+  final bool shouldCopyOnTap;
+  final Function()? onTap;
+  final String text;
+  const BenekTextChip({
+    super.key,
+    this.enableHoverEffect = false,
+    this.shouldCopyOnTap = true,
+    this.onTap,
+    required this.text
+  });
+
+  @override
+  State<BenekTextChip> createState() => _BenekTextChipState();
+}
+
+class _BenekTextChipState extends State<BenekTextChip> {
+  final ElTooltipController _tooltipController = ElTooltipController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ElTooltip(
+        color: AppColors.benekLightBlue,
+        showModal: false,
+        showChildAboveOverlay: false,
+        position: ElTooltipPosition.bottomCenter,
+        content:  Text(
+            BenekStringHelpers.locale('copied'),
+            style: const TextStyle(
+                color: AppColors.benekBlack,
+                fontSize: 12.0,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Qanelas'
+            )
+        ),
+        controller: _tooltipController,
+        child: GestureDetector(
+          onTap: () async {
+            if(widget.shouldCopyOnTap){
+              Clipboard.setData(ClipboardData(text: widget.text));
+              setState(() {
+                _tooltipController.show();
+              });
+            }
+            await Future.delayed(const Duration(milliseconds: 500));
+            setState(() {
+              _tooltipController.hide();
+            });
+
+            if(widget.onTap != null){
+              widget.onTap!();
+            }
+          },
+          child: BenekChip(
+            text: widget.text
+          ),
+          )
+        ),
+      );
+  }
+}

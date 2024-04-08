@@ -1,8 +1,14 @@
+import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
+import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
+import 'package:intl/intl.dart';
+
 class UserPastCaregivers {
-  String? pet;
-  String? careGiver;
-  String? startDate;
-  String? endDate;
+  DateFormat format = DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ');
+
+  dynamic pet;
+  dynamic careGiver;
+  DateTime? startDate;
+  DateTime? endDate;
   String? price;
 
   UserPastCaregivers(
@@ -18,8 +24,8 @@ class UserPastCaregivers {
   UserPastCaregivers.fromJson( Map<String, dynamic> json ){
     pet = json['pet'];
     careGiver = json['careGiver'];
-    startDate = json['startDate'];
-    endDate = json['endDate'];
+    startDate = format.parse(json['startDate']);
+    endDate = format.parse(json['endDate']);
     price = json['price'];
   }
 
@@ -33,5 +39,13 @@ class UserPastCaregivers {
       data['price'] = price;
     }
     return data;
+  }
+
+  dynamic initCareGiver( UserInfo careGiverAsUserInfo ){
+    careGiver = careGiverAsUserInfo;
+  }
+
+  dynamic initPet( PetModel petAsPetModel ){
+    pet = petAsPetModel;
   }
 }

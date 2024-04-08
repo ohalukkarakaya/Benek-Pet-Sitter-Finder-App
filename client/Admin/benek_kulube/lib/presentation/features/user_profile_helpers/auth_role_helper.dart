@@ -36,4 +36,25 @@ class AuthRoleHelper {
         return AuthRoleData( authRole: -1, authRoleColor: unauthorizedUserColor, authRoleText: unauthorizedUser );
     }
   }
+
+  static int getAuthRoleIdFromRoleName(String authRoleText) {
+    switch (authRoleText) {
+      case 'regularUser':
+        return 0;
+      case 'superAdmin':
+        return 1;
+      case 'developer':
+        return 2;
+      case 'moderator':
+        return 3;
+      case 'accountant':
+        return 4;
+      default:
+        return -1;
+    }
+  }
+
+  static bool checkIfRequiredRole(int authRole, List<int> requiredRoles) {
+    return requiredRoles.contains(authRole);
+  }
 }

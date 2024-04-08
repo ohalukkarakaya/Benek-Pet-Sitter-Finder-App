@@ -36,10 +36,37 @@ class _BenekAvatarGridWidgetState extends State<BenekAvatarGridWidget> {
         color: AppColors.benekBlackWithOpacity,
         borderRadius: BorderRadius.circular(6),
       ),
-      child: BenekAvatarGridViewWidget(
-          list: widget.list,
-          emptyMessage: widget.emptyMessage,
-          shouldEnableShimmer: widget.shouldEnableShimmer || widget.list[0] is String,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            BenekStringHelpers.locale('usersPets'),
+            style: const TextStyle(
+              fontFamily: 'Qanelas',
+              fontSize: 12,
+              color: AppColors.benekWhite,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const Divider(color: AppColors.benekWhite, thickness: 0.5),
+          Padding(
+            padding: const EdgeInsets.only( top: 25.0),
+            child: SizedBox(
+              width: 200,
+              height: 120,
+              child: BenekAvatarGridViewWidget(
+                  list: widget.list,
+                  emptyMessage: widget.emptyMessage,
+                  shouldEnableShimmer: widget.shouldEnableShimmer
+                                       || (
+                                            widget.list != null
+                                            && widget.list.isNotEmpty
+                                            && widget.list[0] is String
+                                      ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

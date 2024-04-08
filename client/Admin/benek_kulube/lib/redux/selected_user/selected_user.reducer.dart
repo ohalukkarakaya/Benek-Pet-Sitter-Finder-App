@@ -9,6 +9,12 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
   }else if( action is GetPetsByUserIdRequestAction ){
     userInfo!.addPets(action.pets!);
     return userInfo;
+  }else if( action is InitPastCareGiversAction ){
+    userInfo!.addPastCareGivers(action.pastCareGiversList!);
+    return userInfo;
+  }else if( action is InitCareGiveDataAction ){
+    userInfo!.addCareGiveCareer(action.careGiveList!);
+    return userInfo;
   }
 
   return userInfo;
