@@ -24,8 +24,8 @@ class CareGiveListElement extends StatelessWidget {
               child: BenekCircleAvatar(
                   isDefaultAvatar: careGiveInfo.pet!.petProfileImg.isDefaultImg,
                   imageUrl: careGiveInfo.pet!.petProfileImg.imgUrl,
-                  width: 35,
-                  height: 35,
+                  width: 30,
+                  height: 30,
                   borderWidth: 2,
               ),
             ),

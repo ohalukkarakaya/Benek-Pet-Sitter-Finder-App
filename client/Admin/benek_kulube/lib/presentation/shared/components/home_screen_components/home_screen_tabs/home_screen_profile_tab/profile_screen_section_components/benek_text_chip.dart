@@ -10,13 +10,13 @@ class BenekTextChip extends StatefulWidget {
   final bool enableHoverEffect;
   final bool shouldCopyOnTap;
   final Function()? onTap;
-  final String text;
+  final String? text;
   const BenekTextChip({
     super.key,
     this.enableHoverEffect = false,
     this.shouldCopyOnTap = true,
     this.onTap,
-    required this.text
+    this.text
   });
 
   @override
@@ -46,8 +46,8 @@ class _BenekTextChipState extends State<BenekTextChip> {
         controller: _tooltipController,
         child: GestureDetector(
           onTap: () async {
-            if(widget.shouldCopyOnTap){
-              Clipboard.setData(ClipboardData(text: widget.text));
+            if(widget.shouldCopyOnTap && widget.text != null){
+              Clipboard.setData(ClipboardData(text: widget.text!));
               setState(() {
                 _tooltipController.show();
               });

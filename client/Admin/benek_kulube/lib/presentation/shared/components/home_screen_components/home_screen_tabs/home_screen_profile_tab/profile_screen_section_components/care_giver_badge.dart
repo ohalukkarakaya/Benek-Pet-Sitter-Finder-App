@@ -24,7 +24,7 @@ class _CareGiverBadgeState extends State<CareGiverBadge> {
 
     return Center(
       child: ElTooltip(
-        color: AppColors.benekLightBlue,
+        color: AppColors.benekBlack,
         showModal: false,
         showChildAboveOverlay: false,
         position: ElTooltipPosition.bottomCenter,
@@ -33,7 +33,7 @@ class _CareGiverBadgeState extends State<CareGiverBadge> {
                 ? BenekStringHelpers.locale('userIsCareGiver')
                 : BenekStringHelpers.locale('userIsNotCareGiver'),
             style: const TextStyle(
-                color: AppColors.benekBlack,
+                color: AppColors.benekWhite,
                 fontSize: 12.0,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'Qanelas'
@@ -58,7 +58,9 @@ class _CareGiverBadgeState extends State<CareGiverBadge> {
           child: Container(
             padding: const EdgeInsets.all(6.0),
             decoration: BoxDecoration(
-              color: AppColors.benekBlack.withOpacity(0.2),
+              color: _tooltipController.value == ElTooltipStatus.showing
+                  ? AppColors.benekBlack.withOpacity(0.5)
+                  : AppColors.benekBlackWithOpacity,
               borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
             ),
             child: Container(

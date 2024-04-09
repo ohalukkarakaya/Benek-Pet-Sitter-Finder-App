@@ -59,5 +59,7 @@ class AppStaticTextsTr{
     'giveAuthRoleButonText': 'Yetki Ver',
     'copied': 'Kopyalandı!',
     'showOnMap': 'Haritada Göster',
+    'punishUser': 'Cezalandır',
+    'seeDetails': 'Detayları Gör',
   };
 }

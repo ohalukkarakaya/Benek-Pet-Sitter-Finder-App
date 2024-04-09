@@ -29,7 +29,7 @@ class ProfileAdressWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return location == null || openAdress == null
         ? Shimmer.fromColors(
-          baseColor: AppColors.benekBlack.withOpacity(0.5),
+          baseColor: AppColors.benekBlack.withOpacity(0.4),
           highlightColor: AppColors.benekBlack.withOpacity(0.2),
           child: Container(
             width: 150,

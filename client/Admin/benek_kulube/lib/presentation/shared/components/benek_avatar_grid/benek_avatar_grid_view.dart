@@ -31,7 +31,7 @@ class _BenekAvatarGridViewWidgetState extends State<BenekAvatarGridViewWidget> {
     return itemCount > 0
     ? widget.shouldEnableShimmer || widget.list[0] is! PetModel
       ? Shimmer.fromColors(
-          baseColor: AppColors.benekBlack.withOpacity(0.5),
+          baseColor: AppColors.benekBlack.withOpacity(0.4),
           highlightColor: AppColors.benekBlack.withOpacity(0.2),
           enabled: widget.shouldEnableShimmer,
           child: GridView.builder(

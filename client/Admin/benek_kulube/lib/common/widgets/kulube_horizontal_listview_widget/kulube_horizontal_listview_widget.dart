@@ -44,7 +44,7 @@ class _KulubeHorizontalListViewWidgetState extends State<KulubeHorizontalListVie
         backgroundColor: Colors.transparent,
         body: widget.shouldShowShimmer
         ?  Shimmer.fromColors(
-            baseColor: AppColors.benekBlack.withOpacity(0.5),
+            baseColor: AppColors.benekBlack.withOpacity(0.4),
             highlightColor: AppColors.benekBlack.withOpacity(0.2),
             enabled: widget.shouldShowShimmer,
             child: widget.child ?? const SizedBox(),

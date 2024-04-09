@@ -30,7 +30,7 @@ class _BenekCopyButtonState extends State<BenekCopyButton> {
         color: AppColors.benekLightBlue,
         showModal: false,
         showChildAboveOverlay: false,
-        position: ElTooltipPosition.bottomCenter,
+        position: ElTooltipPosition.bottomEnd,
         content:  Text(
             BenekStringHelpers.locale('copied'),
             style: const TextStyle(

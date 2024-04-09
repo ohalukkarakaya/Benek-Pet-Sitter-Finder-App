@@ -34,13 +34,13 @@ class ProfileContactRowWidget extends StatelessWidget {
           BenekTextChip(
             enableHoverEffect: true,
             shouldCopyOnTap: true,
-            text: email ?? " - ",
+            text: email,
           ),
 
           BenekTextChip(
             enableHoverEffect: true,
             shouldCopyOnTap: true,
-            text: phoneNumber != null ? BenekStringHelpers.formatPhoneNumber(phoneNumber!) : " - ",
+            text: phoneNumber != null ? BenekStringHelpers.formatPhoneNumber(phoneNumber!) : null,
           ),
         ],
       ),

@@ -59,5 +59,7 @@ class AppStaticTextsEn{
     'giveAuthRoleButonText': 'Give Auth Role',
     'copied': 'Copied!',
     'showOnMap': 'Show on Map',
+    'punishUser': 'Punish User',
+    'seeDetails': 'See Details',
   };
 }

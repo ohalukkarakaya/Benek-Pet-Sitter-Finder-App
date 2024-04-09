@@ -1,4 +1,5 @@
 import 'package:benek_kulube/presentation/features/user_profile_helpers/auth_role_helper.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/punish_buton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -112,14 +113,14 @@ class ProfileRowWidget extends StatelessWidget {
           ),
         ),
 
-        Container(
-          padding: const EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-            color: AppColors.benekBlack.withOpacity(0.2),
-            borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+        PunishUserButton(
+          isActive: AuthRoleHelper.checkIfRequiredRole(
+            authRoleId,
+            [
+              AuthRoleHelper.getAuthRoleIdFromRoleName( 'superAdmin' ),
+              AuthRoleHelper.getAuthRoleIdFromRoleName( 'moderator' )
+            ]
           ),
-          width: 150,
-          height: 50,
         ),
       ],
     );

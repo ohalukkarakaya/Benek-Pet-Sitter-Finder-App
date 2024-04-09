@@ -41,7 +41,7 @@ class StoryElement extends StatelessWidget {
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      AppColors.benekBlack,
+                      AppColors.benekBlack.withOpacity(0.8),
                       AppColors.benekBlack.withOpacity(0.0),
                     ],
                   ),

@@ -7,22 +7,25 @@ import 'package:flutter/material.dart';
 class KulubeSearchBarButon extends StatelessWidget {
   const KulubeSearchBarButon({super.key});
 
+  void _onTap(BuildContext context) async {
+    await Navigator.push(
+      context,
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible: false,
+        pageBuilder: (context, _, __) => const KulubeUserSearchScreen(),
+      ),
+    );
+    // setState çağrısı burada olabilir
+  }
+
   @override
   Widget build(BuildContext context) {
     
     return Padding(
       padding: const EdgeInsets.only(top: 45.0, left: 150.0),
       child: GestureDetector(
-          onTap: () async {
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                opaque: false,
-                barrierDismissible: false,
-                pageBuilder: (context, _, __) => const KulubeUserSearchScreen(),
-              )
-            );
-          },
+          onTap: () => _onTap(context),
           child: Hero(
             tag: 'user_search_text_field',
             createRectTween: (begin, end) {

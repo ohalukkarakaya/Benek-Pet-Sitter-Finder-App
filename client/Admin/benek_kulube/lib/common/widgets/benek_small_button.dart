@@ -68,7 +68,7 @@ class _BenekSmallButtonState extends State<BenekSmallButton> {
           color: AppColors.benekLightBlue,
           showModal: false,
           showChildAboveOverlay: false,
-          position: ElTooltipPosition.bottomCenter,
+          position: ElTooltipPosition.topStart,
           content:  Text(
               widget.tooltipMessage!,
               style: const TextStyle(

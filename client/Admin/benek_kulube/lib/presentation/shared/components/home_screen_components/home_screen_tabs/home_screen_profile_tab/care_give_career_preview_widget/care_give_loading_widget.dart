@@ -9,7 +9,7 @@ class CareGiveLoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: AppColors.benekBlack.withOpacity(0.5),
+      baseColor: AppColors.benekBlack.withOpacity(0.4),
       highlightColor: AppColors.benekBlack.withOpacity(0.2),
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

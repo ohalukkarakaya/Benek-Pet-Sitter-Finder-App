@@ -18,10 +18,15 @@ import giveUserAuthorizationRoleController from "../../controllers/adminRoutes/g
 import getBannedUsersListController from "../../controllers/adminRoutes/getBannedUsersListController.js";
 import removeBanController from "../../controllers/adminRoutes/removeBanController.js";
 import getAllEmployeesController from "../../controllers/adminRoutes/getAllEmployeesController.js";
+import getUsersChatsAsAdminController from "../../controllers/adminRoutes/getUsersChatsAsAdminController.js";
+import searchChatAsAdminController from "../../controllers/adminRoutes/searchChatAsAdminController.js";
+import getUsersMessagesAsAdminController from "../../controllers/adminRoutes/getUsersMessagesAsAdminController.js";
 
 import { adminAuthAny, adminAuthSuperAdmin, adminAuthEvaluator, adminAuthAccounting } from "../../middleware/adminAuth.js";
 
 import dotenv from "dotenv";
+import searchChatController from "../../controllers/chatRoutesControllers/chatControllers/searchChatController.js";
+
 
 
 dotenv.config();
@@ -57,6 +62,27 @@ router.get(
     "/reportedMissionList/:lastItemId/:limit",
     adminAuthEvaluator,
     getReportedMissionListController
+);
+
+// get users chat as admin
+router.get(
+    "/getUsersChat/:userId/:limit/:lastItemId",
+    adminAuthEvaluator,
+    getUsersChatsAsAdminController
+);
+
+// search users chat as admin
+router.get(
+    "/searchUsersChat/:userId/:searchText",
+    adminAuthEvaluator,
+    searchChatAsAdminController
+);
+
+// get users messages as admin
+router.get(
+    "/getUsersMessages/:userId/:chatId/:limit/:lastItemId",
+    adminAuthEvaluator,
+    getUsersMessagesAsAdminController
 );
 
 // - tested

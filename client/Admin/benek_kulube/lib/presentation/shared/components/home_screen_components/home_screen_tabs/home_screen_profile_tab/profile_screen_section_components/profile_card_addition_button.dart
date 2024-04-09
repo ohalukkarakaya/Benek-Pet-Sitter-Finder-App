@@ -27,14 +27,14 @@ class _ProfileCardAdditionButtonState extends State<ProfileCardAdditionButton> {
   Widget build(BuildContext context) {
     return Center(
       child: ElTooltip(
-        color: AppColors.benekLightBlue,
+        color: AppColors.benekBlack,
         showModal: false,
         showChildAboveOverlay: false,
         position: ElTooltipPosition.bottomCenter,
         content:  Text(
             widget.hoveringText,
             style: const TextStyle(
-                color: AppColors.benekBlack,
+                color: AppColors.benekWhite,
                 fontSize: 12.0,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'Qanelas'
@@ -59,8 +59,8 @@ class _ProfileCardAdditionButtonState extends State<ProfileCardAdditionButton> {
           child: Container(
             decoration: BoxDecoration(
               color: _tooltipController.value != ElTooltipStatus.showing
-                  ? AppColors.benekBlack.withOpacity(0.2)
-                  : AppColors.benekLightBlue,
+                  ? AppColors.benekBlackWithOpacity
+                  : AppColors.benekBlack.withOpacity(0.5),
               borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15),
@@ -68,9 +68,7 @@ class _ProfileCardAdditionButtonState extends State<ProfileCardAdditionButton> {
               angle: widget.angle,
               child: Icon(
                 widget.iconData,
-                color: _tooltipController.value != ElTooltipStatus.showing
-                    ? AppColors.benekWhite
-                    : AppColors.benekBlack,
+                color: AppColors.benekWhite,
               ),
           ),
         ),

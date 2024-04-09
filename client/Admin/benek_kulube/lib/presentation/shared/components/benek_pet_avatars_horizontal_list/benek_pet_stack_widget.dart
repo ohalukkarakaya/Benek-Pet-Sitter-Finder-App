@@ -24,14 +24,14 @@ class _BenekPetStackWidgetState extends State<BenekPetStackWidget> {
   Widget build(BuildContext context) {
     return Center(
       child: ElTooltip(
-        color: AppColors.benekLightBlue,
+        color: AppColors.benekBlack,
         showModal: false,
         showChildAboveOverlay: false,
         position: ElTooltipPosition.bottomCenter,
         content:  Text(
             BenekStringHelpers.locale('usersPets'),
             style: const TextStyle(
-                color: AppColors.benekBlack,
+                color: AppColors.benekWhite,
                 fontSize: 12.0,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'Qanelas'
@@ -41,7 +41,11 @@ class _BenekPetStackWidgetState extends State<BenekPetStackWidget> {
         child: MouseRegion(
           onHover: (event) {
             setState(() {
-              if( _tooltipController.value != ElTooltipStatus.showing ){
+              if(
+                  _tooltipController.value != ElTooltipStatus.showing
+                  && widget.petList != null
+                  && widget.petList!.isNotEmpty
+              ){
                 _tooltipController.show();
               }
             });
@@ -55,11 +59,15 @@ class _BenekPetStackWidgetState extends State<BenekPetStackWidget> {
           },
           child: Container(
             width: 200,
-            decoration: BoxDecoration(
-              color: AppColors.benekBlackWithOpacity,
-              borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
-            ),
-            padding: const EdgeInsets.symmetric( horizontal: 10.0, vertical: 5.0 ),
+            decoration: widget.petList == null || widget.petList!.isEmpty
+              ? BoxDecoration(
+                color: AppColors.benekBlackWithOpacity,
+                borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+              )
+              : null,
+            padding: widget.petList == null || widget.petList!.isEmpty
+              ? const EdgeInsets.symmetric( horizontal: 10.0, vertical: 5.0 )
+              : null,
             child: BenekHorizontalStackedPetAvatarWidget(
               size: 40,
               petList: widget.petList,
