@@ -1,0 +1,77 @@
+import 'package:benek_kulube/common/constants/message_type_enum.dart';
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../../../../data/models/chat_models/chat_member_model.dart';
+import '../../../../../../../data/models/chat_models/chat_model.dart';
+import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
+import 'chat_preview_element_message_component.dart';
+import 'chat_stacked_profile.dart';
+
+class ChatPreviewElement extends StatelessWidget {
+  final ChatModel chatInfo;
+  const ChatPreviewElement({
+    super.key,
+    required this.chatInfo
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                SizedBox(
+                  width: 100,
+                  height: 35,
+                  child: ChatStackedProfile( chatMembers: chatInfo.members )
+                ),
+
+                const SizedBox( width: 10.0 ),
+
+                chatInfo.messages != null
+                && chatInfo.messages!.isNotEmpty
+                && chatInfo.messages![0] != null
+                && chatInfo.members != null
+                && chatInfo.messages![0].sendedUserId != null
+                && (
+                    chatInfo.messages![0].message != null
+                    || chatInfo.messages![0].fileUrl != null
+                    || chatInfo.messages![0].paymentOffer != null
+                )
+                  ? ChatPreviewElementMessageComponent(
+                  senderUserName: chatInfo.members!.firstWhere(
+                          (user) =>
+                            user.userData!.userId == chatInfo.messages![0].sendedUserId!,
+                          orElse: () => ChatMemberModel(
+                            userData: UserInfo( userName: "" ),
+                            joinDate: null
+                          )
+                  ).userData!.userName!,
+                  message: chatInfo.messages![0].messageType != MessageTypeEnum.UNDEFINED
+                    ? chatInfo.messages![0].message != null
+                      ? chatInfo.messages![0].message!
+                      : getMessageTypeTitle(chatInfo.messages![0].messageType!)
+                    : BenekStringHelpers.locale('undefinedMessageType')
+                )
+                : ChatPreviewElementMessageComponent(
+                  senderUserName: "",
+                  message: BenekStringHelpers.locale('noMessage')
+                )
+              ],
+            ),
+
+          ],
+        )
+      ]
+    );
+  }
+}

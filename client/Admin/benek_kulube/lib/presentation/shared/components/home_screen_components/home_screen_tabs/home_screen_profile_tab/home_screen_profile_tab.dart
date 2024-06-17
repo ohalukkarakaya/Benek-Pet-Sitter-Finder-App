@@ -15,20 +15,10 @@ import 'package:benek_kulube/presentation/shared/components/home_screen_componen
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:el_tooltip/el_tooltip.dart';
-
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
-import 'package:shimmer/shimmer.dart';
-
-import '../../../../../../common/constants/app_colors.dart';
-import '../../../../../../common/constants/benek_icons.dart';
 import '../../../../../../common/widgets/benek_message_box_widget/benek_message_box_widget.dart';
 import '../../../../../../data/models/user_profile_models/user_info_model.dart';
-import '../../../../../../data/models/user_profile_models/user_past_care_givers_model.dart';
-import '../../../benek_avatar_grid/benek_avatar_grid_widget.dart';
-import '../../../benek_pet_avatars_horizontal_list/benek_horizontal_avatar_stack.dart';
-import '../../../benek_pet_avatars_horizontal_list/benek_pet_avatars_horizontal_list.dart';
 import '../../../benek_pet_avatars_horizontal_list/benek_pet_stack_widget.dart';
 import 'benek_profile_stars_widget/benek_profile_star_widget.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';

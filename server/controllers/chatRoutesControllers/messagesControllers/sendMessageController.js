@@ -209,7 +209,7 @@ const sendMessageController = async ( req, res ) => {
         const responseChat = {
             id: savedChat._id.toString(),
             members: chatMemberInfoList,
-            chatStratDate: savedChat.chatStartDate,
+            chatStartDate: savedChat.chatStartDate,
             chatName: savedChat.chatName,
             chatDesc: savedChat.chatDesc,
             chatImageUrl: savedChat.chatImageUrl,

@@ -47,12 +47,16 @@ class PetModel {
         this.allOwnerInfoList});
 
   PetModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'] ?? json['petId'];
+    id = json['id'] ?? (json['_id'] ?? json['petId']);
     name = json['name'] ?? json['petName'];
-    petProfileImg = json['petProfileImg'] != null || json['petProfileImgUrl'] != null
+    petProfileImg = json['petProfileImg'] != null
+        || json['petProfileImgUrl'] != null
         ? UserProfileImg(
-          imgUrl: json['petProfileImg'] ?? json['petProfileImgUrl'],
-          isDefaultImg: json['isDefaultImg'] ?? json['isDefault'],
+          imgUrl: json['petProfileImg'] is Map<String, dynamic>
+              ? json['petProfileImg']['imgUrl']
+              : json['petProfileImgUrl']
+              ?? json['petProfileImg'],
+          isDefaultImg: json['petProfileImg'] is Map<String, dynamic> ? json['petProfileImg']['isDefaultImg'] : json['isDefaultImg'] ?? json['isDefault'],
         )
         : null;
     bio = json['bio'];

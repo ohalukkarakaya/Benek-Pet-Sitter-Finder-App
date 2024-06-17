@@ -1,3 +1,4 @@
+import 'package:benek_kulube/data/models/chat_models/chat_state_model.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_care_giver_career_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_deactivation_model.dart';
@@ -35,6 +36,7 @@ class UserInfo {
   String? gender;
   String? defaultImage;
   int? totalStar;
+  ChatStateModel? chatData;
 
   UserInfo(
     {
@@ -62,7 +64,8 @@ class UserInfo {
       this.interestingPetTags,
       this.gender,
       this.defaultImage,
-      this.totalStar
+      this.totalStar,
+      this.chatData
     }
   );
 
@@ -87,13 +90,19 @@ class UserInfo {
         ? UserLocation.fromJson( json['location'] )
         : null;
     profileImg = json['profileImg'] != null
-        ? UserProfileImg.fromJson( json['profileImg'] )
-        : json['userProfileImg'] != null
+        && json['isProfileImageDefault'] != null
           ? UserProfileImg(
-              imgUrl: json['userProfileImg'],
+              imgUrl: json['profileImg'],
               isDefaultImg: json['isProfileImageDefault'],
           )
-          : null;
+          : json['profileImg'] != null
+            ? UserProfileImg.fromJson( json['profileImg'] )
+            : json['userProfileImg'] != null
+              ? UserProfileImg(
+                  imgUrl: json['userProfileImg'],
+                  isDefaultImg: json['isProfileImageDefault'],
+              )
+              : null;
     pets = json['pets'] != null ? json['pets'].cast<dynamic>() : <dynamic>[];
     isCareGiver = json['isCareGiver'];
     if( json['pastCaregivers'] != null || json['pastCareGivers'] != null ){
@@ -156,6 +165,9 @@ class UserInfo {
     gender = json['gender'];
     defaultImage = json['defaultImage'] ?? json['userProfileImg'];
     totalStar = json['totalStar'];
+    chatData = json['chatData'] != null
+        ? ChatStateModel.fromJson( json['chatData'] )
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -217,6 +229,9 @@ class UserInfo {
     data['gender'] = gender;
     data['defaultImage'] = defaultImage;
     data['totalStar'] = totalStar;
+    if( chatData != null ){
+      data['chatData'] = chatData!.toJson();
+    }
     return data;
   }
 
@@ -230,5 +245,9 @@ class UserInfo {
 
   dynamic addCareGiveCareer( List<UserCaregiverCareer> careGiverCareerDataList ){
     caregiverCareer = careGiverCareerDataList;
+  }
+
+  dynamic addChatData( ChatStateModel inComingChatData ){
+    chatData = inComingChatData;
   }
 }

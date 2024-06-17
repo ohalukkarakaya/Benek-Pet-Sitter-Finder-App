@@ -61,5 +61,15 @@ class AppStaticTextsEn{
     'showOnMap': 'Show on Map',
     'punishUser': 'Punish User',
     'seeDetails': 'See Details',
+    'usersMessagesTitle': 'User\'s Messages',
+    'textMessageTitle': 'Sent a Message',
+    'fileMessageTitle': 'Sent a File',
+    'paymentOfferMessageTitle': 'Offered Payment',
+    'userProfileMessageTitle': 'Sent a User Profile',
+    'petProfileMessageTitle': 'Sent a Pet Profile',
+    'eventMessageTitle': 'Sent an Event',
+    'undefinedMessageType': 'Undefined Message Type',
+    'emptyMessageBoxTitle': 'Message Box is Empty',
+    'noMessage': 'No Message Yet!',
   };
 }

@@ -61,5 +61,15 @@ class AppStaticTextsTr{
     'showOnMap': 'Haritada Göster',
     'punishUser': 'Cezalandır',
     'seeDetails': 'Detayları Gör',
+    'usersMessagesTitle': 'Kullanıcının Mesajları',
+    'textMessageTitle': 'Mesaj Gönderdi',
+    'fileMessageTitle': 'Dosya Gönderdi',
+    'paymentOfferMessageTitle': 'Ödeme Teklif Etti',
+    'userProfileMessageTitle': 'Kullanıcı Profili Gönderdi',
+    'petProfileMessageTitle': 'Hayvan Profili Gönderdi',
+    'eventMessageTitle': 'Bir Etkinlik Paylaştı',
+    'undefinedMessageType': 'Tanımlanamayan Mesaj Türü',
+    'emptyMessageBoxTitle' : 'Mesaj Kutusu Boş',
+    'noMessage': 'Hiç Mesaj Yok!',
   };
 }

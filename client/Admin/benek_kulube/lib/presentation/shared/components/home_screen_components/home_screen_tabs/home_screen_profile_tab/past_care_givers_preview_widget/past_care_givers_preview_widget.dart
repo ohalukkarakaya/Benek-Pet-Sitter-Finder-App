@@ -80,8 +80,10 @@ class _PastCareGiverPreviewWidgetState extends State<PastCareGiverPreviewWidget>
                               height: 38,
                               child: widget.pastCareGiveList != null
                                   && widget.pastCareGiveList!.isNotEmpty
-                                  && widget.pastCareGiveList![index].careGiver is String
-                                  && widget.pastCareGiveList![index].pet is String
+                                  && (
+                                    widget.pastCareGiveList![index].careGiver is String
+                                    || widget.pastCareGiveList![index].pet is String
+                                  )
                                       ? const PastCareGiversLoadingWidget()
                                       : PastCareGiversListElement(pastCareGiverInfo: widget.pastCareGiveList![index]),
                             ),

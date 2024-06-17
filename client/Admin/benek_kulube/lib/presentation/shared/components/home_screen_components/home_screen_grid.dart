@@ -9,6 +9,8 @@ import 'package:benek_kulube/store/app_state.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 
+import 'home_screen_tabs/home_screen_right_tabs/home_screen_home_right_bar/home_screen_home_right_bar.dart';
+import 'home_screen_tabs/home_screen_right_tabs/home_screen_home_right_bar/home_screen_profile_right_tab.dart';
 import 'home_screen_tabs_bar_companents/home_screen_tabs_bar.dart';
 
 class HomeScreenGrid extends StatelessWidget {
@@ -23,7 +25,15 @@ class HomeScreenGrid extends StatelessWidget {
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+
+
+          // Left Tab
+          // =====================================================
           HomeScreenTabsBar( store: store,),
+
+
+          // Center Tab
+          // =====================================================
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -59,29 +69,15 @@ class HomeScreenGrid extends StatelessWidget {
               ),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  right: 40.0, 
-                  top: 50.0
-                ),
-                child: BenekCircleAvatar(
-                  width: 50,
-                  height: 50,
-                  radius: 100,
-                  isDefaultAvatar: store.state.userInfo!.profileImg!.isDefaultImg!,
-                  imageUrl: store.state.userInfo!.profileImg!.imgUrl!,
-                )
-              ),
-              Image.asset(
-                'assets/images/saluting_dog.png',
-                width: 350,
-              ),
-            ],
-          ),
+
+
+          // Right Tab
+          // =====================================================
+          store.state.selectedUserInfo == null
+            ? HomeScreenHomeRightTab( profileImg: store.state.userInfo!.profileImg! )
+            : const HomeScreenProfileRightTab(),
+
+
         ],
       );
   }

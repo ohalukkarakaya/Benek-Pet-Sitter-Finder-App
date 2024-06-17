@@ -1,5 +1,7 @@
-import Chat from "../../../models/Chat/Chat.js";
-import User from "../../../models/User.js";
+import Chat from "../../models/Chat/Chat.js";
+import User from "../../models/User.js";
+
+import mongoose from "mongoose";
 
 const getUsersChatsAsAdminController = async (req, res) => {
     try{

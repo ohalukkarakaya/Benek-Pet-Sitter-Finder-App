@@ -17,8 +17,6 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
     this.size = 50.0,
   });
 
-  @override
-
   Widget _buildChild(){
     return SizedBox(
       height: size,
@@ -81,6 +79,7 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: size,

@@ -1,0 +1,143 @@
+import 'dart:developer';
+
+import 'package:benek_kulube/data/models/chat_models/chat_model.dart';
+import 'package:benek_kulube/presentation/features/user_profile_helpers/auth_role_helper.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+// ignore: depend_on_referenced_packages
+import 'package:redux/redux.dart';
+import 'package:socket_io_client/socket_io_client.dart' as io;
+
+import 'package:benek_kulube/store/app_state.dart';
+import 'package:benek_kulube/store/actions/app_actions.dart';
+
+import '../../../../../../../common/constants/app_config.dart';
+import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
+import '../../../../benek_circle_avatar/benek_circle_avatar.dart';
+import '../../home_screen_profile_tab/message_components/chat_preview_component.dart';
+
+class HomeScreenProfileRightTab extends StatefulWidget {
+  const HomeScreenProfileRightTab({super.key});
+
+  @override
+  State<HomeScreenProfileRightTab> createState() => _HomeScreenProfileRightTabState();
+}
+
+class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
+  bool didRequestSend = false;
+
+  var socket = io.io(
+      AppConfig.socketServerBaseUrl,
+      <String, dynamic>{
+        'transports': ['websocket'],
+        'autoConnect': false,
+      }
+  );
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Store<AppState> store = StoreProvider.of<AppState>(context);
+      if( !didRequestSend ){
+        didRequestSend = true;
+
+        // Moderator Operations Auth Check
+        if(
+          AuthRoleHelper.checkIfRequiredRole( store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
+          && store.state.selectedUserInfo != null
+          && store.state.selectedUserInfo!.userId != null
+        ){
+         // Moderator Operations
+         await store.dispatch(getUsersChatAsAdminRequestAction(store.state.selectedUserInfo!.userId!, null));
+
+         // Connect to web socket
+         socket.connect();
+
+         // Let User Know That You Are Here
+         Future.delayed(Duration.zero, () async {
+           socket.emit('addEvaluatorToChat',  store.state.userInfo!.userId);
+         });
+
+         // Listen for incoming messages
+         socket.on('getMessage', (data) async {
+           ChatModel receivingChatData = ChatModel.fromJson(data['responseChat']);
+           await store.dispatch(getUsersChatAsAdminRequestActionFromSocket(receivingChatData));
+         });
+        }
+
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    socket.disconnect();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context){
+    return StoreConnector<AppState, UserInfo?>(
+      converter: (store) => store.state.selectedUserInfo,
+      builder: (BuildContext context, UserInfo? selectedUserInfo){
+        var store = StoreProvider.of<AppState>( context );
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SizedBox(
+              width: 350,
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  scrollbars: false,
+                  overscroll: false,
+                  physics: const BouncingScrollPhysics(),
+                ),
+                child: ListView(
+                  shrinkWrap: true,
+                  physics: store.state.selectedUserInfo == null
+                      ? const NeverScrollableScrollPhysics()
+                      : const BouncingScrollPhysics(),
+                  children: [
+
+                    Padding(
+                        padding: const EdgeInsets.only(
+                            right: 40.0,
+                            top: 50.0,
+                            bottom: 70.0
+                        ),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              BenekCircleAvatar(
+                                width: 50,
+                                height: 50,
+                                radius: 100,
+                                isDefaultAvatar: store.state.userInfo!.profileImg!.isDefaultImg!,
+                                imageUrl: store.state.userInfo!.profileImg!.imgUrl!,
+                              ),
+                            ],
+                          ),
+                        )
+                    ),
+
+                    selectedUserInfo != null
+                    && selectedUserInfo.chatData != null
+                    ? ChatPreviewWidget(
+                      chatInfo: selectedUserInfo.chatData!,
+                    )
+                    : const SizedBox(),
+                  ],
+                ),
+              ),
+            )
+          ],
+        );
+      }
+    );
+  }
+}

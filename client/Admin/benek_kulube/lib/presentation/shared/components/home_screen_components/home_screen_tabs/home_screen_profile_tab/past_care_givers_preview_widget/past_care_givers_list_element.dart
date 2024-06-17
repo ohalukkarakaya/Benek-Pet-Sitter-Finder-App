@@ -14,6 +14,11 @@ class PastCareGiversListElement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    if( pastCareGiverInfo.pet is String ){
+      print('pet: ${pastCareGiverInfo.pet}');
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

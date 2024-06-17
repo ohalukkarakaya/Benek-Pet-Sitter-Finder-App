@@ -17,6 +17,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 
+import '../models/chat_models/chat_state_model.dart';
 import '../models/pet_models/pet_model.dart';
 import '../models/story_models/story_model.dart';
 
@@ -31,5 +32,6 @@ part 'get_recomended_users_api/get_recomended_users_api.dart';
 part 'story_api/story_api.dart';
 part 'pet_api/pet_api.dart';
 part 'get_user_info_apies/get_light_weight_user_info_by_user_id_list.dart';
+part 'chat_moderating_apies/get_users_chat_as_admin/get_users_chat_as_admin_api.dart';
 
 ApiClient defaultApiClient = ApiClient();
