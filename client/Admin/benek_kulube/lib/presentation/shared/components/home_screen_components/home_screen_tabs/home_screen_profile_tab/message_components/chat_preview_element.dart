@@ -8,11 +8,12 @@ import '../../../../../../../data/models/user_profile_models/user_info_model.dar
 import 'chat_preview_element_message_component.dart';
 import 'chat_stacked_profile.dart';
 
+
 class ChatPreviewElement extends StatelessWidget {
   final ChatModel chatInfo;
   const ChatPreviewElement({
     super.key,
-    required this.chatInfo
+    required this.chatInfo,
   });
 
   @override
@@ -20,58 +21,49 @@ class ChatPreviewElement extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                SizedBox(
-                  width: 100,
-                  height: 35,
-                  child: ChatStackedProfile( chatMembers: chatInfo.members )
-                ),
-
-                const SizedBox( width: 10.0 ),
-
-                chatInfo.messages != null
-                && chatInfo.messages!.isNotEmpty
-                && chatInfo.messages![0] != null
-                && chatInfo.members != null
-                && chatInfo.messages![0].sendedUserId != null
-                && (
-                    chatInfo.messages![0].message != null
-                    || chatInfo.messages![0].fileUrl != null
-                    || chatInfo.messages![0].paymentOffer != null
-                )
+        SizedBox(
+          width: 100,
+          height: 35,
+          child: ChatStackedProfile(chatMembers: chatInfo.members),
+        ),
+        const SizedBox(width: 10.0),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              chatInfo.messages != null &&
+                  chatInfo.messages!.isNotEmpty &&
+                  chatInfo.messages![0] != null &&
+                  chatInfo.members != null &&
+                  chatInfo.messages![0].sendedUserId != null &&
+                  (chatInfo.messages![0].message != null ||
+                      chatInfo.messages![0].fileUrl != null ||
+                      chatInfo.messages![0].paymentOffer != null)
                   ? ChatPreviewElementMessageComponent(
-                  senderUserName: chatInfo.members!.firstWhere(
-                          (user) =>
-                            user.userData!.userId == chatInfo.messages![0].sendedUserId!,
-                          orElse: () => ChatMemberModel(
-                            userData: UserInfo( userName: "" ),
-                            joinDate: null
-                          )
-                  ).userData!.userName!,
-                  message: chatInfo.messages![0].messageType != MessageTypeEnum.UNDEFINED
+                senderUserName: chatInfo.members!.firstWhere(
+                      (user) =>
+                          user.userData!.userId == chatInfo.messages![0].sendedUserId!,
+                      orElse: () => ChatMemberModel(
+                        userData: UserInfo(userName: ""),
+                        joinDate: null,
+                      ),
+                ).userData!.userName!,
+                message: chatInfo.messages![0].messageType !=
+                    MessageTypeEnum.UNDEFINED
                     ? chatInfo.messages![0].message != null
-                      ? chatInfo.messages![0].message!
-                      : getMessageTypeTitle(chatInfo.messages![0].messageType!)
-                    : BenekStringHelpers.locale('undefinedMessageType')
-                )
-                : ChatPreviewElementMessageComponent(
-                  senderUserName: "",
-                  message: BenekStringHelpers.locale('noMessage')
-                )
-              ],
-            ),
-
-          ],
-        )
-      ]
+                    ? chatInfo.messages![0].message!
+                    : getMessageTypeTitle(
+                    chatInfo.messages![0].messageType!)
+                    : BenekStringHelpers.locale('undefinedMessageType'),
+              )
+                  : ChatPreviewElementMessageComponent(
+                senderUserName: "",
+                message: BenekStringHelpers.locale('noMessage'),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

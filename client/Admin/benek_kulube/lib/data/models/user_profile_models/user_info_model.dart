@@ -70,7 +70,7 @@ class UserInfo {
   );
 
   UserInfo.fromJson( Map<String, dynamic> json ){
-    userId = json ['_id'] ?? json['userId'];
+    userId = json['userId'] ?? json ['_id'];
     userName = json['userName'] ?? json['username'];
     authRole = json['authRole'] ?? 0;
     identity = json['identity'] != null
