@@ -52,7 +52,7 @@ class ProfileRowWidget extends StatelessWidget {
                       selectedUserInfo.identity!.firstName!,
                       selectedUserInfo.identity!.lastName!,
                       selectedUserInfo.identity!.middleName,
-                      15 // Character Limit
+                      14 // Character Limit
                   ),
                   style: const TextStyle(
                       fontFamily: 'Qanelas',
