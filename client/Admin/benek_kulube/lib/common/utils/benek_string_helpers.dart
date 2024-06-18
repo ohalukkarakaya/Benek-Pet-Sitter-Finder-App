@@ -81,6 +81,15 @@ class BenekStringHelpers {
     return "$firstName $middleNameAsString${lastName.toUpperCase()}";
   }
 
+  static String getUsersFullNameWithCharacterLimit( String firstName, String lastName, String? middleName, int maxCharCount){
+    String  middleNameAsString = middleName != null ? "$middleName " : "";
+    String fullName = "$firstName $middleNameAsString${lastName.toUpperCase()}";
+    if (fullName.length > maxCharCount) {
+      return "${fullName.substring(0, maxCharCount)}...";
+    }
+    return fullName;
+  }
+
   static String locale(String key){
      String language = ui.window.locale.languageCode;
      //  String language = 'en';

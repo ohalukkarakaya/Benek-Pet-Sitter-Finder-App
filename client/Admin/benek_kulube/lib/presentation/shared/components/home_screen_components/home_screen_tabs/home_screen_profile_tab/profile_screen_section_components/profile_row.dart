@@ -48,10 +48,11 @@ class ProfileRowWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  BenekStringHelpers.getUsersFullName(
+                  BenekStringHelpers.getUsersFullNameWithCharacterLimit(
                       selectedUserInfo.identity!.firstName!,
                       selectedUserInfo.identity!.lastName!,
-                      selectedUserInfo.identity!.middleName
+                      selectedUserInfo.identity!.middleName,
+                      15 // Character Limit
                   ),
                   style: const TextStyle(
                       fontFamily: 'Qanelas',
