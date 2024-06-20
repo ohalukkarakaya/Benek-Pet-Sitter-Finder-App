@@ -27,8 +27,8 @@ class LogModel {
     id = json['_id'];
     userId = json['userId'];
     method = json['method'];
-    status = json['status'];
-    contentLength = json['contentLength'];
+    status = int.parse(json['status']);
+    contentLength = int.parse(json['contentLength']);
     responseTime = json['responseTime'];
     date = format.parse(json['date']);
   }
