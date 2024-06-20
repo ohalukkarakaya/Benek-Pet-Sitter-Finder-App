@@ -50,6 +50,8 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
           && store.state.selectedUserInfo!.userId != null
         ){
          // Moderator Operations
+
+         // Send Get request as first step to pull existing chat data
          await store.dispatch(getUsersChatAsAdminRequestAction(store.state.selectedUserInfo!.userId!, null));
 
          // Connect to web socket
@@ -65,6 +67,18 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
            ChatModel receivingChatData = ChatModel.fromJson(data['responseChat']);
            await store.dispatch(getUsersChatAsAdminRequestActionFromSocket(receivingChatData));
          });
+        }
+
+        // Developer Operations Auth Check
+        if(
+          AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('developer')])
+          && store.state.selectedUserInfo != null
+          && store.state.selectedUserInfo!.userId != null
+        ){
+          // Developer Operations
+
+          // Send Get Request to pull log records of the user
+          await store.dispatch(getLogsByUserIdRequestAction(store.state.selectedUserInfo!.userId!));
         }
 
       }

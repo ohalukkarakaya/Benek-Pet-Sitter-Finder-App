@@ -18,3 +18,4 @@ export '../../redux/get_pets_by_user_id/get_pets_by_user_id.action.dart';
 export '../../redux/init_past_care_givers_list_data/init_past_care_givers_list_data.action.dart';
 export '../../redux/init_past_care_givers_list_data/init_care_give_data.action.dart';
 export '../../redux/chat_moderating/get_users_chat_as_admin/get_users_chat_as_admin.action.dart';
+export '../../redux/logs/get_logs_by_user_id/get_logs_by_user_id.action.dart';

@@ -10,6 +10,8 @@ import 'package:benek_kulube/data/models/user_profile_models/user_past_care_give
 import 'package:benek_kulube/data/models/user_profile_models/user_profile_image_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_star_model.dart';
 
+import '../log_models/log_model.dart';
+
 class UserInfo {
   String? userId;
   String? userName;
@@ -37,6 +39,7 @@ class UserInfo {
   String? defaultImage;
   int? totalStar;
   ChatStateModel? chatData;
+  List<LogModel>? logs;
 
   UserInfo(
     {
@@ -65,7 +68,8 @@ class UserInfo {
       this.gender,
       this.defaultImage,
       this.totalStar,
-      this.chatData
+      this.chatData,
+      this.logs
     }
   );
 
@@ -249,5 +253,9 @@ class UserInfo {
 
   dynamic addChatData( ChatStateModel inComingChatData ){
     chatData = inComingChatData;
+  }
+
+  dynamic addLogData( List<LogModel> inComingLogListData ){
+    logs = inComingLogListData;
   }
 }

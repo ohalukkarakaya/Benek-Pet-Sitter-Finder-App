@@ -59,6 +59,10 @@ class ApiClient {
           return list;
         case 'ChatStateModel':
           return ChatStateModel.fromJson(value);
+        case 'List<LogModel>':
+          List<dynamic> jsonList = value['logs'];
+          List<LogModel> list = jsonList.map((item) => LogModel.fromJson(item)).toList();
+          return list;
         // case 'List<OKRUserParentUserObjectiveComplianceViewModel>':
         //   List<dynamic> jsonList = value;
         //   List<OKRUserParentUserObjectiveComplianceViewModel> list = jsonList.map((item) => OKRUserParentUserObjectiveComplianceViewModel.fromJson(item)).toList();
