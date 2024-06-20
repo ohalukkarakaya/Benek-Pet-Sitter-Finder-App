@@ -1,5 +1,6 @@
 import 'package:benek_kulube/presentation/features/user_profile_helpers/auth_role_helper.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/punish_buton.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/text_with_character_limit_controlled_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -47,18 +48,14 @@ class ProfileRowWidget extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  BenekStringHelpers.getUsersFullNameWithCharacterLimit(
+                TextWithCharacterLimitControlledComponent(
+                  text: BenekStringHelpers.getUsersFullName(
                       selectedUserInfo.identity!.firstName!,
                       selectedUserInfo.identity!.lastName!,
-                      selectedUserInfo.identity!.middleName,
-                      14 // Character Limit
+                      selectedUserInfo.identity!.middleName
                   ),
-                  style: const TextStyle(
-                      fontFamily: 'Qanelas',
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.w500
-                  ),
+                  characterLimit: 14,
+                  fontSize: 15.0,
                 ),
 
                 const SizedBox(height: 2.0,),

@@ -61,7 +61,7 @@ class _BenekChipState extends State<BenekChip> {
           height: 50,
           decoration: const BoxDecoration(
             color: AppColors.benekWhite,
-            borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+            borderRadius: BorderRadius.all( Radius.circular( 6.0 ) ),
           ),
         ),
       );
