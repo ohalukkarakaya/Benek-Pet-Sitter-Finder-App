@@ -7,8 +7,8 @@ class LogModel {
   String? userId;
   String? method;
   String? url;
-  int? status;
-  int? contentLength;
+  dynamic status;
+  dynamic contentLength;
   String? responseTime;
   DateTime? date;
 
@@ -27,8 +27,8 @@ class LogModel {
     id = json['_id'];
     userId = json['userId'];
     method = json['method'];
-    status = int.parse(json['status']);
-    contentLength = int.parse(json['contentLength']);
+    status = parseIntIfItIsInt(json['status']);
+    contentLength = parseIntIfItIsInt(json['contentLength']);
     responseTime = json['responseTime'];
     date = format.parse(json['date']);
   }
@@ -46,5 +46,18 @@ class LogModel {
     data['date'] = date;
 
     return data;
+  }
+
+  dynamic parseIntIfItIsInt(dynamic value) {
+    if (value is String) {
+      try {
+        return int.parse(value);
+      } catch (e) {
+        return value;
+      }
+    } else if (value is int) {
+      return value;
+    }
+    return null;
   }
 }
