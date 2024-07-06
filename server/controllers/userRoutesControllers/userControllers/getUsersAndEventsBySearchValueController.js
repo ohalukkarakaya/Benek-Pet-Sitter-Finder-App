@@ -46,6 +46,8 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
             || filter === "User"
             || filter === "USER"
         ){
+            const searchTermsArray = searchTerm.split(' ');
+
             const users = await User.aggregate(
                 [
                     {
@@ -148,30 +150,45 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
                                 {
                                     $or: [
                                         { "userName": { $regex: searchTerm, $options: "i" } },
+                                        ...searchTermsArray.map(term => ({
+                                            "userName": { $regex: term, $options: "i" }
+                                        })),
                                         {
                                             "identity.firstName": {
                                                 $regex: searchTerm,
                                                 $options: "i"
                                             }
                                         },
+                                        ...searchTermsArray.map(term => ({
+                                            "identity.firstName": { $regex: term, $options: "i" }
+                                        })),
                                         {
                                             "identity.middleName": {
                                                 $regex: searchTerm,
                                                 $options: "i"
                                             }
                                         },
+                                        ...searchTermsArray.map(term => ({
+                                            "identity.middleName": { $regex: term, $options: "i" }
+                                        })),
                                         {
                                             "identity.lastName": {
                                                 $regex: searchTerm,
                                                 $options: "i"
                                             }
                                         },
+                                        ...searchTermsArray.map(term => ({
+                                            "identity.lastName": { $regex: term, $options: "i" }
+                                        })),
                                         {
                                             "identity.openAdress": {
                                                 $regex: searchTerm,
                                                 $options: "i"
                                             }
-                                        }
+                                        },
+                                        ...searchTermsArray.map(term => ({
+                                            "identity.openAdress": { $regex: term, $options: "i" }
+                                        }))
                                     ]
                                 }
                             ]
