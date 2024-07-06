@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:benek_kulube/data/models/chat_models/chat_model.dart';
 import 'package:benek_kulube/presentation/features/user_profile_helpers/auth_role_helper.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/user_id_log_preview_components/user_id_log_preview_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 // ignore: depend_on_referenced_packages
@@ -25,6 +26,7 @@ class HomeScreenProfileRightTab extends StatefulWidget {
 
 class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
   bool didRequestSend = false;
+  bool isLogsLoading = true;
 
   var socket = io.io(
       AppConfig.socketServerBaseUrl,
@@ -79,6 +81,7 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
 
           // Send Get Request to pull log records of the user
           await store.dispatch(getLogsByUserIdRequestAction(store.state.selectedUserInfo!.userId!));
+          isLogsLoading = false;
         }
 
       }
@@ -102,50 +105,60 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(
-              width: 350,
-              child: ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(
-                  scrollbars: false,
-                  overscroll: false,
-                  physics: const BouncingScrollPhysics(),
-                ),
-                child: ListView(
-                  shrinkWrap: true,
-                  physics: store.state.selectedUserInfo == null
-                      ? const NeverScrollableScrollPhysics()
-                      : const BouncingScrollPhysics(),
-                  children: [
-
-                    Padding(
-                        padding: const EdgeInsets.only(
-                            right: 40.0,
-                            top: 50.0,
-                            bottom: 70.0
-                        ),
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              BenekCircleAvatar(
-                                width: 50,
-                                height: 50,
-                                radius: 100,
-                                isDefaultAvatar: store.state.userInfo!.profileImg!.isDefaultImg!,
-                                imageUrl: store.state.userInfo!.profileImg!.imgUrl!,
-                              ),
-                            ],
+            Expanded(
+              child: SizedBox(
+                width: 350,
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    scrollbars: false,
+                    overscroll: false,
+                    physics: const BouncingScrollPhysics(),
+                  ),
+                  child: ListView(
+                    shrinkWrap: true,
+                    physics: store.state.selectedUserInfo == null
+                        ? const NeverScrollableScrollPhysics()
+                        : const BouncingScrollPhysics(),
+                    children: [
+              
+                      Padding(
+                          padding: const EdgeInsets.only(
+                              right: 40.0,
+                              top: 50.0,
+                              bottom: 70.0
                           ),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                BenekCircleAvatar(
+                                  width: 50,
+                                  height: 50,
+                                  radius: 100,
+                                  isDefaultAvatar: store.state.userInfo!.profileImg!.isDefaultImg!,
+                                  imageUrl: store.state.userInfo!.profileImg!.imgUrl!,
+                                ),
+                              ],
+                            ),
+                          )
+                      ),
+              
+                      selectedUserInfo != null
+                      && selectedUserInfo.chatData != null
+                      ? ChatPreviewWidget(
+                        chatInfo: selectedUserInfo.chatData!,
+                      )
+                      : const SizedBox(),
+              
+                      selectedUserInfo != null
+                      && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('developer')])
+                        ? UserIdLogPreviewComponent(
+                          isLoading: isLogsLoading,
+                          logData: selectedUserInfo.logs,
                         )
-                    ),
-
-                    selectedUserInfo != null
-                    && selectedUserInfo.chatData != null
-                    ? ChatPreviewWidget(
-                      chatInfo: selectedUserInfo.chatData!,
-                    )
-                    : const SizedBox(),
-                  ],
+                        : const SizedBox(),
+                    ],
+                  ),
                 ),
               ),
             )
