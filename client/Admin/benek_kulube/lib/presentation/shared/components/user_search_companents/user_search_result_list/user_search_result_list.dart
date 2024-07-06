@@ -5,6 +5,8 @@ import 'package:benek_kulube/presentation/shared/components/user_search_companen
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:benek_kulube/store/actions/app_actions.dart';
+import 'package:benek_kulube/store/app_redux_store.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
@@ -31,6 +33,10 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
   @override
   void initState() {
     super.initState();
+
+    Store<AppState> store = AppReduxStore.currentStore!;
+
+    store.dispatch(resetUserSearchDataAction());
     _updateResultData();
   }
 

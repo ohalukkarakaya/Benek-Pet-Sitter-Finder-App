@@ -34,7 +34,10 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
   void _startTimer() {
     if (_timer != null) {
       _timer!.cancel();
-      store.dispatch(resetUserSearchDataAction());
+      if( textToSendServer.length < 2){
+        store.dispatch(resetUserSearchDataAction());
+      }
+
     }
     _timer = Timer( const Duration(seconds: 1), () {
       _isTextChanged = false;
@@ -57,6 +60,7 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
    @override
     void dispose() {
       _timer?.cancel();
+      store.dispatch(resetUserSearchDataAction());
       super.dispose();
     }
 

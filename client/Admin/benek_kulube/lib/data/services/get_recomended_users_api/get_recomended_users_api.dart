@@ -12,7 +12,7 @@ class RecomendedUsersApi {
     try{
       await AuthUtils.getAccessToken();
 
-      const int limit = 5;
+      const int limit = 20;
       String lastItemIdString = lastItemId ?? 'null';
 
       String path = '/api/user/getUsersAndEventsByLocation/$lastItemIdString/$limit';
