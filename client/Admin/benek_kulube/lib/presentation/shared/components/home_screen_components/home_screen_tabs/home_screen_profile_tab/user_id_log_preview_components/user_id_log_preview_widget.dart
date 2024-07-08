@@ -49,7 +49,7 @@ class UserIdLogPreviewWidget extends StatelessWidget {
         padding: const EdgeInsets.all(30.0),
         decoration: BoxDecoration(
           color: AppColors.benekBlackWithOpacity,
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(5.0),
         ),
         child: spots.length > 1
         ? LineChart(

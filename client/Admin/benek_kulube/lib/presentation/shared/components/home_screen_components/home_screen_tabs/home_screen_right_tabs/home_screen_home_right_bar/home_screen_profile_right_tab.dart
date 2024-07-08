@@ -27,6 +27,7 @@ class HomeScreenProfileRightTab extends StatefulWidget {
 class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
   bool didRequestSend = false;
   bool isLogsLoading = true;
+  bool isChatLoading = true;
 
   var socket = io.io(
       AppConfig.socketServerBaseUrl,
@@ -55,6 +56,7 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
 
          // Send Get request as first step to pull existing chat data
          await store.dispatch(getUsersChatAsAdminRequestAction(store.state.selectedUserInfo!.userId!, null));
+         isChatLoading = false;
 
          // Connect to web socket
          socket.connect();
@@ -144,11 +146,12 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
                       ),
               
                       selectedUserInfo != null
-                      && selectedUserInfo.chatData != null
-                      ? ChatPreviewWidget(
-                        chatInfo: selectedUserInfo.chatData!,
-                      )
-                      : const SizedBox(),
+                      && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
+                        ? ChatPreviewWidget(
+                          chatInfo: selectedUserInfo.chatData,
+                          isLoading: isChatLoading,
+                        )
+                        : const SizedBox(),
               
                       selectedUserInfo != null
                       && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('developer')])
