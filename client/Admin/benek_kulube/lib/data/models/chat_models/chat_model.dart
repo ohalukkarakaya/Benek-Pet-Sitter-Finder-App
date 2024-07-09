@@ -27,7 +27,7 @@ class ChatModel {
   );
 
   ChatModel.fromJson(Map<String, dynamic> json) {
-    id = json['_id'];
+    id = json['_id'] ?? json['id'];
     if (json['members'] != null) {
       members = <ChatMemberModel>[];
       json['members'].forEach((v) {
@@ -43,6 +43,8 @@ class ChatModel {
       });
     }else if( json['lastMessage'] != null ){
       messages = [ MessageModel.fromJson(json['lastMessage']) ];
+    }else if( json['message'] != null ){
+      messages = [ MessageModel.fromJson(json['message']) ];
     }else{
       messages = <MessageModel>[];
     };
@@ -72,6 +74,6 @@ class ChatModel {
   }
 
   void sortMessages(){
-    messages?.sort((a, b) => a.sendDate!.compareTo(b.sendDate!));
+    messages?.sort((a, b) => b.sendDate!.compareTo(a.sendDate!));
   }
 }

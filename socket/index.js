@@ -41,7 +41,12 @@ const removeAdminClient = ( socketId ) => { adminClients = adminClients.filter( 
 
 // Evaluator Operations
 const addEvaluator = ( userId, evaluatingUserId, socketId ) => { !evaluators.some( evaluator => evaluator.userId === userId ) && evaluators.push({ userId, evaluatingUserId, socketId }); }
-const getEvaluatorsOnChat = ( evaluatingUserId ) => { return evaluators.filter(evaluator => evaluator.evaluatingUserId === evaluatingUserId); }
+const getEvaluatorsOnChat = ( evaluatingUserId ) => {
+    return evaluators.filter(
+        evaluator =>
+            evaluator.evaluatingUserId === evaluatingUserId
+    );
+}
 const removeEvaluator = ( socketId ) => {
     evaluator = evaluators.find( evaluator => evaluator.socketId === socketId );
     if( evaluator ){
@@ -73,6 +78,8 @@ io.on(
         //when evaluator starts to view a chat
         socket.on( "addEvaluatorToChat", ( userId, evaluatingUserId ) => {
           addEvaluator( userId, evaluatingUserId, socket.id );
+
+          console.log( "evaluator connected to chat", userId, evaluatingUserId);
 
           let eveluatingUser = getUser( evaluatingUserId );
           if( eveluatingUser ){

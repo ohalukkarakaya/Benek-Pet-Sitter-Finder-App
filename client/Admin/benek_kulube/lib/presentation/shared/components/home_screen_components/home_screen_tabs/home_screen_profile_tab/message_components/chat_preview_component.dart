@@ -9,6 +9,7 @@ import '../../../../../../../common/constants/app_colors.dart';
 class ChatPreviewWidget extends StatefulWidget {
   final double height;
   final double width;
+  final String chatOwnerUserId;
   final ChatStateModel? chatInfo;
   final bool isLoading;
 
@@ -16,6 +17,7 @@ class ChatPreviewWidget extends StatefulWidget {
     super.key,
     this.height = 350,
     this.width = 350,
+    required this.chatOwnerUserId,
     required this.chatInfo,
     this.isLoading = true
   });
@@ -118,6 +120,7 @@ class _ChatPreviewWidgetState extends State<ChatPreviewWidget> {
                               : Column(
                                 children: [
                                   ChatPreviewElement(
+                                      chatOwnerUserId: widget.chatOwnerUserId,
                                       chatInfo: widget.chatInfo!.chats![index]!
                                   ),
                                   index < itemCount - 1
@@ -155,7 +158,6 @@ class _ChatPreviewWidgetState extends State<ChatPreviewWidget> {
                   bottom: 0,
                   child: Container(
                       width: 310,
-                      height: itemCount * 40.0,
                       decoration: BoxDecoration(
                         color: AppColors.benekWhite,
                         borderRadius: const BorderRadius.only(
@@ -172,7 +174,7 @@ class _ChatPreviewWidgetState extends State<ChatPreviewWidget> {
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
+                        padding: const EdgeInsets.only(top: 30.0, bottom: 20.0),
                         child: Center(
                           child: Text(
                             BenekStringHelpers.locale('seeDetails'),

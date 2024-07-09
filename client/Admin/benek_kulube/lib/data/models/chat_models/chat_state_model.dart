@@ -35,8 +35,8 @@ class ChatStateModel {
     if( chats != null && chats!.length > 0 ){
       ChatModel? chatOfTheMessage = chats?.firstWhere(
               (element) =>
-                  element!.id == newChat.id,
-                  orElse: () => null
+                  element!.id.toString() == newChat.id.toString(),
+                  orElse: () => ChatModel()
       );
 
       if( chatOfTheMessage != null ) {

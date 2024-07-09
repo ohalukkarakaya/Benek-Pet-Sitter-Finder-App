@@ -26,7 +26,7 @@ const writeMessageToChatHelper = async (
                 messageType: messageType,
                 message: message,
                 seenBy: [ userId ],
-                sendDate: Date.now()
+                sendDate: new Date()
             }
 
             chat.messages.push( messageObject );
@@ -38,7 +38,7 @@ const writeMessageToChatHelper = async (
                 messageType: messageType,
                 fileUrl: fileUrlPath,
                 seenBy: [ userId ],
-                sendDate: Date.now()
+                sendDate: new Date()
             }
 
             chat.messages.push( messageObject );
@@ -82,7 +82,7 @@ const writeMessageToChatHelper = async (
                         releatedRecordId: paymentReleatedRecordId
                     },
                     seenBy: [ userId ],
-                    sendDate: Date.now()
+                    sendDate: new Date()
                 }
 
                 chat.messages.push( messageObject );
@@ -122,7 +122,7 @@ const writeMessageToChatHelper = async (
                         releatedRecordId: paymentReleatedRecordId
                     },
                     seenBy: [ userId ],
-                    sendDate: Date.now()
+                    sendDate: new Date()
                 }
 
                 chat.messages.push( messageObject );
@@ -150,7 +150,7 @@ const writeMessageToChatHelper = async (
                 messageType: messageType,
                 IdOfTheUserOrPetWhichProfileSended: sharedProfileUser._id.toString(),
                 seenBy: [ userId ],
-                sendDate: Date.now()
+                sendDate: new Date()
             }
 
             chat.messages.push( messageObject );
@@ -173,7 +173,7 @@ const writeMessageToChatHelper = async (
                 messageType: messageType,
                 IdOfTheUserOrPetWhichProfileSended: sharedProfilePet._id.toString(),
                 seenBy: [ userId ],
-                sendDate: Date.now()
+                sendDate: new Date()
             }
 
             chat.messages.push( messageObject );
@@ -216,7 +216,7 @@ const writeMessageToChatHelper = async (
                 messageType: messageType,
                 IdOfTheUserOrPetWhichProfileSended: sharedProfileEvent._id.toString(),
                 seenBy: [ userId ],
-                sendDate: Date.now()
+                sendDate: new Date()
             }
 
             chat.messages.push( messageObject );
@@ -234,7 +234,19 @@ const writeMessageToChatHelper = async (
                 }
             }
 
-            return messageObject; 
+            const savedMessage = savedChat.messages.find(msg =>
+                msg.sendedUserId === messageObject.sendedUserId
+                && msg.sendDate === messageObject.sendDate
+                && msg.messageType === messageObject.messageType
+                && (
+                    msg.message === messageObject.message
+                    || msg.fileUrl === messageObject.fileUrl
+                    || msg.paymentOffer === messageObject.paymentOffer
+                    || msg.IdOfTheUserOrPetWhichProfileSended === messageObject.IdOfTheUserOrPetWhichProfileSended
+                )
+            );
+
+            return savedMessage;
         }
     }catch( err ){
         console.log( "ERROR: writeMessageToChatHelper - ", err );

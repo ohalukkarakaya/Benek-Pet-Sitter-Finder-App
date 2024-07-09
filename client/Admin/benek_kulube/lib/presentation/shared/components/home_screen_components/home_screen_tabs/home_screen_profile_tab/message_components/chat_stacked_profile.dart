@@ -8,23 +8,34 @@ import '../../../../benek_circle_avatar/benek_circle_avatar.dart';
 
 class ChatStackedProfile extends StatelessWidget {
 
+  final String chatOwnerUserId;
   final List<ChatMemberModel>? chatMembers;
 
   const ChatStackedProfile({
     super.key,
+    required this.chatOwnerUserId,
     this.chatMembers
   });
 
 
   Widget _buildStackedProfile(){
+
+    List<ChatMemberModel>? memberList = chatMembers != null && chatMembers!.isNotEmpty
+      ? chatMembers!.where(
+            (member) =>
+                member.userData != null ?
+                    member.userData!.userId != chatOwnerUserId
+                    : false ).toList()
+      : [];
+
     return WidgetStack(
       positions: RestrictedPositions(
         maxCoverage: 0.4,
-        minCoverage: 0.4,
+        minCoverage: 0.3,
         align: StackAlign.left,
       ),
-      stackedWidgets: chatMembers!.isNotEmpty ?
-        chatMembers!.map((member) {
+      stackedWidgets: memberList.isNotEmpty ?
+        memberList.map((member) {
           return member is ChatMemberModel
             && member.userData != null
             && member.userData!.profileImg != null

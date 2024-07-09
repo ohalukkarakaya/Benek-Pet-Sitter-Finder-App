@@ -139,10 +139,14 @@ const sendMessageController = async ( req, res ) => {
         // istek atan kullanıcının sohbet üyesi olup olmadığını kontrol et
         // eğer değilse hata dön
         const isUserMember = chat.members.some(
-            member =>
-                member.userId.toString() === userId
-                && !( member.leaveDate )
-        ).length > 0;
+            member => {
+                return member.userId.toString() === userId
+                && (
+                    !(member.leaveDate)
+                    || member.leaveDate === undefined
+                )
+            });
+
         if( !isUserMember ){
             return res.status(401).json(
                 {
@@ -203,21 +207,22 @@ const sendMessageController = async ( req, res ) => {
             if( !memberObject ){ break; }
 
             let memberInfo = getLightWeightUserInfoHelper( memberObject );
+            memberInfo.joinDate = member.joinDate;
             chatMemberInfoList.push( memberInfo );
         }
 
         const responseChat = {
-            id: savedChat._id.toString(),
+            id: chat._id.toString(),
             members: chatMemberInfoList,
-            chatStartDate: savedChat.chatStartDate,
-            chatName: savedChat.chatName,
-            chatDesc: savedChat.chatDesc,
-            chatImageUrl: savedChat.chatImageUrl,
+            chatStartDate: chat.chatStartDate,
+            chatName: chat.chatName,
+            chatDesc: chat.chatDesc,
+            chatImageUrl: chat.chatImageUrl,
             message: messageToSend
         }
         
         //send responseChat data to socket server
-        const newChatMembers = savedChat.members.map( member => member.userId );
+        const newChatMembers = chat.members.map( member => member.userId );
         const receiverList = newChatMembers.filter( memberId => memberId.toString() !== userId );
 
         await sendNotification( userId, receiverList, "message", messageToSend._id.toString(), "chat", responseChat.id, null, null, null, null );

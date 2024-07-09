@@ -10,9 +10,11 @@ import 'chat_stacked_profile.dart';
 
 
 class ChatPreviewElement extends StatelessWidget {
+  final String chatOwnerUserId;
   final ChatModel chatInfo;
   const ChatPreviewElement({
     super.key,
+    required this.chatOwnerUserId,
     required this.chatInfo,
   });
 
@@ -24,7 +26,7 @@ class ChatPreviewElement extends StatelessWidget {
         SizedBox(
           width: 100,
           height: 35,
-          child: ChatStackedProfile(chatMembers: chatInfo.members),
+          child: ChatStackedProfile(chatOwnerUserId: chatOwnerUserId, chatMembers: chatInfo.members),
         ),
         const SizedBox(width: 10.0),
         Expanded(

@@ -25,21 +25,26 @@ class HomeScreenProfileRightTab extends StatefulWidget {
 }
 
 class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
+  io.Socket? socket;
+
   bool didRequestSend = false;
   bool isLogsLoading = true;
   bool isChatLoading = true;
 
-  var socket = io.io(
-      AppConfig.socketServerBaseUrl,
-      <String, dynamic>{
-        'transports': ['websocket'],
-        'autoConnect': false,
-      }
-  );
-
   @override
   void initState() {
     super.initState();
+
+    var socket = io.io(
+        AppConfig.socketServerBaseUrl,
+        <String, dynamic>{
+          'transports': ['websocket'],
+          'autoConnect': false,
+        }
+    );
+
+    // Connect to web socket
+    socket.connect();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       Store<AppState> store = StoreProvider.of<AppState>(context);
@@ -58,17 +63,20 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
          await store.dispatch(getUsersChatAsAdminRequestAction(store.state.selectedUserInfo!.userId!, null));
          isChatLoading = false;
 
-         // Connect to web socket
-         socket.connect();
-
          // Let User Know That You Are Here
          Future.delayed(Duration.zero, () async {
-           socket.emit('addEvaluatorToChat',  store.state.userInfo!.userId);
+           socket.emit(
+               'addEvaluatorToChat',
+               [
+                 store.state.userInfo!.userId,
+                 store.state.selectedUserInfo!.userId!
+               ]
+           );
          });
 
          // Listen for incoming messages
          socket.on('getMessage', (data) async {
-           ChatModel receivingChatData = ChatModel.fromJson(data['responseChat']);
+           ChatModel receivingChatData = ChatModel.fromJson(data);
            await store.dispatch(getUsersChatAsAdminRequestActionFromSocket(receivingChatData));
          });
         }
@@ -92,7 +100,7 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
 
   @override
   void dispose() {
-    socket.disconnect();
+    socket?.disconnect();
     super.dispose();
   }
 
@@ -148,6 +156,7 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
                       selectedUserInfo != null
                       && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
                         ? ChatPreviewWidget(
+                          chatOwnerUserId: selectedUserInfo.userId!,
                           chatInfo: selectedUserInfo.chatData,
                           isLoading: isChatLoading,
                         )
