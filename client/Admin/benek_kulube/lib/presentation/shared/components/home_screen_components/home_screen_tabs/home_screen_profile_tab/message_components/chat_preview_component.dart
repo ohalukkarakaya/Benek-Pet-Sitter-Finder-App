@@ -39,6 +39,7 @@ class _ChatPreviewWidgetState extends State<ChatPreviewWidget> {
     return Padding(
       padding: const EdgeInsets.only(
           top: 20.0,
+          bottom: 20.0,
           right: 40.0
       ),
       child: MouseRegion(
@@ -134,7 +135,7 @@ class _ChatPreviewWidgetState extends State<ChatPreviewWidget> {
                       }
                     )
                     : Padding(
-                      padding: const EdgeInsets.symmetric( vertical: 70.0),
+                      padding: const EdgeInsets.symmetric( vertical: 70.0 ),
                       child: Center(
                           child: Text(
                             BenekStringHelpers.locale('emptyMessageBoxTitle'),

@@ -19,6 +19,7 @@ ThunkAction<AppState> getUsersChatAsAdminRequestAction( String userId, String? l
 
     try {
       ChatStateModel? _chatData = await api.getUsersChatAsAdminRequest( userId, lastItemId);
+      _chatData?.sortChats();
 
       await store.dispatch(GetUsersChatAsAdminRequestAction(_chatData));
     } on ApiException catch (e) {
