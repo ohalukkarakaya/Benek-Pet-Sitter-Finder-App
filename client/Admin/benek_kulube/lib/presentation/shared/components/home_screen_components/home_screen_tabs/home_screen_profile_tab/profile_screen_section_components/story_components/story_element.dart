@@ -5,6 +5,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../../data/models/story_models/story_model.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+// ignore: depend_on_referenced_packages
+import 'package:redux/redux.dart';
+import 'package:benek_kulube/store/actions/app_actions.dart';
+import 'package:benek_kulube/store/app_state.dart';
 
 class StoryElement extends StatelessWidget {
   final StoryModel? story;
@@ -17,73 +22,81 @@ class StoryElement extends StatelessWidget {
   Widget build(BuildContext context) {
 
     const Size containerSize = Size(125, 250);
+    Store<AppState> store = StoreProvider.of<AppState>(context);
 
-    return Padding(
-        padding: const EdgeInsets.all( 8.0 ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
-          child: Stack(
-            children: [
-              SizedBox(
-                width: containerSize.width,
-                height: containerSize.height,
-                child: story != null
-                  && story!.contentUrl != null
-                    ? ImageVideoHelpers.getThumbnail( story!.contentUrl! )
-                    : const SizedBox(),
-              ),
+    return GestureDetector(
+      onTap: () async {
+        if( story != null ){
+          await store.dispatch(selectStoryAction(story!));
+        }
+      },
+      child: Padding(
+          padding: const EdgeInsets.all( 8.0 ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+            child: Stack(
+              children: [
+                SizedBox(
+                  width: containerSize.width,
+                  height: containerSize.height,
+                  child: story != null
+                    && story!.contentUrl != null
+                      ? ImageVideoHelpers.getThumbnail( story!.contentUrl! )
+                      : const SizedBox(),
+                ),
 
-              Container(
-                width: containerSize.width,
-                height: containerSize.height,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [
-                      AppColors.benekBlack.withOpacity(0.8),
-                      AppColors.benekBlack.withOpacity(0.0),
-                    ],
+                Container(
+                  width: containerSize.width,
+                  height: containerSize.height,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        AppColors.benekBlack.withOpacity(0.8),
+                        AppColors.benekBlack.withOpacity(0.0),
+                      ],
+                    ),
                   ),
                 ),
-              ),
 
-              story != null
-              && story!.about != null
-              && story!.about!.pet != null
-              ? Positioned(
-                  left: 7,
-                  bottom: 7,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      BenekCircleAvatar(
-                          width: 20,
-                          height: 20,
-                          borderWidth: 2.0,
-                          isDefaultAvatar: story!.about!.pet!.petProfileImg!.isDefaultImg!,
-                          imageUrl: story!.about!.pet!.petProfileImg!.imgUrl!
-                      ),
-                      const SizedBox(width: 5,),
-                      OverflowBox(
-                        maxWidth: 75,
-                        child: Text(
-                          story!.about!.pet!.name!,
-                          style: const TextStyle(
-                              fontFamily: 'Qanelas',
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.w500
-                          ),
-                          overflow: TextOverflow.fade,
+                story != null
+                && story!.about != null
+                && story!.about!.pet != null
+                ? Positioned(
+                    left: 7,
+                    bottom: 7,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        BenekCircleAvatar(
+                            width: 20,
+                            height: 20,
+                            borderWidth: 2.0,
+                            isDefaultAvatar: story!.about!.pet!.petProfileImg!.isDefaultImg!,
+                            imageUrl: story!.about!.pet!.petProfileImg!.imgUrl!
                         ),
-                      ),
-                    ],
-                  ),
-                )
-              : const SizedBox(),
-            ],
-          ),
-        )
+                        const SizedBox(width: 5,),
+                        OverflowBox(
+                          maxWidth: 75,
+                          child: Text(
+                            story!.about!.pet!.name!,
+                            style: const TextStyle(
+                                fontFamily: 'Qanelas',
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w500
+                            ),
+                            overflow: TextOverflow.fade,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox(),
+              ],
+            ),
+          )
+      ),
     );;
   }
 }

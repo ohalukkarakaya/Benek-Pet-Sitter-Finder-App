@@ -16,6 +16,7 @@ import '../../redux/get_recomended_users/get_recomended_users.reducer.dart' as g
 import '../../redux/selected_user/selected_user.reducer.dart' as selected_user;
 import '../../redux/get_stories_by_user_id/get_stories_by_user_id.reducer.dart' as get_stories_by_user_id;
 import '../../redux/set_device_language/set_device_language.reducer.dart' as set_device_language;
+import '../../redux/select_story/select_story.reducer.dart' as selected_story;
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
@@ -35,5 +36,6 @@ AppState appReducer(AppState state, dynamic action) {
     userSearchResultList: user_search.userSearchRequestReducer(state.userSearchResultList, action),
     selectedUserInfo: selected_user.setSelectedUserReducer(state.selectedUserInfo, action),
     storiesToDisplay: get_stories_by_user_id.getStoriesByUserIdRequestReducer(state.storiesToDisplay, action),
+    selectedStory: selected_story.selectStoryReducer(state.selectedStory, action),
   );
 }

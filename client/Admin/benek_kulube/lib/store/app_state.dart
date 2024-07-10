@@ -23,6 +23,7 @@ class AppState {
   final UserList? userSearchResultList;
   final UserInfo? selectedUserInfo;
   final List<StoryModel>? storiesToDisplay;
+  final StoryModel? selectedStory;
 
   AppState({
     required this.counter,
@@ -41,6 +42,7 @@ class AppState {
     required this.userSearchResultList,
     required this.selectedUserInfo,
     required this.storiesToDisplay,
+    this.selectedStory,
   });
 
   factory AppState.initial() {
@@ -61,6 +63,7 @@ class AppState {
       userSearchResultList: null,
       selectedUserInfo: null,
       storiesToDisplay: null,
+      selectedStory: null,
     );
   }
 
@@ -81,6 +84,7 @@ class AppState {
     UserList? userSearchResultList,
     UserInfo? selectedUserInfo,
     List<StoryModel>? storiesToDisplay,
+    StoryModel? selectedStory,
   }) {
     return AppState(
       counter: counter ?? this.counter,
@@ -99,6 +103,7 @@ class AppState {
       userSearchResultList: userSearchResultList ?? this.userSearchResultList,
       selectedUserInfo: selectedUserInfo ?? this.selectedUserInfo,
       storiesToDisplay: storiesToDisplay ?? this.storiesToDisplay,
+      selectedStory: selectedStory ?? this.selectedStory,
     );
   }
 }

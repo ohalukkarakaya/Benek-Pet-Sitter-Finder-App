@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/data/models/log_models/log_model.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +47,7 @@ class UserIdLogPreviewWidget extends StatelessWidget {
       child: Container(
         width: width,
         height: height,
-        padding: const EdgeInsets.all(30.0),
+        padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 30.0),
         decoration: BoxDecoration(
           color: AppColors.benekBlackWithOpacity,
           borderRadius: BorderRadius.circular(5.0),
@@ -86,10 +87,10 @@ class UserIdLogPreviewWidget extends StatelessWidget {
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 40,
+                  reservedSize: 30,
                   getTitlesWidget: (value, meta) {
                     return Text(
-                      value.toInt().toString(),
+                      BenekStringHelpers.formatNumberToReadable(value.toInt()),
                       style: const TextStyle(
                           fontFamily: 'Qanelas',
                           fontSize: 8.0,

@@ -27,7 +27,16 @@ const getChatsController = async (req, res) => {
               chatName: 1,
               chatDesc: 1,
               chatImageUrl: 1,
-              lastMessage: { $arrayElemAt: ["$messages", -1] }
+              lastMessage: { $arrayElemAt: ["$messages", -1] },
+              unreadMessageCount: {
+                  $size: {
+                      $filter: {
+                          input: "$messages",
+                          as: "message",
+                          cond: { $not: { $in: [evaluatingUser, "$$message.seenBy"] } }
+                      }
+                  }
+              }
             }
           },
           { $sort: { "lastMessage.sendDate": -1 } },

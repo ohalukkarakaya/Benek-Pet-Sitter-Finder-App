@@ -1,9 +1,5 @@
 import Chat from "../../../models/Chat/Chat.js";
-import EventInvitation from "../../../models/Event/Invitations/InviteEvent.js";
-import Event from "../../../models/Event/Event.js";
-import CareGive from "../../../models/CareGive/CareGive.js";
 import User from "../../../models/User.js";
-import Pet from "../../../models/Pet.js";
 
 import dotenv from "dotenv";
 import io from "socket.io-client";
@@ -223,20 +219,19 @@ const sendMessageController = async ( req, res ) => {
         
         //send responseChat data to socket server
         const newChatMembers = chat.members.map( member => member.userId );
-        const receiverList = newChatMembers.filter( memberId => memberId.toString() !== userId );
 
-        await sendNotification( userId, receiverList, "message", messageToSend._id.toString(), "chat", responseChat.id, null, null, null, null );
+        await sendNotification( userId, newChatMembers, "message", messageToSend._id.toString(), "chat", responseChat.id, null, null, null, null );
         
         socket.emit(
             "sendMessage",
             responseChat,
-            receiverList
+            newChatMembers
         );
 
         return res.status( 200 )
                   .json(
                     {
-                        error: true,
+                        error: false,
                         message: "message sended succesfully",
                         chat: responseChat
                     }

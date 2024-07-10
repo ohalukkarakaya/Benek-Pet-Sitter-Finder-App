@@ -107,4 +107,31 @@ class BenekStringHelpers {
         });
     return formattedNumber;
   }
+
+  static String formatNumberToReadable( int number ){
+    switch (number) {
+      case int n when n < 1000:
+        return n.toString();
+      case int n when n < 10000:
+      // 1,000 - 9,999
+        double result = n / 1000.0;
+        return result == result.roundToDouble() ? '${result.round()} K' : '${result.toStringAsFixed(1)} K';
+      case int n when n < 1000000:
+      // 10,000 - 999,999
+        double result = n / 1000.0;
+        return result == result.roundToDouble() ? '${result.round()} K' : '${result.toStringAsFixed(1)} K';
+      case int n when n < 1000000000:
+      // 1,000,000 - 999,999,999
+        double result = n / 1000000.0;
+        return result == result.roundToDouble() ? '${result.round()} M' : '${result.toStringAsFixed(1)} M';
+      case int n when n < 1000000000000:
+      // 1,000,000,000 - 999,999,999,999
+        double result = n / 1000000000.0;
+        return result == result.roundToDouble() ? '${result.round()} B' : '${result.toStringAsFixed(1)} B';
+      default:
+      // 1,000,000,000,000 and above
+        double result = number / 1000000000000.0;
+        return result == result.roundToDouble() ? '${result.round()} T' : '${result.toStringAsFixed(1)} T';
+    }
+  }
 }

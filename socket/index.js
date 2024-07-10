@@ -79,8 +79,6 @@ io.on(
         socket.on( "addEvaluatorToChat", ( userId, evaluatingUserId ) => {
           addEvaluator( userId, evaluatingUserId, socket.id );
 
-          console.log( "evaluator connected to chat", userId, evaluatingUserId);
-
           let eveluatingUser = getUser( evaluatingUserId );
           if( eveluatingUser ){
             io.to( eveluatingUser.socketId ).emit( "evaluatorConnected", userId );
@@ -94,7 +92,7 @@ io.on(
                 let rawEvaluatorsList = [];
                 for (let receiverUserId of [...new Set(receiverIdList)]) {
                     let user = getUser(receiverUserId);
-                    if (user) {
+                    if (user && receiverUserId !== chatObject.message.sendedUserId.toString()) {
                         io.to(user.socketId).emit("getMessage", chatObject)
                     }
 
@@ -113,7 +111,33 @@ io.on(
             }
         );
 
-        //send message
+        //see message
+        socket.on(
+            "seeMessage",
+            ( chatId, messageIdsList,  receiverIdList, userId ) => {
+                let rawEvaluatorsList = [];
+                let data = { chatId, messageIdsList, userId };
+                for( let receiverId of [...new Set(receiverIdList)] ){
+                    let receiver = getUser( receiverId );
+                    if( receiver && receiver !== userId ){
+                        io.to( receiver.socketId ).emit( "seenMessage", data );
+                    }
+
+                    let evaluators = [...new Set(getEvaluatorsOnChat(receiverId))];
+                    rawEvaluatorsList = rawEvaluatorsList.concat(evaluators);
+                }
+
+                //send data to evaluators
+                let evaluators = [...new Set(rawEvaluatorsList)];
+                if( evaluators.length > 0 ){
+                    for (let evaluator of evaluators) {
+                        io.to(evaluator.socketId).emit("seenMessage", data);
+                    }
+                }
+            }
+        );
+
+        //disconnect
         socket.on(
             "sendNotification",
             ( to, notificationObject ) => {

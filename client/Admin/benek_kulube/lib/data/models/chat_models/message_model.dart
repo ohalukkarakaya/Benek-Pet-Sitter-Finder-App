@@ -1,15 +1,18 @@
 import 'package:benek_kulube/data/models/chat_models/payment_offer_model.dart';
+import 'package:intl/intl.dart';
 
 import '../../../common/constants/message_type_enum.dart';
 
 class MessageModel {
+  DateFormat format = DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ');
+
   String? sendedUserId;
   MessageTypeEnum? messageType;
   String? message;
   String? fileUrl;
   PaymentOfferModel? paymentOffer;
   List<String>? seenBy;
-  String? sendDate;
+  DateTime? sendDate;
   String? id;
 
   MessageModel(
@@ -32,7 +35,7 @@ class MessageModel {
     fileUrl = json['fileUrl'];
     paymentOffer = json['paymentOffer'] != null ? PaymentOfferModel.fromJson(json['paymentOffer']) : null;
     seenBy = json['seenBy'].cast<String>();
-    sendDate = json['sendDate'];
+    sendDate = format.parse(json['sendDate']);
     id = json['_id'];
   }
 

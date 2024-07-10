@@ -14,6 +14,7 @@ class StoryModel {
   int? likeCount;
   CommentModel? lastComment;
   int? commentCount;
+  List<CommentModel>? comments;
 
   StoryModel(
       {
@@ -26,7 +27,8 @@ class StoryModel {
         this.user,
         this.likeCount,
         this.lastComment,
-        this.commentCount
+        this.commentCount,
+        this.comments
       }
   );
 
@@ -64,5 +66,15 @@ class StoryModel {
     }
     data['commentCount'] = commentCount;
     return data;
+  }
+
+  void sortComments() {
+    comments?.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+  }
+
+  void addComments(List<CommentModel> commentList) {
+    comments ??= <CommentModel>[];
+    comments = comments;
+    sortComments();
   }
 }

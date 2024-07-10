@@ -12,6 +12,7 @@ import updateChatNameController from "../../controllers/chatRoutesControllers/ch
 import updateChatDescController from "../../controllers/chatRoutesControllers/chatControllers/updateChatDescController.js";
 import getChatsController from "../../controllers/chatRoutesControllers/chatControllers/getChatsController.js";
 import searchChatController from "../../controllers/chatRoutesControllers/chatControllers/searchChatController.js";
+import getUnreadMessageCountFromChatIdController from "../../controllers/chatRoutesControllers/chatControllers/getUnreadMessageCountFromChatIdController.js";
 
 import messagesRoutes from "./messages.js";
 import meetingRoutes from "./meeting.js";
@@ -81,6 +82,14 @@ router.get(
     "/search/:searchValue",
     auth,
     searchChatController
+);
+
+// - tested
+//get unread message count
+router.get(
+    "/unreadMessageCount/:chatId/:userId",
+    auth,
+    getUnreadMessageCountFromChatIdController
 );
 
 //message routes

@@ -13,6 +13,7 @@ import 'package:benek_kulube/store/app_state.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 
 import '../../../../../../../common/constants/app_config.dart';
+import '../../../../../../../data/models/chat_models/message_seen_data_model.dart';
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../benek_circle_avatar/benek_circle_avatar.dart';
 import '../../home_screen_profile_tab/message_components/chat_preview_component.dart';
@@ -77,7 +78,15 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
          // Listen for incoming messages
          socket.on('getMessage', (data) async {
            ChatModel receivingChatData = ChatModel.fromJson(data);
-           await store.dispatch(getUsersChatAsAdminRequestActionFromSocket(receivingChatData));
+           await store.dispatch(getUsersChatAsAdminRequestActionFromSocket(receivingChatData, store.state.selectedUserInfo!.userId!));
+         });
+
+         // Listen for incoming message reads
+         socket.on('seenMessage', (data) async {
+           MessageSeenData receivingSeenData = MessageSeenData.fromJson(data);
+           receivingSeenData.chatOwnerId = store.state.selectedUserInfo!.userId;
+
+           await store.dispatch(seenMessageAsAdminBySocketAction(receivingSeenData));
          });
         }
 

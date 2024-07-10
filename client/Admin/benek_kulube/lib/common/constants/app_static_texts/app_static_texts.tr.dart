@@ -71,6 +71,7 @@ class AppStaticTextsTr{
     'undefinedMessageType': 'Tanımlanamayan Mesaj Türü',
     'emptyMessageBoxTitle' : 'Mesaj Kutusu Boş',
     'noMessage': 'Hiç Mesaj Yok!',
+    'createdAt': 'Tarihinde Oluşturuldu',
     'noLog': 'Hiç Log Yok!',
     'seeUsersLogs': 'Loglarını Gör',
   };

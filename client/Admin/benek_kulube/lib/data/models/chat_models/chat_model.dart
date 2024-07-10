@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 
 import 'chat_member_model.dart';
 import 'message_model.dart';
+import 'message_seen_data_model.dart';
 
 class ChatModel {
   DateFormat format = DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ');
@@ -13,6 +14,7 @@ class ChatModel {
   List<MessageModel>? messages;
   String? chatImageUrl;
   String? chatName;
+  int? unreadMessageCount;
 
   ChatModel(
       {
@@ -22,7 +24,8 @@ class ChatModel {
         this.chatDesc,
         this.messages,
         this.chatImageUrl,
-        this.chatName
+        this.chatName,
+        this.unreadMessageCount
       }
   );
 
@@ -50,6 +53,7 @@ class ChatModel {
     };
     chatImageUrl = json['chatImageUrl'];
     chatName = json['chatName'];
+    unreadMessageCount = json['unreadMessageCount'] ?? 0;
   }
 
   Map<String, dynamic> toJson(){
@@ -65,12 +69,39 @@ class ChatModel {
     }
     data['chatImageUrl'] = chatImageUrl;
     data['chatName'] = chatName;
+    data['unreadMessageCount'] = unreadMessageCount;
     return data;
   }
 
-  void addMessage(MessageModel newMessage){
+  void addMessage(MessageModel newMessage, String userId){
     messages ??= <MessageModel>[];
+
     messages!.add(newMessage);
+  }
+
+  void seeMessage(MessageSeenData messageSeenData){
+    if( messages != null ){
+      for( var messageId in messageSeenData.messageIdsList! ){
+        for (var message in messages??[]) {
+          if( message.id == messageId ){
+
+            message.seenBy ??= <String>[];
+
+            if( !message.seenBy?.contains(messageSeenData.userId) ){
+              message.seenBy!.add(messageSeenData.userId!);
+            }
+          }
+        }
+      }
+
+      if(messageSeenData.chatOwnerId == messageSeenData.userId) {
+        unreadMessageCount = unreadMessageCount != null
+        && unreadMessageCount! > 0
+        && unreadMessageCount! >= messageSeenData.messageIdsList!.length
+           ? unreadMessageCount! - messageSeenData.messageIdsList!.length
+           : 0;
+      }
+    }
   }
 
   void sortMessages(){

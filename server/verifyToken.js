@@ -13,11 +13,7 @@ export const verifyToken = (req, res, next) => {
                         )
                    );
 
-        const user = jwt.verify(
-                            token, 
-                            process.env
-                                   .JWT,
-                        );
+        const user = jwt.verify( token, process.env.JWT,);
         req.user = user;
         
         next();

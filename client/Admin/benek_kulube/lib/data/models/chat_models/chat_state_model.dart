@@ -1,4 +1,6 @@
+import '../../services/api.dart';
 import 'chat_model.dart';
+import 'message_seen_data_model.dart';
 
 class ChatStateModel {
   int? totalChatCount;
@@ -26,33 +28,56 @@ class ChatStateModel {
   }
 
   void sortChats(){
-    if( chats != null && chats!.length > 0 ){
-      chats!.sort((a, b) => b!.messages!.last.sendDate!.compareTo(a!.messages!.last.sendDate!));
+    if( chats != null && chats!.isNotEmpty ){
+      chats!.sort((a, b) {
+          DateTime bDate = b!.messages != null && b.messages!.isNotEmpty
+              ? b.messages!.last.sendDate!
+              : b.chatStartDate!;
+
+          DateTime aDate = a!.messages != null && a.messages!.isNotEmpty
+              ? a.messages!.last.sendDate!
+              : a.chatStartDate!;
+
+          return bDate.compareTo(aDate);
+      });
     }
   }
 
-  void addMessageOrChat(ChatModel newChat){
-    if( chats != null && chats!.length > 0 ){
+  void addMessageOrChat(ChatModel newChat, String userId) {
+    if( chats != null && chats!.isNotEmpty ){
       ChatModel? chatOfTheMessage = chats?.firstWhere(
-              (element) =>
-                  element!.id.toString() == newChat.id.toString(),
-                  orElse: () => ChatModel()
-      );
+          (element) => element!.id.toString() == newChat.id.toString(),
+          orElse: () => ChatModel());
 
-      if( chatOfTheMessage != null ) {
+      if( chatOfTheMessage != null && chatOfTheMessage.id != null ) {
+        // Yeni mesajları ekle ve üyeleri güncelle
+        chatOfTheMessage.unreadMessageCount = newChat.unreadMessageCount;
         for (var message in newChat.messages!) {
-          chatOfTheMessage.addMessage(message);
+          chatOfTheMessage.addMessage(message, userId);
         }
         chatOfTheMessage.members = newChat.members;
 
+        // Mesajları sırala
         chatOfTheMessage.sortMessages();
-      }else{
-        chats!.add(newChat);
-      }
 
-      sortChats();
+        // Var olan chat'i listeden çıkart ve en üste ekle
+        chats!.removeWhere((element) => element!.id.toString() == newChat.id.toString());
+        chats!.insert(0, chatOfTheMessage);
+      }else{
+        // Yeni chat ekle
+        chats!.insert(0, newChat);
+      }
     }else{
+      // Eğer chats listesi boşsa, yeni chat'i ekle
       chats = [newChat];
+    }
+  }
+
+  void seeMessage(MessageSeenData receivingSeenData){
+    for( var chat in chats??[] ){
+      if( chat.id == receivingSeenData.chatId ){
+        chat.seeMessage(receivingSeenData);
+      }
     }
   }
 }

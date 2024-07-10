@@ -71,6 +71,7 @@ class AppStaticTextsEn{
     'undefinedMessageType': 'Undefined Message Type',
     'emptyMessageBoxTitle': 'Message Box is Empty',
     'noMessage': 'No Message Yet!',
+    'createdAt': 'Created At',
     'noLog': 'No Log Yet!',
     'seeUsersLogs': 'See Logs',
   };

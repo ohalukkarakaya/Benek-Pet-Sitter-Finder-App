@@ -1,5 +1,12 @@
 import Chat from "../../../models/Chat/Chat.js";
 
+import dotenv from "dotenv";
+import io from "socket.io-client";
+
+dotenv.config();
+
+const socket = io( process.env.SOCKET_URL );
+
 const seeMessagesController = async (req, res) => {
     try{
         // gelen veriyi karşıla
@@ -31,20 +38,26 @@ const seeMessagesController = async (req, res) => {
 
         // istek atan kullanıcının sohbete üye olup
         // olmadığını kontrol et, eğer değilse hata dön
-        const isUserMember = chat.members.filter(
-            member =>
-                member.userId.toString() === userId
-                && !( member.leaveDate )
-        ).length > 0;
+        const isUserMember = chat.members.some(
+            member => {
+                return member.userId.toString() === userId
+                    && (
+                        !(member.leaveDate)
+                        || member.leaveDate === undefined
+                    )
+            }
+        );
         if( !isUserMember ){
             return res.status( 401 )
                       .json(
                             {
                                 error: true,
-                                message: "You can2t see those messages"
+                                message: "You can't see those messages"
                             }
                        );
         }
+
+        let receiverIdList = chat.members.map( member => member.userId.toString() );
 
         // listede idsi bulunan her mesajı bul,
         // mesaj varsa ve kullanıcı zaten mesajı görmediyse
@@ -76,6 +89,14 @@ const seeMessagesController = async (req, res) => {
                                );
                 }
             }
+        );
+
+        socket.emit(
+            "seeMessage",
+            chatId,
+            messageIdsList,
+            receiverIdList,
+            userId
         );
 
         return res.status( 200 )

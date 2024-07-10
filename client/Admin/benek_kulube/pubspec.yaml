@@ -57,6 +57,7 @@ dependencies:
   url_launcher: ^6.2.5
   avatar_stack: ^1.2.0
   fl_chart: ^0.68.0
+  chewie: ^1.8.1
 
 dev_dependencies:
   flutter_test:

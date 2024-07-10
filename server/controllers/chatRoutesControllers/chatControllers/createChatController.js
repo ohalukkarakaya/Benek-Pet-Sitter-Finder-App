@@ -1,6 +1,14 @@
 import Chat from "../../../models/Chat/Chat.js";
 import User from "../../../models/User.js";
 
+import dotenv from "dotenv";
+import io from "socket.io-client";
+import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
+
+dotenv.config();
+
+const socket = io( process.env.SOCKET_URL );
+
 const createChatController = async (req, res) => {
     try{
         // gelen veriler
@@ -115,9 +123,19 @@ const createChatController = async (req, res) => {
             memberLisToAdd.push(
                 {
                     userId: memberId,
-                    joinDate: Date.now()
+                    joinDate: new Date()
                 }
             );
+        }
+
+        let chatMemberInfoList = [];
+        for( let member of memberLisToAdd ){
+            let memberObject = await User.findById( member.userId );
+            if( !memberObject ){ break; }
+
+            let memberInfo = getLightWeightUserInfoHelper( memberObject );
+            memberInfo.joinDate = member.joinDate;
+            chatMemberInfoList.push( memberInfo );
         }
 
         // sohbet objesini oluştur ve kaydet
@@ -129,14 +147,32 @@ const createChatController = async (req, res) => {
         ).save()
          .then(
             ( chat ) => {
-            return res.status( 200 )
-                      .json(
-                            {
-                                error: false,
-                                chatId: chat._id.toString(),
-                                message: "New chat created succesfully"
-                            }
-                       );
+                const responseChat = {
+                    id: chat._id.toString(),
+                    members: chatMemberInfoList,
+                    chatStartDate: chat.chatStartDate,
+                    chatName: chat.chatName,
+                    chatDesc: chat.chatDesc,
+                    chatImageUrl: chat.chatImageUrl,
+                    message: null
+                }
+
+                const newChatMembers = chat.members.map( member => member.userId );
+
+                socket.emit(
+                    "sendMessage",
+                    responseChat,
+                    newChatMembers
+                );
+
+                return res.status( 200 )
+                          .json(
+                                {
+                                    error: false,
+                                    chatId: chat._id.toString(),
+                                    message: "New chat created succesfully"
+                                }
+                           );
             }
         );
     }catch( err ){

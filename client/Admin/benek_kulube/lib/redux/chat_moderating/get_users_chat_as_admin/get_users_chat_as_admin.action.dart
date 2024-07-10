@@ -11,6 +11,7 @@ import 'package:benek_kulube/store/app_state.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 import '../../../data/models/chat_models/chat_model.dart';
+import '../../../data/models/chat_models/message_seen_data_model.dart';
 
 ThunkAction<AppState> getUsersChatAsAdminRequestAction( String userId, String? lastItemId ) {
   return (Store<AppState> store) async {
@@ -26,14 +27,31 @@ ThunkAction<AppState> getUsersChatAsAdminRequestAction( String userId, String? l
   };
 }
 
-ThunkAction<AppState> getUsersChatAsAdminRequestActionFromSocket( ChatModel receivingChatData ) {
+ThunkAction<AppState> getUsersChatAsAdminRequestActionFromSocket( ChatModel receivingChatData, String userId ) {
   return (Store<AppState> store) async {
     try {
+      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+      int unReadMessageCountRes = await api.getUnreadMessagesFromChatId( receivingChatData.id!, userId );
+      receivingChatData.unreadMessageCount = unReadMessageCountRes;
+
       ChatStateModel? chat = store.state.selectedUserInfo!.chatData;
-      chat?.addMessageOrChat(receivingChatData);
+      chat?.addMessageOrChat(receivingChatData, store.state.selectedUserInfo!.userId!);
       await store.dispatch(GetUsersChatAsAdminRequestAction(chat));
     } on ApiException catch (e) {
       log('ERROR: getUsersChatAsAdminFromSocketAction - $e');
+    }
+  };
+}
+
+ThunkAction<AppState> seenMessageAsAdminBySocketAction( MessageSeenData receivingSeenData ) {
+  return (Store<AppState> store) async {
+    try {
+      ChatStateModel? chats = store.state.selectedUserInfo!.chatData;
+      chats?.seeMessage(receivingSeenData);
+
+      await store.dispatch(GetUsersChatAsAdminRequestAction(chats));
+    } on ApiException catch (e) {
+      log('ERROR: seenMessageAsAdminBySocketAction - $e');
     }
   };
 }

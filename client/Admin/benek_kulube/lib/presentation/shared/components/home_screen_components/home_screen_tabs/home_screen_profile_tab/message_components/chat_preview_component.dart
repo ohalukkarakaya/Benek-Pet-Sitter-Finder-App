@@ -32,8 +32,8 @@ class _ChatPreviewWidgetState extends State<ChatPreviewWidget> {
   @override
   Widget build(BuildContext context) {
     int itemCount = widget.chatInfo != null && widget.chatInfo!.chats != null
-      ? widget.chatInfo!.chats!.length >= 5
-        ? 5
+      ? widget.chatInfo!.chats!.length >= 3
+        ? 3
         : widget.chatInfo!.chats!.length
       : 0;
     return Padding(
