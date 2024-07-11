@@ -50,6 +50,9 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       Store<AppState> store = StoreProvider.of<AppState>(context);
       if( !didRequestSend ){
+
+        await store.dispatch(IncreaseProcessCounterAction());
+
         didRequestSend = true;
 
         // Moderator Operations Auth Check
@@ -65,15 +68,21 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
          isChatLoading = false;
 
          // Let User Know That You Are Here
-         Future.delayed(Duration.zero, () async {
-           socket.emit(
-               'addEvaluatorToChat',
-               [
-                 store.state.userInfo!.userId,
-                 store.state.selectedUserInfo!.userId!
-               ]
-           );
-         });
+         if(
+          store.state.userInfo != null
+          && store.state.selectedUserInfo != null
+         ){
+           Future.delayed(Duration.zero, () async {
+             socket.emit(
+                 'addEvaluatorToChat',
+                 [
+                   store.state.userInfo!.userId,
+                   store.state.selectedUserInfo!.userId!
+                 ]
+             );
+           });
+         }
+
 
          // Listen for incoming messages
          socket.on('getMessage', (data) async {
@@ -103,14 +112,15 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
           isLogsLoading = false;
         }
 
+        await store.dispatch(DecreaseProcessCounterAction());
       }
     });
   }
 
   @override
   void dispose() {
-    socket?.disconnect();
     super.dispose();
+    socket?.disconnect();
   }
 
   @override

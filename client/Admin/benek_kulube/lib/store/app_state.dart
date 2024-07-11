@@ -9,6 +9,8 @@ import '../data/models/story_models/story_model.dart';
 class AppState {
   final int counter;
 
+  final int processCounter;
+
   final String deviceLanguage;
   final AppTabsEnums activeTab;
   final AppScreenEnums activeScreen;
@@ -27,6 +29,8 @@ class AppState {
 
   AppState({
     required this.counter,
+
+    required this.processCounter,
 
     required this.deviceLanguage,
     required this.activeTab,
@@ -49,6 +53,8 @@ class AppState {
     return AppState(
       counter: 0,
 
+      processCounter: 0,
+
       deviceLanguage: 'tr',
       activeTab: AppTabsEnums.HOME_TAB,
       activeScreen: AppScreenEnums.LOADING_SCREEN,
@@ -70,6 +76,8 @@ class AppState {
   AppState copyWith({
     int? counter,
 
+    int? processCounter,
+
     String? deviceLanguage,
     AppTabsEnums? activeTab,
     AppScreenEnums? activeScreen,
@@ -89,6 +97,8 @@ class AppState {
     return AppState(
       counter: counter ?? this.counter,
 
+      processCounter: processCounter ?? this.processCounter,
+      
       deviceLanguage: deviceLanguage ?? this.deviceLanguage,
       activeTab: activeTab ?? this.activeTab,
       activeScreen: activeScreen ?? this.activeScreen,

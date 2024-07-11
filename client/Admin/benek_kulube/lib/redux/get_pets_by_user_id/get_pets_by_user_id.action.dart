@@ -13,9 +13,13 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 import '../../data/models/pet_models/pet_model.dart';
 
-ThunkAction<AppState> getPetsByUserIdRequestAction( String userId ) {
+ThunkAction<AppState> getPetsByUserIdRequestAction( String? userId ) {
   return (Store<AppState> store) async {
     PetApi api = PetApi();
+
+    if( userId == null ){
+      return;
+    }
 
     try {
       List<PetModel>? _pets = await api.getPetsByUserIdRequest( userId );

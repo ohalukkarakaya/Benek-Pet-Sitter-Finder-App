@@ -35,15 +35,19 @@ class _TabsButonElementState extends State<TabsButonElement> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
+        if( widget.store.state.processCounter != 0 ){
+          return;
+        }
+
         await widget.store.dispatch(setSelectedUserAction(null));
 
-         widget.tab == AppTabsEnums.LOGOUT_TAB
+        widget.tab == AppTabsEnums.LOGOUT_TAB
           ? await AuthUtils.killUserSessionAndRestartApp( widget.store )
           : await widget.store.dispatch(ChangeTabAction( widget.tab ) );
       },
       child: MouseRegion(
         onHover: ( event ){
-          if( 
+          if(
             widget.store.state.activeTab == widget.tab
             || widget.shouldShowTextWhenDeActive
             || isHovering
@@ -67,7 +71,8 @@ class _TabsButonElementState extends State<TabsButonElement> {
         child: Container(
           width: 150,
           padding: const EdgeInsets.symmetric( vertical: 15.0, horizontal: 20.0 ),
-          decoration: isHovering 
+          decoration: widget.store.state.processCounter == 0
+            && isHovering
             || (
               widget.store.state.activeTab == widget.tab
               && widget.store.state.selectedUserInfo == null
@@ -95,7 +100,8 @@ class _TabsButonElementState extends State<TabsButonElement> {
                 child: Icon(
                   widget.icon, 
                   size: 20.0, 
-                  color: isHovering
+                  color: widget.store.state.processCounter == 0
+                         && isHovering
                          || (
                               widget.store.state.activeTab == widget.tab
                               && widget.store.state.selectedUserInfo == null
@@ -106,7 +112,7 @@ class _TabsButonElementState extends State<TabsButonElement> {
               ),
               const SizedBox( width: 10,),
               widget.shouldShowTextWhenDeActive
-              || isHovering
+              || widget.store.state.processCounter == 0 && isHovering
               || (
                   widget.store.state.activeTab == widget.tab
                   && widget.store.state.selectedUserInfo == null
@@ -117,7 +123,7 @@ class _TabsButonElementState extends State<TabsButonElement> {
                     fontFamily: 'Qanelas',
                     fontSize: 15.0,
                     fontWeight: FontWeight.w500,
-                    color: isHovering
+                    color: widget.store.state.processCounter == 0 && isHovering
                       || (
                           widget.store.state.activeTab == widget.tab
                               && widget.store.state.selectedUserInfo == null

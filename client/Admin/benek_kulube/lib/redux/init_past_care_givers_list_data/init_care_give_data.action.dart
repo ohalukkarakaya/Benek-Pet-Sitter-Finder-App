@@ -20,7 +20,8 @@ ThunkAction<AppState> initCareGiveDataAction(){
 
     try {
       if(
-          store.state.selectedUserInfo!.caregiverCareer == null
+          store.state.selectedUserInfo == null
+          || store.state.selectedUserInfo!.caregiverCareer == null
           || store.state.selectedUserInfo!.caregiverCareer!.isEmpty
           || store.state.selectedUserInfo!.caregiverCareer![0].pet is! String
       ){

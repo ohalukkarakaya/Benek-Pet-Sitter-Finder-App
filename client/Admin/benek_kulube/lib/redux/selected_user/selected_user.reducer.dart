@@ -11,13 +11,13 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
     action.userData?.chatData = chatData;
     return action.userData;
   }else if( action is GetPetsByUserIdRequestAction ){
-    userInfo!.addPets(action.pets!);
+    userInfo?.addPets(action.pets!);
     return userInfo;
   }else if( action is InitPastCareGiversAction ){
-    userInfo!.addPastCareGivers(action.pastCareGiversList!);
+    userInfo?.addPastCareGivers(action.pastCareGiversList!);
     return userInfo;
   }else if( action is InitCareGiveDataAction ){
-    userInfo!.addCareGiveCareer(action.careGiveList!);
+    userInfo?.addCareGiveCareer(action.careGiveList!);
     return userInfo;
   }else if( action is GetUsersChatAsAdminRequestAction ){
     userInfo?.chatData = action.chatData;

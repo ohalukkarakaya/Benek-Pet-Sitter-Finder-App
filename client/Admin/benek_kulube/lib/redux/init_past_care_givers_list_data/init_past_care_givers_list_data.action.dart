@@ -22,7 +22,8 @@ ThunkAction<AppState> initPastCareGiversAction(){
 
     try {
       if(
-          store.state.selectedUserInfo!.pastCaregivers == null
+          store.state.selectedUserInfo == null
+          || store.state.selectedUserInfo!.pastCaregivers == null
           || store.state.selectedUserInfo!.pastCaregivers!.isEmpty
           || store.state.selectedUserInfo!.pastCaregivers![0].careGiver is! String
           || store.state.selectedUserInfo!.pastCaregivers![0].pet is! String

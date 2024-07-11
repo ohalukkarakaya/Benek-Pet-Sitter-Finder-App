@@ -17,10 +17,13 @@ import '../../redux/selected_user/selected_user.reducer.dart' as selected_user;
 import '../../redux/get_stories_by_user_id/get_stories_by_user_id.reducer.dart' as get_stories_by_user_id;
 import '../../redux/set_device_language/set_device_language.reducer.dart' as set_device_language;
 import '../../redux/select_story/select_story.reducer.dart' as selected_story;
+import '../../redux/process_counter/process_counter.reducer.dart' as processCounter;
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
     counter: counter.counterReducer(state.counter, action),
+
+    processCounter: processCounter.processCounterReducer(state.processCounter, action),
 
     deviceLanguage: set_device_language.setDeviceLanguageReducer(state.deviceLanguage, action),
     activeTab: change_screen_tab.changeTabReducer(state.activeTab, action),

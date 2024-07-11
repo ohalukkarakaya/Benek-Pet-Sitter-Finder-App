@@ -13,9 +13,13 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 import '../../data/models/story_models/story_model.dart';
 
-ThunkAction<AppState> getStoriesByUserIdRequestAction( String userId ) {
+ThunkAction<AppState> getStoriesByUserIdRequestAction( String? userId ) {
   return (Store<AppState> store) async {
     StoryApi api = StoryApi();
+
+    if( userId == null ){
+      return;
+    }
 
     try {
       List<StoryModel>? _stories = await api.getStoriesByUserIdRequest( userId );

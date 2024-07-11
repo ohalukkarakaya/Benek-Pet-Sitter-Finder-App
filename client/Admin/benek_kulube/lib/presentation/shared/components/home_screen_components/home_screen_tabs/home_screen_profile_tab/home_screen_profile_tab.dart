@@ -39,15 +39,19 @@ class _ProfileTabState extends State<ProfileTab> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       Store<AppState> store = StoreProvider.of<AppState>(context);
+
       if( !didRequestSend ){
+        await store.dispatch(IncreaseProcessCounterAction());
         didRequestSend = true;
-        await store.dispatch(getUserInfoByUserIdAction( store.state.selectedUserInfo!.userId! ));
-        await store.dispatch(getStoriesByUserIdRequestAction( store.state.selectedUserInfo!.userId! ));
-        await store.dispatch(getPetsByUserIdRequestAction( store.state.selectedUserInfo!.userId! ));
+
+        await store.dispatch(getUserInfoByUserIdAction( store.state.selectedUserInfo?.userId ));
+        await store.dispatch(getStoriesByUserIdRequestAction( store.state.selectedUserInfo?.userId ));
+        await store.dispatch(getPetsByUserIdRequestAction( store.state.selectedUserInfo?.userId ));
         await store.dispatch(initPastCareGiversAction());
         await store.dispatch(initCareGiveDataAction());
       }
       updateStoryBoardSize();
+      await store.dispatch(DecreaseProcessCounterAction());
     });
   }
 

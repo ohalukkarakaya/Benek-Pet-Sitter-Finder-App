@@ -25,7 +25,7 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
         positions: RestrictedPositions(
           maxCoverage: 0.4,
           minCoverage: 0.1,
-          align: StackAlign.left,
+          align: StackAlign.center,
         ),
         stackedWidgets: petList!.isNotEmpty ?
           petList!.map((pet) {

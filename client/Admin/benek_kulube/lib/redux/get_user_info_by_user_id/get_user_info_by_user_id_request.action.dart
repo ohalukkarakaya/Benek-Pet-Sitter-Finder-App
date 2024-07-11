@@ -12,9 +12,13 @@ import 'package:redux/redux.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-ThunkAction<AppState> getUserInfoByUserIdAction(String userId){
+ThunkAction<AppState> getUserInfoByUserIdAction(String? userId){
   return (Store<AppState> store) async {
     UserInfoByUserIdApi api = UserInfoByUserIdApi();
+
+    if( userId == null ){
+      return;
+    }
 
     try {
 
