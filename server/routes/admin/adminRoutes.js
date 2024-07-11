@@ -21,6 +21,8 @@ import getAllEmployeesController from "../../controllers/adminRoutes/getAllEmplo
 import getUsersChatsAsAdminController from "../../controllers/adminRoutes/getUsersChatsAsAdminController.js";
 import searchChatAsAdminController from "../../controllers/adminRoutes/searchChatAsAdminController.js";
 import getUsersMessagesAsAdminController from "../../controllers/adminRoutes/getUsersMessagesAsAdminController.js";
+import getPunishmentCountController from "../../controllers/adminRoutes/getPunishmentCountController.js";
+import getPunishmentRecordsController from "../../controllers/adminRoutes/getPunishmentRecordsController.js";
 
 import { adminAuthAny, adminAuthSuperAdmin, adminAuthEvaluator, adminAuthAccounting } from "../../middleware/adminAuth.js";
 
@@ -64,6 +66,7 @@ router.get(
     getReportedMissionListController
 );
 
+// - tested
 // get users chat as admin
 router.get(
     "/getUsersChat/:userId/:limit/:lastItemId",
@@ -131,6 +134,22 @@ router.post(
     "/punishUser/:userId",
     adminAuthEvaluator,
     punishUserController
+);
+
+// - tested
+// get punisment count from user id
+router.get(
+    "/punishmentCount/:userId",
+    adminAuthEvaluator,
+    getPunishmentCountController
+);
+
+// - tested
+// get punisment records by user id
+router.get(
+    "/getPunishmentRecords/:userId",
+    adminAuthEvaluator,
+    getPunishmentRecordsController
 );
 
 // - tested
