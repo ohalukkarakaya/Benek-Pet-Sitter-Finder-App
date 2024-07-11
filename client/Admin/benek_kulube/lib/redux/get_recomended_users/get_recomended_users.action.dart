@@ -31,7 +31,10 @@ ThunkAction<AppState> getRecomendedUsersRequestAction( bool isPagination ) {
       if( isPagination ){
         store.state.recomendedUsersList!.addNewPage(_dataList);
         _dataList = store.state.recomendedUsersList!;
-      } 
+      }
+
+      _dataList.recentlySeenUsers = store.state.recomendedUsersList?.recentlySeenUsers;
+
       await store.dispatch(GetRecomendedUsersRequestAction(_dataList));
       
     } on ApiException catch (e) {

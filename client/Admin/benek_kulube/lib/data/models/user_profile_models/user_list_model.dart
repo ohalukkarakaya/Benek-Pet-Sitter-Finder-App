@@ -48,14 +48,25 @@ class UserList {
     return data;
   }
 
-  dynamic addNewSeenUser( UserInfo user ){
-    if( recentlySeenUsers != null && recentlySeenUsers!.contains( user ) ){
-      recentlySeenUsers!.remove( user );
+  dynamic addNewSeenUser( UserInfo? user ){
+    if( user == null ){
+      return;
+    }
+
+    UserInfo existingUser = recentlySeenUsers?.firstWhere(
+      (userElement) => userElement.userId == user.userId,
+      orElse: () => UserInfo()
+    ) ?? UserInfo();
+
+    if( existingUser.userId != null ){
+      recentlySeenUsers!.remove( existingUser );
     }
     
-    if( recentlySeenUsers != null && recentlySeenUsers!.length >= 5 ){
+    if( recentlySeenUsers != null && recentlySeenUsers!.length > 6 ){
       recentlySeenUsers!.removeAt(0);
     }
+
+    recentlySeenUsers ??= <UserInfo>[];
 
     recentlySeenUsers?.add( user );
   }
@@ -65,6 +76,7 @@ class UserList {
 
     removeDuplicateUsers();
   }
+
 
   dynamic setSearchValue( String value ){
     searchValue = value;

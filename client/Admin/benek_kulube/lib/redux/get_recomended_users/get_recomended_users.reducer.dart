@@ -4,6 +4,9 @@ import 'package:benek_kulube/store/actions/app_actions.dart';
 UserList? userSearchRequestReducer( UserList? recomendedUsers, dynamic action ){
   if( action is GetRecomendedUsersRequestAction ){
     return action.dataList;
+  }else if( action is SetRecentlySeenUserAction ){
+    recomendedUsers?.addNewSeenUser( action.userInfo );
+    return recomendedUsers;
   }
 
   return recomendedUsers;

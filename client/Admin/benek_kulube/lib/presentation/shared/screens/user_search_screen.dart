@@ -73,6 +73,7 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
 
   void _updateSelectedUser(UserInfo user) async {
     Store<AppState> store = StoreProvider.of<AppState>(context);
+    await store.dispatch(SetRecentlySeenUserAction(user));
     await store.dispatch(setSelectedUserAction(null));
     Navigator.pop(context);
     await Future.delayed(const Duration(milliseconds: 100));
@@ -106,14 +107,15 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
         Navigator.pop(context);
       },
 
-      child: RawKeyboardListener(
+      child: KeyboardListener(
         focusNode: _focusNode,
-        onKey: (RawKeyEvent event){
+        onKeyEvent: (KeyEvent event){
           if(
-            event is RawKeyDownEvent 
+            event is KeyDownEvent
             && event.logicalKey == LogicalKeyboardKey.escape
           ){
               setState(() {
+                hoveringUser = null;
                 shouldPop = true;
               });
           }

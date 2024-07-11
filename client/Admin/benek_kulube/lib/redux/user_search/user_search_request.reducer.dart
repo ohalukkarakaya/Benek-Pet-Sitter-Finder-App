@@ -4,6 +4,9 @@ import 'package:benek_kulube/store/actions/app_actions.dart';
 UserList? userSearchRequestReducer( UserList? userSearchListData, dynamic action ){
   if( action is UserSearchRequestAction ){
     return action.searchListData;
+  }else if( action is SetRecentlySeenUserAction ){
+    userSearchListData?.addNewSeenUser( action.userInfo );
+    return userSearchListData;
   }
 
   return userSearchListData;

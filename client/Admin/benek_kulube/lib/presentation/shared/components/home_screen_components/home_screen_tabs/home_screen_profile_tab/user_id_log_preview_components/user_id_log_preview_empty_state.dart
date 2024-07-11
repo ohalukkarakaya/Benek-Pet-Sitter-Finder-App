@@ -30,9 +30,9 @@ class UserIdLogPreviewEmptyStateWidget extends StatelessWidget {
             BenekStringHelpers.locale('noLog'),
             style: const TextStyle(
               fontFamily: 'Qanelas',
-              fontSize: 12,
+              fontSize: 15,
               color: AppColors.benekWhite,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w200,
             ),
           ),
         )

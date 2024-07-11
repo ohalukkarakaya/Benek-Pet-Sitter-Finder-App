@@ -1,6 +1,8 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
+import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
+import 'package:benek_kulube/presentation/shared/components/user_search_companents/user_search_result_list/user_search_recently_seen_user_row.dart';
 import 'package:benek_kulube/presentation/shared/components/user_search_companents/user_search_result_list/user_search_result_list_custom_scroll_view.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +80,17 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
           double totalHeight = 0.0;
           totalHeight = 64.0 * itemCount;
 
-          double lastChildHeight = totalHeight + 50 + (20 * (itemCount - 1));
+          double lastChildHeight = resultDataObject != null
+              && resultDataObject.recentlySeenUsers != null
+              && resultDataObject.recentlySeenUsers!.isNotEmpty
+                  ? totalHeight + 50 + (20 * (itemCount - 1)) - 110
+                  : totalHeight + 50 + (20 * (itemCount - 1));
+
+          double dynamicHeightLimit = resultDataObject != null
+              && resultDataObject.recentlySeenUsers != null
+              && resultDataObject.recentlySeenUsers!.isNotEmpty
+                   ? 678.6 - 110
+                   : 678.6;
 
           if (resultData == null || resultData.isEmpty) {
             return const SizedBox.shrink();
@@ -88,21 +100,32 @@ class _UserSearchResultListState extends State<UserSearchResultList> {
 
           return Column(
             children: [
+
+              resultDataObject != null
+              && resultDataObject.recentlySeenUsers != null
+              && resultDataObject.recentlySeenUsers!.isNotEmpty
+                  ? UserSearchRecentlySeenUserRow(
+                    recentlySeenUsers: resultDataObject.recentlySeenUsers?.reversed.toList() ?? [],
+                    onUserHoverCallback: widget.onUserHoverCallback,
+                    onUserHoverExitCallback: widget.onUserHoverExitCallback,
+                  )
+                  : const SizedBox(),
+
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.benekBlack,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(6.0),
                     topRight: const Radius.circular(6.0),
-                    bottomLeft: lastChildHeight <= 678.6
+                    bottomLeft: lastChildHeight <= dynamicHeightLimit
                         ? const Radius.circular(6.0)
                         : const Radius.circular(0.0),
-                    bottomRight: lastChildHeight <= 678.6
+                    bottomRight: lastChildHeight <= dynamicHeightLimit
                         ? const Radius.circular(6.0)
                         : const Radius.circular(0.0),
                   ),
                 ),
-                height: lastChildHeight <= 678.6 ? lastChildHeight : 678.6,
+                height: lastChildHeight <= dynamicHeightLimit ? lastChildHeight : dynamicHeightLimit,
                 padding: const EdgeInsets.all(10.0),
                 child: ScrollConfiguration(
                   behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),

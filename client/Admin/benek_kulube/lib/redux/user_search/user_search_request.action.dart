@@ -45,6 +45,8 @@ ThunkAction<AppState> resetUserSearchDataAction() {
   return (Store<AppState> store) async {
     try {
       UserList? _resetData;
+      _resetData?.recentlySeenUsers = store.state.userSearchResultList?.recentlySeenUsers;
+
       await store.dispatch(UserSearchRequestAction(_resetData));
     } on ApiException catch (e) {
       log('ERROR: resetUserSearchDataAction - $e');
