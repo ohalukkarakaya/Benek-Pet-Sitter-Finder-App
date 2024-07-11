@@ -10,6 +10,7 @@ import 'package:benek_kulube/data/models/user_profile_models/user_past_care_give
 import 'package:benek_kulube/data/models/user_profile_models/user_profile_image_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_star_model.dart';
 
+import '../chat_models/punishment_info_model.dart';
 import '../log_models/log_model.dart';
 
 class UserInfo {
@@ -40,6 +41,7 @@ class UserInfo {
   int? totalStar;
   ChatStateModel? chatData;
   List<LogModel>? logs;
+  PunishmentInfoModel? punishmentInfo;
 
   UserInfo(
     {
@@ -69,7 +71,8 @@ class UserInfo {
       this.defaultImage,
       this.totalStar,
       this.chatData,
-      this.logs
+      this.logs,
+      this.punishmentInfo,
     }
   );
 
@@ -257,5 +260,9 @@ class UserInfo {
 
   dynamic addLogData( List<LogModel> inComingLogListData ){
     logs = inComingLogListData;
+  }
+
+  dynamic addPunishmentInfo( PunishmentInfoModel inComingPunishmentInfo ){
+    punishmentInfo = inComingPunishmentInfo;
   }
 }

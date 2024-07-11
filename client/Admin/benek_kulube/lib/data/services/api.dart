@@ -35,5 +35,6 @@ part 'pet_api/pet_api.dart';
 part 'get_user_info_apies/get_light_weight_user_info_by_user_id_list.dart';
 part 'chat_moderating_apies/get_users_chat_as_admin/get_users_chat_as_admin_api.dart';
 part 'get_log_apies/get_logs_by_user_id_api.dart';
+part 'get_punishment_info_apies/get_users_punishment_info_api.dart';
 
 ApiClient defaultApiClient = ApiClient();

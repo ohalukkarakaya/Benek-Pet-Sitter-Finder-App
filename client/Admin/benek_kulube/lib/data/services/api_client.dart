@@ -65,6 +65,8 @@ class ApiClient {
           return list;
         case 'UnreadMessageCount':
           return value['unreadMessageCount'] is int ? value['unreadMessageCount'] : int.parse('${value['unreadMessageCount']}');
+        case 'PunishmentCount':
+          return value['punishmentCount'] is int ? value['punishmentCount'] : int.parse('${value['punishmentCount']}');
         // case 'List<OKRUserParentUserObjectiveComplianceViewModel>':
         //   List<dynamic> jsonList = value;
         //   List<OKRUserParentUserObjectiveComplianceViewModel> list = jsonList.map((item) => OKRUserParentUserObjectiveComplianceViewModel.fromJson(item)).toList();

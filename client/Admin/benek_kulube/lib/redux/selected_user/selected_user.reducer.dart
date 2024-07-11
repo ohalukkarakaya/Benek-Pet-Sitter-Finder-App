@@ -2,6 +2,8 @@ import 'package:benek_kulube/data/models/chat_models/chat_state_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 
+import '../../data/models/chat_models/punishment_info_model.dart';
+
 UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
 
   if( action is SetSelectedUserAction ){
@@ -24,6 +26,16 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
     return userInfo;
   }else if( action is GetLogsByUserIdRequestAction ){
     userInfo?.logs = action.dataList;
+    return userInfo;
+  }else if( action is GetUsersPunishmentCountRequestAction ){
+    userInfo?.punishmentInfo ?? (
+        userInfo?.punishmentInfo = PunishmentInfoModel(
+          punishmentCount: 0,
+          punishmentList: []
+        )
+    );
+    userInfo?.punishmentInfo?.setPunishmentCount(action.usersPunishmentCount);
+
     return userInfo;
   }
 

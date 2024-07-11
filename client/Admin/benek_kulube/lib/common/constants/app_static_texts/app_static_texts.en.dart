@@ -74,5 +74,6 @@ class AppStaticTextsEn{
     'createdAt': 'Created At',
     'noLog': 'No Log Yet!',
     'seeUsersLogs': 'See Logs',
+    'punishment': 'Punishment',
   };
 }

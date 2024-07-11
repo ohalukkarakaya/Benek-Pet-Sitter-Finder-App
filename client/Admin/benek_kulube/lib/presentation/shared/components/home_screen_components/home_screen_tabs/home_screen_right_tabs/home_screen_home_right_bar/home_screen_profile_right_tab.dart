@@ -17,6 +17,7 @@ import '../../../../../../../data/models/chat_models/message_seen_data_model.dar
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../benek_circle_avatar/benek_circle_avatar.dart';
 import '../../home_screen_profile_tab/message_components/chat_preview_component.dart';
+import '../../home_screen_profile_tab/profile_screen_section_components/punishment_count_widget.dart';
 
 class HomeScreenProfileRightTab extends StatefulWidget {
   const HomeScreenProfileRightTab({super.key});
@@ -97,6 +98,9 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
 
            await store.dispatch(seenMessageAsAdminBySocketAction(receivingSeenData));
          });
+
+         // Send Get Request to pull punishment count of the user
+         await store.dispatch(getUsersPunishmentCountRequestAction(store.state.selectedUserInfo!.userId!));
         }
 
         // Developer Operations Auth Check
@@ -171,6 +175,15 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
                             ),
                           )
                       ),
+
+                      selectedUserInfo != null
+                      && selectedUserInfo.punishmentInfo != null
+                      && selectedUserInfo.punishmentInfo!.punishmentCount != null
+                      && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
+                        ? PunishmentCountWidget(
+                          punishmentCount: selectedUserInfo.punishmentInfo?.punishmentCount ?? 0,
+                        )
+                        : const SizedBox(),
               
                       selectedUserInfo != null
                       && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])

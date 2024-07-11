@@ -74,5 +74,6 @@ class AppStaticTextsTr{
     'createdAt': 'Tarihinde Oluşturuldu',
     'noLog': 'Hiç Log Yok!',
     'seeUsersLogs': 'Loglarını Gör',
+    'punishment': 'Ceza',
   };
 }
