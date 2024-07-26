@@ -58,6 +58,9 @@ dependencies:
   avatar_stack: ^1.2.0
   fl_chart: ^0.68.0
   chewie: ^1.8.1
+  video_player: ^2.9.1
+  video_player_win: ^2.3.9
+  path_provider: ^2.1.3
 
 dev_dependencies:
   flutter_test:

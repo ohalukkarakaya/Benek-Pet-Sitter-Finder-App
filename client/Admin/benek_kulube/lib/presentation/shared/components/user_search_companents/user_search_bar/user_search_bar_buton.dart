@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 class KulubeSearchBarButon extends StatelessWidget {
   const KulubeSearchBarButon({super.key});
 
-  void _onTap(BuildContext context) async {
+  void _onTap(BuildContext context) async { 
     await Navigator.push(
       context,
       PageRouteBuilder(

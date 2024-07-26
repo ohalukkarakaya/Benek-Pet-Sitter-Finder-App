@@ -12,12 +12,14 @@ import 'package:benek_kulube/presentation/shared/components/home_screen_componen
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_adress_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_bio_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_row.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/story_watch_screen.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import '../../../../../../common/widgets/benek_message_box_widget/benek_message_box_widget.dart';
+import '../../../../../../data/models/story_models/story_model.dart';
 import '../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../benek_pet_avatars_horizontal_list/benek_pet_stack_widget.dart';
 import 'benek_profile_stars_widget/benek_profile_star_widget.dart';
@@ -64,9 +66,7 @@ class _ProfileTabState extends State<ProfileTab> {
   Size calculateStoryBoardSize() {
     Store<AppState> store = StoreProvider.of<AppState>(context);
     return Size(
-      store.state.storiesToDisplay != null && store.state.storiesToDisplay!.isNotEmpty && store.state.storiesToDisplay!.length < 5
-          ? store.state.storiesToDisplay!.length * 155.0
-          : 540,
+      540,
       store.state.storiesToDisplay != null && store.state.storiesToDisplay!.isEmpty ? 150 : 250,
     );
   }
@@ -89,7 +89,23 @@ class _ProfileTabState extends State<ProfileTab> {
                   children: [
                     BenekMessageBoxWidget(
                       size: storyBoardSize,
-                      child: const KulubeStoriesBoard(),
+                      child: KulubeStoriesBoard(
+                        onTapPageBuilder: (dynamic Function() selectStoryFunction, List<StoryModel>? stories, int index) async {
+
+                          if( stories?[index] != null ){
+                            await selectStoryFunction();
+                          }
+
+                          await Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              opaque: false,
+                              barrierDismissible: false,
+                              pageBuilder: (context, _, __) => const StoryWatchScreen(),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

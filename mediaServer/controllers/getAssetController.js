@@ -23,6 +23,16 @@ const getAssetController = ( req, res ) => {
           });
       }
 
+    if(
+        fileExtension == 'mp4'
+        || fileExtension == 'MP4'
+        || fileExtension == '.mp4'
+        || fileExtension == '.MP4'
+    ){
+        // Set the correct content type for video
+        res.setHeader('Content-Type', 'video/mp4');
+    }
+
     // assets klasöründe beklenen dosya yolu
     const assetFilePath = path.join( __dirname, '../../assets', assetPath );
 

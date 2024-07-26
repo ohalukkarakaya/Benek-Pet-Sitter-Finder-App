@@ -75,5 +75,6 @@ class AppStaticTextsTr{
     'noLog': 'Hiç Log Yok!',
     'seeUsersLogs': 'Loglarını Gör',
     'punishment': 'Ceza',
+    'noPunishment': 'Ceza Kaydı Yok!',
   };
 }

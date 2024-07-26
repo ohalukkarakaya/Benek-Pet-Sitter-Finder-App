@@ -75,5 +75,6 @@ class AppStaticTextsEn{
     'noLog': 'No Log Yet!',
     'seeUsersLogs': 'See Logs',
     'punishment': 'Punishment',
+    'noPunishment': 'No Punishment Record!',
   };
 }

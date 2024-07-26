@@ -177,11 +177,9 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
                       ),
 
                       selectedUserInfo != null
-                      && selectedUserInfo.punishmentInfo != null
-                      && selectedUserInfo.punishmentInfo!.punishmentCount != null
                       && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
                         ? PunishmentCountWidget(
-                          punishmentCount: selectedUserInfo.punishmentInfo?.punishmentCount ?? 0,
+                          punishmentCount: selectedUserInfo.punishmentInfo?.punishmentCount,
                         )
                         : const SizedBox(),
               

@@ -1,7 +1,12 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+
+
 
 class ImageVideoHelpers {
 
@@ -39,6 +44,34 @@ class ImageVideoHelpers {
       }
     } else {
       return const SizedBox();
+    }
+  }
+
+  static getVideo(String url) async {
+    String videoUrl = '${ImageVideoHelpers.mediaServerBaseUrlHelper()}getAsset?assetPath=$url';
+    var headers = {
+      'private-key': dotenv.env['MEDIA_SERVER_API_KEY']!
+    };
+
+    var request = http.Request('GET', Uri.parse(videoUrl));
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      var videoBytes = await response.stream.toBytes();
+
+      // Create a temporary file and write the video bytes to it
+      Directory tempDir = await getTemporaryDirectory();
+      File tempFile = File('${tempDir.path}/temp_video.mp4');
+      await tempFile.writeAsBytes(videoBytes);
+
+      // Return the file path
+      return tempFile.path;
+    }
+    else {
+      log(response.reasonPhrase ?? 'ERROR: getVideoUrl');
+      return null;
     }
   }
 

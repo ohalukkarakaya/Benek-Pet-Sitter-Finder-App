@@ -1,7 +1,7 @@
 import 'package:benek_kulube/presentation/features/image_video_helpers/image_video_helpers.dart';
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/story_watch_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../../data/models/story_models/story_model.dart';
@@ -12,11 +12,33 @@ import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:benek_kulube/store/app_state.dart';
 
 class StoryElement extends StatelessWidget {
+  final void Function(dynamic Function() selectStoryFunction, List<StoryModel>? stories, int index) onTapPageBuilder;
+  final int index;
+  final List<StoryModel>? stories;
   final StoryModel? story;
   const StoryElement({
     super.key,
+    required this.onTapPageBuilder,
+    required this.index,
+    this.stories,
     this.story
   });
+
+  void _onTap(BuildContext context, dynamic Function() selectStoryFunction) async {
+
+    if( story != null ){
+      await selectStoryFunction();
+    }
+
+    await Navigator.push(
+      context,
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible: false,
+        pageBuilder: (context, _, __) => const StoryWatchScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +47,7 @@ class StoryElement extends StatelessWidget {
     Store<AppState> store = StoreProvider.of<AppState>(context);
 
     return GestureDetector(
-      onTap: () async {
-        if( story != null ){
-          await store.dispatch(selectStoryAction(story!));
-        }
-      },
+      onTap: () => onTapPageBuilder(() => store.dispatch(selectStoryAction(story!)), stories, index),
       child: Padding(
           padding: const EdgeInsets.all( 8.0 ),
           child: ClipRRect(
@@ -53,7 +71,7 @@ class StoryElement extends StatelessWidget {
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: [
-                        AppColors.benekBlack.withOpacity(0.8),
+                        AppColors.benekBlack.withOpacity(1),
                         AppColors.benekBlack.withOpacity(0.0),
                       ],
                     ),
@@ -77,8 +95,8 @@ class StoryElement extends StatelessWidget {
                             imageUrl: story!.about!.pet!.petProfileImg!.imgUrl!
                         ),
                         const SizedBox(width: 5,),
-                        OverflowBox(
-                          maxWidth: 75,
+                        SizedBox(
+                          width: 75,
                           child: Text(
                             story!.about!.pet!.name!,
                             style: const TextStyle(
