@@ -1,0 +1,35 @@
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/widgets/story_context_component/story_desc_widget.dart';
+import 'package:benek_kulube/common/widgets/story_context_component/story_like_info_card_widget.dart';
+import 'package:benek_kulube/data/models/story_models/story_model.dart';
+import 'package:flutter/widgets.dart';
+
+class StoryContextWidget extends StatelessWidget {
+  final StoryModel story;
+
+  const StoryContextWidget({
+    super.key,
+    required this.story
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Story description
+        StoryDescWidget(
+          profileImg: story.user?.profileImg,
+          desc: story.desc,
+          about: story.about,
+          createdAt: BenekStringHelpers.getDateAsString(story.createdAt!),
+        ),
+
+        const SizedBox(height: 20.0),
+        // like info
+        StoryLikeInfoCardWidget( storyId: story.storyId! ),
+        // Story context
+        SizedBox(),
+      ]
+    );
+  }
+}

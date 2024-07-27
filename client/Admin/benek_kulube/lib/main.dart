@@ -12,6 +12,7 @@ import 'package:redux/redux.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'dart:ui' as ui;
+import 'package:video_player_media_kit/video_player_media_kit.dart';
 
 void initMacOSWindow(Size size) async {
   if (Platform.isMacOS) {
@@ -43,6 +44,12 @@ void initWindowsAndLinuxWindow() async {
 }
 
 void main() async {
+
+  VideoPlayerMediaKit.ensureInitialized(
+    macOS: true,
+    windows: true,
+    linux: true,
+  );
   
   await dotenv.load(fileName: ".env");
 

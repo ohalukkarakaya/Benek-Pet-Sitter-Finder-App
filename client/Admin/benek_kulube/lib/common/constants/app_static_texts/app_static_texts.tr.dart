@@ -76,5 +76,11 @@ class AppStaticTextsTr{
     'seeUsersLogs': 'Loglarını Gör',
     'punishment': 'Ceza',
     'noPunishment': 'Ceza Kaydı Yok!',
+    'yearsOld': 'Yaşında',
+    'Female': 'Dişi',
+    'Male': 'Erkek',
+    'beTheFirstOneToLike': 'İlk Beğenen Sen Ol!',
+    'peopleLiked': 'Kişi Beğendi',
+    'justYou': 'Sadece Sen',
   };
 }

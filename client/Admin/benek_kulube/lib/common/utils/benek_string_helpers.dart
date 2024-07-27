@@ -76,6 +76,22 @@ class BenekStringHelpers {
     return "${date.day} ${getMonthAsString(date.month)} ${date.year}";
   }
 
+  static String getPetGenderAsString(String sex){
+    return locale(sex);
+  }
+
+  static int calculateYearsDifference(DateTime pastDate) {
+    DateTime now = DateTime.now();
+    int yearsDifference = now.year - pastDate.year;
+
+    if (now.month < pastDate.month ||
+        (now.month == pastDate.month && now.day < pastDate.day)) {
+      yearsDifference--;
+    }
+
+    return yearsDifference;
+  }
+
   static String getUsersFullName( String firstName, String lastName, String? middleName){
     String  middleNameAsString = middleName != null ? "$middleName " : "";
     return "$firstName $middleNameAsString${lastName.toUpperCase()}";

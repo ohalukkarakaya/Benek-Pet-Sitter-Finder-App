@@ -109,7 +109,7 @@ class _UserSearchResultListCustomScrollViewWidgetState extends State<UserSearchR
       await store.dispatch(getRecomendedUsersRequestAction(true));
     }
     
-    // use sfter request function
+    // use after request function
     if( callBackAfterRequestDone != null && mounted ){
       callBackAfterRequestDone();
     }

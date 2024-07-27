@@ -115,12 +115,26 @@ const getStoryByUserIdController = async ( req, res ) => {
                     }
             }
 
-            storyObject.likeCount = storyObject.likes
-                                               .length;
+            let firstFiveOfLikeLimit = 5;
+            if( storyObject.likes.length < 5 ){
+                firstFiveOfLikeLimit = storyObject.likes.length;
+            }
+
+            storyObject.firstFiveLikedUser = [];
+            for( let i = 0; i < firstFiveOfLikeLimit; i++ ) {
+                const likedUser = await User.findById( storyObject.likes[ i ].toString());
+                const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
+
+                storyObject.firstFiveLikedUser.push( likedUserInfo );
+            }
+
+            storyObject.didUserLiked = storyObject.likes.includes( req.user._id.toString() );
+
+            storyObject.likeCount = storyObject.likes.length;
+
             delete storyObject.likes;
 
-            const lastComment = storyObject.comments
-                                           .pop();
+            const lastComment = storyObject.comments.pop();
 
             if( lastComment ){
                 delete lastComment.replies;
@@ -129,8 +143,7 @@ const getStoryByUserIdController = async ( req, res ) => {
                 storyObject.lastComment = lastComment;
             }
             
-            storyObject.commentCount = storyObject.comments
-                                                  .length;
+            storyObject.commentCount = storyObject.comments.length;
             delete storyObject.comments;
             delete storyObject.__v;
             delete storyObject.updatedAt;

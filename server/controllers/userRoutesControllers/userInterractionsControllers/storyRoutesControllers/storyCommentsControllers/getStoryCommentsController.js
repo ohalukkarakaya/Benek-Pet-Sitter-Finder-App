@@ -32,7 +32,7 @@ const getStoryCommentsController = async ( req, res ) => {
             });
         }
 
-        let skip = lastElementId !== 'null' ? story.comments.findIndex( commentObject => commentObject._id.toString() === lastElementId ) + 1 : 0;
+        let skip = lastElementId !== 'null' ? story.comments.reverse().findIndex( commentObject => commentObject._id.toString() === lastElementId ) + 1 : 0;
         let comments = [];
         if( skip === 0 ){
             const usersComments = story.comments.filter(
@@ -42,7 +42,9 @@ const getStoryCommentsController = async ( req, res ) => {
 
             limit = limit - usersComments.length;
             if( usersComments.length > 0 ){
-                comments = usersComments;
+                for( let commentObject of usersComments ){
+                    comments.push( commentObject );
+                }
             }
         }
 
@@ -51,13 +53,15 @@ const getStoryCommentsController = async ( req, res ) => {
                 commentObject =>
                     commentObject.userId.toString() !== userId
             );
-            const startIndex = commentList.length - skip - 1;
+            const startIndex = Math.abs(comments.length - ( skip - 1 ));
             const endIndex = startIndex + limit;
 
             const limitedComments = commentList.slice( startIndex, endIndex );
 
             if( limitedComments.length > 0 ){
-                comments.push( limitedComments );
+                for( let commentObject of limitedComments ){
+                    comments.push( commentObject );
+                }
             }
         }
 
@@ -127,6 +131,7 @@ const getStoryCommentsController = async ( req, res ) => {
             return res.status( 200 ).json({
                 error: false,
                 message: "Comments Prepared succesfully",
+                totalCommentCount: story.comments.length,
                 commentCount: comments.length,
                 comments: resultCommentData
             });

@@ -2,21 +2,26 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:video_player/video_player.dart';
 
+
+import '../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../presentation/features/image_video_helpers/image_video_helpers.dart';
 import 'package:benek_kulube/common/widgets/vertical_video_companent/video_loading_widget.dart'; // Tekrar ekledim
 
 class VerticalContentComponent extends StatefulWidget {
   final String src;
+  final UserInfo user;
   final double width;
   final double height;
 
   const VerticalContentComponent({
     super.key,
     required this.src,
+    required this.user,
     required this.width,
     required this.height
   });
@@ -79,7 +84,7 @@ class _VerticalContentComponentState extends State<VerticalContentComponent> {
 
       // Hide the mute icon after 1 second
       _hideIconTimer?.cancel();
-      _hideIconTimer = Timer(Duration(seconds: 1), () {
+      _hideIconTimer = Timer( const Duration(seconds: 1), () {
         setState(() {
           _showIcon = false;
         });
@@ -128,6 +133,16 @@ class _VerticalContentComponentState extends State<VerticalContentComponent> {
                     ),
                   )
                 : const SizedBox(),
+
+            Positioned(
+              bottom: 20,
+              left: 20,
+              child: BenekCircleAvatar(
+                borderWidth: 2,
+                isDefaultAvatar: widget.user.profileImg!.isDefaultImg!,
+                imageUrl: widget.user.profileImg!.imgUrl!,
+              ),
+            ),
           ],
         )
         : Container(

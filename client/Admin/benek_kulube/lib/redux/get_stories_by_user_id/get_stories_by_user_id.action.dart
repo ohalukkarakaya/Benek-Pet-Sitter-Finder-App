@@ -32,8 +32,44 @@ ThunkAction<AppState> getStoriesByUserIdRequestAction( String? userId ) {
   };
 }
 
+ThunkAction<AppState> setStoriesAction( List<StoryModel>? stories ) {
+  return (Store<AppState> store) async {
+    try {
+      await store.dispatch(GetStoriesByUserIdRequestAction(stories));
+    } on ApiException catch (e) {
+      log('ERROR: getStoriesByUserId - $e');
+      // await AuthUtils.killUserSessionAndRestartApp(store);
+    }
+  };
+}
+
+ThunkAction<AppState> likeStoryAction( String? storyId ) {
+  return (Store<AppState> store) async {
+    StoryApi api = StoryApi();
+
+    if( storyId == null ){
+      return;
+    }
+
+    try {
+      bool response = await api.likeStoryRequest( storyId );
+      if( response ){
+        await store.dispatch(LikeStoryAction(storyId));
+      }
+    } on ApiException catch (e) {
+      log('ERROR: likeStory - $e');
+    }
+  };
+}
+
 class GetStoriesByUserIdRequestAction {
   final List<StoryModel>? _stories;
   List<StoryModel>? get stories => _stories;
   GetStoriesByUserIdRequestAction(this._stories);
+}
+
+class LikeStoryAction {
+  final String? _storyId;
+  String? get storyId => _storyId;
+  LikeStoryAction(this._storyId);
 }

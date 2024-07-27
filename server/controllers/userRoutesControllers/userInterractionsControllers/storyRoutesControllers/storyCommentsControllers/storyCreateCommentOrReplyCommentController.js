@@ -37,6 +37,9 @@ const storyCreateCommentOrReplyCommentController = async (req, res) => {
             );
         }
 
+        let commentId;
+        let replyId;
+
         const isReply = req.body.commentId;
         if(isReply){
             const comment = story.comments.find(
@@ -66,6 +69,8 @@ const storyCreateCommentOrReplyCommentController = async (req, res) => {
                                                 && reply.reply === commentDesc
                                          );
 
+            replyId = insertedReply._id.toString();
+
             await sendNotification(
                 req.user._id.toString(),
                 comment.userId.toString(),
@@ -91,6 +96,8 @@ const storyCreateCommentOrReplyCommentController = async (req, res) => {
                     comment.userId === req.user._id.toString()
                     && comment.comment === commentDesc
             );
+
+            commentId = insertedComment._id.toString();
 
             await sendNotification(
                 req.user._id.toString(),
@@ -124,6 +131,8 @@ const storyCreateCommentOrReplyCommentController = async (req, res) => {
         return res.status(200).json(
             {
                 error: false,
+                commentId: commentId,
+                replyId: replyId,
                 message: "comment or reply inserted succesfully"
             }
         );

@@ -67,6 +67,15 @@ class ApiClient {
           return value['unreadMessageCount'] is int ? value['unreadMessageCount'] : int.parse('${value['unreadMessageCount']}');
         case 'PunishmentCount':
           return value['punishmentCount'] is int ? value['punishmentCount'] : int.parse('${value['punishmentCount']}');
+        case 'List<CommentModel>':
+          List<dynamic> jsonList = value['comments'];
+          List<CommentModel> list = jsonList.map((item) => CommentModel.fromJson(item)).toList();
+          return {
+            'totalCommentCount': value['totalCommentCount'] != null
+                ? int.parse( value['totalCommentCount'].toString() )
+                : 0,
+            'list': list
+          };
         // case 'List<OKRUserParentUserObjectiveComplianceViewModel>':
         //   List<dynamic> jsonList = value;
         //   List<OKRUserParentUserObjectiveComplianceViewModel> list = jsonList.map((item) => OKRUserParentUserObjectiveComplianceViewModel.fromJson(item)).toList();

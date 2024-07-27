@@ -18,11 +18,11 @@ class UserSearchResultList extends StatefulWidget {
   final Function( UserInfo ) onUserHoverCallback;
   final Function() onUserHoverExitCallback;
   const UserSearchResultList({
-    Key? key, 
+    super.key,
     required this.store,
     required this.onUserHoverCallback,
     required this.onUserHoverExitCallback
-  }) : super(key: key);
+  });
 
   @override
   State<UserSearchResultList> createState() => _UserSearchResultListState();

@@ -76,5 +76,11 @@ class AppStaticTextsEn{
     'seeUsersLogs': 'See Logs',
     'punishment': 'Punishment',
     'noPunishment': 'No Punishment Record!',
+    'yearsOld': 'Years Old',
+    'Female': 'Female',
+    'Male': 'Male',
+    'beTheFirstOneToLike': 'Be the first one to like!',
+    'peopleLiked': 'People Liked',
+    'justYou': 'Just You',
   };
 }

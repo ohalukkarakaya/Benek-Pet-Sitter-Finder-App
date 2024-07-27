@@ -44,7 +44,7 @@ const StorySchema = new schema(
         desc: {
             type: String,
             maxLength: [
-                50,
+                200,
                 '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
             ],
         },

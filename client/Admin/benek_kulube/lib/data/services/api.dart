@@ -3,6 +3,7 @@ library benek.api;
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:benek_kulube/data/models/content_models/comment_model.dart';
 import 'package:benek_kulube/data/models/kulube_login_qr_code_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:benek_kulube/store/app_state.dart';

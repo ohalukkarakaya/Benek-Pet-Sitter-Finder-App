@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:benek_kulube/data/models/story_models/story_about_data_model.dart';
 import '../../../presentation/features/date_helpers/date_time_helpers.dart';
 import '../user_profile_models/user_info_model.dart';
@@ -12,7 +14,8 @@ class StoryModel {
   DateTime? expiresAt;
   UserInfo? user;
   int? likeCount;
-  CommentModel? lastComment;
+  bool? didUserLiked;
+  List<UserInfo>? firstFiveLikedUser;
   int? commentCount;
   List<CommentModel>? comments;
 
@@ -26,7 +29,8 @@ class StoryModel {
         this.expiresAt,
         this.user,
         this.likeCount,
-        this.lastComment,
+        this.didUserLiked,
+        this.firstFiveLikedUser,
         this.commentCount,
         this.comments
       }
@@ -41,9 +45,15 @@ class StoryModel {
     expiresAt = DateTimeHelpers.getDateTime(json['expiresAt']);
     user = json['user'] != null ? UserInfo.fromJson(json['user']) : null;
     likeCount = json['likeCount'];
-    lastComment = json['lastComment'] != null
-        ? CommentModel.fromJson(json['lastComment'])
+    didUserLiked = json['didUserLiked'];
+    firstFiveLikedUser = json['firstFiveLikedUser'] != null
+        ? List<UserInfo>.from(json['firstFiveLikedUser'].map((x) => UserInfo.fromJson(x)))
         : null;
+    comments = json['comments'] != null
+        ? List<CommentModel>.from(json['comments'].map((x) => CommentModel.fromJson(x)))
+        : json['lastComment'] != null
+          ? [CommentModel.fromJson(json['lastComment'])]
+          : null;
     commentCount = json['commentCount'];
   }
 
@@ -61,20 +71,70 @@ class StoryModel {
       data['user'] = user!.toJson();
     }
     data['likeCount'] = likeCount;
-    if (lastComment != null) {
-      data['lastComment'] = lastComment!.toJson();
+    if (comments != null && comments!.isNotEmpty) {
+      data['lastComment'] = comments![0].toJson();
     }
     data['commentCount'] = commentCount;
     return data;
   }
 
   void sortComments() {
-    comments?.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+    comments?.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+  }
+
+  void addComment(CommentModel comment) {
+    comments ??= <CommentModel>[];
+    sortComments();
+    comments!.insert(0, comment);
   }
 
   void addComments(List<CommentModel> commentList) {
     comments ??= <CommentModel>[];
-    comments = comments;
+    comments = commentList + comments!;
+
+    final uniqueComments = LinkedHashMap<String, CommentModel>();
+
+    for (var comment in comments!) {
+      uniqueComments[comment.id!] = comment;
+    }
+
+    comments = uniqueComments.values.toList();
+
     sortComments();
+  }
+
+  void addReplyToComment(String commentId, CommentModel reply) {
+    comments ??= <CommentModel>[];
+    for (var comment in comments!) {
+      if (comment.id == commentId) {
+        comment.addReply(reply);
+        break;
+      }
+    }
+  }
+
+  void addRepliesToComment(String commentId, List<CommentModel> replyList) {
+    comments ??= <CommentModel>[];
+    for (var comment in comments!) {
+      if (comment.id == commentId) {
+        comment.addReplies(replyList);
+        break;
+      }
+    }
+  }
+
+  void setCommentCount(int commentCount) {
+    this.commentCount = commentCount;
+  }
+
+  void setLikeCount(int likeCount) {
+    this.likeCount = likeCount;
+  }
+
+  void likeStory() {
+    didUserLiked = didUserLiked ?? false;
+    didUserLiked = !didUserLiked!;
+
+    likeCount = didUserLiked! ? likeCount! + 1 : likeCount! - 1;
   }
 }

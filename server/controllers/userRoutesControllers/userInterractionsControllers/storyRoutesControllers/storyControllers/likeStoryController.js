@@ -53,7 +53,7 @@ const likeStoryController = async (req, res) => {
         }
 
         story.markModified( 'likes' );
-        story.save(
+        await story.save(
             ( err ) => {
                 if( err ){
                   console.log( "error", err );

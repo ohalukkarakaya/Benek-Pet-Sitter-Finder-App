@@ -47,7 +47,13 @@ class StoryElement extends StatelessWidget {
     Store<AppState> store = StoreProvider.of<AppState>(context);
 
     return GestureDetector(
-      onTap: () => onTapPageBuilder(() => store.dispatch(selectStoryAction(story!)), stories, index),
+      onTap: () => onTapPageBuilder(
+          () async {
+            store.dispatch(getStoryCommentsByStoryIdRequestAction(story!.storyId, null));
+            await store.dispatch(selectStoryAction(story!));
+          },
+          stories,
+          index),
       child: Padding(
           padding: const EdgeInsets.all( 8.0 ),
           child: ClipRRect(
