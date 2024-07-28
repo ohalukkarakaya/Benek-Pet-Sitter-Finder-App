@@ -53,7 +53,7 @@ const getStoryCommentsController = async ( req, res ) => {
                 commentObject =>
                     commentObject.userId.toString() !== userId
             );
-            const startIndex = Math.abs(comments.length - ( skip - 1 ));
+            const startIndex = Math.abs(comments.length - Math.abs( (skip - 1) ));
             const endIndex = startIndex + limit;
 
             const limitedComments = commentList.slice( startIndex, endIndex );

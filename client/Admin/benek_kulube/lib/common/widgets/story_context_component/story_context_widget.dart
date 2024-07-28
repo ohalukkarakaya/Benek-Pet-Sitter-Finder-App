@@ -4,6 +4,8 @@ import 'package:benek_kulube/common/widgets/story_context_component/story_like_i
 import 'package:benek_kulube/data/models/story_models/story_model.dart';
 import 'package:flutter/widgets.dart';
 
+import 'comments_component/comments_component.dart';
+
 class StoryContextWidget extends StatelessWidget {
   final StoryModel story;
 
@@ -27,8 +29,10 @@ class StoryContextWidget extends StatelessWidget {
         const SizedBox(height: 20.0),
         // like info
         StoryLikeInfoCardWidget( storyId: story.storyId! ),
+
+        const SizedBox(height: 20.0),
         // Story context
-        SizedBox(),
+        CommentsComponent( selectedStoryId: story.storyId!,),
       ]
     );
   }

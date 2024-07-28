@@ -1,3 +1,4 @@
+import '../../data/models/user_profile_models/user_info_model.dart';
 import '../../store/actions/app_actions.dart';
 import '../../data/models/story_models/story_model.dart';
 
@@ -16,8 +17,18 @@ List<StoryModel>? getStoriesByUserIdRequestReducer( List<StoryModel>? stories, d
 
    return stories;
   }else if( action is LikeStoryAction ) {
-    int index = stories!.indexWhere((element) => element.storyId == action.storyId);
+    int index = stories!.indexWhere((element) => element.storyId == action.data?['storyId']);
     stories[index].likeStory();
+
+    if(stories[index].didUserLiked!){
+      stories[index].firstFiveLikedUser = stories[index].firstFiveLikedUser ?? <UserInfo>[];
+      stories[index].firstFiveLikedUser?.add(action.data?['user']);
+    }else{
+      stories[index].firstFiveLikedUser = stories[index].firstFiveLikedUser?.where(
+          (user) =>
+              user.userId != action.data?['user'].userId
+      ).toList();
+    }
 
     return stories;
   }

@@ -12,6 +12,7 @@ import 'package:benek_kulube/store/app_state.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 import '../../data/models/story_models/story_model.dart';
+import '../../data/models/user_profile_models/user_info_model.dart';
 
 ThunkAction<AppState> getStoriesByUserIdRequestAction( String? userId ) {
   return (Store<AppState> store) async {
@@ -54,7 +55,9 @@ ThunkAction<AppState> likeStoryAction( String? storyId ) {
     try {
       bool response = await api.likeStoryRequest( storyId );
       if( response ){
-        await store.dispatch(LikeStoryAction(storyId));
+        UserInfo? user = store.state.userInfo;
+        Map<String, dynamic> data = {'user': user, 'storyId': storyId};
+        await store.dispatch(LikeStoryAction(data));
       }
     } on ApiException catch (e) {
       log('ERROR: likeStory - $e');
@@ -69,7 +72,7 @@ class GetStoriesByUserIdRequestAction {
 }
 
 class LikeStoryAction {
-  final String? _storyId;
-  String? get storyId => _storyId;
-  LikeStoryAction(this._storyId);
+  final Map<String, dynamic>? _data;
+  Map<String, dynamic>? get data => _data;
+  LikeStoryAction(this._data);
 }

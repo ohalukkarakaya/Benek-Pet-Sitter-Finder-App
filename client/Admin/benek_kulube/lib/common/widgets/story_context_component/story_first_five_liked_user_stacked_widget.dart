@@ -18,6 +18,11 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
   });
 
   Widget _buildInfoWidget(int surplus){
+
+    int count = users != null && users!.length > 5
+        ? totalLikeCount - 5
+        : totalLikeCount - users!.length;
+
     return Container(
       height: 35,
       width: 35,
@@ -33,7 +38,7 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            '+ ${totalLikeCount - users!.length}',
+            '+ $count',
             style: const TextStyle(
               color: AppColors.benekBlack,
               fontSize: 12.0,
@@ -61,7 +66,7 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
          );
        }).toList();
 
-       totalLikeCount - users!.length > 0
+       users!.length > 5 || totalLikeCount - users!.length > 0
         ? widgetList = avatarList.cast<Widget>() + [_buildInfoWidget(totalLikeCount - users!.length)]
         : widgetList = avatarList;
 
@@ -80,7 +85,7 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
         ),
         stackedWidgets: _buildUserAvatars(),
         buildInfoWidget: ( surplus ){
-          return totalLikeCount - users!.length > 0
+          return users!.length > 5 || totalLikeCount - users!.length > 0
           ? _buildInfoWidget(surplus)
           : const SizedBox();
         }

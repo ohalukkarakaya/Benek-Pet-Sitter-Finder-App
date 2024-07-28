@@ -71,7 +71,7 @@ const StorySchema = new schema(
                     type: String,
                     required: true,
                     maxLength: [
-                        50,
+                        200,
                         '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                     ],
                 },
@@ -90,7 +90,7 @@ const StorySchema = new schema(
                             type: String,
                             required: true,
                             maxLength: [
-                                50,
+                                200,
                                 '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                             ],
                         },
