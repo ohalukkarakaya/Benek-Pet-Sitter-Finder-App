@@ -19,7 +19,7 @@ class UserIdLogPreviewLoadingWidget extends StatelessWidget {
       baseColor: AppColors.benekBlack.withOpacity(0.5),
       highlightColor: AppColors.benekBlack.withOpacity(0.2),
       child: Padding(
-        padding: const EdgeInsets.only(right: 40.0),
+        padding: const EdgeInsets.only(right: 40.0, bottom: 30.0),
         child: Container(
           width: width,
           height: height,

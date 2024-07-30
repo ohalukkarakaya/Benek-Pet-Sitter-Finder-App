@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 
@@ -33,12 +35,41 @@ class LocationHelper {
       // When we reach here, permissions are granted and we can
       // continue accessing the position of the device.
       Position? position = await Geolocator.getLastKnownPosition();
-      
-      position ??= await Geolocator.getCurrentPosition( desiredAccuracy: LocationAccuracy.high );
+
+      if (position == null) {
+        try {
+          position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.lowest,
+            forceAndroidLocationManager: true,
+            timeLimit: const Duration(seconds: 5),
+          );
+        } on TimeoutException catch (e) {
+          log("TimeoutException: ${e.message}");
+          position = Position(
+              longitude:  store.state.userInfo!.location != null ? store.state.userInfo!.location.lng : 30.704044,
+              latitude: store.state.userInfo!.location != null ? store.state.userInfo!.location.lat : 36.884804,
+              timestamp: DateTime.now(),
+              accuracy: 0.0,
+              altitude: 0.0,
+              altitudeAccuracy: 0.0,
+              heading: 0.0,
+              headingAccuracy: 0.0,
+              speed: 0.0,
+              speedAccuracy: 0.0
+          );
+        }
+      }
 
       // Set Current Location
       await store.dispatch(SetCurrentLocationAction(position));
 
+    } on PlatformException catch (e) {
+      log("PlatformException: ${e.message}");
+      if (e.details != null) {
+        log("PlatformException details: ${e.details}");
+      }
+
+      return Future.error("Couldn't get location data}");
     } catch (e) {
       log("Error: getCurrentLocation - $e");
     }

@@ -12,7 +12,7 @@ const getUsersAndEventsByLocationController = async ( req, res) => {
         const lastItemId = req.params.lastItemId || 'null';
         const userId = req.user._id.toString();
 
-        if( !lat || !lng ){
+        if( lat === undefined || lng === undefined ){
             return res.status( 400 ).json({
                 error: true,
                 message: "missing params"

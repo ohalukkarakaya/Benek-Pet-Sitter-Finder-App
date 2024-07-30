@@ -13,7 +13,7 @@ const getUsersAndEventsBySearchValueController = async ( req, res ) => {
         const userId = req.user._id.toString();
         const filter = req.body.filter;
 
-        if( !lat || !lng ){
+        if( lat === undefined || lng === undefined ){
             return res.status( 400 ).json({
                 error: true,
                 message: "missing params"

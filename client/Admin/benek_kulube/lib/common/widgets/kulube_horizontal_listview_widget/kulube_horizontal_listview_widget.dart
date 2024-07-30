@@ -4,16 +4,20 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/add_story_button.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/benek_icons.dart';
 
 class KulubeHorizontalListViewWidget extends StatefulWidget {
   final bool isEmpty;
+  final bool isUsersProfile;
   final bool shouldShowShimmer;
   final String emptyListMessage;
   final Widget? child;
   const KulubeHorizontalListViewWidget({
     super.key,
     required this.isEmpty,
+    this.isUsersProfile = false,
     this.shouldShowShimmer = false,
     required this.emptyListMessage,
     this.child
@@ -50,6 +54,7 @@ class _KulubeHorizontalListViewWidgetState extends State<KulubeHorizontalListVie
             child: widget.child ?? const SizedBox(),
         )
         : widget.isEmpty
+          && !widget.isUsersProfile
             ? Center(
                 child: Text(
                   widget.emptyListMessage,
@@ -61,7 +66,9 @@ class _KulubeHorizontalListViewWidgetState extends State<KulubeHorizontalListVie
                   ),
                 )
             )
-            : widget.child ?? const SizedBox(),
+            : widget.isUsersProfile
+               ? const AddStoryButton()
+               : widget.child ?? const SizedBox(),
       ),
     );
   }

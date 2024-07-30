@@ -52,7 +52,11 @@ class _ProfileTabState extends State<ProfileTab> {
         await store.dispatch(initPastCareGiversAction());
         await store.dispatch(initCareGiveDataAction());
       }
-      updateStoryBoardSize();
+
+      if( store.state.userInfo?.userId != store.state.selectedUserInfo?.userId){
+        updateStoryBoardSize();
+      }
+
       await store.dispatch(DecreaseProcessCounterAction());
     });
   }
@@ -90,6 +94,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     BenekMessageBoxWidget(
                       size: storyBoardSize,
                       child: KulubeStoriesBoard(
+                        isUsersProfile: store.state.userInfo?.userId == selectedUserInfo.userId,
                         onTapPageBuilder: (dynamic Function() selectStoryFunction, List<StoryModel>? stories, int index) async {
 
                           if( stories?[index] != null ){

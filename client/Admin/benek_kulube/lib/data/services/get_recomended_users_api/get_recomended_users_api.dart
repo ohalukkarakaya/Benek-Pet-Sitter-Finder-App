@@ -42,7 +42,7 @@ class RecomendedUsersApi {
       }
     }catch( err ){
       log('ERROR: postRecomendedUsersRequest - $err');
-      await AuthUtils.killUserSessionAndRestartApp( store );
+      // await AuthUtils.killUserSessionAndRestartApp( store );
     }
   }
 }

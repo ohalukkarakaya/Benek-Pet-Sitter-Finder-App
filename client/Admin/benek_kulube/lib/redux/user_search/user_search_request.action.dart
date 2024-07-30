@@ -18,7 +18,9 @@ ThunkAction<AppState> userSearchRequestAction(String searchValue, bool isPaginat
     UserSearchApi api = UserSearchApi();
 
     try {
-      await LocationHelper.getCurrentLocation(store);
+      if( store.state.currentLocation == null ) {
+        await LocationHelper.getCurrentLocation(store);
+      }
 
       double latitude = store.state.currentLocation!.latitude;
       double longitude = store.state.currentLocation!.longitude;
