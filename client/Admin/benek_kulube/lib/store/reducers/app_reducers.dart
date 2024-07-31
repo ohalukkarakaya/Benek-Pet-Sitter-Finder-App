@@ -18,6 +18,7 @@ import '../../redux/get_stories_by_user_id/get_stories_by_user_id.reducer.dart' 
 import '../../redux/set_device_language/set_device_language.reducer.dart' as set_device_language;
 import '../../redux/select_story/select_story.reducer.dart' as selected_story;
 import '../../redux/process_counter/process_counter.reducer.dart' as processCounter;
+import '../../redux/pet_search/pet_search_request.reducer.dart' as pet_search;
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
@@ -37,6 +38,7 @@ AppState appReducer(AppState state, dynamic action) {
     currentLocation: set_current_location.setCurrentLocationReducer(state.currentLocation, action),
     recomendedUsersList: get_recomended_users.userSearchRequestReducer(state.recomendedUsersList, action),
     userSearchResultList: user_search.userSearchRequestReducer(state.userSearchResultList, action),
+    petSearchResultList: pet_search.petSearchRequestReducer(state.petSearchResultList, action),
     selectedUserInfo: selected_user.setSelectedUserReducer(state.selectedUserInfo, action),
     storiesToDisplay: get_stories_by_user_id.getStoriesByUserIdRequestReducer(state.storiesToDisplay, action),
     selectedStory: selected_story.selectStoryReducer(state.selectedStory, action),

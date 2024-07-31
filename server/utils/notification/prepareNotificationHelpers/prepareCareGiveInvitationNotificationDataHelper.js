@@ -47,7 +47,7 @@ const prepareCareGiveInvitationNotificationDataHelper = async ( notification ) =
             }
         }
 
-        const petInfo = getLightWeightPetInfoHelper( pet );
+        const petInfo = await getLightWeightPetInfoHelper( pet );
 
         const priceInfo = {
             priceType: invitedCareGive.prices.priceType,

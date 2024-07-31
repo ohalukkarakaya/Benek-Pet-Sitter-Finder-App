@@ -1,6 +1,7 @@
 import 'package:benek_kulube/data/models/pet_models/pet_care_giver_history_model.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_handover_record_model.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_image_model.dart';
+import 'package:benek_kulube/data/models/pet_models/pet_kind_model.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_vaccination_certificate_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 
@@ -14,11 +15,11 @@ class PetModel {
   String? bio;
   String? sex;
   DateTime? birthDay;
-  String? kind;
-  String? species;
+  PetKindModel? kind;
   List<PetVaccinationCertificateModel>? vaccinations;
   List<PetCareGiverHistoryModel>? careGiverHistory;
   UserInfo? primaryOwner;
+  List<UserInfo>? allOwners;
   List<String>? followers;
   List<PetImageModel>? images;
   List<PetHandoverRecordModel>? handOverRecord;
@@ -35,10 +36,10 @@ class PetModel {
         this.sex,
         this.birthDay,
         this.kind,
-        this.species,
         this.vaccinations,
         this.careGiverHistory,
         this.primaryOwner,
+        this.allOwners,
         this.followers,
         this.images,
         this.handOverRecord,
@@ -62,8 +63,7 @@ class PetModel {
     bio = json['bio'];
     sex = json['sex'];
     birthDay = DateTimeHelpers.getDateTime(json['birthDay']);
-    kind = json['kind'];
-    species = json['species'];
+    kind = json['kind'] != null ? PetKindModel.fromJson(json['kind']) : null;
     if (json['vaccinations'] != null) {
       vaccinations = <PetVaccinationCertificateModel>[];
       json['vaccinations'].forEach((v) {
@@ -79,6 +79,12 @@ class PetModel {
     primaryOwner = json['primaryOwner'] != null
         ? UserInfo.fromJson(json['primaryOwner'])
         : null;
+    if (json['allOwners'] != null && json['allOwners'] is List) {
+      allOwners = <UserInfo>[];
+      json['allOwners'].forEach((v) {
+        allOwners!.add(UserInfo.fromJson(v));
+      });
+    }
     followers = json['followers'] != null ? json['followers'].cast<String>() : [];
     if (json['images'] != null) {
       images = <PetImageModel>[];
@@ -112,8 +118,7 @@ class PetModel {
     data['bio'] = bio;
     data['sex'] = sex;
     data['birthDay'] = birthDay;
-    data['kind'] = kind;
-    data['species'] = species;
+    data['kind'] = kind?.toJson();
     if (vaccinations != null) {
       data['vaccinations'] = vaccinations!.map((v) => v.toJson()).toList();
     }
@@ -123,6 +128,9 @@ class PetModel {
     }
     if (primaryOwner != null) {
       data['primaryOwner'] = primaryOwner!.toJson();
+    }
+    if (allOwners != null) {
+      data['allOwners'] = allOwners!.map((v) => v.toJson()).toList();
     }
     data['followers'] = followers ?? [];
     if (images != null) {

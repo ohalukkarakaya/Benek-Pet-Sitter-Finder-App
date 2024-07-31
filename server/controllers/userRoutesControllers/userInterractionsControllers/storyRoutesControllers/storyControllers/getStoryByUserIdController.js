@@ -72,7 +72,7 @@ const getStoryByUserIdController = async ( req, res ) => {
                                             );
 
                     if( tagedPet ){
-                        const petInfo = getLightWeightPetInfoHelper( tagedPet );
+                        const petInfo = await getLightWeightPetInfoHelper( tagedPet );
                         storyObject.about
                                    .taged = petInfo;
 

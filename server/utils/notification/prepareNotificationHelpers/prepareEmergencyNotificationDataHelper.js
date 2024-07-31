@@ -38,7 +38,7 @@ const prepareEmergencyNotificationDataHelper = async ( notification ) => {
                                                 .toString()
                                      );
 
-        const petInfo = getLightWeightPetInfoHelper( pet );
+        const petInfo = await getLightWeightPetInfoHelper( pet );
         const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
 
         const notificationData = {

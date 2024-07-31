@@ -1,6 +1,7 @@
 import User from "../../../models/User.js";
 import Pet from "../../../models/Pet.js";
-import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
+
+import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
 
 const getPetByIdController = async ( req, res ) => {
     try{
@@ -12,7 +13,7 @@ const getPetByIdController = async ( req, res ) => {
             });
         }
 
-        const pet = await Pet.findById( petId ).lean();
+        let pet = await Pet.findById( petId ).lean();
 
         const owner = await User.findById( pet.primaryOwner.toString() );
 
@@ -28,25 +29,7 @@ const getPetByIdController = async ( req, res ) => {
             });
         }
 
-        const primaryOwnerInfo = getLightWeightUserInfoHelper( owner );
-
-        pet.primaryOwner = primaryOwnerInfo;
-
-        pet.allOwnerInfoList = [];
-        for( let ownerId of pet.allOwners ){
-            const secondaryOwner = await User.findById( ownerId.toString() );                      
-            const secondaryOwnerInfo = getLightWeightUserInfoHelper( secondaryOwner );
-                
-            pet.allOwnerInfoList.push( secondaryOwnerInfo );
-        };
-
-        if(  pet.allOwnerInfoList.length === pet.allOwners.length ){
-            delete pet.allOwners
-        }
-
-        for( let image of pet.images ){
-            image = image.imgUrl
-        };
+        pet = await getLightWeightPetInfoHelper( pet );
 
         return res.status( 200 ).json({
             error: false,

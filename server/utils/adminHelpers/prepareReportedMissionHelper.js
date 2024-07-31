@@ -47,7 +47,7 @@ const prepareReportedMissionHelper = async ( reportList ) => {
             if( !pet ){
                 petInfo = "Pet Not Found"
             }else{
-                petInfo = getLightWeightPetInfoHelper( pet ); 
+                petInfo = await getLightWeightPetInfoHelper( pet );
             }
 
             const careGive = await CareGive.findById( report.careGiveId );

@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -47,6 +48,10 @@ class ImageVideoHelpers {
     }
   }
 
+  static getFullUrl(String url) {
+    return '${ImageVideoHelpers.mediaServerBaseUrlHelper()}getAsset?assetPath=$url';
+  }
+
   static getVideo(String url) async {
     String videoUrl = '${ImageVideoHelpers.mediaServerBaseUrlHelper()}getAsset?assetPath=$url';
     var headers = {
@@ -73,6 +78,26 @@ class ImageVideoHelpers {
       log(response.reasonPhrase ?? 'ERROR: getVideoUrl');
       return null;
     }
+  }
+
+  static Future<String?> pickFile( List<String>? allowedExtensions ) async {
+    String? filePath;
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: allowedExtensions,
+        allowMultiple: false,
+      );
+
+      if (result != null) {
+        final file = File(result.files.single.path!);
+        filePath = file.path;
+      }
+    } catch (e) {
+      log('ERROR: pickFile - $e');
+    }
+
+    return filePath;
   }
 
 }

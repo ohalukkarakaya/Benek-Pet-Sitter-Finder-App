@@ -80,7 +80,7 @@ const preparePetImageReplyNotificationDataHelper = async ( notification ) => {
         }
 
         const commentUserInfo = getLightWeightUserInfoHelper( commentUser );
-        const petInfo = getLightWeightPetInfoHelper( pet );
+        const petInfo = await getLightWeightPetInfoHelper( pet );
         const notificationData = {
             error: false,
             contentType: "petImageReply",

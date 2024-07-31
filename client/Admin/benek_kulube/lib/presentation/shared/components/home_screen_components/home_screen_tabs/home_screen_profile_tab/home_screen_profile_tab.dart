@@ -3,16 +3,19 @@ import 'dart:ui';
 
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/common/widgets/benek_message_box_widget/benek_message_box_triangle_widget.dart';
+import 'package:benek_kulube/presentation/features/image_video_helpers/image_video_helpers.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/care_give_career_preview_widget/care_give_preview_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_preview_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/adress_row/adress_map.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/care_giver_badge.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_contact_row.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/create_story_screen.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/kulube_stories_board.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_adress_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_bio_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_row.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/story_watch_screen.dart';
+import 'package:benek_kulube/presentation/shared/screens/pet_search_screen.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -75,6 +78,41 @@ class _ProfileTabState extends State<ProfileTab> {
     );
   }
 
+  Future<void> createStoryPageBuilderFunction() async {
+    // choose file
+    final String? directoryPath = await ImageVideoHelpers.pickFile(['jpg', 'jpeg', 'mp4', 'mov', 'avi']);
+    if( directoryPath == null ){
+      return;
+    }
+
+    // choose pet
+    final pickedPet = await Navigator.push(
+      context,
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible: false,
+        pageBuilder: (context, _, __) => const KulubePetSearchScreen(),
+      ),
+    );
+
+    if( pickedPet == null ){
+      return;
+    }
+
+    //open story create page
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible: false,
+        pageBuilder: (context, _, __) => CreateStoryScreen(
+          src: directoryPath,
+          pet: pickedPet,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, UserInfo?>(
@@ -110,6 +148,7 @@ class _ProfileTabState extends State<ProfileTab> {
                             ),
                           );
                         },
+                        createStoryPageBuilderFunction: createStoryPageBuilderFunction,
                       ),
                     ),
                   ],

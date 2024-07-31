@@ -72,7 +72,7 @@ class _StoryContextVerticalScrollWidgetState extends State<StoryContextVerticalS
             itemBuilder: (context, index) {
               return Padding(
                 padding: EdgeInsets.only( bottom: index != widget.storiesToDisplay.length - 1 ? 15.0 : 0.0),
-                child: Container(
+                child: SizedBox(
                   width: widget.width,
                   height: widget.height,
                   child: StoryContextWidget(

@@ -42,7 +42,7 @@ const prepareExpenseRecordHelper = async ( expenseRecordIdList ) => {
                 if( careGive ){
                     const pet = await Pet.findById( careGive.petId.toString() );
                     if( pet ){
-                        const petInfo = getLightWeightPetInfoHelper( pet );
+                        const petInfo = await getLightWeightPetInfoHelper( pet );
 
                         parentContent = await getLightWeightCareGiveInfoHelper(
                             careGiverInfo,

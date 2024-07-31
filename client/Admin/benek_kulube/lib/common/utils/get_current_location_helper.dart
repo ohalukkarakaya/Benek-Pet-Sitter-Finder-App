@@ -60,6 +60,8 @@ class LocationHelper {
         }
       }
 
+      log("Current Location: ${position.latitude}, ${position.longitude}");
+
       // Set Current Location
       await store.dispatch(SetCurrentLocationAction(position));
 

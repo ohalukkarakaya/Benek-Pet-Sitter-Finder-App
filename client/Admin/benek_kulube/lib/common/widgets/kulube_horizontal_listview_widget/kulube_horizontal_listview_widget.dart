@@ -9,18 +9,22 @@ import '../../constants/app_colors.dart';
 import '../../constants/benek_icons.dart';
 
 class KulubeHorizontalListViewWidget extends StatefulWidget {
+
   final bool isEmpty;
   final bool isUsersProfile;
   final bool shouldShowShimmer;
   final String emptyListMessage;
   final Widget? child;
+  final Function()? createStoryPageBuilderFunction;
+
   const KulubeHorizontalListViewWidget({
     super.key,
     required this.isEmpty,
     this.isUsersProfile = false,
     this.shouldShowShimmer = false,
     required this.emptyListMessage,
-    this.child
+    this.child,
+    this.createStoryPageBuilderFunction,
   });
 
   @override
@@ -67,7 +71,9 @@ class _KulubeHorizontalListViewWidgetState extends State<KulubeHorizontalListVie
                 )
             )
             : widget.isUsersProfile
-               ? const AddStoryButton()
+               ? AddStoryButton(
+                    createStoryPageBuilderFunction: widget.createStoryPageBuilderFunction??(){},
+               )
                : widget.child ?? const SizedBox(),
       ),
     );

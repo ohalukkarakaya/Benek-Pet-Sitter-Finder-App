@@ -31,7 +31,7 @@ const getPetsByUserIdController = async ( req, res ) => {
 
         for( let petId of searchedUser.pets ){
             const pet = await Pet.findById( petId.toString() );
-            const petInfo = getLightWeightPetInfoHelper( pet );
+            const petInfo = await getLightWeightPetInfoHelper( pet );
             petInfoList.push( petInfo );
         }
 

@@ -25,6 +25,7 @@ class UserInfo {
   UserLocation? location;
   UserProfileImg? profileImg;
   List<dynamic>? pets;
+  List<PetModel>? recommendedPets;
   bool? isCareGiver;
   List<UserPastCaregivers>? pastCaregivers;
   List<UserCaregiverCareer>? caregiverCareer;
@@ -56,6 +57,7 @@ class UserInfo {
       this.location,
       this.profileImg,
       this.pets,
+      this.recommendedPets,
       this.isCareGiver,
       this.pastCaregivers,
       this.caregiverCareer,
@@ -111,6 +113,11 @@ class UserInfo {
               )
               : null;
     pets = json['pets'] != null ? json['pets'].cast<dynamic>() : <dynamic>[];
+    if( json['recommendedPets'] != null ){
+      List<dynamic> jsonList = json['recommendedPets'];
+      List <PetModel> list = jsonList.map((item) => PetModel.fromJson(item)).toList();
+      recommendedPets = list;
+    }
     isCareGiver = json['isCareGiver'];
     if( json['pastCaregivers'] != null || json['pastCareGivers'] != null ){
       List<dynamic> jsonList = json['pastCaregivers'] != null && json['pastCaregivers'].length > 0
@@ -264,5 +271,9 @@ class UserInfo {
 
   dynamic addPunishmentInfo( PunishmentInfoModel inComingPunishmentInfo ){
     punishmentInfo = inComingPunishmentInfo;
+  }
+
+  dynamic addRecommendedPets( List<PetModel> inComingRecommendedPets ){
+    recommendedPets = inComingRecommendedPets;
   }
 }

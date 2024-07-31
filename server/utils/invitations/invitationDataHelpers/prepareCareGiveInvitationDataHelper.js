@@ -36,7 +36,7 @@ const prepareCareGiveInvitationDataHelper = async ( invitation ) => {
                 message: "Pet Not Found"
             }
         }
-        const petInfo = getLightWeightPetInfoHelper( pet );
+        const petInfo = await getLightWeightPetInfoHelper( pet );
         
         invitationOfCareGive.pet = petInfo;
 

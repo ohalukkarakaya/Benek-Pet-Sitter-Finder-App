@@ -12,7 +12,7 @@ const getPetsByJwtController = async ( req, res ) => {
 
         for( let petId of user.pets ){
             const pet = await Pet.findById( petId.toString() );
-            const petInfo = getLightWeightPetInfoHelper( pet );
+            const petInfo = await getLightWeightPetInfoHelper( pet );
 
             petInfoList.push( petInfo );
         }

@@ -4,6 +4,8 @@ import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dar
 import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:geolocator/geolocator.dart';
 import '../data/models/kulube_login_qr_code_model.dart';
+import '../data/models/pet_models/pet_list_model.dart';
+import '../data/models/pet_models/pet_model.dart';
 import '../data/models/story_models/story_model.dart';
 
 class AppState {
@@ -23,6 +25,7 @@ class AppState {
   final Position? currentLocation;
   final UserList? recomendedUsersList;
   final UserList? userSearchResultList;
+  final PetListModel? petSearchResultList;
   final UserInfo? selectedUserInfo;
   final List<StoryModel>? storiesToDisplay;
   final StoryModel? selectedStory;
@@ -44,6 +47,7 @@ class AppState {
     required this.currentLocation,
     required this.recomendedUsersList,
     required this.userSearchResultList,
+    required this.petSearchResultList,
     required this.selectedUserInfo,
     required this.storiesToDisplay,
     this.selectedStory,
@@ -67,6 +71,7 @@ class AppState {
       currentLocation: null,
       recomendedUsersList: null,
       userSearchResultList: null,
+      petSearchResultList: null,
       selectedUserInfo: null,
       storiesToDisplay: null,
       selectedStory: null,
@@ -90,6 +95,7 @@ class AppState {
     Position? currentLocation,
     UserList? recomendedUsersList,
     UserList? userSearchResultList,
+    PetListModel? petSearchResultList,
     UserInfo? selectedUserInfo,
     List<StoryModel>? storiesToDisplay,
     StoryModel? selectedStory,
@@ -111,6 +117,7 @@ class AppState {
       currentLocation: currentLocation ?? this.currentLocation,
       recomendedUsersList: recomendedUsersList ?? this.recomendedUsersList,
       userSearchResultList: userSearchResultList ?? this.userSearchResultList,
+      petSearchResultList: petSearchResultList ?? this.petSearchResultList,
       selectedUserInfo: selectedUserInfo ?? this.selectedUserInfo,
       storiesToDisplay: storiesToDisplay ?? this.storiesToDisplay,
       selectedStory: selectedStory ?? this.selectedStory,

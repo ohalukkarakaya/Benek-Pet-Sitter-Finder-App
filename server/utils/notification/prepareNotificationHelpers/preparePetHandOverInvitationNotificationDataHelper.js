@@ -44,8 +44,8 @@ const preparePetHandOverInvitationNotificationDataHelper = async ( notification 
             }
         }
 
-        invitedUserInfo = getLightWeightUserInfoHelper( invitedUser );
-        petInfo = getLightWeightPetInfoHelper( pet );
+        let invitedUserInfo = getLightWeightUserInfoHelper( invitedUser );
+        let petInfo = await getLightWeightPetInfoHelper( pet );
 
         const notificationData = {
             error: false,

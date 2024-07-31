@@ -37,7 +37,7 @@ const getPetSendedHandOverInvitationsController = async ( req, res ) => {
             invitation.to = secondaryOwnerInfo;
 
             const pet = await Pet.findById( invitation.petId.toString() );
-            const petInfo = getLightWeightPetInfoHelper( pet );
+            const petInfo = await getLightWeightPetInfoHelper( pet );
 
             invitation.pet = petInfo;
             delete invitation.petId;

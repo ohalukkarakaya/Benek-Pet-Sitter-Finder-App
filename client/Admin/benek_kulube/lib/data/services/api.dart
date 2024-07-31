@@ -20,6 +20,7 @@ import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dar
 
 import '../models/chat_models/chat_state_model.dart';
 import '../models/log_models/log_model.dart';
+import '../models/pet_models/pet_list_model.dart';
 import '../models/pet_models/pet_model.dart';
 import '../models/story_models/story_model.dart';
 
@@ -33,6 +34,8 @@ part 'user_search_api/user_search_api.dart';
 part 'get_recomended_users_api/get_recomended_users_api.dart';
 part 'story_api/story_api.dart';
 part 'pet_api/pet_api.dart';
+part 'pet_api/get_recommended_pets_api.dart';
+part 'pet_api/pet_search_api.dart';
 part 'get_user_info_apies/get_light_weight_user_info_by_user_id_list.dart';
 part 'chat_moderating_apies/get_users_chat_as_admin/get_users_chat_as_admin_api.dart';
 part 'get_log_apies/get_logs_by_user_id_api.dart';

@@ -62,7 +62,7 @@ const prepareMissionUploadNotificationDataHelper = async ( notification ) => {
         }
 
         const careGiverInfo = getLightWeightUserInfoHelper( careGiver );
-        const petInfo = getLightWeightPetInfoHelper( pet );
+        const petInfo = await getLightWeightPetInfoHelper( pet );
 
         const notificationData = {
             error: false,

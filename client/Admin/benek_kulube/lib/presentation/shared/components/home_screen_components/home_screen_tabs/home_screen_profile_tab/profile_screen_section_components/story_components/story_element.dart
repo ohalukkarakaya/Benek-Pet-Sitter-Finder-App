@@ -53,7 +53,8 @@ class StoryElement extends StatelessWidget {
             await store.dispatch(selectStoryAction(story!));
           },
           stories,
-          index),
+          index
+      ),
       child: Padding(
           padding: const EdgeInsets.all( 8.0 ),
           child: ClipRRect(

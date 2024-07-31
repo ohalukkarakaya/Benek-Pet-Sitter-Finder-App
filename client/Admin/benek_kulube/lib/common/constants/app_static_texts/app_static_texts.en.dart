@@ -8,6 +8,7 @@ class AppStaticTextsEn{
     'qrCodeExpireTime': 'This code expires in one hour!',
     'welcomeScreenWarning': 'This platform is for Benek employees! If you are not, please delete the app!',
     'searchAUser': 'Search for a User',
+    'searchAPet': 'Search for a Pet',
     'homeTab': 'Main menu',
     'logsTab': 'Logs',
     'reportedTab': 'Reported',
@@ -82,5 +83,7 @@ class AppStaticTextsEn{
     'beTheFirstOneToLike': 'Be the first one to like!',
     'peopleLiked': 'People Liked',
     'justYou': 'Just You',
+    'post': 'Post',
+    'writeACaption': 'Write a caption...',
   };
 }

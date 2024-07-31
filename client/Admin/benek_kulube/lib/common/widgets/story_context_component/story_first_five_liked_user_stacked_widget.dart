@@ -8,13 +8,19 @@ import '../../../presentation/shared/components/benek_circle_avatar/benek_circle
 import '../../constants/app_colors.dart';
 
 class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
+  final bool isCentered;
   final int totalLikeCount;
   final List<UserInfo>? users;
+  final Color backgroundColor;
+  final double borderWidth;
 
   const StoryFirstFiveLikedUserStackedWidget({
     super.key,
+    this.isCentered = true,
     required this.totalLikeCount,
     this.users,
+    this.backgroundColor = AppColors.benekWhite,
+    this.borderWidth = 2,
   });
 
   Widget _buildInfoWidget(int surplus){
@@ -27,10 +33,10 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
       height: 35,
       width: 35,
       decoration: BoxDecoration(
-        color: AppColors.benekWhite,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(100),
       ),
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all( borderWidth.toDouble() ),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100),
@@ -60,9 +66,10 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
          return BenekCircleAvatar(
            width: 35,
            height: 35,
-           borderWidth: 2,
+           borderWidth: borderWidth,
            isDefaultAvatar: user.profileImg!.isDefaultImg!,
            imageUrl: user.profileImg!.imgUrl!,
+           bgColor: backgroundColor,
          );
        }).toList();
 
@@ -76,12 +83,12 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
      return <Widget>[];
   }
 
-  Widget _buildStackedUserAvatars(){
+  Widget _buildStackedUserAvatars(bool isCentered){
     return WidgetStack(
         positions: RestrictedPositions(
           maxCoverage: 0.6,
           minCoverage: 0.3,
-          align: StackAlign.center,
+          align: isCentered ? StackAlign.center : StackAlign.right,
         ),
         stackedWidgets: _buildUserAvatars(),
         buildInfoWidget: ( surplus ){
@@ -95,7 +102,7 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return users != null && users!.isNotEmpty
-      ? _buildStackedUserAvatars()
+      ? _buildStackedUserAvatars(isCentered)
       : Center(
           child: Text(
             totalLikeCount > 0 ? BenekStringHelpers.locale('justYou') : BenekStringHelpers.locale('beTheFirstOneToLike'),

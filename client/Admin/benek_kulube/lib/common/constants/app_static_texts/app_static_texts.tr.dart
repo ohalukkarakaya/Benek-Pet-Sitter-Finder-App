@@ -8,6 +8,7 @@ class AppStaticTextsTr{
     'qrCodeExpireTime': 'Bu kodun süresi, bir saat içinde dolar!',
     'welcomeScreenWarning': 'Bu platform Benek çalışanları içindir! Eğer değilsen, lütfen uygulamayı sil!',
     'searchAUser': 'Bir Kullanıcı Ara',
+    'searchAPet': 'Bir Evcil Hayvan Ara',
     'homeTab': 'Ana Menü',
     'logsTab': 'Loglar',
     'reportedTab': 'Bildirilenler',
@@ -82,5 +83,7 @@ class AppStaticTextsTr{
     'beTheFirstOneToLike': 'İlk Beğenen Sen Ol!',
     'peopleLiked': 'Kişi Beğendi',
     'justYou': 'Sadece Sen',
+    'post': 'Gönder',
+    'writeACaption': 'Bir Açıklama Yaz',
   };
 }

@@ -44,7 +44,7 @@ const prepareStarNotificationDataHelper = async ( notification ) => {
             }
         }
 
-        const petInfo = getLightWeightPetInfoHelper( pet );
+        const petInfo = await getLightWeightPetInfoHelper( pet );
                         
         const notificationData = {
             contentType: "star",

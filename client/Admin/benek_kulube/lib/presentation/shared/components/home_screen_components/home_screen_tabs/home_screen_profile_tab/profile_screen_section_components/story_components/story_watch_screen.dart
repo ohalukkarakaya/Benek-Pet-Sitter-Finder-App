@@ -13,7 +13,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import 'package:benek_kulube/store/app_state.dart';
-import 'package:benek_kulube/data/models/story_models/story_model.dart';
 
 class StoryWatchScreen extends StatefulWidget {
   const StoryWatchScreen({super.key});

@@ -62,7 +62,7 @@ const prepareNewMissionNotificationDataHelper = async ( notification ) => {
         }
 
         const petOwnerInfo = getLightWeightUserInfoHelper( petOwner );
-        const petInfo = getLightWeightPetInfoHelper( pet );
+        const petInfo = await getLightWeightPetInfoHelper( pet );
 
         const notificationData = {
             error: false,

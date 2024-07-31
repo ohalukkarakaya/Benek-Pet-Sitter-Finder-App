@@ -24,3 +24,5 @@ export '../../redux/set_recently_seen_user/set_recently_seen_user.action.dart';
 export '../../redux/process_counter/process_counter.action.dart';
 export '../../redux/get_punishment_info/get_users_punishment_count.action.dart';
 export '../../redux/get_story_comments/get_story_comments_by_story_id.action.dart';
+export '../../redux/get_recommended_pets/get_recommended_pets.action.dart';
+export '../../redux/pet_search/pet_search_request.action.dart';

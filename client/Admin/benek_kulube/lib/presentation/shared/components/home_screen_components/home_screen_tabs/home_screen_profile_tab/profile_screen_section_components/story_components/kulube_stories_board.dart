@@ -14,10 +14,13 @@ import 'package:redux/redux.dart';
 
 class KulubeStoriesBoard extends StatelessWidget {
   final void Function(dynamic Function() selectStoryFunction, List<StoryModel>? stories, int index) onTapPageBuilder;
+  final void Function()? createStoryPageBuilderFunction;
   final bool isUsersProfile;
+
   const KulubeStoriesBoard({
     super.key,
     required this.onTapPageBuilder,
+    required this.createStoryPageBuilderFunction,
     this.isUsersProfile = false
   });
 
@@ -31,6 +34,7 @@ class KulubeStoriesBoard extends StatelessWidget {
             isUsersProfile: isUsersProfile,
             emptyListMessage: BenekStringHelpers.locale('noStoryMessage'),
             shouldShowShimmer: stories == null,
+            createStoryPageBuilderFunction: createStoryPageBuilderFunction,
             child: ListView.builder(
               shrinkWrap: true,
               physics: stories != null && stories.length >= 5
@@ -44,7 +48,9 @@ class KulubeStoriesBoard extends StatelessWidget {
               itemBuilder: (context, index) {
                 int indx = isUsersProfile && stories != null ? index - 1 : index;
                 return indx < 0
-                ? const AddStoryButton()
+                ? AddStoryButton(
+                    createStoryPageBuilderFunction: createStoryPageBuilderFunction??(){},
+                )
                 : StoryElement(
                     onTapPageBuilder: onTapPageBuilder,
                     index: index,

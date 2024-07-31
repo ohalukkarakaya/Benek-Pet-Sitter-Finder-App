@@ -13,17 +13,21 @@ import '../../../presentation/features/image_video_helpers/image_video_helpers.d
 import 'package:benek_kulube/common/widgets/vertical_video_companent/video_loading_widget.dart'; // Tekrar ekledim
 
 class VerticalContentComponent extends StatefulWidget {
+  final bool isLocalAsset;
   final String src;
   final UserInfo user;
   final double width;
   final double height;
+  final bool isCreatingStory;
 
   const VerticalContentComponent({
     super.key,
+    this.isLocalAsset = false,
     required this.src,
     required this.user,
     required this.width,
-    required this.height
+    required this.height,
+    this.isCreatingStory = false,
   });
 
   @override
@@ -33,6 +37,7 @@ class VerticalContentComponent extends StatefulWidget {
 class _VerticalContentComponentState extends State<VerticalContentComponent> {
 
   VideoPlayerController? _videoPlayerController;
+  String? urlPath;
   File? _tempFile;
   bool _isPlayerInitialized = false;
   bool _isMuted = false;
@@ -47,26 +52,34 @@ class _VerticalContentComponentState extends State<VerticalContentComponent> {
 
   Future<void> initializePlayer() async {
 
-    String? videoFilePath = await ImageVideoHelpers.getVideo(widget.src);
+    bool isMp4 = ImageVideoHelpers.isVideo(widget.src);
+    String? path = !widget.isCreatingStory
+                     ? isMp4
+                        ? await ImageVideoHelpers.getVideo(widget.src)
+                        : ImageVideoHelpers.getFullUrl(widget.src)
+                     : widget.src;
 
-    if (videoFilePath != null) {
-      _tempFile = File(videoFilePath);
+    setState(() {
+      urlPath = path;
+    });
+
+    if (path != null && isMp4) {
+      _tempFile = File(path);
       _videoPlayerController = VideoPlayerController.file(_tempFile!)
         ..initialize().then((_) {
           setState(() {
             _videoPlayerController?.play();
           });
         });
-    } else {
-      // Handle error
-      log('Error loading video');
     }
 
     setState(() {
       _isPlayerInitialized = true;
     });
 
-    _videoPlayerController!.setLooping(true);
+    if(isMp4) {
+      _videoPlayerController!.setLooping(true);
+    }
   }
 
   @override
@@ -94,28 +107,33 @@ class _VerticalContentComponentState extends State<VerticalContentComponent> {
 
   @override
   Widget build(BuildContext context) {
+    bool isMp4 = ImageVideoHelpers.isVideo(widget.src);
     return ClipRRect(
         borderRadius: BorderRadius.circular(25.0),
       child: _isPlayerInitialized
         ? Stack(
           children: [
             GestureDetector(
-              onTap: _toggleMute,
+              onTap: isMp4 ? _toggleMute : null,
               child: SizedBox(
                   width: widget.width,
                   height: widget.height,
                   child: FittedBox(
                     fit: BoxFit.cover,
                     child: SizedBox(
-                      width: _videoPlayerController!.value.size.width,
-                      height: _videoPlayerController!.value.size.height,
-                      child: VideoPlayer(_videoPlayerController!),
+                      width: isMp4 ? _videoPlayerController!.value.size.width : widget.width,
+                      height: isMp4 ? _videoPlayerController!.value.size.height : widget.height,
+                      child: isMp4
+                          ? VideoPlayer(_videoPlayerController!)
+                          : !widget.isLocalAsset
+                               ? Image.network(urlPath!, fit: BoxFit.cover)
+                               : Image.file( File(urlPath!), fit: BoxFit.cover),
                     ),
                   ),
                 ),
             ),
 
-            _showIcon
+            _showIcon && isMp4
                 ? Positioned(
                     bottom: 20,
                     right: 20,

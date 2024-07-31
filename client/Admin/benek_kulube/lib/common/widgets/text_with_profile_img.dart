@@ -20,16 +20,12 @@ class TextWithProfileImg extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            children: [
-              BenekCircleAvatar(
-                isDefaultAvatar: profileImg.isDefaultImg!,
-                imageUrl: profileImg.imgUrl!,
-                width: 30.0,
-                height: 30.0,
-                borderWidth: 2.0,
-              ),
-            ],
+          BenekCircleAvatar(
+            isDefaultAvatar: profileImg.isDefaultImg!,
+            imageUrl: profileImg.imgUrl!,
+            width: 30.0,
+            height: 30.0,
+            borderWidth: 2.0,
           ),
           const SizedBox(width: 8),
           Expanded(

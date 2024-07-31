@@ -41,6 +41,8 @@ class ApiClient {
           return UserInfo.fromJson(value['user']);
         case 'UserSearchResult':
           return UserList.fromJson(value);
+        case 'PetListModel':
+          return PetListModel.fromJson(value);
         case 'StoryModel':
           return StoryModel.fromJson(value);
         case 'List<StoryModel>':

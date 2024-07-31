@@ -56,10 +56,29 @@ class _TaggedPetButtonWidgetState extends State<TaggedPetButtonWidget> {
                 ),
               ),
               const SizedBox(width: 12.0),
-              BenekCircleAvatar(
-                  isDefaultAvatar: widget.pet.petProfileImg!.isDefaultImg!,
-                  imageUrl: widget.pet.petProfileImg!.imgUrl!,
-                  bgColor: AppColors.benekBlack,
+              Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only( bottom: 5.0),
+                      child: BenekCircleAvatar(
+                        isDefaultAvatar: widget.pet.petProfileImg!.isDefaultImg!,
+                        imageUrl: widget.pet.petProfileImg!.imgUrl!,
+                        bgColor: AppColors.benekBlack,
+                        borderWidth: 2,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 15.0),
+                      child: BenekCircleAvatar(
+                        isDefaultAvatar: widget.pet.primaryOwner!.profileImg!.isDefaultImg!,
+                        imageUrl: widget.pet.primaryOwner!.profileImg!.imgUrl!,
+                        width: 30,
+                        height: 30,
+                        borderWidth: 2,
+                        bgColor: AppColors.benekBlack,
+                      ),
+                    ),
+                  ]
               ),
               const SizedBox(width: 12.0),
               Column(
@@ -77,7 +96,7 @@ class _TaggedPetButtonWidgetState extends State<TaggedPetButtonWidget> {
                   ),
 
                   Text(
-                    "${BenekStringHelpers.calculateYearsDifference(widget.pet.birthDay!)} ${BenekStringHelpers.locale('yearsOld')}, ${BenekStringHelpers.getPetGenderAsString(widget.pet.sex!)}",
+                    "${BenekStringHelpers.calculateYearsDifference(widget.pet.birthDay!)} ${BenekStringHelpers.locale('yearsOld')}, ${BenekStringHelpers.getPetKindAsString(widget.pet.kind!)}, ${BenekStringHelpers.getPetGenderAsString(widget.pet.sex!)}",
                     style: const TextStyle(
                       color: AppColors.benekBlack,
                       fontSize: 12.0,

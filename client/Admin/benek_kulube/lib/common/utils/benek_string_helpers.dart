@@ -1,3 +1,5 @@
+import 'package:benek_kulube/data/models/pet_models/pet_kind_model.dart';
+
 import '../constants/app_static_texts/app_static_texts.en.dart';
 import '../constants/app_static_texts/app_static_texts.tr.dart';
 import 'dart:ui' as ui;
@@ -80,6 +82,14 @@ class BenekStringHelpers {
     return locale(sex);
   }
 
+  static String getPetKindAsString(PetKindModel petKind){
+    String language = ui.PlatformDispatcher.instance.locale.languageCode;
+    if( language == 'tr' || language == 'tr_TR' || language == 'TR' || language == 'Tr' ){
+      return petKind.tr!;
+    }
+    return petKind.en!;
+  }
+
   static int calculateYearsDifference(DateTime pastDate) {
     DateTime now = DateTime.now();
     int yearsDifference = now.year - pastDate.year;
@@ -105,7 +115,7 @@ class BenekStringHelpers {
   }
 
   static String locale(String key){
-     String language = ui.window.locale.languageCode;
+     String language = ui.PlatformDispatcher.instance.locale.languageCode;
      //  String language = 'en';
      if( language == 'tr' || language == 'tr_TR' || language == 'TR' || language == 'Tr' ){
        String? localizedText = AppStaticTextsTr.texts[key];

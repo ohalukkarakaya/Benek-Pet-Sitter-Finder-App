@@ -44,7 +44,7 @@ const prepareSecondaryPetOwnerInvitationNotificationDataHelper = async ( notific
             }
         }
 
-        const petInfo = getLightWeightPetInfoHelper( pet );
+        const petInfo = await getLightWeightPetInfoHelper( pet );
         const petOwnerInfo = getLightWeightUserInfoHelper( petOwner );
 
         const notificationData = {
