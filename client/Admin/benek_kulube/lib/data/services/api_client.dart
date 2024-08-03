@@ -180,7 +180,7 @@ class ApiClient {
             response = put(Uri.parse(url), headers: headerParams, body: msgBody);
             break;
           case "DELETE":
-            response = delete(Uri.parse(url), headers: headerParams);
+            response = delete(Uri.parse(url), headers: headerParams, body: msgBody);
             break;
           case "PATCH":
             response = patch(Uri.parse(url), headers: headerParams, body: msgBody);

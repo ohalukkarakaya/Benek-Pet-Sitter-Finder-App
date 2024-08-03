@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../../common/constants/app_colors.dart';
@@ -48,12 +49,9 @@ class _PunishUserButtonState extends State<PunishUserButton> {
             const SizedBox(width: 5),
             Text(
               BenekStringHelpers.locale('punishUser'),
-              style: TextStyle(
-                color: widget.isActive ? AppColors.benekWhite : AppColors.benekBlack,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Qanelas',
-              ),
+              style: semiBoldTextStyle(
+                textColor: widget.isActive ? AppColors.benekWhite : AppColors.benekBlack,
+              )
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/constants/benek_icons.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
 
 class BenekHorizontalButton extends StatefulWidget {
@@ -51,10 +52,10 @@ class _BenekHorizontalButtonState extends State<BenekHorizontalButton> {
               Text(
                 widget.text,
                 style: TextStyle(
-                  fontFamily: 'Qanelas',
+                  fontFamily: defaultFontFamily(),
                   fontSize: 12.0,
                   color: !isHovering ? AppColors.benekWhite : AppColors.benekBlack,
-                  fontWeight: FontWeight.w400,
+                  fontWeight: getFontWeight('regular'),
                 ),
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis

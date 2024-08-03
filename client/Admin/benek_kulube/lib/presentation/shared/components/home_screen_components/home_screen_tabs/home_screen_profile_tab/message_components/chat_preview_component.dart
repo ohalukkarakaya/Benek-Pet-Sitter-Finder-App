@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/data/models/chat_models/chat_state_model.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/message_components/chat_loading_element.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/message_components/chat_preview_element.dart';
@@ -72,12 +73,7 @@ class _ChatPreviewWidgetState extends State<ChatPreviewWidget> {
                     children: [
                       Text(
                         BenekStringHelpers.locale('usersMessagesTitle'),
-                        style: const TextStyle(
-                          fontFamily: 'Qanelas',
-                          fontSize: 12,
-                          color: AppColors.benekWhite,
-                          fontWeight: FontWeight.w400,
-                        ),
+                        style: regularTextStyle( textColor: AppColors.benekWhite ),
                       ),
 
                       const SizedBox( width: 10.0),
@@ -86,12 +82,7 @@ class _ChatPreviewWidgetState extends State<ChatPreviewWidget> {
                         widget.chatInfo != null
                         && widget.chatInfo!.totalChatCount != null
                             ? widget.chatInfo!.totalChatCount.toString() : '0',
-                        style: const TextStyle(
-                          fontFamily: 'Qanelas',
-                          fontSize: 12,
-                          color: AppColors.benekWhite,
-                          fontWeight: FontWeight.w400,
-                        ),
+                        style: regularTextStyle( textColor: AppColors.benekWhite ),
                       ),
                     ],
                   ),
@@ -139,12 +130,7 @@ class _ChatPreviewWidgetState extends State<ChatPreviewWidget> {
                       child: Center(
                           child: Text(
                             BenekStringHelpers.locale('emptyMessageBoxTitle'),
-                            style: const TextStyle(
-                              fontFamily: 'Qanelas',
-                              fontSize: 12,
-                              color: AppColors.benekWhite,
-                              fontWeight: FontWeight.w400,
-                            ),
+                            style: regularTextStyle( textColor: AppColors.benekWhite ),
                           ),
                         ),
                     )
@@ -181,9 +167,9 @@ class _ChatPreviewWidgetState extends State<ChatPreviewWidget> {
                             BenekStringHelpers.locale('seeDetails'),
                             style: TextStyle(
                               color: AppColors.benekWhite,
-                              fontFamily: 'Qanelas',
+                              fontFamily: defaultFontFamily(),
                               fontSize: 12,
-                              fontWeight: isHovering ? FontWeight.w600 : FontWeight.w400,
+                              fontWeight: isHovering ? getFontWeight('semiBold') : getFontWeight('regular'),
                             ),
                           ),
                         ),

@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/material.dart';
@@ -44,11 +45,9 @@ class _BenekAvatarGridViewBuilderState extends State<BenekAvatarGridViewBuilder>
           content:  widget.item!.name != null
               ? Text(
               BenekStringHelpers.locale('seeAll'),
-              style: const TextStyle(
-                  color: AppColors.benekWhite,
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'Qanelas'
+              style: mediumTextStyle(
+                textColor: AppColors.benekWhite,
+                textFontSize: 15.0
               )
           )
               : const SizedBox(),
@@ -83,12 +82,7 @@ class _BenekAvatarGridViewBuilderState extends State<BenekAvatarGridViewBuilder>
                 child: Center(
                   child: Text(
                     "+ ${widget.itemCount - 5}",
-                    style: const TextStyle(
-                      color: AppColors.benekBlack,
-                      fontSize: 15,
-                      fontFamily: 'Qanelas',
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: boldTextStyle( textFontSize: 15.0 ),
                   ),
                 ),
               ),
@@ -117,11 +111,9 @@ class _BenekAvatarGridViewBuilderState extends State<BenekAvatarGridViewBuilder>
           content:  widget.item!.name != null
             ? Text(
                 '@${widget.item!.name}',
-                style: const TextStyle(
-                    color: AppColors.benekWhite,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Qanelas'
+                style: mediumTextStyle(
+                  textColor: AppColors.benekWhite,
+                  textFontSize: 15.0
                 )
             )
             : const SizedBox(),

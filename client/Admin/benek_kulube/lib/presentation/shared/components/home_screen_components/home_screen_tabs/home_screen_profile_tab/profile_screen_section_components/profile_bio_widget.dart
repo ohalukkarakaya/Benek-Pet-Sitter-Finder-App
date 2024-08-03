@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../../../../../common/constants/app_colors.dart';
@@ -26,11 +27,7 @@ class ProfileBioWidget extends StatelessWidget {
               Text(
                 text,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontFamily: 'Qanelas',
-                  fontSize: 12.0,
-                  color: AppColors.benekWhite
-                ),
+                style: planeTextWithoutWeightStyle( textColor: AppColors.benekWhite ),
               )
             ]
           ),

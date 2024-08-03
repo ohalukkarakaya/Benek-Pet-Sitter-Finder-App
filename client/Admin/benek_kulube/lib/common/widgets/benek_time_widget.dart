@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:benek_kulube/common/utils/benek_date_time_helpers.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/styles.text.dart';
+
 class BenekTime extends StatefulWidget {
   final double timeFontSize;
   final double dateFontSize;
@@ -53,21 +55,13 @@ class _BenekTimeState extends State<BenekTime> {
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-              Text(
+            Text(
               currentTime['hour'],
-              style: TextStyle(
-                fontFamily: 'Qanelas',
-                fontSize: widget.timeFontSize,
-                fontWeight: FontWeight.w100
-              ),
+              style: ultraLightTextWithoutColorStyle( textFontSize: widget.timeFontSize ),
             ),
             Text(
               " : ${currentTime['minute']}",
-              style: TextStyle(
-                fontFamily: 'Qanelas',
-                fontSize: widget.timeFontSize,
-                fontWeight: FontWeight.w400
-              ),
+              style: regularTextWithoutColorStyle( textFontSize: widget.timeFontSize ),
             ),
           ],
         ),
@@ -78,19 +72,11 @@ class _BenekTimeState extends State<BenekTime> {
             children: [
               Text(
                 "${currentTime['day']} ${currentTime['month']} ",
-                style: TextStyle(
-                  fontFamily: 'Qanelas',
-                  fontSize: widget.dateFontSize,
-                  fontWeight: FontWeight.w100
-                ),
+                style: ultraLightTextWithoutColorStyle( textFontSize: widget.dateFontSize ),
               ),
               Text(
                 "${currentTime['dayOfWeek']}",
-                style: TextStyle(
-                  fontFamily: 'Qanelas',
-                  fontSize: widget.dateFontSize,
-                  fontWeight: FontWeight.w400
-                ),
+                style: regularTextWithoutColorStyle( textFontSize: widget.dateFontSize )
               ),
             ],
           ),

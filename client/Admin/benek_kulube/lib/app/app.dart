@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/presentation/shared/screens/login_screen.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ class KulubeApp extends StatelessWidget {
         color: Colors.transparent,
         theme: ThemeData(
           splashFactory: InkRipple.splashFactory,
-          fontFamily: 'Qanelas',
+          fontFamily: defaultFontFamily(),
         ),
         darkTheme: ThemeData.dark().copyWith(
           splashFactory: InkRipple.splashFactory,

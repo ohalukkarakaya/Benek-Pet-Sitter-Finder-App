@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -41,10 +42,10 @@ class _BenekChipState extends State<BenekChip> {
                 ? Text(
                   widget.text!,
                   style: TextStyle(
-                    fontFamily: 'Qanelas',
+                    fontFamily: defaultFontFamily(),
                     fontSize: 12.0,
                     color: !isHovering ? AppColors.benekWhite : AppColors.benekBlack,
-                    fontWeight: !isHovering ? FontWeight.w400 : FontWeight.w600,
+                    fontWeight: !isHovering ? getFontWeight('regular') : getFontWeight('semiBold'),
                   ),
                   overflow: TextOverflow.ellipsis,
                 )

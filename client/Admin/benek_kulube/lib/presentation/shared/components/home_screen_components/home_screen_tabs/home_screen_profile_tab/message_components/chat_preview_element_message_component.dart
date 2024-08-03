@@ -1,4 +1,4 @@
-import 'package:benek_kulube/data/models/chat_models/chat_model.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
 
 class ChatPreviewElementMessageComponent extends StatelessWidget {
@@ -21,21 +21,21 @@ class ChatPreviewElementMessageComponent extends StatelessWidget {
             TextSpan(
               text: senderUserName != "" ? '$senderUserName :  ' : '',
               style: TextStyle(
-                  fontFamily: 'Qanelas',
+                  fontFamily: defaultFontFamily(),
                   fontSize: 8.0,
                   fontWeight: areThereUnreadMessages
-                      ? FontWeight.w900
-                      : FontWeight.w600
+                      ? getFontWeight('black')
+                      : getFontWeight('semiBold')
               ),
             ),
             TextSpan(
               text: message,
               style: TextStyle(
-                  fontFamily: 'Qanelas',
+                  fontFamily: defaultFontFamily(),
                   fontSize: 8.0,
                   fontWeight: areThereUnreadMessages
-                      ? FontWeight.w600
-                      : FontWeight.w400
+                      ? getFontWeight('black')
+                      : getFontWeight('semiBold')
               ),
             ),
           ],

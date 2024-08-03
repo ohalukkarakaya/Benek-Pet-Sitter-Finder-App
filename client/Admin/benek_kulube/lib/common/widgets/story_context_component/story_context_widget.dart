@@ -8,10 +8,12 @@ import 'comments_component/comments_component.dart';
 
 class StoryContextWidget extends StatelessWidget {
   final StoryModel story;
+  final Function()? closeFunction;
 
   const StoryContextWidget({
     super.key,
-    required this.story
+    required this.story,
+    this.closeFunction
   });
 
   @override
@@ -28,7 +30,10 @@ class StoryContextWidget extends StatelessWidget {
 
         const SizedBox(height: 20.0),
         // like info
-        StoryLikeInfoCardWidget( storyId: story.storyId! ),
+        StoryLikeInfoCardWidget(
+            storyId: story.storyId!,
+            closeFunction: closeFunction,
+        ),
 
         const SizedBox(height: 20.0),
         // Story context

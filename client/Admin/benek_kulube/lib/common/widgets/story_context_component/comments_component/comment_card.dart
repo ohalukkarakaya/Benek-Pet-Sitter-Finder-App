@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/common/widgets/benek_like_button/like_buton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -82,20 +83,12 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                   children: [
                     Text(
                       widget.comment.user!.userName!,
-                      style: const TextStyle(
-                        fontFamily: 'Qanelas',
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: semiBoldTextWithoutColorStyle()
                     ),
                     const SizedBox( height: 2.0,),
                     Text(
                       widget.comment.comment!,
-                      style: const TextStyle(
-                        fontFamily: 'Qanelas',
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style: regularTextWithoutColorStyle()
                     ),
                   ],
                 ),

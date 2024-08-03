@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_care_giver_career_model.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/care_give_career_preview_widget/care_give_list_element.dart';
 import 'package:flutter/material.dart';
@@ -55,12 +56,7 @@ class _CareGivePreviewWidgetState extends State<CareGivePreviewWidget> {
               children: [
                 Text(
                   widget.title,
-                  style: const TextStyle(
-                    fontFamily: 'Qanelas',
-                    fontSize: 12,
-                    color: AppColors.benekWhite,
-                    fontWeight: FontWeight.w400,
-                  ),
+                  style: regularTextStyle( textColor: AppColors.benekWhite ),
                 ),
                 const Divider(color: AppColors.benekWhite, thickness: 0.5),
                 SizedBox(
@@ -100,11 +96,9 @@ class _CareGivePreviewWidgetState extends State<CareGivePreviewWidget> {
                     : Center(
                       child: Text(
                         widget.emptyStateTitle,
-                        style: const TextStyle(
-                          color: AppColors.benekWhite,
-                          fontFamily: 'Qanelas',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w200,
+                        style: thinTextStyle(
+                          textColor: AppColors.benekWhite,
+                          textFontSize: 15,
                         ),
                       ),
                     ),
@@ -141,9 +135,9 @@ class _CareGivePreviewWidgetState extends State<CareGivePreviewWidget> {
                         BenekStringHelpers.locale('seeDetails'),
                         style: TextStyle(
                           color: AppColors.benekWhite,
-                          fontFamily: 'Qanelas',
+                          fontFamily: defaultFontFamily(),
                           fontSize: 12,
-                          fontWeight: isHovering ? FontWeight.w600 : FontWeight.w400,
+                          fontWeight: isHovering ? getFontWeight('semiBold') : getFontWeight('regular'),
                         ),
                       ),
                     ),

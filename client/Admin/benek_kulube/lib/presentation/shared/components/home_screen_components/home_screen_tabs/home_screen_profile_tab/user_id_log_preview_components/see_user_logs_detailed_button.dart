@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../../common/constants/app_colors.dart';
@@ -46,10 +47,10 @@ class _SeeUserLogsDetailedButtonState extends State<SeeUserLogsDetailedButton> {
               child: Text(
                 BenekStringHelpers.locale('seeUsersLogs'),
                 style: TextStyle(
-                  fontFamily: 'Qanelas',
+                  fontFamily: defaultFontFamily(),
                   fontSize: 12,
-                  color: isHovering ? Colors.black : Colors.white,
-                  fontWeight: isHovering ? FontWeight.w500 : FontWeight.w400,
+                  color: isHovering ? AppColors.benekBlack : AppColors.benekWhite,
+                  fontWeight: isHovering ? getFontWeight('medium') : getFontWeight('regular'),
                 ),
               ),
             ),

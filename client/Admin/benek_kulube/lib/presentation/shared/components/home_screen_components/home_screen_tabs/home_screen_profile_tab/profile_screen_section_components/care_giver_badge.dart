@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/widgets.dart';
 
@@ -32,12 +33,7 @@ class _CareGiverBadgeState extends State<CareGiverBadge> {
             widget.isCareGiver
                 ? BenekStringHelpers.locale('userIsCareGiver')
                 : BenekStringHelpers.locale('userIsNotCareGiver'),
-            style: const TextStyle(
-                color: AppColors.benekWhite,
-                fontSize: 12.0,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Qanelas'
-            )
+            style: mediumTextStyle( textColor: AppColors.benekWhite )
         ),
         controller: _tooltipController,
         child: MouseRegion(

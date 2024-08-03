@@ -1,6 +1,7 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/constants/benek_icons.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/common/widgets/story_context_component/story_first_five_liked_user_stacked_widget.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
@@ -100,12 +101,9 @@ class _KulubePetCardState extends State<KulubePetCard> {
                         children: [
                           Text(
                             widget.resultData.name!,
-                            style: TextStyle(
-                                fontFamily: 'Qanelas',
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.w500,
-                                color: isHovering ? Colors.black : null
-                            ),
+                            style: isHovering
+                              ? mediumTextStyle( textFontSize: 15.0 )
+                              : mediumTextWithoutColorStyle( textFontSize: 15.0 ),
                           ),
                           const SizedBox(height: 8.0),
                           Row(
@@ -113,12 +111,9 @@ class _KulubePetCardState extends State<KulubePetCard> {
                               Text(
                                 BenekStringHelpers.getStringWithCharacterLimit(
                                     "$petKind | ${BenekStringHelpers.calculateYearsDifference(widget.resultData.birthDay!)} ${BenekStringHelpers.locale('yearsOld')} | ${BenekStringHelpers.getPetGenderAsString(widget.resultData.sex!)}", 80),
-                                style: TextStyle(
-                                    fontFamily: 'Qanelas',
-                                    fontSize: 15.0,
-                                    fontWeight: FontWeight.w300,
-                                    color: isHovering ? Colors.black : null
-                                ),
+                                style: isHovering
+                                  ? lightTextStyle( textFontSize: 15.0 )
+                                  : lightTextWithoutColorStyle( textFontSize: 15.0 ),
                               ),
                             ],
                           ),
@@ -126,12 +121,9 @@ class _KulubePetCardState extends State<KulubePetCard> {
                       ),
                       Text(
                         widget.resultData.bio != null ? BenekStringHelpers.getStringWithCharacterLimit(widget.resultData.bio!, 50) : "",
-                        style: TextStyle(
-                            fontFamily: 'Qanelas',
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.w400,
-                            color: isHovering ? Colors.black : null
-                        ),
+                        style: isHovering
+                          ? regularTextStyle( textFontSize: 12.0 )
+                          : regularTextWithoutColorStyle( textFontSize: 12.0 ),
                       ),
                     ],
                   ),
@@ -152,10 +144,20 @@ class _KulubePetCardState extends State<KulubePetCard> {
                       ),
                     ),
 
-                    const VerticalDivider(
-                      color: AppColors.benekWhite,
-                      thickness: 2,
-                    ),
+                     Padding(
+                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                       child: Container(
+                        width: 2.0,
+                        height: 35.0,
+                        decoration: BoxDecoration(
+                          color: isHovering ? AppColors.benekBlack : AppColors.benekWhite,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(6.0),
+                            bottomLeft: Radius.circular(6.0),
+                          ),
+                        ),
+                                           ),
+                     ),
 
                     BenekCircleAvatar(
                       imageUrl: widget.resultData.primaryOwner!.profileImg!.imgUrl!,

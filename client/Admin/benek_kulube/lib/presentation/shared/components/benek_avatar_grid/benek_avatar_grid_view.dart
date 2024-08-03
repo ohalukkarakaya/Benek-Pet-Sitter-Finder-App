@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -81,11 +82,9 @@ class _BenekAvatarGridViewWidgetState extends State<BenekAvatarGridViewWidget> {
               widget.emptyMessage != null
                   ? widget.emptyMessage!
                   : BenekStringHelpers.locale('notFoundMessage'),
-              style: const TextStyle(
-                color: AppColors.benekWhite,
-                fontFamily: 'Qanelas',
-                fontSize: 15,
-                fontWeight: FontWeight.w200,
+              style: thinTextStyle(
+                textFontSize: 15,
+                textColor: AppColors.benekWhite,
               ),
             ),
           ],

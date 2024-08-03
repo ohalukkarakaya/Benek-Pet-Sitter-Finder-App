@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/material.dart';
 
@@ -41,12 +42,7 @@ class _BenekAvatarGridWidgetState extends State<BenekAvatarGridWidget> {
         children: [
           Text(
             BenekStringHelpers.locale('usersPets'),
-            style: const TextStyle(
-              fontFamily: 'Qanelas',
-              fontSize: 12,
-              color: AppColors.benekWhite,
-              fontWeight: FontWeight.w400,
-            ),
+            style: regularTextStyle( textColor: AppColors.benekWhite ),
           ),
           const Divider(color: AppColors.benekWhite, thickness: 0.5),
           Padding(

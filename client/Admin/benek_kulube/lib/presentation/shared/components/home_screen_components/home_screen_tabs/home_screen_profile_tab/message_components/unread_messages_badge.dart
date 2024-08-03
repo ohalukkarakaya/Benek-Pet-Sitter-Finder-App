@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../../../../../common/constants/app_colors.dart';
@@ -22,12 +23,7 @@ class UnreadMessagesBadge extends StatelessWidget {
       child: Center(
         child: Text(
           BenekStringHelpers.formatNumberToReadable( unreadMessageCount ),
-          style: const TextStyle(
-            fontFamily: 'Qanelas',
-            fontSize: 8.0,
-            color: AppColors.benekBlack,
-            fontWeight: FontWeight.w600,
-          ),
+          style: semiBoldTextStyle( textFontSize: 8.0 ),
         ),
       ),
     );

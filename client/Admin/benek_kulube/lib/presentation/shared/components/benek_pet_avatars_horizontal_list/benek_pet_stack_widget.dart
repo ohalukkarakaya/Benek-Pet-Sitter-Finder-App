@@ -3,6 +3,7 @@ import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../common/constants/app_colors.dart';
+import '../../../../common/utils/styles.text.dart';
 import 'benek_horizontal_avatar_stack.dart';
 
 class BenekPetStackWidget extends StatefulWidget {
@@ -30,12 +31,7 @@ class _BenekPetStackWidgetState extends State<BenekPetStackWidget> {
         position: ElTooltipPosition.bottomCenter,
         content:  Text(
             BenekStringHelpers.locale('usersPets'),
-            style: const TextStyle(
-                color: AppColors.benekWhite,
-                fontSize: 12.0,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Qanelas'
-            )
+            style: mediumTextStyle( textColor: AppColors.benekWhite ),
         ),
         controller: _tooltipController,
         child: MouseRegion(

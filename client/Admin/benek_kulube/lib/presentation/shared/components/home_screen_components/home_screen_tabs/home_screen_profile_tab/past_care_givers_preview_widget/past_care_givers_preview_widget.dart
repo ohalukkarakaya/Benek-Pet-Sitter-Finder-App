@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_list_element.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_loading_widget.dart';
 import 'package:flutter/material.dart';
@@ -55,12 +56,7 @@ class _PastCareGiverPreviewWidgetState extends State<PastCareGiverPreviewWidget>
               children: [
                 Text(
                   widget.title,
-                  style: const TextStyle(
-                    fontFamily: 'Qanelas',
-                    fontSize: 12,
-                    color: AppColors.benekWhite,
-                    fontWeight: FontWeight.w400,
-                  ),
+                  style: regularTextStyle( textColor: AppColors.benekWhite ),
                 ),
                 const Divider(color: AppColors.benekWhite, thickness: 0.5),
                 SizedBox(
@@ -104,11 +100,9 @@ class _PastCareGiverPreviewWidgetState extends State<PastCareGiverPreviewWidget>
                     : Center(
                       child: Text(
                         widget.pastCareGiversEmptyStateTitle,
-                        style: const TextStyle(
-                          color: AppColors.benekWhite,
-                          fontFamily: 'Qanelas',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w200,
+                        style: thinTextStyle(
+                          textColor: AppColors.benekWhite,
+                          textFontSize: 15,
                         ),
                       ),
                     ),
@@ -145,9 +139,9 @@ class _PastCareGiverPreviewWidgetState extends State<PastCareGiverPreviewWidget>
                       BenekStringHelpers.locale('seeDetails'),
                       style: TextStyle(
                         color: AppColors.benekWhite,
-                        fontFamily: 'Qanelas',
+                        fontFamily: defaultFontFamily(),
                         fontSize: 12,
-                        fontWeight: isHovering ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: isHovering ? getFontWeight('semiBold') : getFontWeight('regular'),
                       ),
                     ),
                   ),

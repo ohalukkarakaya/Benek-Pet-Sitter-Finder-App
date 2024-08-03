@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/material.dart';
 
@@ -71,12 +72,7 @@ class _BenekSmallButtonState extends State<BenekSmallButton> {
           position: ElTooltipPosition.topStart,
           content:  Text(
               widget.tooltipMessage!,
-              style: const TextStyle(
-                  color: AppColors.benekBlack,
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'Qanelas'
-              )
+              style: mediumTextStyle()
           ),
         controller: _tooltipController,
         child: GestureDetector(

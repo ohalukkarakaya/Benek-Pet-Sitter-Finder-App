@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../../common/constants/app_colors.dart';
@@ -28,15 +29,13 @@ class UserIdLogPreviewEmptyStateWidget extends StatelessWidget {
         child: Center(
           child: Text(
             BenekStringHelpers.locale('noLog'),
-            style: const TextStyle(
-              fontFamily: 'Qanelas',
-              fontSize: 15,
-              color: AppColors.benekWhite,
-              fontWeight: FontWeight.w200,
+            style: thinTextStyle(
+              textColor: AppColors.benekWhite,
+              textFontSize: 15,
             ),
           ),
-        )
-      ),
+        ),
+      )
     );
   }
 }

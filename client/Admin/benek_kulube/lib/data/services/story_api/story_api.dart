@@ -48,12 +48,152 @@ class StoryApi {
       }
     }catch( err ){
       log('ERROR: getStoriesByUserIdRequest - $err');
-      // await AuthUtils.killUserSessionAndRestartApp( store );
     }
     return null;
   }
 
-  Future<Map<String, dynamic>?> getCommentsByStoryId(String storyId, String? lastElementId, int? limit) async {
+  Future<Map<String, dynamic>> postStoryRequest(String abutId, String desc, String src ) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      String path = '/api/user/interractions/story';
+
+      Object? postBody;
+
+      // Query Params
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = ["multipart/form-data;"];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      if( contentType.startsWith("multipart/form-data") ){
+        bool hasFields = false;
+        MultipartRequest mp = MultipartRequest("POST", Uri.parse(AppConfig.baseUrl + path));
+
+        mp.fields.addAll({
+          'aboutId': abutId,
+          'aboutType': 'pet',
+          'desc': desc
+        });
+
+        String mimeType = 'application/octet-stream';
+        if (src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.JPG') || src.endsWith('.JPEG')) {
+          mimeType = 'image/jpeg';
+        } else if (src.endsWith('.mp4') || src.endsWith('.MP4')) {
+          mimeType = 'video/mp4';
+        }
+
+        mp.files.add(await http.MultipartFile.fromPath(
+            'file',
+            src,
+            contentType: MediaType.parse(mimeType)
+        ));
+        hasFields = true;
+        if ( hasFields ) postBody = mp;
+      }
+
+      var response = await apiClient.invokeAPI(path, 'POST', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      // ignore: unnecessary_null_comparison
+      }else if( response.body != null ){
+        var decodedJson = json.decode(response.body);
+        return {
+          'storyId': decodedJson['storyId'],
+          'contentUrl': decodedJson['contentUrl'],
+          'storyExpireDate': decodedJson['storyExpireDate']
+        };
+      }
+    }catch( err ){
+      log('ERROR: postStoryRequest - $err');
+    }
+    return {};
+  }
+
+  Future<bool> deleteStoryRequest( String storyId ) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      String path = '/api/user/interractions/story';
+
+      Object? postBody = {
+        'storyId': storyId
+      };
+
+      // Query Params
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = [];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      if( contentType.startsWith("multipart/form-data") ){
+        bool hasFields = false;
+        MultipartRequest mp = MultipartRequest("", Uri.parse(""));
+        // ignore: dead_code
+        if ( hasFields ) postBody = mp;
+      }
+
+      var response = await apiClient.invokeAPI(path, 'DELETE', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      }else if(response.statusCode == 404){
+        return false;
+        // ignore: unnecessary_null_comparison
+      }else if( response.body != null ){
+        return true;
+      }
+    }catch( err ){
+      log('ERROR: deleteStoryRequest - $err');
+    }
+    return false;
+  }
+
+  Future<bool> likeStoryRequest( String storyId  ) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      String path = '/api/user/interractions/story/$storyId';
+
+      Object? postBody;
+
+      // Query Params
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = [];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      if( contentType.startsWith("multipart/form-data") ){
+        bool hasFields = false;
+        MultipartRequest mp = MultipartRequest("", Uri.parse(""));
+        // ignore: dead_code
+        if ( hasFields ) postBody = mp;
+      }
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      }else if(response.statusCode == 404){
+        return false;
+        // ignore: unnecessary_null_comparison
+      }else if( response.body != null ){
+        return true;
+      }
+    }catch( err ){
+      log('ERROR: likeStoryRequest - $err');
+    }
+    return false;
+  }
+
+  Future<Map<String, dynamic>?> getCommentsByStoryId(String storyId, String? lastElementId, int? limit ) async {
     Store<AppState> store = AppReduxStore.currentStore!;
     try {
       await AuthUtils.getAccessToken();
@@ -94,48 +234,7 @@ class StoryApi {
       }
     } catch (err) {
       log('ERROR: getCommentsByStoryId - $err');
-      // await AuthUtils.killUserSessionAndRestartApp( store );
     }
     return null;
-  }
-
-  Future<bool> likeStoryRequest( String storyId ) async {
-    try{
-      await AuthUtils.getAccessToken();
-
-      String path = '/api/user/interractions/story/$storyId';
-
-      Object? postBody;
-
-      // Query Params
-      List<QueryParam> queryParams = [];
-      Map<String, String> headerParams = {};
-      Map<String, String> formParams = {};
-      List<String> contentTypes = [];
-      List<String> authNames = [];
-
-      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
-
-      if( contentType.startsWith("multipart/form-data") ){
-        bool hasFields = false;
-        MultipartRequest mp = MultipartRequest("", Uri.parse(""));
-        // ignore: dead_code
-        if ( hasFields ) postBody = mp;
-      }
-
-      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
-      if (response.statusCode >= 400 && response.statusCode != 404) {
-        throw ApiException(code: response.statusCode, message: response.body);
-        // ignore: unnecessary_null_comparison
-      }else if(response.statusCode == 404){
-        return false;
-      }else if( response.body != null ){
-        return true;
-      }
-    }catch( err ){
-      log('ERROR: likeStoryRequest - $err');
-      // await AuthUtils.killUserSessionAndRestartApp( store );
-    }
-    return false;
   }
 }

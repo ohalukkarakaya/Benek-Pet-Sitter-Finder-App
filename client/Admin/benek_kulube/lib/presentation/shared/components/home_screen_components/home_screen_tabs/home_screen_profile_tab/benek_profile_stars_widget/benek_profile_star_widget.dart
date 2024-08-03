@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -64,10 +65,9 @@ class _BenekProfileStarWidgetState extends State<BenekProfileStarWidget> {
               padding: const EdgeInsets.all(5.0),
               child: Text(
                 "|  ${NumberFormat.compact().format(widget.starCount)}",
-                style: const TextStyle(
-                  fontFamily: 'Qanelas',
-                  fontSize: 15,
-                  color: AppColors.benekWhite
+                style: planeTextWithoutWeightStyle(
+                  textFontSize: 15,
+                  textColor: AppColors.benekWhite
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
 import Story from "../../../../../models/Story.js";
 import s3 from "../../../../../utils/s3Service.js";
 import dotenv from "dotenv";
+import deleteFileHelper from "../../../../../utils/fileHelpers/deleteFileHelper.js";
 
 dotenv.config();
 
@@ -44,33 +45,19 @@ const deleteStoryController = async (req, res) => {
             Key: `profileAssets/${req.user._id.toString()}/story/${contentName}`
         };
 
-        s3.deleteObject(
-            deleteContentParams,
-            (error, data) => {
-              if(error){
-                console.log("error", error);
-                return res.status(500).json(
-                  {
-                    error: true,
-                    message: "An error occured while deleting content"
-                  }
+        const deleteAssets = await deleteFileHelper( story.contentUrl );
+        if( deleteAssets.error ){ console.log( `ERROR: delete assets - ${ story._id.toString() }` ); }
+
+        story.deleteOne().then(
+            (_) => {
+                return res.status(200).json(
+                    {
+                        error: false,
+                        message: "Story deleted succesfully"
+                    }
                 );
-              }
-
-              story.deleteOne().then(
-                (_) => {
-                    return res.status(200).json(
-                        {
-                            error: false,
-                            message: "Story deleted succesfully"
-                        }
-                    );
-                }
-              );
             }
-          );
-
-        
+        );
     }catch(err){
         console.log("ERROR: delete story - ", err);
         return res.status(500).json(

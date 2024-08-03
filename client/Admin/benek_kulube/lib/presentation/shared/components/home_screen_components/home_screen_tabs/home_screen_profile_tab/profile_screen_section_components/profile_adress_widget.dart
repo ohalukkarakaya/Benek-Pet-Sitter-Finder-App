@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:benek_kulube/common/constants/benek_icons.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/common/widgets/benek_small_button.dart';
 import 'package:benek_kulube/data/services/google_services/google_maps_helpers.dart';
 import 'package:flutter/material.dart';
@@ -62,12 +63,7 @@ class ProfileAdressWidget extends StatelessWidget {
                 children: [
                   Text(
                     "${location!.country} / ${location!.city}",
-                    style: const TextStyle(
-                      fontFamily: 'Qanelas',
-                      fontSize: 12.0,
-                      color: AppColors.benekWhite,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: mediumTextStyle( textColor: AppColors.benekWhite ),
                   ),
 
                   BenekCopyButton( valueToCopy: openAdress ?? "",),
@@ -77,12 +73,7 @@ class ProfileAdressWidget extends StatelessWidget {
                 children: [
                   Text(
                     openAdress ?? "",
-                    style: const TextStyle(
-                      fontFamily: 'Qanelas',
-                      fontSize: 12.0,
-                      color: AppColors.benekWhite,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: regularTextStyle( textColor: AppColors.benekWhite ),
                   ),
                 ]
               ),

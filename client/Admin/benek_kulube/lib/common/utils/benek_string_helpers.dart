@@ -1,4 +1,5 @@
 import 'package:benek_kulube/data/models/pet_models/pet_kind_model.dart';
+import 'package:intl/intl.dart';
 
 import '../constants/app_static_texts/app_static_texts.en.dart';
 import '../constants/app_static_texts/app_static_texts.tr.dart';
@@ -88,6 +89,11 @@ class BenekStringHelpers {
       return petKind.tr!;
     }
     return petKind.en!;
+  }
+
+  static formatDate(String date){
+    DateFormat format = DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ');
+    return format.parse(date);
   }
 
   static int calculateYearsDifference(DateTime pastDate) {

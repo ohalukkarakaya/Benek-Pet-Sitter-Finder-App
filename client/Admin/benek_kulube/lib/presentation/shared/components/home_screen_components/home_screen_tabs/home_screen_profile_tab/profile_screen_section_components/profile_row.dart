@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/presentation/features/user_profile_helpers/auth_role_helper.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/punish_buton.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/text_with_character_limit_component/text_with_character_limit_controlled_component.dart';
@@ -62,11 +63,7 @@ class ProfileRowWidget extends StatelessWidget {
 
                 Text(
                   "@${selectedUserInfo.userName}",
-                  style: const TextStyle(
-                      fontFamily: 'Qanelas',
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w400
-                  ),
+                  style: regularTextWithoutColorStyle()
                 ),
               ],
             ),
@@ -93,12 +90,7 @@ class ProfileRowWidget extends StatelessWidget {
                 ),
                 child: Text(
                   authRoleData.authRoleText,
-                  style: TextStyle(
-                    fontFamily: 'Qanelas',
-                    fontSize: 12.0,
-                    color: authRoleData.authRoleColor,
-                    fontWeight: FontWeight.w900,
-                  ),
+                  style: blackTextStyle( textColor: authRoleData.authRoleColor),
                 ),
               ),
 

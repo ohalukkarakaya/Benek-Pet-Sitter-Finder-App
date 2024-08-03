@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_profile_image_model.dart';
@@ -31,12 +32,7 @@ class TextWithProfileImg extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-                color: AppColors.benekWhite,
-                fontSize: 12.0,
-                fontWeight: FontWeight.w300,
-                fontFamily: 'Qanelas',
-              ),
+              style: lightTextStyle( textColor: AppColors.benekWhite ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),

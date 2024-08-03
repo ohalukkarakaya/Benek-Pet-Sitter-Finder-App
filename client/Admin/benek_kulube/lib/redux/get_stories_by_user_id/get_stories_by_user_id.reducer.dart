@@ -31,6 +31,16 @@ List<StoryModel>? getStoriesByUserIdRequestReducer( List<StoryModel>? stories, d
     }
 
     return stories;
+  }else if( action is PostStoryRequestAction ){
+    stories ??= <StoryModel>[];
+
+    stories.add(action.story!);
+
+    return stories;
+  }else if( action is DeleteStoryByStoryIdRequestAction ){
+    stories?.removeWhere((element) => element.storyId == action.storyId);
+
+    return stories;
   }
 
   return stories;

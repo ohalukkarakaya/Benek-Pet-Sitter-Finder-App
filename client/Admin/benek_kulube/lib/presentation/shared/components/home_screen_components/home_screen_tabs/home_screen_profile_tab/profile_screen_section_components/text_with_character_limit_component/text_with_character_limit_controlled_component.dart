@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/text_with_character_limit_component/text_with_character_limit_and_tool_tip_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -29,11 +30,7 @@ class TextWithCharacterLimitControlledComponent extends StatelessWidget {
             text,
             characterLimit // Character Limit
         ),
-        style: TextStyle(
-            fontFamily: 'Qanelas',
-            fontSize: fontSize,
-            fontWeight: FontWeight.w500
-        ),
+        style: mediumTextWithoutColorStyle( textFontSize: fontSize ),
       );
     }
   }

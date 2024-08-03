@@ -7,6 +7,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../../presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/add_story_button.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/benek_icons.dart';
+import '../../utils/styles.text.dart';
 
 class KulubeHorizontalListViewWidget extends StatefulWidget {
 
@@ -42,7 +43,7 @@ class _KulubeHorizontalListViewWidgetState extends State<KulubeHorizontalListVie
       color: Colors.transparent,
       theme: ThemeData(
         splashFactory: InkRipple.splashFactory,
-        fontFamily: 'Qanelas',
+        fontFamily: defaultFontFamily(),
       ),
       darkTheme: ThemeData.dark().copyWith(
         splashFactory: InkRipple.splashFactory,
@@ -62,17 +63,18 @@ class _KulubeHorizontalListViewWidgetState extends State<KulubeHorizontalListVie
             ? Center(
                 child: Text(
                   widget.emptyListMessage,
-                  style: const TextStyle(
-                    color: AppColors.benekWhite,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w200,
-                    fontFamily: 'Qanelas',
+                  style: thinTextStyle(
+                    textColor: AppColors.benekWhite,
+                    textFontSize: 15,
                   ),
                 )
             )
-            : widget.isUsersProfile
-               ? AddStoryButton(
-                    createStoryPageBuilderFunction: widget.createStoryPageBuilderFunction??(){},
+            : widget.isEmpty
+              && widget.isUsersProfile
+               ? Center(
+                 child: AddStoryButton(
+                      createStoryPageBuilderFunction: widget.createStoryPageBuilderFunction??(){},
+                 ),
                )
                : widget.child ?? const SizedBox(),
       ),

@@ -14,13 +14,15 @@ class StoryContextVerticalScrollWidget extends StatefulWidget {
   final List<StoryModel> storiesToDisplay;
   final double width;
   final double height;
+  final Function()? closeFunction;
 
   const StoryContextVerticalScrollWidget({
     super.key,
     required this.activePageIndex,
     required this.storiesToDisplay,
     required this.width,
-    required this.height
+    required this.height,
+    this.closeFunction
   });
 
   @override
@@ -77,6 +79,7 @@ class _StoryContextVerticalScrollWidgetState extends State<StoryContextVerticalS
                   height: widget.height,
                   child: StoryContextWidget(
                     story: widget.storiesToDisplay[index],
+                    closeFunction: widget.closeFunction,
                   )
                 ),
               );

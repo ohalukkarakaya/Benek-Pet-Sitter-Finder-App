@@ -1,10 +1,19 @@
-import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 import 'package:flutter/widgets.dart';
 
+
+import 'package:flutter_redux/flutter_redux.dart';
+// ignore: depend_on_referenced_packages
+import 'package:redux/redux.dart';
+import 'package:benek_kulube/store/app_state.dart';
+import 'package:benek_kulube/store/actions/app_actions.dart';
+
 import '../../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../../common/widgets/story_context_component/tagged_pet_button_widget.dart';
+import '../../../../../../../../data/models/story_models/story_about_data_model.dart';
+import '../../../../../../../../data/models/story_models/story_model.dart';
+import 'edit_story_desc_info_card.dart';
 import 'edit_story_desc_post_button.dart';
 import 'edit_story_desc_text_field.dart';
 
@@ -13,6 +22,7 @@ class EditStoryDescSectionWidget extends StatefulWidget {
   final UserInfo userInfo;
   final PetModel pet;
   final String? desc;
+  final Function()? closeFunction;
 
   const EditStoryDescSectionWidget({
     super.key,
@@ -20,6 +30,7 @@ class EditStoryDescSectionWidget extends StatefulWidget {
     required this.userInfo,
     required this.pet,
     this.desc,
+    this.closeFunction,
   });
 
   @override
@@ -28,6 +39,13 @@ class EditStoryDescSectionWidget extends StatefulWidget {
 
 class _EditStoryDescSectionWidgetState extends State<EditStoryDescSectionWidget> {
   String? writenDesc;
+
+  bool isDescReady() {
+    return writenDesc != null
+        && writenDesc?.trim() != ""
+        && writenDesc?.trim() != " "
+        && writenDesc!.length >= 10;
+  }
 
   @override
   void initState() {
@@ -65,11 +83,51 @@ class _EditStoryDescSectionWidgetState extends State<EditStoryDescSectionWidget>
               ],
             ),
           ),
-          const SizedBox(height: 20.0),
+
+          EditStoryDescInfoCard(
+            isReady: isDescReady(),
+            color: isDescReady()
+                ? AppColors.benekLightBlue
+                : AppColors.benekBrick,
+
+            darkColor: isDescReady()
+                ? AppColors.benekDarkBlue
+                : AppColors.benekRed,
+
+            textColor: isDescReady()
+                ? AppColors.benekBlack
+                : AppColors.benekWhite,
+          ),
 
           EditStoryDescPostButton(
-            onTap: () {
+            isDescReady: isDescReady(),
+            onTap: () async {
               // Post the story
+
+              var store = StoreProvider.of<AppState>( context );
+
+              StoryModel story = StoryModel(
+                storyId: null,
+                about: StoryAboutDataModel(
+                  aboutType: 'pet',
+                  pet: widget.pet
+                ),
+                desc: writenDesc,
+                contentUrl: widget.src,
+                createdAt: DateTime.now(),
+                expiresAt: DateTime.now().add(const Duration(days: 1)),
+                user: widget.userInfo,
+                likeCount: 0,
+                didUserLiked: false,
+                commentCount: 0,
+                firstFiveLikedUser: [],
+                comments: [],
+              );
+
+              await store.dispatch(postStoryRequestAction(story));
+              widget.closeFunction != null
+                  ? widget.closeFunction!()
+                  : null;
             },
           )
         ],

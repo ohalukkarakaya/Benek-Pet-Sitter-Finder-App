@@ -55,7 +55,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
         focusNode: _createStoryFocusNode,
         onKeyEvent: (KeyEvent event){
           if(
-          event is KeyDownEvent
+              event is KeyDownEvent
               && event.logicalKey == LogicalKeyboardKey.escape
           ){
             setState(() {
@@ -92,6 +92,9 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
                     userInfo: store.state.selectedUserInfo!,
                     pet: widget.pet,
                     desc: null,
+                    closeFunction: () => setState(() {
+                      shouldPop = true;
+                    })
                   )
                 ],
               )

@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -47,11 +48,8 @@ class _PunishmentCountWidgetState extends State<PunishmentCountWidget> {
                 widget.punishmentCount! > 0
                     ? '${widget.punishmentCount} ${BenekStringHelpers.locale('punishment')}'
                     : BenekStringHelpers.locale('noPunishment'),
-                style: const TextStyle(
-                    color: AppColors.benekWhite,
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Qanelas'
+                style: mediumTextStyle(
+                    textColor: AppColors.benekWhite
                 )
             ),
             controller: _punishWidgetTooltipController,

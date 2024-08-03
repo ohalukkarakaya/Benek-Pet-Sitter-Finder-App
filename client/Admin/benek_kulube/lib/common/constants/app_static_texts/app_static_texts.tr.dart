@@ -2,6 +2,7 @@ class AppStaticTextsTr{
   static const Map<String, String> texts = {
     'appName': 'Kulübe',
     'appDescription': 'Benek, evcil hayvan sahipleri ve bakıcıları için tasarlanmış bir platformdur.',
+    'error': 'Hata',
     'welcomeMessage': 'Kulübe\'ye Hoş Geldin',
     'qrCodeDescription': 'Giriş yapmak için aşağıdaki kodu Benek uygulamasına okut.',
     'toGetNewQrCode': 'Yeni bi QR kod almak için butona tıkla :)',
@@ -84,6 +85,12 @@ class AppStaticTextsTr{
     'peopleLiked': 'Kişi Beğendi',
     'justYou': 'Sadece Sen',
     'post': 'Gönder',
-    'writeACaption': 'Bir Açıklama Yaz',
+    'writeACaption': 'Bir Açıklama Yaz...',
+    'tagPetInfoCaption': 'Anılar bir evcil hayvanlarla ilgilidir! Lütfen bir evcil hayvan etiketleyin!',
+    'addDescriptionCaption': 'Anı için açıklama yazmak zorunludur!',
+    'invalidPath': 'Geçersiz Dosya Yolu!',
+    'invalidPathDesc': 'Dosya yolu geçersizdir. Lütfen Dosya yolunu kontrol edip tekrar deneyin.',
+    'enterDescFirst': 'Önce Açıklama Girin!',
+    'delete': 'Sil',
   };
 }

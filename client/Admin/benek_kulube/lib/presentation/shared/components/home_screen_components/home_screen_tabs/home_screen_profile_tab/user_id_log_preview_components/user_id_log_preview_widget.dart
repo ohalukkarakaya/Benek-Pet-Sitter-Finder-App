@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/data/models/log_models/log_model.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -71,11 +72,7 @@ class UserIdLogPreviewWidget extends StatelessWidget {
                           angle: - 45,
                           child: Text(
                               '$date:00',
-                              style: const TextStyle(
-                                  fontFamily: 'Qanelas',
-                                  fontSize: 8.0,
-                                  fontWeight: FontWeight.w400
-                              ),
+                              style: regularTextWithoutColorStyle( textFontSize: 8.0 ),
                           ),
                         ),
                       );
@@ -91,11 +88,7 @@ class UserIdLogPreviewWidget extends StatelessWidget {
                   getTitlesWidget: (value, meta) {
                     return Text(
                       BenekStringHelpers.formatNumberToReadable(value.toInt()),
-                      style: const TextStyle(
-                          fontFamily: 'Qanelas',
-                          fontSize: 8.0,
-                          fontWeight: FontWeight.w400
-                      ),
+                      style: regularTextWithoutColorStyle( textFontSize: 8.0 ),
                     );
                   },
                 ),
@@ -131,11 +124,9 @@ class UserIdLogPreviewWidget extends StatelessWidget {
                     final date = logCountByDate.keys.elementAt(touchedSpot.x.toInt());
                     return LineTooltipItem(
                       '$date:00 / ${touchedSpot.y.toInt()}',
-                      const TextStyle(
-                        fontFamily: 'Qanelas',
-                        fontSize: 10,
-                        color: AppColors.benekWhite,
-                        fontWeight: FontWeight.w400,
+                      regularTextStyle(
+                        textColor: AppColors.benekWhite,
+                        textFontSize: 10.0,
                       ),
                     );
                   }).toList();
@@ -147,12 +138,7 @@ class UserIdLogPreviewWidget extends StatelessWidget {
         : Center(
           child: Text(
             '${logCountByDate.keys.elementAt(0)}:00 / ${logCountByDate.values.elementAt(0)} logs',
-            style: const TextStyle(
-              fontFamily: 'Qanelas',
-              fontSize: 12,
-              color: AppColors.benekWhite,
-              fontWeight: FontWeight.w400,
-            ),
+            style: regularTextStyle( textColor: AppColors.benekWhite ),
           ),
         ),
       ),

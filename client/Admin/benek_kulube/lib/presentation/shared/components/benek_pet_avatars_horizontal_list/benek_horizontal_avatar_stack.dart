@@ -1,6 +1,7 @@
 import 'package:avatar_stack/avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -64,12 +65,7 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
                 child: Center(
                   child: Text(
                     "+ $surplus",
-                    style: const TextStyle(
-                      color: AppColors.benekBlack,
-                      fontSize: 15,
-                      fontFamily: 'Qanelas',
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: boldTextStyle( textFontSize: 15.0 ),
                   ),
                 ),
               ),
@@ -98,11 +94,9 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
               : Center(
                 child: Text(
                   BenekStringHelpers.locale('noPetMessage'),
-                  style: const TextStyle(
-                    color: AppColors.benekWhite,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w200,
-                    fontFamily: 'Qanelas',
+                  style: thinTextStyle(
+                    textColor: AppColors.benekWhite,
+                    textFontSize: 15.0,
                   ),
                 )
             )

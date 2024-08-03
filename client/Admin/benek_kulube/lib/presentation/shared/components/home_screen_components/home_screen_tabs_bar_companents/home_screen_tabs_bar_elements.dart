@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:benek_kulube/store/app_state.dart';
@@ -119,17 +120,13 @@ class _TabsButonElementState extends State<TabsButonElement> {
               )
                   ? Text(
                   widget.title,
-                  style: TextStyle(
-                    fontFamily: 'Qanelas',
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.w500,
-                    color: widget.store.state.processCounter == 0 && isHovering
+                  style: widget.store.state.processCounter == 0 && isHovering
                       || (
                           widget.store.state.activeTab == widget.tab
                               && widget.store.state.selectedUserInfo == null
                       )
-                        ? Colors.black : null
-                  ),
+                      ? mediumTextStyle( textFontSize: 15.0 )
+                      : mediumTextWithoutColorStyle( textFontSize: 15.0 ),
                 )
                 : const SizedBox()
             ],

@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:flutter/widgets.dart';
@@ -87,22 +88,12 @@ class _TaggedPetButtonWidgetState extends State<TaggedPetButtonWidget> {
                 children: [
                   Text(
                     widget.pet.name!,
-                    style: const TextStyle(
-                      color: AppColors.benekBlack,
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Qanelas',
-                    ),
+                    style: mediumTextStyle()
                   ),
 
                   Text(
                     "${BenekStringHelpers.calculateYearsDifference(widget.pet.birthDay!)} ${BenekStringHelpers.locale('yearsOld')}, ${BenekStringHelpers.getPetKindAsString(widget.pet.kind!)}, ${BenekStringHelpers.getPetGenderAsString(widget.pet.sex!)}",
-                    style: const TextStyle(
-                      color: AppColors.benekBlack,
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w300,
-                      fontFamily: 'Qanelas',
-                    ),
+                    style: lightTextStyle()
                   ),
                 ],
               ),

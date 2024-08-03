@@ -1,6 +1,7 @@
 import 'package:avatar_stack/avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../data/models/user_profile_models/user_info_model.dart';
@@ -45,12 +46,7 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
         child: Center(
           child: Text(
             '+ $count',
-            style: const TextStyle(
-              color: AppColors.benekBlack,
-              fontSize: 12.0,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'Qanelas',
-            ),
+            style: blackTextStyle()
           ),
         ),
       ),
@@ -106,12 +102,7 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
       : Center(
           child: Text(
             totalLikeCount > 0 ? BenekStringHelpers.locale('justYou') : BenekStringHelpers.locale('beTheFirstOneToLike'),
-            style: const TextStyle(
-              color: AppColors.benekWhite,
-              fontSize: 12.0,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'Qanelas',
-            ),
+            style: mediumTextStyle( textColor: AppColors.benekWhite ),
           ),
     );
   }

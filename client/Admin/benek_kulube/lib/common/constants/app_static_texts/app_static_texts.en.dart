@@ -2,6 +2,7 @@ class AppStaticTextsEn{
   static const Map<String, String> texts = {
     'appName': 'Kulübe',
     'appDescription': 'Benek is a platform designed for pet owners and caregivers.',
+    'error': 'Error',
     'welcomeMessage': 'Welcome to the Kulübe',
     'qrCodeDescription': 'To log in, scan the code below into the Benek application.',
     'toGetNewQrCode': 'Click the button to get a new QR code :)',
@@ -85,5 +86,11 @@ class AppStaticTextsEn{
     'justYou': 'Just You',
     'post': 'Post',
     'writeACaption': 'Write a caption...',
+    'tagPetInfoCaption': 'Stories has to be about A pet! Please tag a pet!',
+    'addDescriptionCaption': 'Writing a description for the Story is mandatory!',
+    'invalidPath': 'Invalid File Path!',
+    'invalidPathDesc': 'The file path you provided is invalid. Please check the file path and try again.',
+    'enterDescFirst': 'Enter Description First!',
+    'delete': 'Delete',
   };
 }

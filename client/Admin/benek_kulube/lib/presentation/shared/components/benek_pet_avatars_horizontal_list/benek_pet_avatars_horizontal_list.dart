@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/common/widgets/kulube_horizontal_listview_widget/kulube_horizontal_listview_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:el_tooltip/el_tooltip.dart';
@@ -53,11 +54,9 @@ class _BenekPetAvatarsHorizontalListViewState extends State<BenekPetAvatarsHoriz
                         content:  widget.pets != null && widget.pets![index] is PetModel && widget.pets![index].name != null
                             ? Text(
                                 '@${widget.pets![index].name!}',
-                                style: const TextStyle(
-                                    color: AppColors.benekWhite,
-                                    fontSize: 15.0,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: 'Qanelas'
+                                style: mediumTextStyle(
+                                    textColor: AppColors.benekWhite,
+                                    textFontSize: 15.0
                                 )
                             )
                             : const SizedBox(),

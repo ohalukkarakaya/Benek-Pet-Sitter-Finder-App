@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/common/widgets/benek_time_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_buttons/home_screen_buton_widget.dart';
 import 'package:flutter/material.dart';
@@ -53,19 +54,11 @@ class KulubeHomeTabWidget extends StatelessWidget {
           children: [
             Text(
               BenekStringHelpers.locale('welcome'),
-              style: const TextStyle(
-                fontFamily: 'Qanelas',
-                fontSize: 15.0,
-                fontWeight: FontWeight.w100
-              ),
+              style: ultraLightTextWithoutColorStyle( textFontSize: 15.0 ),
             ),
             Text(
               " ${BenekStringHelpers.getUsersFullName(firstName, lastName, middleName)}",
-              style: const TextStyle(
-                fontFamily: 'Qanelas',
-                fontSize: 15.0,
-                fontWeight: FontWeight.w400
-              ),
+              style: regularTextWithoutColorStyle( textFontSize: 15.0 ),
             ),
           ],
         ),

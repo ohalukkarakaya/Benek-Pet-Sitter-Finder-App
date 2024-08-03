@@ -25,31 +25,29 @@ class _AddStoryButtonState extends State<AddStoryButton> {
         onTap: () => widget.createStoryPageBuilderFunction.call(),
         child: ClipRRect(
           borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
-          child: Center(
-            child: MouseRegion(
-              onHover: (_) {
-                setState(() {
-                  isHovered = true;
-                });
-              },
-              onExit: (_) {
-                setState(() {
-                  isHovered = false;
-                });
-              },
-              child: Container(
-                width: 125,
-                height: 250,
-                decoration: BoxDecoration(
-                  color: !isHovered ? AppColors.benekBlackWithOpacity : AppColors.benekBlack,
-                  borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
-                ),
-                child: const Center(
-                  child: Icon(
-                    BenekIcons.plussquare,
-                    color: AppColors.benekWhite,
-                    size: 30,
-                  ),
+          child: MouseRegion(
+            onHover: (_) {
+              setState(() {
+                isHovered = true;
+              });
+            },
+            onExit: (_) {
+              setState(() {
+                isHovered = false;
+              });
+            },
+            child: Container(
+              width: 125,
+              height: 250,
+              decoration: BoxDecoration(
+                color: !isHovered ? AppColors.benekBlackWithOpacity : AppColors.benekBlack,
+                borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+              ),
+              child: const Center(
+                child: Icon(
+                  BenekIcons.plussquare,
+                  color: AppColors.benekWhite,
+                  size: 30,
                 ),
               ),
             ),

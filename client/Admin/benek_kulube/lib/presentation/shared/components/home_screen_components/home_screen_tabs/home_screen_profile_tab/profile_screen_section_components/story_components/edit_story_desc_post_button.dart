@@ -1,13 +1,16 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../../common/utils/benek_string_helpers.dart';
 
 class EditStoryDescPostButton extends StatefulWidget {
+  final bool isDescReady;
   final void Function()? onTap;
 
   const EditStoryDescPostButton({
     super.key,
+    this.isDescReady = false,
     this.onTap,
   });
 
@@ -31,22 +34,27 @@ class _EditStoryDescPostButtonState extends State<EditStoryDescPostButton> {
         });
       },
       child: GestureDetector(
-        onTap: widget.onTap,
+        onTap: widget.isDescReady ? widget.onTap : null,
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: !isHovered ? AppColors.benekBlack : AppColors.benekLightBlue,
+            color: !isHovered
+                ? AppColors.benekBlack
+                : widget.isDescReady
+                    ? AppColors.benekLightBlue
+                    : AppColors.benekRed,
             borderRadius: BorderRadius.circular(6.0),
           ),
           padding: const EdgeInsets.symmetric(vertical: 25.0),
           child: Center(
             child: Text(
-              BenekStringHelpers.locale('post'),
-              style: TextStyle(
-                color: !isHovered ? AppColors.benekWhite : AppColors.benekBlack,
-                fontSize: 16.0,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Qanelas',
+              !widget.isDescReady
+              && isHovered
+                  ? BenekStringHelpers.locale('enterDescFirst')
+                  : BenekStringHelpers.locale('post'),
+              style: mediumTextStyle(
+                textColor: !isHovered || !widget.isDescReady ? AppColors.benekWhite : AppColors.benekBlack,
+                textFontSize: 16.0,
               ),
             ),
           ),

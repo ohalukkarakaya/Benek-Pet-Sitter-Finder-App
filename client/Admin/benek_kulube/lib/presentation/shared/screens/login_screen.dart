@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/common/utils/shared_preferences_helper.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
@@ -91,29 +92,17 @@ class _LoginScreenState extends State<LoginScreen> {
                            children: [
                              TextSpan(
                                text: BenekStringHelpers.locale('welcomeMessage').substring(0, appNameIndex),
-                               style: const TextStyle(
-                                   fontFamily: 'Qanelas',
-                                   fontSize: 40.0,
-                                   fontWeight: FontWeight.w100
-                               ),
+                               style: ultraLightTextWithoutColorStyle( textFontSize: 40.0 ),
                              ),
                              TextSpan(
                                text: BenekStringHelpers.locale('appName'),
-                               style: const TextStyle(
-                                 fontFamily: 'Qanelas',
-                                 fontSize: 40.0,
-                                 fontWeight: FontWeight.w400
-                               ),
+                               style: regularTextWithoutColorStyle( textFontSize: 40.0 ),
                              ),
                              TextSpan(
                                text: BenekStringHelpers.locale('welcomeMessage').substring(
                                  appNameIndex + BenekStringHelpers.locale('appname').length
                                ),
-                               style: const TextStyle(
-                                 fontFamily: 'Qanelas',
-                                 fontSize: 40.0,
-                                 fontWeight: FontWeight.w100
-                               ),
+                               style: ultraLightTextWithoutColorStyle( textFontSize: 40.0 ),
                              ),
                            ]
                          )
@@ -123,11 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     Text(
                       BenekStringHelpers.locale('qrCodeDescription'),
-                      style: const TextStyle(
-                        fontFamily: 'Qanelas',
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.w400
-                      ),
+                      style: regularTextWithoutColorStyle( textFontSize: 15.0 ),
                     ),
 
                     const SizedBox(height: 40.0),
@@ -141,21 +126,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       || store.state.loginQrCodeData.expireTime!.isBefore(DateTime.now())
                         ? BenekStringHelpers.locale('toGetNewQrCode')
                         : BenekStringHelpers.locale("qrCodeExpireTime"),
-                      style: const TextStyle(
-                        fontFamily: 'Qanelas',
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w400
-                      ),
+                      style: regularTextWithoutColorStyle(),
                     ),
                   ],
                 ),
                 Text(
                       BenekStringHelpers.locale("welcomeScreenWarning"),
-                      style: const TextStyle(
-                        fontFamily: 'Qanelas',
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w200
-                      ),
+                      style: thinTextWithoutColorStyle()
                     ),
               ],
             ),

@@ -49,50 +49,39 @@ const createStoryController = async ( req, res ) => {
                         );
         }
 
-        await new Story(
-            {
-                userId: user._id.toString(),
-                about: {
-                    id: req.body.aboutId,
-                    aboutType: req.body.aboutType
-                },
-                desc: req.body.desc,
-                contentUrl: contentUrl
-            }
-        ).save().then(
+        await new Story({
+            userId: user._id.toString(),
+            about: {
+                id: req.body.aboutId,
+                aboutType: req.body.aboutType
+            },
+            desc: req.body.desc,
+            contentUrl: contentUrl
+        }).save().then(
             ( story ) => {
-                return res.status( 200 )
-                          .json(
-                                {
-                                    error: false,
-                                    message: `Story with id ${story._id}, created succesfully`,
-                                    storyId: story._id.toString(),
-                                    contentUrl: story.contentUrl,
-                                    storyExpireDate: story.expiresAt
-                                }
-                           );
+                return res.status( 200 ).json({
+                    error: false,
+                    message: `Story with id ${story._id}, created succesfully`,
+                    storyId: story._id.toString(),
+                    contentUrl: story.contentUrl,
+                    storyExpireDate: story.expiresAt
+                });
             }
         ).catch(
             ( error ) => {
                 console.log( "ERROR: create story - ", error );
-                return res.status( 500 )
-                          .json(
-                                {
-                                    error: true,
-                                    message: "An error occured while saving story data"
-                                }
-                           );
+                return res.status( 500 ).json({
+                    error: true,
+                    message: "An error occured while saving story data"
+                });
             }
         );
     }catch( err ){
         console.log( "ERROR: create story - ", err );
-        return res.status( 500 )
-                  .json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                   );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
 }
 

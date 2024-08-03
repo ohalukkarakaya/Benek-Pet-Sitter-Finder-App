@@ -37,7 +37,13 @@ class KulubeStoriesBoard extends StatelessWidget {
             createStoryPageBuilderFunction: createStoryPageBuilderFunction,
             child: ListView.builder(
               shrinkWrap: true,
-              physics: stories != null && stories.length >= 5
+              physics: stories != null
+                  && (
+                      !isUsersProfile
+                      && stories.length >= 4
+                      || isUsersProfile
+                      && stories.length >= 3
+                  )
                   ? const BouncingScrollPhysics()
                   : const NeverScrollableScrollPhysics(),
 

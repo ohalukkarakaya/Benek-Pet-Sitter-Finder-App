@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/constants/benek_icons.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:benek_kulube/store/app_state.dart';
@@ -90,11 +91,7 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
                 padding: EdgeInsets.only(right: 25.0),
                 child: Icon( BenekIcons.searchcircle ),
               ),
-              hintStyle: const TextStyle(
-                fontFamily: 'Qanelas',
-                fontSize: 20.0,
-                fontWeight: FontWeight.w200
-              ),
+              hintStyle: thinTextWithoutColorStyle( textFontSize: 20.0 ),
               fillColor: AppColors.benekBlack.withOpacity(0.9),
               contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
               filled: true,
@@ -107,11 +104,7 @@ class _UserSearchBarTextFieldWidgetState extends State<UserSearchBarTextFieldWid
                 borderRadius: BorderRadius.circular(6.0),
               ),
             ),
-            style: const TextStyle(
-              fontFamily: 'Qanelas',
-              fontSize: 20.0,
-              fontWeight: FontWeight.w400
-            )
+            style: regularTextWithoutColorStyle( textFontSize: 20.0 ),
           ),
         ),
       ),

@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/material.dart';
 
@@ -33,12 +34,7 @@ class _TextWithCharacterLimitAndToolTipWidgetState extends State<TextWithCharact
         showChildAboveOverlay: false,
         content: Text(
             widget.text,
-            style: const TextStyle(
-                color: AppColors.benekBlack,
-                fontSize: 12.0,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Qanelas'
-            )
+            style: mediumTextStyle()
         ),
         controller: _textToolController,
         child: MouseRegion(
@@ -62,11 +58,7 @@ class _TextWithCharacterLimitAndToolTipWidgetState extends State<TextWithCharact
                 widget.text,
                 widget.characterLimit // Character Limit
             ),
-            style: TextStyle(
-                fontFamily: 'Qanelas',
-                fontSize: widget.fontSize,
-                fontWeight: FontWeight.w500
-            ),
+            style: mediumTextWithoutColorStyle( textFontSize: widget.fontSize ),
           ),
         ),
 

@@ -98,6 +98,11 @@ class _StoryWatchScreenState extends State<StoryWatchScreen> {
                       storiesToDisplay: store.state.storiesToDisplay!,
                       width: MediaQuery.of(context).size.width / 3,
                       height: MediaQuery.of(context).size.height - 100,
+                      closeFunction: () {
+                        setState(() {
+                          shouldPop = true;
+                        });
+                      },
                     )
                   ),
                 ],

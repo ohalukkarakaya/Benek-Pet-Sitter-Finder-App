@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../../../common/constants/app_colors.dart';
@@ -77,9 +78,9 @@ class _UserSearchRecentlySeenUserCardState extends State<UserSearchRecentlySeenU
                 Text(
                   widget.userInfo.userName!,
                   style: TextStyle(
-                      fontFamily: 'Qanelas',
+                      fontFamily: defaultFontFamily(),
                       fontSize: 12.0,
-                      fontWeight: isHovering ? FontWeight.w500 : FontWeight.w400,
+                      fontWeight: isHovering ? getFontWeight('medium') : getFontWeight('regular'),
                       color: isHovering ? AppColors.benekBlack : null
                   ),
                   overflow: TextOverflow.ellipsis,

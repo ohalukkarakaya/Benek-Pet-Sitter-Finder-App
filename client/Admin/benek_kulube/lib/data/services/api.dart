@@ -2,11 +2,15 @@ library benek.api;
 
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/benek_toast_helper.dart';
 import 'package:benek_kulube/data/models/content_models/comment_model.dart';
 import 'package:benek_kulube/data/models/kulube_login_qr_code_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:benek_kulube/store/app_state.dart';
+import 'package:flutter/widgets.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import 'package:benek_kulube/common/constants/app_config.dart';
@@ -15,6 +19,7 @@ import 'package:benek_kulube/data/services/api_exception.dart';
 import 'package:benek_kulube/store/app_redux_store.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 

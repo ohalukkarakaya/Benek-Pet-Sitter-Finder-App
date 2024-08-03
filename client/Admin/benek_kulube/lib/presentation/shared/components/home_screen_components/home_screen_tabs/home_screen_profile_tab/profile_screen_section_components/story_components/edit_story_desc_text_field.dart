@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -67,12 +68,7 @@ class _EditStoryDescTextFieldWidgetState extends State<EditStoryDescTextFieldWid
               maxLines: null,
               keyboardType: TextInputType.multiline,
               cursorColor: AppColors.benekWhite,
-              style: const TextStyle(
-                color: AppColors.benekWhite,
-                fontSize: 12.0,
-                fontWeight: FontWeight.w300,
-                fontFamily: 'Qanelas',
-              ),
+              style: lightTextStyle( textColor: AppColors.benekWhite ),
               textAlignVertical: TextAlignVertical.top,
               decoration: InputDecoration(
                 counterText: '',

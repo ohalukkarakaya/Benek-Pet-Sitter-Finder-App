@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/presentation/shared/components/pet_search_components/pet_search_result_list/pet_search_result_list_custom_scroll_view.dart';
+import 'package:benek_kulube/presentation/shared/components/pet_search_components/pet_search_result_list/pet_tag_info_card.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -82,7 +83,7 @@ class _PetSearchResultListState extends State<PetSearchResultList> {
           totalHeight = 80.0 * itemCount;
 
           double lastChildHeight = totalHeight + 50 + (20 * (itemCount - 1));
-          double dynamicHeightLimit = 678.6;
+          double dynamicHeightLimit = 678.6 - 88;
 
           if (resultData == null || resultData.pets == null || resultData.pets!.isEmpty) {
             return const SizedBox.shrink();
@@ -92,6 +93,11 @@ class _PetSearchResultListState extends State<PetSearchResultList> {
 
           return Column(
             children: [
+
+              const PetTagInfoCard(),
+
+              const SizedBox( height: 20.0, ),
+
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.benekBlack,

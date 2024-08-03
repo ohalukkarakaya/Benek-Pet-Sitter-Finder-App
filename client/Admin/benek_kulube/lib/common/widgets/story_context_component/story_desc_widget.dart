@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/common/widgets/story_context_component/tagged_pet_button_widget.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_profile_image_model.dart';
 import 'package:flutter/widgets.dart';
@@ -53,12 +54,7 @@ class StoryDescWidget extends StatelessWidget {
               children: [
                 Text(
                   createdAt!,
-                  style: const TextStyle(
-                    color: AppColors.benekWhite,
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.w300,
-                    fontFamily: 'Qanelas',
-                  ),
+                  style: lightTextStyle( textColor: AppColors.benekWhite ),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),

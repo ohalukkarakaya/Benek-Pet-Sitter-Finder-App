@@ -1,6 +1,7 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/constants/benek_icons.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/presentation/shared/screens/user_search_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -56,7 +57,10 @@ class KulubeSearchBarButon extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text( BenekStringHelpers.locale('searchAUser'), style: const TextStyle( fontFamily: 'Qanelas' )),
+                    Text(
+                        BenekStringHelpers.locale('searchAUser'),
+                        style: planeTextStyle()
+                    ),
                     const Icon( BenekIcons.searchcircle, size: 20.0, ),
                   ],
                 ),

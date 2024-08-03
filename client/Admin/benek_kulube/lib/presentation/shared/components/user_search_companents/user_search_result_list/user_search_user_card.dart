@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/constants/benek_icons.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:flutter/material.dart';
@@ -111,18 +112,18 @@ class _KulubeUserCardState extends State<KulubeUserCard> {
                 Text(
                   "@${widget.resultData.userName!} | ",
                   style: TextStyle(
-                    fontFamily: 'Qanelas',
+                    fontFamily: defaultFontFamily(),
                     fontSize: 15.0,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: getFontWeight('medium'),
                     color: isHovering ? Colors.black : null
                   ),
                 ),
                 Text(
                   usersFullName,
                   style: TextStyle(
-                    fontFamily: 'Qanelas',
+                    fontFamily: defaultFontFamily(),
                     fontSize: 15.0,
-                    fontWeight: FontWeight.w300,
+                    fontWeight: getFontWeight('light'),
                     color: isHovering ? Colors.black : null
                   ),
                 ),
@@ -131,9 +132,9 @@ class _KulubeUserCardState extends State<KulubeUserCard> {
             subtitle: Text(
               widget.resultData.identity!.bio!,
               style: TextStyle(
-                fontFamily: 'Qanelas',
+                fontFamily: defaultFontFamily(),
                 fontSize: 12.0,
-                fontWeight: FontWeight.w400,
+                fontWeight: getFontWeight('regular'),
                 color: isHovering ? Colors.black : null
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_care_giver_career_model.dart';
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:flutter/material.dart';
@@ -40,11 +41,9 @@ class CareGiveListElement extends StatelessWidget {
                   children: [
                     Text(
                       BenekStringHelpers.locale('startDate'),
-                      style: const TextStyle(
-                        color: AppColors.benekWhite,
-                        fontSize: 8.0,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'Qanelas',
+                      style: regularTextStyle(
+                        textColor: AppColors.benekWhite,
+                        textFontSize: 8.0
                       ),
                     ),
 
@@ -52,12 +51,10 @@ class CareGiveListElement extends StatelessWidget {
 
                     Text(
                       BenekStringHelpers.getDateAsString( careGiveInfo.startDate! ),
-                      style: const TextStyle(
-                        color: AppColors.benekWhite,
-                        fontSize: 8.0,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Qanelas',
-                      ),
+                      style: semiBoldTextStyle(
+                          textColor: AppColors.benekWhite,
+                          textFontSize: 8.0
+                        ),
                     )
                   ],
                 ),
@@ -68,11 +65,9 @@ class CareGiveListElement extends StatelessWidget {
                   children: [
                     Text(
                       BenekStringHelpers.locale('endDate'),
-                      style: const TextStyle(
-                        color: AppColors.benekWhite,
-                        fontSize: 8.0,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'Qanelas',
+                      style: regularTextStyle(
+                        textColor: AppColors.benekWhite,
+                        textFontSize: 8.0
                       ),
                     ),
 
@@ -80,11 +75,9 @@ class CareGiveListElement extends StatelessWidget {
 
                     Text(
                       BenekStringHelpers.getDateAsString( careGiveInfo.endDate! ),
-                      style: const TextStyle(
-                        color: AppColors.benekWhite,
-                        fontSize: 8.0,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Qanelas',
+                      style: semiBoldTextStyle(
+                        textColor: AppColors.benekWhite,
+                        textFontSize: 8.0
                       ),
                     )
                   ],
@@ -97,11 +90,9 @@ class CareGiveListElement extends StatelessWidget {
 
         Text(
           careGiveInfo.price! == 'Free' ? BenekStringHelpers.locale('volunteer') : careGiveInfo.price!,
-          style: const TextStyle(
-            color: AppColors.benekWhite,
-            fontSize: 12.0,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Qanelas',
+          style: semiBoldTextStyle(
+            textColor: AppColors.benekWhite,
+            textFontSize: 12.0
           ),
         )
       ],

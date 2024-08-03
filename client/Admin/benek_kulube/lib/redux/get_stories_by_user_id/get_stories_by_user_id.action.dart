@@ -28,7 +28,6 @@ ThunkAction<AppState> getStoriesByUserIdRequestAction( String? userId ) {
       await store.dispatch(GetStoriesByUserIdRequestAction(_stories));
     } on ApiException catch (e) {
       log('ERROR: getStoriesByUserId - $e');
-      // await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };
 }

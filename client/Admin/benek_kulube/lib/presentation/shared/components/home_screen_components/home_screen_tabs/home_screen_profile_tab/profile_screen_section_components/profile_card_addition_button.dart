@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/material.dart';
 
@@ -33,12 +34,7 @@ class _ProfileCardAdditionButtonState extends State<ProfileCardAdditionButton> {
         position: ElTooltipPosition.bottomCenter,
         content:  Text(
             widget.hoveringText,
-            style: const TextStyle(
-                color: AppColors.benekWhite,
-                fontSize: 12.0,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Qanelas'
-            )
+            style: mediumTextStyle( textColor: AppColors.benekWhite ),
         ),
         controller: _tooltipController,
         child: MouseRegion(

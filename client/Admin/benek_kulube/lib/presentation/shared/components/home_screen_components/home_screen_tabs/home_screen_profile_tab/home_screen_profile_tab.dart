@@ -1,8 +1,8 @@
 import 'dart:developer';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
-import 'package:benek_kulube/common/widgets/benek_message_box_widget/benek_message_box_triangle_widget.dart';
 import 'package:benek_kulube/presentation/features/image_video_helpers/image_video_helpers.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/care_give_career_preview_widget/care_give_preview_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_preview_widget.dart';
@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
+import '../../../../../../common/utils/benek_toast_helper.dart';
 import '../../../../../../common/widgets/benek_message_box_widget/benek_message_box_widget.dart';
 import '../../../../../../data/models/story_models/story_model.dart';
 import '../../../../../../data/models/user_profile_models/user_info_model.dart';
@@ -78,10 +79,24 @@ class _ProfileTabState extends State<ProfileTab> {
     );
   }
 
+
   Future<void> createStoryPageBuilderFunction() async {
     // choose file
     final String? directoryPath = await ImageVideoHelpers.pickFile(['jpg', 'jpeg', 'mp4', 'mov', 'avi']);
     if( directoryPath == null ){
+      return;
+    }
+
+    final File file = File(directoryPath);
+
+    if (! await file.exists()) {
+      // Dosya yok
+      BenekToastHelper.showErrorToast(
+          BenekStringHelpers.locale('invalidPath'),
+          BenekStringHelpers.locale('invalidPathDesc'),
+          context
+      );
+
       return;
     }
 
@@ -134,8 +149,10 @@ class _ProfileTabState extends State<ProfileTab> {
                       child: KulubeStoriesBoard(
                         isUsersProfile: store.state.userInfo?.userId == selectedUserInfo.userId,
                         onTapPageBuilder: (dynamic Function() selectStoryFunction, List<StoryModel>? stories, int index) async {
+                          bool isUsersProfile = store.state.userInfo?.userId == selectedUserInfo.userId;
+                          int indx = isUsersProfile && stories != null ? index - 1 : index;
 
-                          if( stories?[index] != null ){
+                          if( stories?[indx] != null ){
                             await selectStoryFunction();
                           }
 
