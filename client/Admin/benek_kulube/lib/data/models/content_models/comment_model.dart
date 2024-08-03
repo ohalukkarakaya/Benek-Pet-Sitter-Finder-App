@@ -19,6 +19,7 @@ class CommentModel {
   List<String>? likes;
   int? likeCount;
   int? replyCount;
+  List<UserInfo>? lastThreeRepliedUsers;
 
   CommentModel({
     this.id,
@@ -32,6 +33,7 @@ class CommentModel {
     this.likes,
     this.likeCount = 0,
     this.replyCount = 0,
+    this.lastThreeRepliedUsers,
   });
 
   CommentModel.fromJson(Map<String, dynamic> json) {
@@ -69,6 +71,13 @@ class CommentModel {
       user = UserInfo.fromJson(json['user']);
     } else if (json['userId'] != null) {
       _loadUser(json['userId']);
+    }
+
+    if (json['lastThreeRepliedUsers'] != null && json['lastThreeRepliedUsers'].isNotEmpty) {
+      lastThreeRepliedUsers = <UserInfo>[];
+      json['lastThreeRepliedUser'].forEach((v) {
+        lastThreeRepliedUsers!.add(UserInfo.fromJson(v));
+      });
     }
   }
 

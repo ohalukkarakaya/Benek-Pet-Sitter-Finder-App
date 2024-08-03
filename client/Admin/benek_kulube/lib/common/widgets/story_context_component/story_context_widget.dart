@@ -29,31 +29,46 @@ class _StoryContextWidgetState extends State<StoryContextWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Story description
-        StoryDescWidget(
-          profileImg: widget.story.user?.profileImg,
-          desc: widget.story.desc,
-          about: widget.story.about,
-          createdAt: BenekStringHelpers.getDateAsString(widget.story.createdAt!),
-        ),
+        Expanded(
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              scrollbars: false,
+              overscroll: false,
+              physics: const BouncingScrollPhysics(),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Story description
+                  StoryDescWidget(
+                    profileImg: widget.story.user?.profileImg,
+                    desc: widget.story.desc,
+                    about: widget.story.about,
+                    createdAt: BenekStringHelpers.getDateAsString(widget.story.createdAt!),
+                  ),
 
-        const SizedBox(height: 20.0),
-        // like info
-        StoryLikeInfoCardWidget(
-            storyId: widget.story.storyId!,
-            closeFunction: widget.closeFunction,
-        ),
+                  const SizedBox(height: 20.0),
+                  // like info
+                  StoryLikeInfoCardWidget(
+                      storyId: widget.story.storyId!,
+                      closeFunction: widget.closeFunction,
+                  ),
 
-        const SizedBox(height: 20.0),
-        // Story context
-        CommentsComponent(
-          selectedStoryId: widget.story.storyId!,
-          isReply: selectedComment != null,
-          selectCommentFunction: ( CommentModel comment) {
-            setState(() {
-              selectedComment = comment;
-            });
-          },
+                  const SizedBox(height: 20.0),
+                  // Story context
+                  CommentsComponent(
+                    selectedStoryId: widget.story.storyId!,
+                    isReply: selectedComment != null,
+                    selectCommentFunction: ( CommentModel comment) {
+                      setState(() {
+                        selectedComment = comment;
+                      });
+                    },
+                  ),
+                ]
+              ),
+            ),
+          ),
         ),
 
         const SizedBox(height: 20.0),
@@ -62,7 +77,7 @@ class _StoryContextWidgetState extends State<StoryContextWidget> {
           storyId: widget.story.storyId!,
           selectedCommentId: selectedComment?.id,
         ),
-      ]
+      ],
     );
   }
 }

@@ -137,9 +137,23 @@ const getStoryByUserIdController = async ( req, res ) => {
             const lastComment = storyObject.comments.pop();
 
             if( lastComment ){
+                let lastThreeRepliedUsers = [];
+                if( lastComment.replies !== null && lastComment.replies.length > 0 ){
+                    const lastThreeReplyLength = lastComment.replies.length > 3 ? 3 : lastComment.replies.length;
+                    for( let i = 0; i < lastThreeReplyLength; i++ ){
+                        if( lastComment.replies[ i ] ){
+                            const repliedUser = await User.findById( commentObject.replies[ i ].userId.toString() );
+                            const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
+
+                            lastThreeRepliedUsers.push( repliedUserInfo );
+                        }
+                    }
+                }
+
                 delete lastComment.replies;
                 delete lastComment.replies;
 
+                lastComment.lastThreeRepliedUsers = lastThreeRepliedUsers;
                 storyObject.lastComment = lastComment;
             }
             

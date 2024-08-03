@@ -1,11 +1,14 @@
+import 'dart:developer';
+
+import 'package:benek_kulube/common/widgets/story_context_component/comments_component/comment_loading_element.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import 'package:benek_kulube/store/app_state.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../../data/models/content_models/comment_model.dart';
-import '../../benek_custom_scroll_list_widget.dart';
 import 'comment_card.dart';
 
 class CommentsList extends StatefulWidget {
@@ -17,7 +20,7 @@ class CommentsList extends StatefulWidget {
     super.key,
     required this.totalCommentCount,
     this.commentList,
-    this.isCommentList = false
+    this.isCommentList = false,
   });
 
   @override
@@ -25,86 +28,68 @@ class CommentsList extends StatefulWidget {
 }
 
 class _CommentsListState extends State<CommentsList> {
-  int revealAnimationLastIndex = -1; //index of last element which done its animation
   bool shoudSendPaginationRequest = false; //pagination request controlling state
   bool isWaitingForAsyncRequest = false; //we make it true after we send request and we dont want to send new one because it is gonna be duplicate
 
   void checkIfPaginationNeeded(Store<AppState> store, int? index) {
-    if (
-    _isPaginationNeeded(store, index)
-        && !isWaitingForAsyncRequest
-    ){
-      // We could send request directly in here but if we do, we gonna need
-      // to call requestNextPageIfNeeded function in every where so its better
-      // to send one request at main builder and control it by
-      // shoudSendPaginationRequest state.
+    if (_isPaginationNeeded(store, index) && !isWaitingForAsyncRequest) {
       setState(() {
         shoudSendPaginationRequest = true;
       });
     }
   }
 
-  bool _isPaginationNeeded( Store<AppState> store, int? index ){
+  bool _isPaginationNeeded(Store<AppState> store, int? index) {
     return (
-        (
-            // we dont pass index data if we call this condition in main builder
-            // not in visibility detector.
-            index != null
-            && index == widget.commentList!.length - 3
-        )
-    )
-        // if there is data waits for us on server :)
-        && widget.totalCommentCount > widget.commentList!.length;
+        index != null && index == widget.commentList!.length - 3
+    ) && widget.totalCommentCount > widget.commentList!.length;
   }
 
-  void requestNextPageIfNeeded( Store<AppState> store ){
+  void requestNextPageIfNeeded(Store<AppState> store) {
     if (shoudSendPaginationRequest) {
-      // close states so it's not gonna send same request multiple time
       setState(() {
         shoudSendPaginationRequest = false;
         isWaitingForAsyncRequest = true;
       });
 
       // Send Request
-      getRecomendedUsersNextPageRequest(
-        () {
-          // Function wich gonna be called after request done
-          setState(() {
-            isWaitingForAsyncRequest = false;
-          });
-        },
-        // Pass store data
-        store
-      );
+      getRecomendedUsersNextPageRequest(() {
+        setState(() {
+          isWaitingForAsyncRequest = false;
+        });
+      }, store);
     }
   }
 
   Future<void> getRecomendedUsersNextPageRequest(
-      Function? callBackAfterRequestDone,
-      Store<AppState> store
-      ) async {
-    if(
-        widget.isCommentList
-        && widget.commentList != null
-    ){
+      Function? callBackAfterRequestDone, Store<AppState> store) async {
+    if (widget.isCommentList && widget.commentList != null) {
       // TO DO: send pagination request for comments
-    }else{
+    } else {
       // send pagination request for replies
     }
 
-    // TO DO: use after request function
-    if( callBackAfterRequestDone != null && mounted ){
+    if (callBackAfterRequestDone != null && mounted) {
       callBackAfterRequestDone();
     }
   }
 
-  Widget _buildCommentCard( int index ){
+  Widget _buildCommentCard(int index) {
     return CommentCardWidget(
       index: index,
-      indexOfLastRevealedItem: revealAnimationLastIndex,
-      comment: widget.isCommentList
-          ? widget.commentList![index]
-          : widget.commentList![index],
+      comment: widget.commentList![index],
+    );
+  }
+
+  Widget _buildVisibilityDetector(Widget child, int index) {
+    return VisibilityDetector(
+      key: Key(index.toString()),
+      onVisibilityChanged: (visibilityInfo) {
+        if (mounted) {
+          checkIfPaginationNeeded(StoreProvider.of<AppState>(context), index);
+        }
+      },
+      child: child,
     );
   }
 
@@ -113,14 +98,25 @@ class _CommentsListState extends State<CommentsList> {
     Store<AppState> store = StoreProvider.of<AppState>(context);
 
     checkIfPaginationNeeded(store, null);
-    requestNextPageIfNeeded( store );
+    requestNextPageIfNeeded(store);
 
-    return BenekCustomScrollListWidget(
-      itemDataList: widget.commentList,
-      child: (index) => _buildCommentCard(index),
-      onVisibilityChangedCB: (visibilityInfo, index){
-        checkIfPaginationNeeded(store, index);
-      },
+    return Column(
+      children: List.generate(
+          widget.commentList != null
+             ? widget.commentList!.length
+             : widget.totalCommentCount > 6
+                 ? 6
+                 : widget.totalCommentCount,
+          (index) {
+            return widget.commentList != null
+              && widget.commentList?[ index ] != null
+              ? _buildVisibilityDetector(
+                  _buildCommentCard(index),
+                  index,
+                )
+              : const CommentLoadingElement();
+          }
+      ),
     );
   }
 }

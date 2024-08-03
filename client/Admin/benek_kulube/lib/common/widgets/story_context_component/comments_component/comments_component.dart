@@ -1,10 +1,10 @@
+import 'dart:developer';
+
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/data/models/content_models/comment_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-// ignore: depend_on_referenced_packages
-import 'package:redux/redux.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import '../../../../data/models/story_models/story_model.dart';
 import '../../../utils/styles.text.dart';
@@ -32,30 +32,29 @@ class CommentsComponent extends StatelessWidget {
         );
       },
       builder: (context, story) {
-        return Expanded(
-          child: Container(
-            decoration: const BoxDecoration(
-              color: AppColors.benekBlack,
-              borderRadius: BorderRadius.all(Radius.circular(6.0)),
-            ),
-            child: ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-              child: story != null
-                  && story.comments != null
-                  && story.comments!.isNotEmpty
-                  ? CommentsList(
-                totalCommentCount: story.commentCount ?? 0,
-                commentList: story.comments,
-                isCommentList: !isReply,
-              )
-                  : Center(
-                child: Text(
-                  BenekStringHelpers.locale('commentEmptyState'),
-                  style: regularTextStyle(textColor: AppColors.benekWhite),
-                ),
-              ),
-            ),
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.benekBlack,
+            borderRadius: BorderRadius.all(Radius.circular(6.0)),
           ),
+          padding: const EdgeInsets.all(10.0),
+          child: story != null
+              && (story.commentCount ?? 0) > 0
+              && (story.comments == null || story.comments!.isNotEmpty)
+                ? CommentsList(
+                  totalCommentCount: story.commentCount ?? 0,
+                  commentList: story.comments,
+                  isCommentList: !isReply,
+                )
+                : Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 114.0),
+                  child: Center(
+                    child: Text(
+                      BenekStringHelpers.locale('commentEmptyState'),
+                      style: regularTextStyle(textColor: AppColors.benekWhite),
+                    ),
+                  ),
+                ),
         );
       },
     );

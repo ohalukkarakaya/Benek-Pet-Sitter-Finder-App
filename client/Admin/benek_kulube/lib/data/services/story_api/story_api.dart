@@ -43,8 +43,6 @@ class StoryApi {
         return apiClient.deserialize( '{"stories": []}', 'List<StoryModel>' ) as List<StoryModel>;
       }else if( response.body != null ){
         return apiClient.deserialize( response.body, 'List<StoryModel>' ) as List<StoryModel>;
-      }else{
-        await AuthUtils.killUserSessionAndRestartApp( store );
       }
     }catch( err ){
       log('ERROR: getStoriesByUserIdRequest - $err');

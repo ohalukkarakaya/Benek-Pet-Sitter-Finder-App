@@ -51,9 +51,7 @@ class StoryModel {
         : null;
     comments = json['comments'] != null
         ? List<CommentModel>.from(json['comments'].map((x) => CommentModel.fromJson(x)))
-        : json['lastComment'] != null
-          ? [CommentModel.fromJson(json['lastComment'])]
-          : null;
+        : null;
     commentCount = json['commentCount'];
   }
 
@@ -136,5 +134,9 @@ class StoryModel {
     didUserLiked = !didUserLiked!;
 
     likeCount = didUserLiked! ? likeCount! + 1 : likeCount! - 1;
+  }
+
+  void resetComments(){
+    comments = null;
   }
 }

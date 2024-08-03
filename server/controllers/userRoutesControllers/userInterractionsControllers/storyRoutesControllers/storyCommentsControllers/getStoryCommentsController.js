@@ -96,6 +96,21 @@ const getStoryCommentsController = async ( req, res ) => {
                     lastReply.likeCount = lastReply.likes.length;
                     delete lastReply.likes;
                 }
+
+                let lastThreeRepliedUsers = [];
+                if( commentObject.replies !== null && commentObject.replies.length > 0 ){
+                    const lastThreeReplyLength = commentObject.replies.length > 3 ? 3 : commentObject.replies.length;
+                    for( let i = 0; i < lastThreeReplyLength; i++ ){
+                        if( commentObject.replies[ i ] ){
+                            const repliedUser = await User.findById( commentObject.replies[ i ].userId.toString() );
+                            const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
+
+                            lastThreeRepliedUsers.push( repliedUserInfo );
+                        }
+                    }
+                }
+
+                commentObject.lastThreeRepliedUsers = lastThreeRepliedUsers;
                 
                 
                 commentObject.lastReply = lastReply;
