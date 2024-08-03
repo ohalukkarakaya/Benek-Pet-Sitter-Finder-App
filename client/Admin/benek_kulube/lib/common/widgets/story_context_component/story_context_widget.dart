@@ -4,9 +4,11 @@ import 'package:benek_kulube/common/widgets/story_context_component/story_like_i
 import 'package:benek_kulube/data/models/story_models/story_model.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../../data/models/content_models/comment_model.dart';
 import 'comments_component/comments_component.dart';
+import 'comments_component/leave_comment_component.dart';
 
-class StoryContextWidget extends StatelessWidget {
+class StoryContextWidget extends StatefulWidget {
   final StoryModel story;
   final Function()? closeFunction;
 
@@ -17,27 +19,49 @@ class StoryContextWidget extends StatelessWidget {
   });
 
   @override
+  State<StoryContextWidget> createState() => _StoryContextWidgetState();
+}
+
+class _StoryContextWidgetState extends State<StoryContextWidget> {
+  CommentModel? selectedComment;
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         // Story description
         StoryDescWidget(
-          profileImg: story.user?.profileImg,
-          desc: story.desc,
-          about: story.about,
-          createdAt: BenekStringHelpers.getDateAsString(story.createdAt!),
+          profileImg: widget.story.user?.profileImg,
+          desc: widget.story.desc,
+          about: widget.story.about,
+          createdAt: BenekStringHelpers.getDateAsString(widget.story.createdAt!),
         ),
 
         const SizedBox(height: 20.0),
         // like info
         StoryLikeInfoCardWidget(
-            storyId: story.storyId!,
-            closeFunction: closeFunction,
+            storyId: widget.story.storyId!,
+            closeFunction: widget.closeFunction,
         ),
 
         const SizedBox(height: 20.0),
         // Story context
-        CommentsComponent( selectedStoryId: story.storyId!,),
+        CommentsComponent(
+          selectedStoryId: widget.story.storyId!,
+          isReply: selectedComment != null,
+          selectCommentFunction: ( CommentModel comment) {
+            setState(() {
+              selectedComment = comment;
+            });
+          },
+        ),
+
+        const SizedBox(height: 20.0),
+
+        LeaveCommentComponent(
+          storyId: widget.story.storyId!,
+          selectedCommentId: selectedComment?.id,
+        ),
       ]
     );
   }

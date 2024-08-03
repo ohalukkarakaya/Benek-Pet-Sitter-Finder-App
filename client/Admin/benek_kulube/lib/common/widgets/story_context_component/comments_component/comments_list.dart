@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
-import 'package:benek_kulube/store/actions/app_actions.dart';
 import 'package:benek_kulube/store/app_state.dart';
 
 import '../../../../data/models/content_models/comment_model.dart';

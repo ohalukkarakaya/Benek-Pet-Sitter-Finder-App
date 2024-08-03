@@ -85,6 +85,7 @@ class _StoryElementState extends State<StoryElement> {
                         colors: [
                           AppColors.benekBlack.withOpacity(1),
                           !isHovered
+                          || widget.story == null
                             ? AppColors.benekBlack.withOpacity(0.0)
                             : AppColors.benekBlack.withOpacity(0.5),
                         ],

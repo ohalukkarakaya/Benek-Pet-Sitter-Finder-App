@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../common/constants/app_colors.dart';
 import '../../../../common/utils/color_to_hex_converter.dart';
 import 'benek_process_indicator_steps.dart';
 
@@ -13,7 +14,7 @@ class BenekProcessIndicator extends StatefulWidget {
 
   const BenekProcessIndicator({
     Key? key,
-    this.color = Colors.white,
+    this.color = AppColors.benekWhite,
     this.width = 30,
     this.height = 30,
   }) : super(key: key);

@@ -74,7 +74,7 @@ class _StoryLikeInfoCardWidgetState extends State<StoryLikeInfoCardWidget> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 14.0),
                 decoration: BoxDecoration(
-                  color: !isIconHovered ? AppColors.benekBlack : AppColors.benekLightBlue,
+                  color: !isIconHovered ? AppColors.benekBlack : AppColors.benekRed,
                   borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
                 ),
                 child: IconButton(
@@ -82,10 +82,10 @@ class _StoryLikeInfoCardWidgetState extends State<StoryLikeInfoCardWidget> {
                       await store.dispatch(deleteStoryByStoryIdRequestAction(widget.storyId));
                       widget.closeFunction?.call();
                     },
-                    icon: Icon(
+                    icon: const Icon(
                       BenekIcons.trash,
-                      color: !isIconHovered ? AppColors.benekWhite : AppColors.benekRed,
-                      size: 20,
+                      color: AppColors.benekWhite,
+                      size: 18,
 
                     )
                 ),

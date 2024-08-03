@@ -193,8 +193,47 @@ class StoryApi {
     return false;
   }
 
+  Future<String?> postCommentOrReply(String storyId, String desc, String? commentId) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      String path = '/api/user/interractions/story/comments/$storyId';
+
+      Map<String, dynamic> postBody = {
+        'desc': desc
+      };
+
+      if( commentId != null ){
+        postBody['commentId'] = commentId;
+      }
+
+      // Query Params
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = [];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'POST', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      }else if(response.statusCode == 404){
+        return null;
+        // ignore: unnecessary_null_comparison
+      }else if( response.body != null ){
+        var decodedJson = json.decode(response.body);
+        return decodedJson['commentId'] ?? decodedJson['replyId'];
+      }
+    }catch( err ){
+      log('ERROR: postCommentOrReply - $err');
+    }
+
+    return null;
+  }
+
   Future<Map<String, dynamic>?> getCommentsByStoryId(String storyId, String? lastElementId, int? limit ) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try {
       await AuthUtils.getAccessToken();
 
