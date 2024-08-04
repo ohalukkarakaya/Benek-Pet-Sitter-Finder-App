@@ -29,3 +29,6 @@ export '../../redux/pet_search/pet_search_request.action.dart';
 export '../../redux/post_story/post_story.action.dart';
 export '../../redux/delete_stories_by_id/delete_stories_by_id.action.dart';
 export '../../redux/post_story_comment_or_reply/post_story_comment_or_reply.action.dart';
+export '../../redux/put_edit_story_comment_or_reply/put_edit_story_comment_or_reply.action.dart';
+export '../../redux/like_story_comment/like_story_comment.action.dart';
+export '../../redux/delete_story_comment_or_reply/delete_story_comment_or_reply.action.dart';

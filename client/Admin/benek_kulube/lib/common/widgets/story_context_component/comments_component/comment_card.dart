@@ -1,6 +1,9 @@
 import 'dart:developer';
 
 // ignore: depend_on_referenced_packages
+import 'package:benek_kulube/common/widgets/approve_screen.dart';
+import 'package:benek_kulube/common/widgets/story_context_component/comments_component/edit_comment_components/edit_comment_screen.dart';
+import 'package:benek_kulube/redux/like_story_comment/like_story_comment.action.dart';
 import 'package:redux/redux.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/common/utils/styles.text.dart';
@@ -13,6 +16,7 @@ import 'package:benek_kulube/store/app_state.dart';
 import '../../../../data/models/content_models/comment_model.dart';
 import '../../../../data/models/story_models/story_model.dart';
 import '../../../../presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
+import '../../../../redux/delete_story_comment_or_reply/delete_story_comment_or_reply.action.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/benek_icons.dart';
 import 'last_three_comment_replier_profile_stack_widget.dart';
@@ -69,6 +73,8 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
     _previousComment = currentComment;
   }
 
+  bool idleUpdate = false;
+
   int _getCommentCount() {
     final store = StoreProvider.of<AppState>(context);
     final story = store.state.storiesToDisplay?.firstWhere(
@@ -86,6 +92,17 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
         textHeight = size?.height;
       });
     });
+  }
+
+  Future<bool?> onCommentLikeButtonTapped(bool didLiked) async {
+    Store<AppState> store = StoreProvider.of<AppState>(context);
+    await store.dispatch(likeStoryCommentOrReplyRequestAction(widget.storyId, widget.commentId, null));
+
+    setState(() {
+      idleUpdate = !idleUpdate;
+    });
+
+    return !didLiked;
   }
 
   @override
@@ -113,6 +130,8 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
       builder: (context, comment) {
         Store<AppState> store = StoreProvider.of<AppState>(context);
         bool isCommentBelongsToUser = comment?.user?.userId == store.state.userInfo?.userId;
+
+        bool _didLiked = comment?.didUserLiked ?? false;
 
         return comment != null
             ? Padding(
@@ -150,7 +169,7 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                                     borderWidth: 2.0,
                                   ),
                                   SizedBox(
-                                    height: textHeight != null ? textHeight! + 20 : 5,
+                                    height: textHeight != null ? textHeight! + 40 : 60,
                                   ),
                                   comment.lastThreeRepliedUsers != null &&
                                       comment.lastThreeRepliedUsers!.isNotEmpty
@@ -214,78 +233,124 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                LikeButton(
-                                  size: 15.0,
-                                  isLiked: false,
-                                  likeBuilder: (isLiked) {
-                                    return const Center(
-                                      child: Icon(
-                                        Icons.chat_bubble_outline,
-                                        color: AppColors.benekWhite,
-                                        size: 14,
-                                      ),
-                                    );
-                                  },
+                                IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: (){
+
+                                    },
+                                    icon: const Icon(
+                                      Icons.chat_bubble_outline,
+                                      color: AppColors.benekWhite,
+                                      size: 14,
+                                    ),
                                 ),
                                 const SizedBox(width: 15.0),
-                                LikeButton(
-                                  size: 15.0,
-                                  isLiked: false,
-                                  likeBuilder: (isLiked) {
-                                    return Center(
-                                      child: Icon(
-                                        isLiked ? Icons.favorite : Icons.favorite_border,
-                                        color: isLiked ? AppColors.benekRed : AppColors.benekWhite,
-                                        size: 15,
-                                      ),
-                                    );
-                                  },
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: LikeButton(
+                                    size: 15.0,
+                                    isLiked: _didLiked,
+                                    onTap: onCommentLikeButtonTapped,
+                                    likeBuilder: (isLiked) {
+                                      return Center(
+                                        child: Icon(
+                                          isLiked ? Icons.favorite : Icons.favorite_border,
+                                          color: isLiked ? AppColors.benekRed : AppColors.benekWhite,
+                                          size: 15,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                                 SizedBox(width: isCommentBelongsToUser ? 30.0 : 0.0),
                                 isCommentBelongsToUser
-                                    ? LikeButton(
-                                      size: 17.0,
-                                      isLiked: false,
-                                      likeBuilder: (isLiked) {
-                                        return Center(
-                                          child: Icon(
-                                            isLiked
-                                                ? Icons.edit_note_outlined
-                                                : Icons.edit_note_outlined,
-                                            color: AppColors.benekWhite,
-                                            size: 16,
+                                    ? IconButton(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: (){
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            opaque: false,
+                                            barrierDismissible: false,
+                                            pageBuilder: (context, _, __) => EditCommentScreen(
+                                                storyId: widget.storyId,
+                                                commentId: widget.commentId,
+                                                textToEdit: comment.comment!,
+                                            ),
                                           ),
                                         );
                                       },
+                                      icon: const Icon(
+                                        Icons.edit_note_outlined,
+                                        color: AppColors.benekWhite,
+                                        size: 16,
+                                      ),
                                     )
                                     : const SizedBox(),
 
                                 SizedBox(width: isCommentBelongsToUser ? 15.0 : 0.0),
 
                                 isCommentBelongsToUser
-                                    ? LikeButton(
-                                  size: 15.0,
-                                  isLiked: false,
-                                  likeBuilder: (isLiked) {
-                                    return const Center(
-                                      child: Icon(
-                                        Icons.delete_outline,
-                                        color: AppColors.benekWhite,
-                                        size: 15,
-                                      ),
-                                    );
-                                  },
-                                )
+                                    ? IconButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () async {
+                                            bool? isApproved = await Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                opaque: false,
+                                                barrierDismissible: false,
+                                                pageBuilder: (context, _, __) => ApproveScreen(
+                                                  title: BenekStringHelpers.locale('approveCommentDelete'),
+                                                ),
+                                              ),
+                                            );
+
+                                            if(isApproved == null || !isApproved){
+                                              return;
+                                            }
+
+                                            Store<AppState> store = StoreProvider.of<AppState>(context);
+                                            await store.dispatch(deleteStoryCommentOrReplyRequestAction(widget.storyId, widget.commentId, null));
+                                        },
+                                        icon: const Icon(
+                                          Icons.delete_outline,
+                                          color: AppColors.benekWhite,
+                                          size: 15,
+                                        ),
+                                    )
                                     : const SizedBox(),
                               ],
                             ),
                             const SizedBox(height: 10.0),
-                            Text(
-                              '${comment.replyCount} ${BenekStringHelpers.locale('reply')}  |  ${comment.likeCount} ${BenekStringHelpers.locale('like')}',
-                              style: regularTextWithoutColorStyle().copyWith(
-                                color: AppColors.benekGrey,
-                                fontSize: 12.0,
-                              ),
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    log('Reply to comment');
+                                  },
+                                  child: Text(
+                                    '${comment.replyCount} ${BenekStringHelpers.locale('reply')}',
+                                    style: regularTextWithoutColorStyle().copyWith(
+                                      color: AppColors.benekGrey,
+                                      fontSize: 12.0,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  '  |  ',
+                                  style: regularTextWithoutColorStyle().copyWith(
+                                    color: AppColors.benekGrey,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                                Text(
+                                  '${comment.likeCount} ${BenekStringHelpers.locale('like')}',
+                                  style: regularTextWithoutColorStyle().copyWith(
+                                    color: AppColors.benekGrey,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

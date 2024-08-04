@@ -10,6 +10,7 @@ import '../user_profile_models/user_info_model.dart';
 class CommentModel {
   String? id;
   bool? isLastItem;
+  bool? didUserLiked;
   bool? isReply;
   UserInfo? user;
   String? comment;
@@ -25,6 +26,7 @@ class CommentModel {
   CommentModel({
     this.id,
     this.isLastItem = false,
+    this.didUserLiked = false,
     this.isReply = false,
     this.user,
     this.comment,
@@ -41,6 +43,7 @@ class CommentModel {
   CommentModel.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
     isLastItem = false;
+    didUserLiked = json['didUserLiked'] ?? false;
     isReply = json['reply'] != null;
     comment = json['comment'];
     reply = json['reply'];
@@ -160,5 +163,31 @@ class CommentModel {
 
   void setAsLastItem( bool isLastItemResponse ){
     isLastItem = isLastItemResponse;
+  }
+
+  void editCommentOrReply( bool isReply, String newDesc ){
+    if( isReply ){
+      reply = newDesc;
+    }else{
+      comment = newDesc;
+    }
+  }
+
+  void likeCommentOrReply( String? replyId ) {
+    bool isReply = replyId != null;
+    didUserLiked = isReply
+        ? replies!.firstWhere((element) => element.id == replyId).didUserLiked ?? false
+        : didUserLiked ?? false;
+    if( isReply ) {
+      replies!.firstWhere(
+          (element) =>
+              element.id == replyId
+      ).likeCommentOrReply( null );
+    }else{
+      didUserLiked = !didUserLiked!;
+      likeCount = didUserLiked!
+          ? likeCount! + 1
+          : likeCount! - 1;
+    }
   }
 }

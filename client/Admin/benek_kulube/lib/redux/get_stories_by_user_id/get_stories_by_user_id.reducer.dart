@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import '../../data/models/content_models/comment_model.dart';
 import '../../data/models/user_profile_models/user_info_model.dart';
 import '../../store/actions/app_actions.dart';
 import '../../data/models/story_models/story_model.dart';
@@ -39,6 +40,12 @@ List<StoryModel>? getStoriesByUserIdRequestReducer( List<StoryModel>? stories, d
     stories[index].commentCount = stories[index].commentCount! + 1;
 
     return stories;
+  }else if( action is PutEditStoryCommentOrReplyRequestAction ){
+    int index = stories!.indexWhere((element) => element.storyId == action.storyId);
+    stories[index].editCommentOrReply( action.newDesc!, action.commentId!, action.replyId );
+
+    return stories;
+
   }else if( action is GetStoryCommentsByStoryIdRequestAction ){
     int index = stories!.indexWhere((element) => element.storyId == action.data?['storyId']);
 
@@ -48,6 +55,20 @@ List<StoryModel>? getStoriesByUserIdRequestReducer( List<StoryModel>? stories, d
     }else{
       stories[index].insertComments( action.data?['list'] );
     }
+
+    return stories;
+  }else if( action is LikeStoryCommentOrReplyRequestAction ){
+    int index = stories!.indexWhere((element) => element.storyId == action.storyId);
+
+    stories[index].comments!
+      .firstWhere((element) => element.id == action.commentId)
+      .likeCommentOrReply( action.replyId );
+
+    return stories;
+  }else if( action is DeleteStoryCommentOrReplyRequestAction ){
+    int index = stories!.indexWhere((element) => element.storyId == action.storyId);
+
+    stories[index].deleteCommentOrReply(action.commentId!, action.replyId);
 
     return stories;
   }

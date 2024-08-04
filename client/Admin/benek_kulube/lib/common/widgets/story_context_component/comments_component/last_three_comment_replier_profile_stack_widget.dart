@@ -2,14 +2,17 @@ import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/
 import 'package:flutter/widgets.dart';
 
 import '../../../../data/models/user_profile_models/user_info_model.dart';
+import '../../../constants/app_colors.dart';
 
 class LastThreeCommentReplierProfileStackWidget extends StatelessWidget {
   final double size;
   final List<UserInfo> users;
+  final Color? borderColor;
   const LastThreeCommentReplierProfileStackWidget({
     super.key,
     required this.size,
     required this.users,
+    this.borderColor = AppColors.benekWhite,
   });
 
   @override
@@ -28,6 +31,7 @@ class LastThreeCommentReplierProfileStackWidget extends StatelessWidget {
               width: size / 2,
               height: size / 2,
               borderWidth: 2.0,
+              bgColor: borderColor,
             )
           ),
 
@@ -41,6 +45,7 @@ class LastThreeCommentReplierProfileStackWidget extends StatelessWidget {
                   width: size / 2.3,
                   height: size / 2.3,
                   borderWidth: 1.5,
+                  bgColor: borderColor,
                 )
             )
             : const SizedBox(),
@@ -55,6 +60,7 @@ class LastThreeCommentReplierProfileStackWidget extends StatelessWidget {
                 width: size / 2.8,
                 height: size / 2.8,
                 borderWidth: 1.0,
+                bgColor: borderColor,
               )
           )
               : const SizedBox(),

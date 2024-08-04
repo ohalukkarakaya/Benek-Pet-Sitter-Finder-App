@@ -231,6 +231,47 @@ class StoryApi {
     return null;
   }
 
+  Future<String?> putEditCommentOrReply(String newDesc, String storyId, String commentId, String? replyId) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      String path = '/api/user/interractions/story/comments/edit/$storyId';
+
+      Map<String, dynamic> postBody = {
+        'desc': newDesc,
+        'commentId': commentId
+      };
+
+      if( replyId != null ){
+        postBody['replyId'] = replyId;
+      }
+
+      // Query Params
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = [];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      }else if(response.statusCode == 404){
+        return null;
+        // ignore: unnecessary_null_comparison
+      }else if( response.body != null && response.statusCode == 200 ){
+        return newDesc;
+      }
+
+      return null;
+    }catch( err ){
+      log('ERROR: putEditCommentOrReply - $err');
+    }
+    return null;
+  }
+
   Future<Map<String, dynamic>?> getCommentsByStoryId(String storyId, String? lastElementId, int? limit ) async {
     try {
       await AuthUtils.getAccessToken();
@@ -271,6 +312,81 @@ class StoryApi {
       }
     } catch (err) {
       log('ERROR: getCommentsByStoryId - $err');
+    }
+    return null;
+  }
+
+  Future<bool?> likeStoryCommentOrReplyRequest( String storyId, String commentId, String? replyId ) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      String path = '/api/user/interractions/story/comments/likeCommentOrReply';
+
+      Map<String, dynamic>? postBody = {
+        'storyId': storyId,
+        'commentId': commentId
+      };
+
+      if( replyId != null ){
+        postBody['replyId'] = replyId;
+      }
+
+      // Query Params
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> authNames = [];
+
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      }else if(response.statusCode == 404){
+        return null;
+        // ignore: unnecessary_null_comparison
+      }else if( response.body != null ){
+        return true;
+      }
+    }catch( err ){
+      log('ERROR: likeStoryCommentOrReplyRequest - $err');
+    }
+    return null;
+  }
+
+  Future<bool?> deleteStoryCommentOrReplyRequest( String storyId, String commentId, String? replyId ) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      String path = '/api/user/interractions/story/comments/$storyId';
+
+      Map<String, dynamic>? postBody = {
+        'commentId': commentId
+      };
+
+      if( replyId != null ){
+        postBody['replyId'] = replyId;
+      }
+
+      // Query Params
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> authNames = [];
+
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'DELETE', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      }else if(response.statusCode == 404){
+        return null;
+        // ignore: unnecessary_null_comparison
+      }else if( response.body != null && response.statusCode == 200 ){
+        return true;
+      }
+    }catch( err ){
+      log('ERROR: deleteStoryCommentOrReply - $err');
     }
     return null;
   }

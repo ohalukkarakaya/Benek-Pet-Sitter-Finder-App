@@ -100,6 +100,9 @@ const getStoryCommentsController = async (req, res) => {
                     }
                 }
 
+                let didUserLiked = commentObject.likes.includes(userId);
+                commentObject.didUserLiked = didUserLiked;
+
                 commentObject.lastThreeRepliedUsers = lastThreeRepliedUsers;
 
                 commentObject.lastReply = lastReply;

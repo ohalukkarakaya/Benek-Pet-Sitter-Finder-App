@@ -21,25 +21,25 @@ class ApproveScreen extends StatefulWidget {
 
 class _ApproveScreenState extends State<ApproveScreen> {
   bool didApprove = false;
-  late FocusNode _focusNode;
+  late FocusNode _focusNodeApproveCreen;
 
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode();
-    _focusNode.requestFocus();
+    _focusNodeApproveCreen = FocusNode();
+    _focusNodeApproveCreen.requestFocus();
   }
 
   @override
   void dispose() {
-    _focusNode.dispose();
+    _focusNodeApproveCreen.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return KeyboardListener(
-      focusNode: _focusNode,
+      focusNode: _focusNodeApproveCreen,
       onKeyEvent: (KeyEvent event) {
         if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
           Navigator.of(context).pop(didApprove);

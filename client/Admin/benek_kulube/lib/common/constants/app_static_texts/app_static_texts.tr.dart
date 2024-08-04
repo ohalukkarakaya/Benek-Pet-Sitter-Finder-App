@@ -98,5 +98,6 @@ class AppStaticTextsTr{
     'like': 'Beğeni',
     'reply': 'Yanıt',
     'approveStoryDelete': 'Anıyı silmek için kaydır...',
+    'approveCommentDelete': 'Yorumu silmek için kaydır...',
   };
 }

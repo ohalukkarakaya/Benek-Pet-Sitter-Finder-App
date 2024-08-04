@@ -155,4 +155,25 @@ class StoryModel {
   void resetComments(){
     comments = null;
   }
+
+  void editCommentOrReply(String newDesc, String commentId, String? replyId) {
+    bool isReply = replyId != null;
+
+    CommentModel editingObject = isReply
+        ? comments!.firstWhere((element) => element.id == commentId).replies!.firstWhere((element) => element.id == replyId)
+        : comments!.firstWhere((element) => element.id == commentId);
+
+    editingObject.editCommentOrReply(isReply, newDesc);
+  }
+
+  void deleteCommentOrReply( String commentId, String? replyId ){
+    CommentModel? comment = comments?.firstWhere((element) => element.id == commentId );
+    if( replyId != null ){
+      comment!.replies!.removeWhere((element) => element.id == replyId);
+      comment.replyCount = comment.replyCount ?? 1 - 1;
+    }else{
+      comments?.removeWhere((element) => element.id == commentId);
+      commentCount = commentCount! - 1;
+    }
+  }
 }

@@ -101,28 +101,37 @@ class _LeaveCommentComponentState extends State<LeaveCommentComponent> {
                   const SizedBox(width: 8),
 
                   Expanded(
-                    child: FocusScope(
-                      node: _focusScopeNode,
-                      child: TextFormField(
-                        focusNode: _textFocusNode,
-                        controller: _textController,
-                        maxLength: 200,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
-                        maxLines: null,
-                        keyboardType: TextInputType.multiline,
-                        cursorColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                        style: lightTextStyle( textColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite ),
-                        textAlignVertical: TextAlignVertical.top,
-                        decoration: InputDecoration(
-                          counterText: '',
-                          hintText: isReply
-                              ? BenekStringHelpers.locale('writeAReply')
-                              : BenekStringHelpers.locale('writeAComment'),
-                          hintStyle: isFocused ? lightTextStyle( textColor: AppColors.benekGrey ) : null,
-                          contentPadding: EdgeInsets.zero,
-                          border: InputBorder.none,
+                    child: SizedBox(
+                      height: 48.0,
+                      child: ScrollConfiguration(
+                        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: FocusScope(
+                            node: _focusScopeNode,
+                            child: TextFormField(
+                              focusNode: _textFocusNode,
+                              controller: _textController,
+                              maxLength: 200,
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+                              maxLines: null,
+                              keyboardType: TextInputType.multiline,
+                              cursorColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                              style: lightTextStyle( textColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite ),
+                              textAlignVertical: TextAlignVertical.top,
+                              decoration: InputDecoration(
+                                counterText: '',
+                                hintText: isReply
+                                    ? BenekStringHelpers.locale('writeAReply')
+                                    : BenekStringHelpers.locale('writeAComment'),
+                                hintStyle: isFocused ? lightTextStyle( textColor: AppColors.benekGrey ) : null,
+                                contentPadding: EdgeInsets.zero,
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),

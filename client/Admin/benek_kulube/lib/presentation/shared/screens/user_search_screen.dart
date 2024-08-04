@@ -99,7 +99,7 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
     }
 
     return BenekBluredModalBarier(
-      isDismissible: true,
+      isDismissible: false,
       onDismiss: () async {
         Navigator.pop(context);
       },

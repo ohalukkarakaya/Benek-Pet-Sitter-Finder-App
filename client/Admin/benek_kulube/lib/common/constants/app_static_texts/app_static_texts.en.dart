@@ -98,5 +98,6 @@ class AppStaticTextsEn{
     'like': 'Like',
     'reply': 'Reply',
     'approveStoryDelete': 'Slide to delete story...',
+    'approveCommentDelete': 'Slide to delete comment...',
   };
 }
