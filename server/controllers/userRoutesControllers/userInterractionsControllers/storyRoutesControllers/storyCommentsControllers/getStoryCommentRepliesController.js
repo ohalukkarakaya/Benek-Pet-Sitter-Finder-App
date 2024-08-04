@@ -46,8 +46,10 @@ const getStoryCommentRepliesController = async ( req, res ) => {
             });
         }
 
+        let reversedReplies = comment.replies.reverse();
         let skip = lastElementId !== 'null' ? comment.replies.findIndex( replyObject => replyObject._id.toString() === lastElementId ) + 1 : 0;
         let replies = [];
+
         if( skip === 0 ){
             const usersReplies = comment.replies.filter(
                 replyObject =>
@@ -56,38 +58,29 @@ const getStoryCommentRepliesController = async ( req, res ) => {
 
             limit = limit - usersReplies.length;
             if( usersReplies.length > 0 ){
-                replies = usersReplies;
+                replies.push(...usersReplies);
             }
         }
 
-        if( limit >= 0 ){
-            const replyList = comment.replies.reverse().filter(
+        if( limit > 0 ){
+            const replyList = reversedReplies.filter(
                 replyObject =>
                     replyObject.userId.toString() !== userId
             );
-            const startIndex = replyList.length - skip - 1;
-            const endIndex = startIndex + limit;
 
-            const limitedReplies = replyList.slice( startIndex, endIndex );
-
-            if( limitedReplies.length > 0 ){
-                replies.push( limitedReplies );
-            }
-            
+            const limitedReplies = commentList.slice(skip, skip + limit);
+            comments.push(...limitedReplies);
         }
 
         if( replies.length > 0 ){
             for( let replyObject of replies ){
                 const repliedUser = await User.findById( replyObject.userId.toString() );
                 const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
+
                 replyObject.user = repliedUserInfo;
                 delete replyObject.userId;
 
-                let firstFiveOfLikeLimit = 5;
-
-                if( replyObject.likes.length < 5 ){
-                    firstFiveOfLikeLimit = replyObject.likes.length;
-                }
+                let firstFiveOfLikeLimit = Math.min(replyObject.likes.length, 5);
 
                 replyObject.firstFiveLikedUser = [];
                 for( let i = 0; i < firstFiveOfLikeLimit; i++ ){
@@ -97,35 +90,35 @@ const getStoryCommentRepliesController = async ( req, res ) => {
                     replyObject.firstFiveLikedUser.push( likedUserInfo );
                 }
 
+                let diduserLiked = replyObject.likes.includes( userId );
+                replyObject.didUserLiked = diduserLiked;
+
                 replyObject.likeCount = replyObject.likes.length;
                 delete replyObject.likes;
             }
 
-            let usersReplies;
-            let otherReplies;
-            if( replies.length > 0 ){
-                usersReplies = replies.filter(
-                    replyObject =>
-                        replyObject.user.userId === userId
-                ).sort(
-                    ( a, b ) => 
-                        b.createdAt - a.createdAt
-                );
-    
-                otherReplies = replies.filter(
-                    replyObject =>
-                        replyObject.user.userId !== userId
-                ).sort(
-                    ( a, b ) => 
-                        b.createdAt - a.createdAt
-                );
-            }
+            const usersReplies = replies.filter(
+                replyObject =>
+                    replyObject.user.userId === userId
+            ).sort(
+                ( a, b ) =>
+                    b.createdAt - a.createdAt
+            );
+
+            const otherReplies = replies.filter(
+                replyObject =>
+                    replyObject.user.userId !== userId
+            ).sort(
+                ( a, b ) =>
+                    b.createdAt - a.createdAt
+            );
 
             const resultreplyData = [...usersReplies, ...otherReplies];
             return res.status( 200 ).json(
                 {
                     error: false,
-                    message: "Reply List Prepared Succesfully",
+                    message: "Reply List Prepared Successfully",
+                    totalReplyCount: comment.replies.length,
                     replyCount: replies.length,
                     replies: resultreplyData
                 }
