@@ -12,22 +12,24 @@ class BenekBluredModalBarier extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        ModalBarrier(
-          color: !isLightColor 
-                    ? AppColors.benekBlack.withOpacity(0.5)
-                    : Colors.grey.withOpacity(0.5),
-          dismissible: isDismissible,
-          onDismiss: onDismiss,
-        ),
-        BackdropFilter(
-          blendMode: BlendMode.srcOver,
-          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0, tileMode: TileMode.clamp),
-          child: child ?? const SizedBox(),
-        )
-      ],
+    return GestureDetector(
+      onTap: isDismissible ? onDismiss : null,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ModalBarrier(
+            color: !isLightColor
+                      ? AppColors.benekBlack.withOpacity(0.5)
+                      : Colors.grey.withOpacity(0.5),
+            dismissible: isDismissible,
+          ),
+          BackdropFilter(
+            blendMode: BlendMode.srcOver,
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0, tileMode: TileMode.clamp),
+            child: child ?? const SizedBox(),
+          )
+        ],
+      ),
     );
   }
 }

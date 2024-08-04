@@ -50,6 +50,11 @@ class _StoryWatchScreenState extends State<StoryWatchScreen> {
 
     return BenekBluredModalBarier(
       isDismissible: false,
+      onDismiss: (){
+        setState(() {
+          shouldPop = true;
+        });
+      },
       child: KeyboardListener(
         focusNode: _storyWatchFocusNode,
         onKeyEvent: (KeyEvent event){

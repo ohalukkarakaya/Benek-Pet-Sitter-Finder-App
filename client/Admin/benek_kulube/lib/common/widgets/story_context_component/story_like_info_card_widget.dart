@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/common/utils/styles.text.dart';
+import 'package:benek_kulube/common/widgets/approve_screen.dart';
 import 'package:benek_kulube/common/widgets/benek_like_button/like_buton.dart';
 import 'package:benek_kulube/common/widgets/story_context_component/story_first_five_liked_user_stacked_widget.dart';
 import 'package:benek_kulube/data/models/story_models/story_model.dart';
@@ -79,13 +80,24 @@ class _StoryLikeInfoCardWidgetState extends State<StoryLikeInfoCardWidget> {
                 ),
                 child: IconButton(
                     onPressed: () async {
+                      bool didApprove = await Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          opaque: false,
+                          barrierDismissible: false,
+                          pageBuilder: (context, _, __) => ApproveScreen(title: BenekStringHelpers.locale('approveStoryDelete')),
+                        ),
+                      );
+
+                      if(didApprove != true) return;
+
                       await store.dispatch(deleteStoryByStoryIdRequestAction(widget.storyId));
                       widget.closeFunction?.call();
                     },
                     icon: const Icon(
-                      BenekIcons.trash,
+                      Icons.delete_outline,
                       color: AppColors.benekWhite,
-                      size: 18,
+                      size: 20,
 
                     )
                 ),

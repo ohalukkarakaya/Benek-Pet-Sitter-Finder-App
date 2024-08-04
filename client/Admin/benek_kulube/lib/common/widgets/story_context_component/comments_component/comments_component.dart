@@ -42,6 +42,7 @@ class CommentsComponent extends StatelessWidget {
               && (story.commentCount ?? 0) > 0
               && (story.comments == null || story.comments!.isNotEmpty)
                 ? CommentsList(
+                  storyId: selectedStoryId,
                   totalCommentCount: story.commentCount ?? 0,
                   commentList: story.comments,
                   isCommentList: !isReply,

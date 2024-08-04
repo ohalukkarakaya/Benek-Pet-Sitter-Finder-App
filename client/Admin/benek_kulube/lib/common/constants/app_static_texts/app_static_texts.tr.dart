@@ -95,5 +95,8 @@ class AppStaticTextsTr{
     'invalidPathDesc': 'Dosya yolu geçersizdir. Lütfen Dosya yolunu kontrol edip tekrar deneyin.',
     'enterDescFirst': 'Önce Açıklama Girin!',
     'delete': 'Sil',
+    'like': 'Beğeni',
+    'reply': 'Yanıt',
+    'approveStoryDelete': 'Anıyı silmek için kaydır...',
   };
 }

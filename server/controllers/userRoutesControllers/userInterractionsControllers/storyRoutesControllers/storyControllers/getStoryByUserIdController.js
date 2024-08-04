@@ -134,23 +134,48 @@ const getStoryByUserIdController = async ( req, res ) => {
 
             delete storyObject.likes;
 
-            const lastComment = storyObject.comments.pop();
+            const lastComment = storyObject.comments.length > 0
+                ? storyObject.comments[storyObject.comments.length - 1]
+                : {};
+
+            const replyCount = lastComment.replies !== undefined && lastComment.replies !== null
+                    ? lastComment.replies.length
+                    : 0;
+            let lastReply = lastComment.replies !== undefined && lastComment.replies !== null && lastComment.replies.length > 0
+                ? lastComment.replies[lastComment.replies.length - 1]
+                : {};
+
+            if (lastReply.likes) {
+                lastReply.likeCount = lastReply.likes.length;
+                delete lastReply.likes;
+            }
 
             if( lastComment ){
                 let lastThreeRepliedUsers = [];
-                if( lastComment.replies !== null && lastComment.replies.length > 0 ){
-                    const lastThreeReplyLength = lastComment.replies.length > 3 ? 3 : lastComment.replies.length;
-                    for( let i = 0; i < lastThreeReplyLength; i++ ){
-                        if( lastComment.replies[ i ] ){
-                            const repliedUser = await User.findById( commentObject.replies[ i ].userId.toString() );
-                            const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
+                if (lastComment.replies !== undefined && lastComment.replies !== null && lastComment.replies.length > 0) {
+                    const uniqueUsers = new Set();
+                    for (let i = 0; i < lastComment.replies.length; i++) {
+                        if (uniqueUsers.size >= 3) break;
 
-                            lastThreeRepliedUsers.push( repliedUserInfo );
+                        const reply = lastComment.replies[i];
+                        if (reply) {
+                            const repliedUser = await User.findById(reply.userId.toString());
+                            const repliedUserInfo = getLightWeightUserInfoHelper(repliedUser);
+
+                            if (!uniqueUsers.has(reply.userId.toString())) {
+                                uniqueUsers.add(reply.userId.toString());
+                                lastThreeRepliedUsers.push(repliedUserInfo);
+                            }
                         }
                     }
                 }
 
-                delete lastComment.replies;
+                lastComment.lastReply = lastReply;
+                lastComment.replyCount = replyCount;
+                lastComment.likeCount = lastComment !== undefined && lastComment != null && lastComment.likes !== undefined && lastComment.likes !== null
+                    ?   lastComment.likes.length
+                    : 0;
+
                 delete lastComment.replies;
 
                 lastComment.lastThreeRepliedUsers = lastThreeRepliedUsers;
@@ -158,6 +183,7 @@ const getStoryByUserIdController = async ( req, res ) => {
             }
             
             storyObject.commentCount = storyObject.comments.length;
+
             delete storyObject.comments;
             delete storyObject.__v;
             delete storyObject.updatedAt;

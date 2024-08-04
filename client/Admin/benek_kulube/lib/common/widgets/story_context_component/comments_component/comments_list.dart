@@ -9,10 +9,13 @@ import 'package:benek_kulube/store/app_state.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../../data/models/content_models/comment_model.dart';
+import '../../../../data/models/story_models/story_model.dart';
+import '../../../../redux/get_story_comments/get_story_comments_by_story_id.action.dart';
 import 'comment_card.dart';
 
 class CommentsList extends StatefulWidget {
   final int totalCommentCount;
+  final String storyId;
   final List<CommentModel>? commentList;
   final bool isCommentList; // it also can be comment reply list
 
@@ -20,6 +23,7 @@ class CommentsList extends StatefulWidget {
     super.key,
     required this.totalCommentCount,
     this.commentList,
+    required this.storyId,
     this.isCommentList = false,
   });
 
@@ -40,9 +44,8 @@ class _CommentsListState extends State<CommentsList> {
   }
 
   bool _isPaginationNeeded(Store<AppState> store, int? index) {
-    return (
-        index != null && index == widget.commentList!.length - 3
-    ) && widget.totalCommentCount > widget.commentList!.length;
+    return ( index != null && index >= widget.commentList!.length - 3)
+      && widget.totalCommentCount > widget.commentList!.length;
   }
 
   void requestNextPageIfNeeded(Store<AppState> store) {
@@ -64,9 +67,25 @@ class _CommentsListState extends State<CommentsList> {
   Future<void> getRecomendedUsersNextPageRequest(
       Function? callBackAfterRequestDone, Store<AppState> store) async {
     if (widget.isCommentList && widget.commentList != null) {
-      // TO DO: send pagination request for comments
+      // send pagination request for comments
+      log('PAGINATION Request for Comments');
+
+      StoryModel? story = store.state.storiesToDisplay!.firstWhere(
+        (element) => element.storyId == widget.storyId,
+      );
+
+      List<CommentModel>? commentList = story.comments!;
+
+      CommentModel lastComment = commentList.firstWhere(
+        (element) => element.isLastItem!,
+      );
+
+      await store.dispatch(getStoryCommentsByStoryIdRequestAction(
+        store.state.selectedStory!.storyId,
+        lastComment.id!,
+      ));
     } else {
-      // send pagination request for replies
+      // TO DO: send pagination request for replies
     }
 
     if (callBackAfterRequestDone != null && mounted) {
@@ -75,9 +94,11 @@ class _CommentsListState extends State<CommentsList> {
   }
 
   Widget _buildCommentCard(int index) {
+    Store<AppState> store = StoreProvider.of<AppState>(context);
+
     return CommentCardWidget(
-      index: index,
-      comment: widget.commentList![index],
+      commentId: widget.commentList![ index ].id!,
+      storyId: widget.storyId,
     );
   }
 
@@ -104,8 +125,8 @@ class _CommentsListState extends State<CommentsList> {
       children: List.generate(
           widget.commentList != null
              ? widget.commentList!.length
-             : widget.totalCommentCount > 6
-                 ? 6
+             : widget.totalCommentCount > 5
+                 ? 5
                  : widget.totalCommentCount,
           (index) {
             return widget.commentList != null

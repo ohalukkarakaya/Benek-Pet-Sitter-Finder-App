@@ -2,117 +2,106 @@ import User from "../../../../../models/User.js";
 import Story from "../../../../../models/Story.js";
 import getLightWeightUserInfoHelper from "../../../../../utils/getLightWeightUserInfoHelper.js";
 
-const getStoryCommentsController = async ( req, res ) => {
-    try{
+const getStoryCommentsController = async (req, res) => {
+    try {
         const userId = req.user._id.toString();
         const storyId = req.params.storyId.toString();
         const lastElementId = req.params.lastElementId || 'null';
-        let limit = parseInt( req.params.limit ) || 15;
- 
-        if( !storyId ){
-            return res.status( 400 ).json({
+        let limit = parseInt(req.params.limit) || 15;
+
+        if (!storyId) {
+            return res.status(400).json({
                 error: true,
                 message: "Missing Param"
             });
         }
 
-        const story = await Story.findById( storyId ).lean();
-        if( !story ){
-            return res.status( 404 ).json({
+        const story = await Story.findById(storyId).lean();
+        if (!story) {
+            return res.status(404).json({
                 error: true,
                 message: "Story Not Found"
             });
         }
 
-        const storyOwner = await User.findById( story.userId.toString() );
-        if( !storyOwner || storyOwner.blockedUsers.includes( req.user._id.toString() ) ){
-            return res.status( 401 ).json({
+        const storyOwner = await User.findById(story.userId.toString());
+        if (!storyOwner || storyOwner.blockedUsers.includes(req.user._id.toString())) {
+            return res.status(401).json({
                 error: true,
                 message: "Unauthorized"
             });
         }
 
-        let skip = lastElementId !== 'null' ? story.comments.reverse().findIndex( commentObject => commentObject._id.toString() === lastElementId ) + 1 : 0;
+        const reversedComments = story.comments.reverse();
+        let skip = lastElementId !== 'null' ? reversedComments.findIndex(commentObject => commentObject._id.toString() === lastElementId) + 1 : 0;
         let comments = [];
-        if( skip === 0 ){
-            const usersComments = story.comments.filter(
+
+        if (skip === 0) {
+            const usersComments = reversedComments.filter(
                 commentObject =>
                     commentObject.userId.toString() === userId
             );
 
             limit = limit - usersComments.length;
-            if( usersComments.length > 0 ){
-                for( let commentObject of usersComments ){
-                    comments.push( commentObject );
-                }
-            }
+            comments.push(...usersComments);
         }
 
-        if( limit >= 0 ){
-            const commentList = story.comments.reverse().filter(
+        if (limit > 0) {
+            const commentList = reversedComments.filter(
                 commentObject =>
                     commentObject.userId.toString() !== userId
             );
-            const startIndex = Math.abs(comments.length - Math.abs( (skip - 1) ));
-            const endIndex = startIndex + limit;
-
-            const limitedComments = commentList.slice( startIndex, endIndex );
-
-            if( limitedComments.length > 0 ){
-                for( let commentObject of limitedComments ){
-                    comments.push( commentObject );
-                }
-            }
+            const limitedComments = commentList.slice(skip, skip + limit);
+            comments.push(...limitedComments);
         }
 
-        if( comments.length > 0 ){
-            for( let commentObject of comments ){
-                const commentedUser = await User.findById( commentObject.userId.toString() );
-                const commentedUserInfo = getLightWeightUserInfoHelper( commentedUser );
+        if (comments.length > 0) {
+            for (let commentObject of comments) {
+                const commentedUser = await User.findById(commentObject.userId.toString());
+                const commentedUserInfo = getLightWeightUserInfoHelper(commentedUser);
 
                 commentObject.user = commentedUserInfo;
                 delete commentObject.userId;
 
-                let firstFiveOfLikeLimit = 5;
-                
-                if( commentObject.likes.length < 5 ){
-                    firstFiveOfLikeLimit = commentObject.likes.length;
-                }
+                let firstFiveOfLikeLimit = Math.min(commentObject.likes.length, 5);
 
                 commentObject.firstFiveLikedUser = [];
-                for( let i = 0; i < firstFiveOfLikeLimit; i++ ){
-                    const likedUser = await User.findById( commentObject.likes[ i ].toString());
-                    const likedUserInfo = getLightWeightUserInfoHelper( likedUser );
+                for (let i = 0; i < firstFiveOfLikeLimit; i++) {
+                    const likedUser = await User.findById(commentObject.likes[i].toString());
+                    const likedUserInfo = getLightWeightUserInfoHelper(likedUser);
 
-                    commentObject.firstFiveLikedUser.push( likedUserInfo );
+                    commentObject.firstFiveLikedUser.push(likedUserInfo);
                 }
 
                 const replyCount = commentObject.replies.length;
-                let lastReply = commentObject.replies.length > 0
-                                    ?   commentObject.replies.pop()
-                                    : {};
+                let lastReply = replyCount > 0 ? commentObject.replies[replyCount - 1] : {};
 
-                if( lastReply.likes ){
+                if (lastReply.likes) {
                     lastReply.likeCount = lastReply.likes.length;
                     delete lastReply.likes;
                 }
 
                 let lastThreeRepliedUsers = [];
-                if( commentObject.replies !== null && commentObject.replies.length > 0 ){
-                    const lastThreeReplyLength = commentObject.replies.length > 3 ? 3 : commentObject.replies.length;
-                    for( let i = 0; i < lastThreeReplyLength; i++ ){
-                        if( commentObject.replies[ i ] ){
-                            const repliedUser = await User.findById( commentObject.replies[ i ].userId.toString() );
-                            const repliedUserInfo = getLightWeightUserInfoHelper( repliedUser );
+                if (commentObject.replies.length > 0) {
+                    const uniqueUsers = new Set();
+                    for (let i = 0; i < commentObject.replies.length; i++) {
+                        if (uniqueUsers.size >= 3) break;
 
-                            lastThreeRepliedUsers.push( repliedUserInfo );
+                        const reply = commentObject.replies[i];
+                        if (reply) {
+                            const repliedUser = await User.findById(reply.userId.toString());
+                            const repliedUserInfo = getLightWeightUserInfoHelper(repliedUser);
+
+                            if (!uniqueUsers.has(reply.userId.toString())) {
+                                uniqueUsers.add(reply.userId.toString());
+                                lastThreeRepliedUsers.push(repliedUserInfo);
+                            }
                         }
                     }
                 }
 
                 commentObject.lastThreeRepliedUsers = lastThreeRepliedUsers;
-                
-                
+
                 commentObject.lastReply = lastReply;
                 commentObject.replyCount = replyCount;
                 commentObject.likeCount = commentObject.likes.length;
@@ -121,42 +110,29 @@ const getStoryCommentsController = async ( req, res ) => {
                 delete commentObject.replies;
             }
 
-            let usersComments;
-            let otherComments;
+            const usersComments = comments.filter(
+                commentObject => commentObject.user.userId.toString() === userId
+            ).sort((a, b) => b.createdAt - a.createdAt);
 
-            if( comments.length > 0 ){
-                usersComments = comments.filter(
-                    commentObject =>
-                        commentObject.user.userId.toString() === userId
-                ).sort(
-                    ( a, b ) => 
-                        b.createdAt - a.createdAt
-                );
-
-                otherComments = comments.filter(
-                    commentObject =>
-                        commentObject.user.userId.toString() !== userId
-                ).sort(
-                    ( a, b ) => 
-                        b.createdAt - a.createdAt
-                );
-            }
+            const otherComments = comments.filter(
+                commentObject => commentObject.user.userId.toString() !== userId
+            ).sort((a, b) => b.createdAt - a.createdAt);
 
             const resultCommentData = [...usersComments, ...otherComments];
-            return res.status( 200 ).json({
+            return res.status(200).json({
                 error: false,
-                message: "Comments Prepared succesfully",
+                message: "Comments Prepared successfully",
                 totalCommentCount: story.comments.length,
                 commentCount: comments.length,
                 comments: resultCommentData
             });
-        }else{
-            return res.status( 404 ).json({
+        } else {
+            return res.status(404).json({
                 error: true,
                 message: "No Comment Found"
             });
         }
-    }catch( err ){
+    } catch (err) {
         console.log("ERROR: getStoryCommentsController - ", err);
         return res.status(500).json({
             error: true,

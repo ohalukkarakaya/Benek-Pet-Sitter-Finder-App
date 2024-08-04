@@ -95,5 +95,8 @@ class AppStaticTextsEn{
     'invalidPathDesc': 'The file path you provided is invalid. Please check the file path and try again.',
     'enterDescFirst': 'Enter Description First!',
     'delete': 'Delete',
+    'like': 'Like',
+    'reply': 'Reply',
+    'approveStoryDelete': 'Slide to delete story...',
   };
 }

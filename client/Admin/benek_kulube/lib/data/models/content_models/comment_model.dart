@@ -9,6 +9,7 @@ import '../user_profile_models/user_info_model.dart';
 
 class CommentModel {
   String? id;
+  bool? isLastItem;
   bool? isReply;
   UserInfo? user;
   String? comment;
@@ -23,6 +24,7 @@ class CommentModel {
 
   CommentModel({
     this.id,
+    this.isLastItem = false,
     this.isReply = false,
     this.user,
     this.comment,
@@ -38,6 +40,7 @@ class CommentModel {
 
   CommentModel.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
+    isLastItem = false;
     isReply = json['reply'] != null;
     comment = json['comment'];
     reply = json['reply'];
@@ -75,7 +78,7 @@ class CommentModel {
 
     if (json['lastThreeRepliedUsers'] != null && json['lastThreeRepliedUsers'].isNotEmpty) {
       lastThreeRepliedUsers = <UserInfo>[];
-      json['lastThreeRepliedUser'].forEach((v) {
+      json['lastThreeRepliedUsers'].forEach((v) {
         lastThreeRepliedUsers!.add(UserInfo.fromJson(v));
       });
     }
@@ -153,5 +156,9 @@ class CommentModel {
     likes = likes ?? <String>[];
     likes!.add(userId);
     likeCount = likeCount! + 1;
+  }
+
+  void setAsLastItem( bool isLastItemResponse ){
+    isLastItem = isLastItemResponse;
   }
 }

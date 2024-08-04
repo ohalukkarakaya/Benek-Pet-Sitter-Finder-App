@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../data/models/user_profile_models/user_info_model.dart';
 import '../../store/actions/app_actions.dart';
 import '../../data/models/story_models/story_model.dart';
@@ -34,6 +36,8 @@ List<StoryModel>? getStoriesByUserIdRequestReducer( List<StoryModel>? stories, d
     int index = stories!.indexWhere((element) => element.storyId == action.data?['storyId']);
     stories[index].addComment( action.data?['comment'] );
 
+    stories[index].commentCount = stories[index].commentCount! + 1;
+
     return stories;
   }else if( action is GetStoryCommentsByStoryIdRequestAction ){
     int index = stories!.indexWhere((element) => element.storyId == action.data?['storyId']);
@@ -42,7 +46,7 @@ List<StoryModel>? getStoriesByUserIdRequestReducer( List<StoryModel>? stories, d
     if( action.data?['isPagination'] ){
       stories[index].addComments( action.data?['list'] );
     }else{
-      stories[index].comments = action.data?['list'];
+      stories[index].insertComments( action.data?['list'] );
     }
 
     return stories;

@@ -96,9 +96,25 @@ class StoryModel {
       uniqueComments[comment.id!] = comment;
     }
 
+    for (var entry in uniqueComments.entries) {
+      if (entry.value.isLastItem ?? false) {
+        entry.value.setAsLastItem(false);
+        break;
+      }
+    }
+
+    if(uniqueComments.isNotEmpty){
+     uniqueComments.entries.first.value.setAsLastItem(true);
+    }
+
     comments = uniqueComments.values.toList();
 
     sortComments();
+  }
+
+  void insertComments(List<CommentModel> comingComments) {
+    comingComments[comingComments.length - 1].setAsLastItem(true);
+    comments ??= comingComments;
   }
 
   void addReplyToComment(String commentId, CommentModel reply) {
