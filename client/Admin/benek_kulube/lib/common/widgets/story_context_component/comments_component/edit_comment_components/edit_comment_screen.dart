@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:benek_kulube/data/models/content_models/comment_model.dart';
-import 'package:benek_kulube/presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
 import 'package:benek_kulube/presentation/shared/components/loading_components/benek_blured_modal_barier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,7 +22,6 @@ class EditCommentScreen extends StatefulWidget {
   final String storyId;
   final String commentId;
   final String? replyId;
-
   final String textToEdit;
 
   const EditCommentScreen({
@@ -45,9 +43,7 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
   late final TextEditingController _textControllerEditComment;
 
   late final bool isReply;
-
   bool isFocused = false;
-
   bool isSendingRequest = false;
 
   void _onFocusChanged() {
@@ -80,229 +76,218 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
     _focusNodeEditComment.dispose();
     _focusScopeNodeEditComment.dispose();
     _textFocusNodeEditComment.dispose();
-
-    _textControllerEditComment.text = widget.textToEdit;
     _textControllerEditComment.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
     Store<AppState> store = StoreProvider.of<AppState>(context);
     StoryModel story = store.state.storiesToDisplay!.firstWhere((StoryModel story) => story.storyId == widget.storyId);
     CommentModel commentObject = story.comments!.firstWhere((CommentModel comment) => comment.id == widget.commentId);
     CommentModel? replyObject = isReply ? commentObject.replies!.firstWhere((CommentModel reply) => reply.id == widget.replyId) : null;
-
     CommentModel editingObject = isReply ? replyObject! : commentObject;
 
-    return KeyboardListener(
-      focusNode: _focusNodeEditComment,
-      onKeyEvent: (KeyEvent event) {
-        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-          Navigator.of(context).pop();
-        }else{
-
-        }
+    return BenekBluredModalBarier(
+      isDismissible: true,
+      onDismiss: () {
+        Navigator.of(context).pop();
       },
-      child: BenekBluredModalBarier(
-        isDismissible: false,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: Container(
-              width: 500,
-              height: 169,
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: isFocused ? AppColors.benekLightBlue : AppColors.benekBlack,
-                borderRadius: BorderRadius.circular(6.0),
-              ),
-
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Container(
+            width: 500,
+            height: 169,
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: isFocused ? AppColors.benekLightBlue : AppColors.benekBlack,
+              borderRadius: BorderRadius.circular(6.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Stack(
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  BenekCircleAvatar(
-                                    imageUrl: editingObject.user!.profileImg!.imgUrl!,
-                                    width: 30.0,
-                                    height: 30.0,
-                                    isDefaultAvatar: editingObject.user!.profileImg!.isDefaultImg!,
-                                    bgColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                    borderWidth: 2.0,
-                                  ),
-                                  editingObject.lastThreeRepliedUsers != null && editingObject.lastThreeRepliedUsers!.isNotEmpty
-                                      ? LastThreeCommentReplierProfileStackWidget(
-                                        size: 30.0,
-                                        users: editingObject.lastThreeRepliedUsers!,
-                                        borderColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                      )
-                                      : const SizedBox(),
-                                ],
-                              ),
-                              editingObject.lastThreeRepliedUsers != null &&
-                              editingObject.lastThreeRepliedUsers!.isNotEmpty
-                                  ? Positioned(
-                                    top: 40,
-                                    bottom: 40,
-                                    left: 15,
-                                    child: Container(
-                                      width: 1.0,
-                                      color: AppColors.benekGrey,
-                                      height: constraints.maxHeight,
-                                    ),
-                                  )
-                                  : const SizedBox(),
-                            ],
-                          );
-                        },
-                      ),
-                      const SizedBox(width: 10.0),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Stack(
                           children: [
-                            Row(
+                            Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  editingObject.user!.userName!,
-                                  style: semiBoldTextWithoutColorStyle().copyWith(
-                                    color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                  ),
+                                BenekCircleAvatar(
+                                  imageUrl: editingObject.user!.profileImg!.imgUrl!,
+                                  width: 30.0,
+                                  height: 30.0,
+                                  isDefaultAvatar: editingObject.user!.profileImg!.isDefaultImg!,
+                                  bgColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                  borderWidth: 2.0,
                                 ),
-                                Text(
-                                  BenekStringHelpers.getDateAsString(editingObject.createdAt!),
-                                  style: regularTextWithoutColorStyle().copyWith(
-                                    color: AppColors.benekGrey,
-                                    fontSize: 8.0,
-                                  ),
-                                ),
+                                editingObject.lastThreeRepliedUsers != null && editingObject.lastThreeRepliedUsers!.isNotEmpty
+                                    ? LastThreeCommentReplierProfileStackWidget(
+                                  size: 30.0,
+                                  users: editingObject.lastThreeRepliedUsers!,
+                                  borderColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                )
+                                    : const SizedBox(),
                               ],
                             ),
-                            const SizedBox(height: 4.0),
-                            SizedBox(
-                              height: 50.0,
-                              child: ScrollConfiguration(
-                                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                                child: SingleChildScrollView(
-                                  physics: const BouncingScrollPhysics(),
-                                  child: FocusScope(
-                                    node: _focusScopeNodeEditComment,
-                                    child: TextFormField(
-                                      focusNode: _textFocusNodeEditComment,
-                                      controller: _textControllerEditComment,
-                                      maxLength: 200,
-                                      onChanged: (value) {
-                                        setState(() {});
-                                      },
-                                      maxLines: null,
-                                      keyboardType: TextInputType.multiline,
-                                      cursorColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                      style: lightTextStyle( textColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite ),
-                                      textAlignVertical: TextAlignVertical.top,
-                                      decoration: InputDecoration(
-                                        counterText: '',
-                                        hintText: isReply
-                                            ? BenekStringHelpers.locale('writeAReply')
-                                            : BenekStringHelpers.locale('writeAComment'),
-                                        hintStyle: isFocused ? lightTextStyle( textColor: AppColors.benekGrey ) : null,
-                                        contentPadding: EdgeInsets.zero,
-                                        border: InputBorder.none,
-                                      ),
+                            editingObject.lastThreeRepliedUsers != null && editingObject.lastThreeRepliedUsers!.isNotEmpty
+                                ? Positioned(
+                              top: 40,
+                              bottom: 40,
+                              left: 15,
+                              child: Container(
+                                width: 1.0,
+                                color: AppColors.benekGrey,
+                                height: constraints.maxHeight,
+                              ),
+                            )
+                                : const SizedBox(),
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 10.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                editingObject.user!.userName!,
+                                style: semiBoldTextWithoutColorStyle().copyWith(
+                                  color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                ),
+                              ),
+                              Text(
+                                BenekStringHelpers.getDateAsString(editingObject.createdAt!),
+                                style: regularTextWithoutColorStyle().copyWith(
+                                  color: AppColors.benekGrey,
+                                  fontSize: 8.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4.0),
+                          SizedBox(
+                            height: 50.0,
+                            child: ScrollConfiguration(
+                              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                              child: SingleChildScrollView(
+                                physics: const BouncingScrollPhysics(),
+                                child: FocusScope(
+                                  node: _focusScopeNodeEditComment,
+                                  child: TextFormField(
+                                    focusNode: _textFocusNodeEditComment,
+                                    controller: _textControllerEditComment,
+                                    maxLength: 200,
+                                    onChanged: (value) {
+                                      setState(() {});
+                                    },
+                                    maxLines: null,
+                                    keyboardType: TextInputType.multiline,
+                                    cursorColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                    style: lightTextStyle(textColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite),
+                                    textAlignVertical: TextAlignVertical.top,
+                                    decoration: InputDecoration(
+                                      counterText: '',
+                                      hintText: isReply
+                                          ? BenekStringHelpers.locale('writeAReply')
+                                          : BenekStringHelpers.locale('writeAComment'),
+                                      hintStyle: isFocused ? lightTextStyle(textColor: AppColors.benekGrey) : null,
+                                      contentPadding: EdgeInsets.zero,
+                                      border: InputBorder.none,
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 10.0),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        log('Reply to comment');
-                                      },
-                                      child: Text(
-                                        '${editingObject.replyCount} ${BenekStringHelpers.locale('reply')}',
-                                        style: regularTextWithoutColorStyle().copyWith(
-                                          color: AppColors.benekGrey,
-                                          fontSize: 12.0,
-                                        ),
-                                      ),
-                                    ),
-                                    Text(
-                                      '  |  ',
+                          ),
+                          const SizedBox(height: 10.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      log('Reply to comment');
+                                    },
+                                    child: Text(
+                                      '${editingObject.replyCount} ${BenekStringHelpers.locale('reply')}',
                                       style: regularTextWithoutColorStyle().copyWith(
                                         color: AppColors.benekGrey,
                                         fontSize: 12.0,
                                       ),
                                     ),
-                                    Text(
-                                      '${editingObject.likeCount} ${BenekStringHelpers.locale('like')}',
-                                      style: regularTextWithoutColorStyle().copyWith(
-                                        color: AppColors.benekGrey,
-                                        fontSize: 12.0,
-                                      ),
+                                  ),
+                                  Text(
+                                    '  |  ',
+                                    style: regularTextWithoutColorStyle().copyWith(
+                                      color: AppColors.benekGrey,
+                                      fontSize: 12.0,
                                     ),
-                                  ],
-                                ),
-
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  onPressed: () async {
-                                    if(!isSendingRequest){
-                                      setState(() {
-                                        isSendingRequest = true;
-                                      });
-                                      await store.dispatch(putEditStoryCommentOrReplyRequestAction(
+                                  ),
+                                  Text(
+                                    '${editingObject.likeCount} ${BenekStringHelpers.locale('like')}',
+                                    style: regularTextWithoutColorStyle().copyWith(
+                                      color: AppColors.benekGrey,
+                                      fontSize: 12.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () async {
+                                  if (!isSendingRequest) {
+                                    setState(() {
+                                      isSendingRequest = true;
+                                    });
+                                    await store.dispatch(
+                                      putEditStoryCommentOrReplyRequestAction(
                                         _textControllerEditComment.text,
                                         widget.storyId,
                                         widget.commentId,
                                         widget.replyId,
-                                      ));
-                                      setState(() {
-                                        isSendingRequest = false;
-                                      });
-                                      Navigator.of(context).pop();
-                                    }
-                                  },
-                                  icon: !isSendingRequest
+                                      ),
+                                    );
+                                    setState(() {
+                                      isSendingRequest = false;
+                                    });
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                                icon: !isSendingRequest
                                     ? Icon(
-                                      Icons.send,
-                                      color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                      size: 15,
-                                    )
-                                    : BenekProcessIndicator(
-                                      width: 15.0,
-                                      height: 15.0,
-                                      color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                    ),
+                                  Icons.send,
+                                  color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                  size: 15,
+                                )
+                                    : CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                  ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            )
-          )
+            ),
+          ),
         ),
       ),
     );
