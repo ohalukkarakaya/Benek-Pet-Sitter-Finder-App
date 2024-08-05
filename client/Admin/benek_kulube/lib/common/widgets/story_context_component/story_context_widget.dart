@@ -1,12 +1,19 @@
+import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/widgets/story_context_component/comments_component/comment_card.dart';
 import 'package:benek_kulube/common/widgets/story_context_component/story_desc_widget.dart';
 import 'package:benek_kulube/common/widgets/story_context_component/story_like_info_card_widget.dart';
 import 'package:benek_kulube/data/models/story_models/story_model.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../data/models/content_models/comment_model.dart';
+import '../../../redux/get_story_comment_replies/get_story_comment_replies.action.dart';
+import '../../../redux/get_story_comments/get_story_comments_by_story_id.action.dart';
 import 'comments_component/comments_component.dart';
 import 'comments_component/leave_comment_component.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:benek_kulube/store/app_state.dart';
+import 'package:redux/redux.dart';
 
 class StoryContextWidget extends StatefulWidget {
   final StoryModel story;
@@ -55,14 +62,64 @@ class _StoryContextWidgetState extends State<StoryContextWidget> {
                   ),
 
                   const SizedBox(height: 20.0),
+                  // selected comment widget
+                  selectedComment != null
+                    ? Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.benekBlack,
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                      child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        child: CommentCardWidget(
+                          isSelectedComment: true,
+                          resetSelectedCommentFunction: () async {
+                            String selectedCommentId = selectedComment!.id!;
+                            setState(() {
+                              selectedComment = null;
+                            });
+                            await StoreProvider.of<AppState>(context).dispatch(
+                              resetStoryCommentRepliesAction(
+                                widget.story.storyId!,
+                                selectedCommentId,
+                              ),
+                            );
+                          },
+                          commentId: selectedComment!.id!,
+                          storyId: widget.story.storyId!,
+                        ),
+                      ),
+                    )
+                    : const SizedBox(),
+
+                  const SizedBox(height: 20.0),
                   // Story context
                   CommentsComponent(
                     selectedStoryId: widget.story.storyId!,
-                    isReply: selectedComment != null,
-                    selectCommentFunction: ( CommentModel comment) {
+                    selectedComment: selectedComment,
+                    selectCommentFunction: ( String commentId ) async {
+                      CommentModel comment = widget.story.comments!.firstWhere(
+                        (comment) => comment.id == commentId,
+                      );
+
+                      await StoreProvider.of<AppState>(context).dispatch(
+                        resetStoryCommentRepliesAction(
+                          widget.story.storyId!,
+                          comment.id!,
+                        ),
+                      );
+
                       setState(() {
                         selectedComment = comment;
                       });
+
+                      await StoreProvider.of<AppState>(context).dispatch(
+                        getStoryCommentRepliesRequestAction(
+                          widget.story.storyId!,
+                          comment.id!,
+                          null,
+                        ),
+                      );
                     },
                   ),
                 ]

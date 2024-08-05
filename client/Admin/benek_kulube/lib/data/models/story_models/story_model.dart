@@ -170,7 +170,7 @@ class StoryModel {
     CommentModel? comment = comments?.firstWhere((element) => element.id == commentId );
     if( replyId != null ){
       comment!.replies!.removeWhere((element) => element.id == replyId);
-      comment.replyCount = comment.replyCount ?? 1 - 1;
+      comment.replyCount = comment.replyCount! - 1;
     }else{
       comments?.removeWhere((element) => element.id == commentId);
       commentCount = commentCount! - 1;

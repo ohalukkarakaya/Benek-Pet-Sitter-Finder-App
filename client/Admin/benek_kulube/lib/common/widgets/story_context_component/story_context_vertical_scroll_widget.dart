@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:benek_kulube/common/widgets/story_context_component/story_context_widget.dart';
 import 'package:benek_kulube/common/widgets/vertical_video_companent/vertical_video_widget.dart';
 import 'package:flutter/material.dart';
@@ -42,12 +44,17 @@ class _StoryContextVerticalScrollWidgetState extends State<StoryContextVerticalS
   @override
   void didUpdateWidget(StoryContextVerticalScrollWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (widget.activePageIndex != oldWidget.activePageIndex) {
       _controller.animateToPage(
         widget.activePageIndex,
         duration: const Duration(milliseconds: 700),
         curve: Curves.easeInOut,
-      );
+      ).then((_) {
+        Store<AppState> store = StoreProvider.of<AppState>(context);
+        log("activePageIndex: ${widget.activePageIndex}, oldWidget.activePageIndex: ${oldWidget.activePageIndex}");
+        store.dispatch(resetStoryCommentsAction(store.state.storiesToDisplay![oldWidget.activePageIndex].storyId));
+      });
     }
   }
 

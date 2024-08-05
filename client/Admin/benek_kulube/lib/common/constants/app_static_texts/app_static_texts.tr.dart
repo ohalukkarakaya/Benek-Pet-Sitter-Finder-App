@@ -89,6 +89,7 @@ class AppStaticTextsTr{
     'writeAComment': 'Bir yorum yaz...',
     'writeAReply': 'Bir yanıt yaz...',
     'commentEmptyState': 'Hiç Yorum Yok!',
+    'replyEmptyState': 'Hiç Yanıt Yok!',
     'tagPetInfoCaption': 'Anılar bir evcil hayvanlarla ilgilidir! Lütfen bir evcil hayvan etiketleyin!',
     'addDescriptionCaption': 'Anı için açıklama yazmak zorunludur!',
     'invalidPath': 'Geçersiz Dosya Yolu!',
@@ -99,5 +100,6 @@ class AppStaticTextsTr{
     'reply': 'Yanıt',
     'approveStoryDelete': 'Anıyı silmek için kaydır...',
     'approveCommentDelete': 'Yorumu silmek için kaydır...',
+    'approveReplyDelete': 'Yanıtı silmek için kaydır...',
   };
 }

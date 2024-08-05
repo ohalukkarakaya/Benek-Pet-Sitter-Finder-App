@@ -37,16 +37,19 @@ class _StoryWatchScreenState extends State<StoryWatchScreen> {
 
     final Store<AppState> store = StoreProvider.of<AppState>(context);
 
+    int selectedStoryIndex = store.state.selectedStory != null && store.state.storiesToDisplay != null
+        ? store.state.storiesToDisplay!.indexWhere((StoryModel story) => story.storyId == store.state.selectedStory!.storyId)
+        : 0;
+
     if( shouldPop ){
       setState(() {
         shouldPop = false;
       });
-      Navigator.pop(context);
-    }
 
-    int selectedStoryIndex = store.state.selectedStory != null && store.state.storiesToDisplay != null
-        ? store.state.storiesToDisplay!.indexWhere((StoryModel story) => story.storyId == store.state.selectedStory!.storyId)
-        : 0;
+      Navigator.pop(context);
+
+      store.dispatch(resetStoryCommentsAction(store.state.storiesToDisplay![selectedStoryIndex].storyId));
+    }
 
     return BenekBluredModalBarier(
       isDismissible: false,

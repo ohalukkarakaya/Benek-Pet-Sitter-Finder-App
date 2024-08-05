@@ -11,13 +11,13 @@ import '../../../utils/styles.text.dart';
 import 'comments_list.dart';
 
 class CommentsComponent extends StatelessWidget {
-  final bool isReply;
+  final CommentModel? selectedComment;
   final String selectedStoryId;
-  final Function(CommentModel comment)? selectCommentFunction;
+  final Function(String commentId)? selectCommentFunction;
 
   const CommentsComponent({
     super.key,
-    this.isReply = false,
+    this.selectedComment,
     required this.selectedStoryId,
     this.selectCommentFunction,
   });
@@ -39,19 +39,71 @@ class CommentsComponent extends StatelessWidget {
           ),
           padding: const EdgeInsets.all(10.0),
           child: story != null
-              && (story.commentCount ?? 0) > 0
-              && (story.comments == null || story.comments!.isNotEmpty)
+              && (
+                (
+                  selectedComment == null
+                  && (story.commentCount ?? 0) > 0
+                )
+                || (
+                  selectedComment != null
+                  && story.comments != null
+                  && (story.comments![
+                        story.comments!.indexWhere(
+                          (comment) =>
+                            comment.id == selectedComment!.id
+                        )
+                  ].replyCount ?? 0) > 0
+                )
+              )
+              && (
+                (
+                  selectedComment == null
+                  && (
+                    story.comments == null
+                    || story.comments!.isNotEmpty
+                  )
+                )
+                || (
+                  selectedComment != null
+                  && story.comments != null
+                  && story.comments!.isNotEmpty
+                  && (
+                      story.comments![
+                            story.comments!.indexWhere(
+                              (comment) =>
+                                comment.id == selectedComment!.id
+                            )
+                      ].replies == null
+
+                      || story.comments![
+                            story.comments!.indexWhere(
+                              (comment) =>
+                                comment.id == selectedComment!.id
+                            )
+                      ].replies!.isNotEmpty
+                  )
+                )
+              )
                 ? CommentsList(
                   storyId: selectedStoryId,
-                  totalCommentCount: story.commentCount ?? 0,
+                  totalCommentCount: selectedComment == null
+                      ? story.commentCount ?? 0
+                      : story.comments![
+                          story.comments!.indexWhere(
+                            (comment) => comment.id == selectedComment!.id
+                          )
+                      ].replyCount ?? 0,
                   commentList: story.comments,
-                  isCommentList: !isReply,
+                  selectedComment: selectedComment,
+                  selectCommentFunction: selectCommentFunction,
                 )
                 : Padding(
                   padding: const EdgeInsets.symmetric(vertical: 114.0),
                   child: Center(
                     child: Text(
-                      BenekStringHelpers.locale('commentEmptyState'),
+                      selectedComment == null
+                          ? BenekStringHelpers.locale('commentEmptyState')
+                          : BenekStringHelpers.locale('replyEmptyState'),
                       style: regularTextStyle(textColor: AppColors.benekWhite),
                     ),
                   ),

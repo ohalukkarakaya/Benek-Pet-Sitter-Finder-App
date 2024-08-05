@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:benek_kulube/common/constants/app_colors.dart';
@@ -11,7 +12,6 @@ class CommentModel {
   String? id;
   bool? isLastItem;
   bool? didUserLiked;
-  bool? isReply;
   UserInfo? user;
   String? comment;
   String? reply;
@@ -27,7 +27,6 @@ class CommentModel {
     this.id,
     this.isLastItem = false,
     this.didUserLiked = false,
-    this.isReply = false,
     this.user,
     this.comment,
     this.reply,
@@ -44,7 +43,6 @@ class CommentModel {
     id = json['_id'];
     isLastItem = false;
     didUserLiked = json['didUserLiked'] ?? false;
-    isReply = json['reply'] != null;
     comment = json['comment'];
     reply = json['reply'];
     if (json['replies'] != null) {
@@ -132,19 +130,53 @@ class CommentModel {
     replies = replies ?? <CommentModel>[];
     sortReplies();
     replies!.insert(0, reply);
+
+    lastThreeRepliedUsers = lastThreeRepliedUsers ?? <UserInfo>[];
+
+    List<String?>? userIdList = lastThreeRepliedUsers?.map((e) => e.userId).toList();
+
+    if(
+      userIdList == null
+      || (userIdList != null && userIdList.isEmpty)
+      || (userIdList != null && !userIdList.contains(reply.user!.userId))
+    ){
+      lastThreeRepliedUsers?.insert(0, reply.user!);
+    }
+
+    replyCount = replyCount! + 1;
   }
 
   void addReplies(List<CommentModel> replyList) {
     replies = replies ?? <CommentModel>[];
-    for (var reply in replyList) {
-      replies!.add(reply);
+    replies = replyList + replies!;
+
+    final uniqueReplies = LinkedHashMap<String, CommentModel>();
+
+    for( var reply in replies! ){
+      uniqueReplies[reply.id!] = reply;
     }
+
+    for (var entry in uniqueReplies.entries) {
+      if (entry.value.isLastItem ?? false) {
+        entry.value.setAsLastItem(false);
+        break;
+      }
+    }
+
+    if(uniqueReplies.isNotEmpty){
+      uniqueReplies.entries.first.value.setAsLastItem(true);
+    }
+
+    replies = uniqueReplies.values.toList();
+
     sortReplies();
   }
 
-  void insertReplies(List<CommentModel> replies) {
-    this.replies = replies;
-    sortReplies();
+  void insertReplies(List<CommentModel> comingReplies) {
+    if( comingReplies.isNotEmpty ){
+      comingReplies[comingReplies.length - 1].setAsLastItem(true);
+    }
+    replies = comingReplies;
   }
 
   void setReplyCount(int replyCount) {

@@ -78,10 +78,23 @@ class ApiClient {
                 : 0,
             'list': list
           };
-        // case 'List<OKRUserParentUserObjectiveComplianceViewModel>':
-        //   List<dynamic> jsonList = value;
-        //   List<OKRUserParentUserObjectiveComplianceViewModel> list = jsonList.map((item) => OKRUserParentUserObjectiveComplianceViewModel.fromJson(item)).toList();
-        //   return list;
+        case 'ReplyList':
+          int totalReplyCount = value['totalReplyCount'] != null
+              ? int.parse( value['totalReplyCount'].toString() )
+              : 0;
+
+          int replyCount = value['replyCount'] != null
+              ? int.parse( value['replyCount'].toString() )
+              : 0;
+
+          List<dynamic> jsonList = value['replies'];
+          List<CommentModel> list = jsonList.map((item) => CommentModel.fromJson(item)).toList();
+          return {
+            'totalReplyCount': totalReplyCount,
+            'replyCount': replyCount,
+            'list': list
+          };
+
         default:
           {
             Match match;

@@ -10,6 +10,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../../data/models/content_models/comment_model.dart';
 import '../../../../data/models/story_models/story_model.dart';
+import '../../../../redux/get_story_comment_replies/get_story_comment_replies.action.dart';
 import '../../../../redux/get_story_comments/get_story_comments_by_story_id.action.dart';
 import 'comment_card.dart';
 
@@ -17,14 +18,16 @@ class CommentsList extends StatefulWidget {
   final int totalCommentCount;
   final String storyId;
   final List<CommentModel>? commentList;
-  final bool isCommentList; // it also can be comment reply list
+  final CommentModel? selectedComment;
+  final Function( String commentId )? selectCommentFunction;
 
   const CommentsList({
     super.key,
     required this.totalCommentCount,
     this.commentList,
     required this.storyId,
-    this.isCommentList = false,
+    this.selectedComment,
+    this.selectCommentFunction,
   });
 
   @override
@@ -32,13 +35,13 @@ class CommentsList extends StatefulWidget {
 }
 
 class _CommentsListState extends State<CommentsList> {
-  bool shoudSendPaginationRequest = false; //pagination request controlling state
+  bool shouldSendPaginationRequest = false; //pagination request controlling state
   bool isWaitingForAsyncRequest = false; //we make it true after we send request and we dont want to send new one because it is gonna be duplicate
 
   void checkIfPaginationNeeded(Store<AppState> store, int? index) {
     if (_isPaginationNeeded(store, index) && !isWaitingForAsyncRequest) {
       setState(() {
-        shoudSendPaginationRequest = true;
+        shouldSendPaginationRequest = true;
       });
     }
   }
@@ -49,14 +52,14 @@ class _CommentsListState extends State<CommentsList> {
   }
 
   void requestNextPageIfNeeded(Store<AppState> store) {
-    if (shoudSendPaginationRequest) {
+    if (shouldSendPaginationRequest) {
       setState(() {
-        shoudSendPaginationRequest = false;
+        shouldSendPaginationRequest = false;
         isWaitingForAsyncRequest = true;
       });
 
       // Send Request
-      getRecomendedUsersNextPageRequest(() {
+      getRecomendedCommentsNextPageRequest(() {
         setState(() {
           isWaitingForAsyncRequest = false;
         });
@@ -64,15 +67,19 @@ class _CommentsListState extends State<CommentsList> {
     }
   }
 
-  Future<void> getRecomendedUsersNextPageRequest(
-      Function? callBackAfterRequestDone, Store<AppState> store) async {
-    if (widget.isCommentList && widget.commentList != null) {
+  Future<void> getRecomendedCommentsNextPageRequest( Function? callBackAfterRequestDone, Store<AppState> store) async {
+
+    if( widget.commentList == null ){
+      return null;
+    }
+
+    StoryModel? story = store.state.storiesToDisplay!.firstWhere(
+          (element) => element.storyId == widget.storyId,
+    );
+
+    if (widget.selectedComment == null) {
       // send pagination request for comments
       log('PAGINATION Request for Comments');
-
-      StoryModel? story = store.state.storiesToDisplay!.firstWhere(
-        (element) => element.storyId == widget.storyId,
-      );
 
       List<CommentModel>? commentList = story.comments!;
 
@@ -85,7 +92,20 @@ class _CommentsListState extends State<CommentsList> {
         lastComment.id!,
       ));
     } else {
-      // TO DO: send pagination request for replies
+      // send pagination request for replies
+      log('PAGINATION Request for Replies');
+
+      List<CommentModel>? replyList = widget.selectedComment!.replies;
+
+      CommentModel lastReply = replyList!.firstWhere(
+        (element) => element.isLastItem!,
+      );
+
+      await store.dispatch(getStoryCommentRepliesRequestAction(
+        store.state.selectedStory!.storyId!,
+        widget.selectedComment!.id!,
+        lastReply.id!,
+      ));
     }
 
     if (callBackAfterRequestDone != null && mounted) {
@@ -97,7 +117,11 @@ class _CommentsListState extends State<CommentsList> {
     Store<AppState> store = StoreProvider.of<AppState>(context);
 
     return CommentCardWidget(
-      commentId: widget.commentList![ index ].id!,
+      slectCommentFunction: widget.selectedComment == null
+          ? () => widget.selectCommentFunction!( widget.commentList![ index ].id! )
+          : null,
+      replyId: widget.selectedComment != null ? widget.commentList![ widget.commentList!.indexWhere((element) => element.id == widget.selectedComment!.id) ].replies![ index ].id : null,
+      commentId: widget.selectedComment != null ? widget.selectedComment!.id! : widget.commentList![ index ].id!,
       storyId: widget.storyId,
     );
   }
@@ -123,19 +147,33 @@ class _CommentsListState extends State<CommentsList> {
 
     return Column(
       children: List.generate(
-          widget.commentList != null
+          widget.commentList != null && widget.selectedComment == null
              ? widget.commentList!.length
-             : widget.totalCommentCount > 5
-                 ? 5
-                 : widget.totalCommentCount,
+             : widget.commentList != null && widget.selectedComment != null && widget.commentList![ widget.commentList!.indexWhere( (element) => element.id == widget.selectedComment!.id ) ].replies != null
+                  ? widget.commentList![ widget.commentList!.indexWhere( (element) => element.id == widget.selectedComment!.id ) ].replies!.length
+                  : widget.totalCommentCount > 2
+                         ? 2
+                         : widget.totalCommentCount,
           (index) {
-            return widget.commentList != null
-              && widget.commentList?[ index ] != null
+            return (
+                (
+                  widget.selectedComment == null
+                  && widget.commentList != null
+                  && widget.commentList?[ index ] != null
+                )
+                || (
+                  widget.selectedComment != null
+                  && widget.commentList != null
+                  && widget.commentList?[ index ] != null
+                  && widget.commentList![ widget.commentList!.indexWhere( (element) => element.id == widget.selectedComment!.id ) ].replies != null
+                  && widget.commentList![ widget.commentList!.indexWhere( (element) => element.id == widget.selectedComment!.id ) ].replies![ index ] != null
+                )
+            )
               ? _buildVisibilityDetector(
                   _buildCommentCard(index),
                   index,
                 )
-              : const CommentLoadingElement();
+              : CommentLoadingElement( isReply: widget.selectedComment != null);
           }
       ),
     );

@@ -18,15 +18,22 @@ import '../../../../data/models/story_models/story_model.dart';
 import '../../../../presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import '../../../../redux/delete_story_comment_or_reply/delete_story_comment_or_reply.action.dart';
 import '../../../constants/app_colors.dart';
-import '../../../constants/benek_icons.dart';
 import 'last_three_comment_replier_profile_stack_widget.dart';
 
 class CommentCardWidget extends StatefulWidget {
+  final bool isSelectedComment;
+  final Function()? slectCommentFunction;
+  final Function()? resetSelectedCommentFunction;
+  final String? replyId;
   final String commentId;
   final String storyId;
 
   const CommentCardWidget({
     super.key,
+    this.isSelectedComment = false,
+    this.slectCommentFunction,
+    this.resetSelectedCommentFunction,
+    this.replyId,
     required this.commentId,
     required this.storyId,
   });
@@ -52,14 +59,26 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
   void didUpdateWidget(CommentCardWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     final commentCount = _getCommentCount();
+
     final store = StoreProvider.of<AppState>(context);
-    final currentComment = store.state.storiesToDisplay?.firstWhere(
-          (story) => story.storyId == widget.storyId,
-      orElse: () => StoryModel(),
-    ).comments?.firstWhere(
-          (comment) => comment.id == widget.commentId,
-      orElse: () => CommentModel(),
-    );
+    final currentComment = widget.replyId == null
+      ? store.state.storiesToDisplay?.firstWhere(
+              (story) => story.storyId == widget.storyId,
+          orElse: () => StoryModel(),
+        ).comments?.firstWhere(
+              (comment) => comment.id == widget.commentId,
+          orElse: () => CommentModel(),
+        )
+     : store.state.storiesToDisplay?.firstWhere(
+              (story) => story.storyId == widget.storyId,
+          orElse: () => StoryModel(),
+        ).comments?.firstWhere(
+              (comment) => comment.id == widget.commentId,
+          orElse: () => CommentModel(),
+        ).replies?.firstWhere(
+              (reply) => reply.id == widget.replyId,
+          orElse: () => CommentModel(),
+        );
 
     if (commentCount != _previousCommentsCount) {
       _previousCommentsCount = commentCount;
@@ -81,7 +100,13 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
           (story) => story.storyId == widget.storyId,
       orElse: () => StoryModel(),
     );
-    return story?.comments?.length ?? 0;
+
+    return widget.replyId == null
+        ? story?.comments?.length ?? 0
+        : story?.comments?.firstWhere(
+              (comment) => comment.id == widget.commentId,
+          orElse: () => CommentModel(),
+        ).replies?.length ?? 0;
   }
 
   void _updateTextHeight() {
@@ -96,7 +121,7 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
 
   Future<bool?> onCommentLikeButtonTapped(bool didLiked) async {
     Store<AppState> store = StoreProvider.of<AppState>(context);
-    await store.dispatch(likeStoryCommentOrReplyRequestAction(widget.storyId, widget.commentId, null));
+    await store.dispatch(likeStoryCommentOrReplyRequestAction(widget.storyId, widget.commentId, widget.replyId));
 
     setState(() {
       idleUpdate = !idleUpdate;
@@ -119,13 +144,26 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
   Widget build(BuildContext context) {
     return StoreConnector<AppState, CommentModel?>(
       converter: (store) {
-        return store.state.storiesToDisplay?.firstWhere(
-              (story) => story.storyId == widget.storyId,
-          orElse: () => StoryModel(),
-        ).comments?.firstWhere(
-              (comment) => comment.id == widget.commentId,
-          orElse: () => CommentModel(),
-        );
+        return widget.replyId == null
+
+        ? store.state.storiesToDisplay?.firstWhere(
+                (story) => story.storyId == widget.storyId,
+            orElse: () => StoryModel(),
+          ).comments?.firstWhere(
+                (comment) => comment.id == widget.commentId,
+            orElse: () => CommentModel(),
+          )
+
+        : store.state.storiesToDisplay?.firstWhere(
+                (story) => story.storyId == widget.storyId,
+            orElse: () => StoryModel(),
+          ).comments?.firstWhere(
+                (comment) => comment.id == widget.commentId,
+            orElse: () => CommentModel(),
+          ).replies?.firstWhere(
+                (reply) => reply.id == widget.replyId,
+            orElse: () => CommentModel(),
+          );
       },
       builder: (context, comment) {
         Store<AppState> store = StoreProvider.of<AppState>(context);
@@ -154,45 +192,64 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                     children: [
                       LayoutBuilder(
                         builder: (context, constraints) {
-                          return Stack(
+                          return Column(
+                            mainAxisAlignment: widget.isSelectedComment ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  BenekCircleAvatar(
-                                    imageUrl: comment.user!.profileImg!.imgUrl!,
-                                    width: 30.0,
-                                    height: 30.0,
-                                    isDefaultAvatar: comment.user!.profileImg!.isDefaultImg!,
-                                    bgColor: AppColors.benekWhite,
-                                    borderWidth: 2.0,
+                              widget.isSelectedComment
+                              ? IconButton(
+                                  onPressed: () => widget.resetSelectedCommentFunction!(),
+                                  icon: const Icon(
+                                    Icons.arrow_back_ios,
+                                    color: AppColors.benekWhite,
+                                    size: 14,
                                   ),
-                                  SizedBox(
-                                    height: textHeight != null ? textHeight! + 40 : 60,
+                              ) : const SizedBox(),
+
+                              SizedBox( height: widget.isSelectedComment ? 10.0 : 0.0 ),
+
+                              Stack(
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      BenekCircleAvatar(
+                                        imageUrl: comment.user!.profileImg!.imgUrl!,
+                                        width: 30.0,
+                                        height: 30.0,
+                                        isDefaultAvatar: comment.user!.profileImg!.isDefaultImg!,
+                                        bgColor: AppColors.benekWhite,
+                                        borderWidth: 2.0,
+                                      ),
+                                      SizedBox(
+                                        height: textHeight != null ? textHeight! + 40 : 60,
+                                      ),
+                                      comment.lastThreeRepliedUsers != null
+                                      && comment.lastThreeRepliedUsers!.isNotEmpty
+                                      && !widget.isSelectedComment
+                                          ? LastThreeCommentReplierProfileStackWidget(
+                                              size: 30.0,
+                                              users: comment.lastThreeRepliedUsers!,
+                                            )
+                                          : const SizedBox(),
+                                    ],
                                   ),
                                   comment.lastThreeRepliedUsers != null &&
-                                      comment.lastThreeRepliedUsers!.isNotEmpty
-                                      ? LastThreeCommentReplierProfileStackWidget(
-                                    size: 30.0,
-                                    users: comment.lastThreeRepliedUsers!,
-                                  )
+                                  comment.lastThreeRepliedUsers!.isNotEmpty
+                                  && !widget.isSelectedComment
+                                      ? Positioned(
+                                        top: 40,
+                                        bottom: 40,
+                                        left: 15,
+                                        child: Container(
+                                          width: 1.0,
+                                          color: AppColors.benekGrey,
+                                          height: constraints.maxHeight,
+                                        ),
+                                      )
                                       : const SizedBox(),
                                 ],
                               ),
-                              comment.lastThreeRepliedUsers != null &&
-                                  comment.lastThreeRepliedUsers!.isNotEmpty
-                                  ? Positioned(
-                                top: 40,
-                                bottom: 40,
-                                left: 15,
-                                child: Container(
-                                  width: 1.0,
-                                  color: AppColors.benekGrey,
-                                  height: constraints.maxHeight,
-                                ),
-                              )
-                                  : const SizedBox(),
                             ],
                           );
                         },
@@ -202,49 +259,82 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  comment.user!.userName!,
-                                  style: semiBoldTextWithoutColorStyle().copyWith(
+                            !widget.isSelectedComment
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                     Text(
+                                        comment.user!.userName!,
+                                        style: semiBoldTextWithoutColorStyle().copyWith(
+                                          color: AppColors.benekWhite,
+                                        ),
+                                      ),
+                                      Text(
+                                        BenekStringHelpers.getDateAsString(comment.createdAt!),
+                                        style: regularTextWithoutColorStyle().copyWith(
+                                          color: AppColors.benekGrey,
+                                          fontSize: 8.0,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const SizedBox(),
+
+                            const SizedBox(height: 4.0),
+                            MouseRegion(
+                              cursor: widget.replyId == null && !widget.isSelectedComment ? SystemMouseCursors.click : SystemMouseCursors.basic,
+                              child: GestureDetector(
+                                onTap: widget.replyId == null && !widget.isSelectedComment ? widget.slectCommentFunction : null,
+                                child: widget.isSelectedComment
+                                ? RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: '${comment.user!.userName}  :  ',
+                                        style: boldTextStyle( textColor: AppColors.benekWhite ),
+                                      ),
+                                      TextSpan(
+                                        text: comment.comment,
+                                        style: regularTextStyle( textColor: AppColors.benekWhite ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+
+                                : Text(
+                                  widget.replyId == null
+                                      ? comment.comment!
+                                      : comment.reply!,
+                                  key: _textKey,
+                                  style: regularTextWithoutColorStyle().copyWith(
                                     color: AppColors.benekWhite,
                                   ),
                                 ),
-                                Text(
-                                  BenekStringHelpers.getDateAsString(comment.createdAt!),
-                                  style: regularTextWithoutColorStyle().copyWith(
-                                    color: AppColors.benekGrey,
-                                    fontSize: 8.0,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4.0),
-                            Text(
-                              comment.comment!,
-                              key: _textKey,
-                              style: regularTextWithoutColorStyle().copyWith(
-                                color: AppColors.benekWhite,
                               ),
                             ),
-                            const SizedBox(height: 15.0),
+                            SizedBox(height: widget.isSelectedComment ? 15.0 : 0.0),
+                            widget.isSelectedComment
+                                ? const Divider(color: AppColors.benekGrey)
+                                : const SizedBox(height: 15.0),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                IconButton(
-                                    padding: EdgeInsets.zero,
-                                    onPressed: (){
 
-                                    },
+                                widget.replyId == null
+                                && !widget.isSelectedComment
+                                ? IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: widget.replyId == null ? widget.slectCommentFunction : null,
                                     icon: const Icon(
                                       Icons.chat_bubble_outline,
                                       color: AppColors.benekWhite,
                                       size: 14,
                                     ),
-                                ),
-                                const SizedBox(width: 15.0),
+                                )
+                                : const SizedBox(),
+
+                                SizedBox(width: widget.replyId == null ? 10.0 : 0.0),
                                 MouseRegion(
                                   cursor: SystemMouseCursors.click,
                                   child: LikeButton(
@@ -262,7 +352,7 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                                     },
                                   ),
                                 ),
-                                SizedBox(width: isCommentBelongsToUser ? 30.0 : 0.0),
+                                SizedBox(width: isCommentBelongsToUser ? 20.0 : 0.0),
                                 isCommentBelongsToUser
                                     ? IconButton(
                                       padding: EdgeInsets.zero,
@@ -275,7 +365,8 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                                             pageBuilder: (context, _, __) => EditCommentScreen(
                                                 storyId: widget.storyId,
                                                 commentId: widget.commentId,
-                                                textToEdit: comment.comment!,
+                                                replyId: widget.replyId,
+                                                textToEdit: widget.replyId == null ? comment.comment! : comment.reply!,
                                             ),
                                           ),
                                         );
@@ -288,8 +379,6 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                                     )
                                     : const SizedBox(),
 
-                                SizedBox(width: isCommentBelongsToUser ? 15.0 : 0.0),
-
                                 isCommentBelongsToUser
                                     ? IconButton(
                                         padding: EdgeInsets.zero,
@@ -300,7 +389,9 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                                                 opaque: false,
                                                 barrierDismissible: false,
                                                 pageBuilder: (context, _, __) => ApproveScreen(
-                                                  title: BenekStringHelpers.locale('approveCommentDelete'),
+                                                  title: widget.replyId == null
+                                                    ? BenekStringHelpers.locale('approveCommentDelete')
+                                                    : BenekStringHelpers.locale('approveReplyDelete'),
                                                 ),
                                               ),
                                             );
@@ -310,7 +401,7 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                                             }
 
                                             Store<AppState> store = StoreProvider.of<AppState>(context);
-                                            await store.dispatch(deleteStoryCommentOrReplyRequestAction(widget.storyId, widget.commentId, null));
+                                            await store.dispatch(deleteStoryCommentOrReplyRequestAction(widget.storyId, widget.commentId, widget.replyId));
                                         },
                                         icon: const Icon(
                                           Icons.delete_outline,
@@ -321,35 +412,48 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                                     : const SizedBox(),
                               ],
                             ),
-                            const SizedBox(height: 10.0),
+
+                            widget.isSelectedComment
+                              ? const Divider(color: AppColors.benekGrey)
+                              : const SizedBox(height: 10.0),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    log('Reply to comment');
-                                  },
-                                  child: Text(
-                                    '${comment.replyCount} ${BenekStringHelpers.locale('reply')}',
+                                Row(
+                                  children: [
+                                    widget.replyId == null
+                                      ? Text(
+                                        '${comment.replyCount} ${BenekStringHelpers.locale('reply')}',
+                                        style: regularTextWithoutColorStyle().copyWith(
+                                          color: AppColors.benekGrey,
+                                          fontSize: 12.0,
+                                        ),
+                                      ) : const SizedBox(),
+                                    widget.replyId == null
+                                      ? Text(
+                                        '  |  ',
+                                        style: regularTextWithoutColorStyle().copyWith(
+                                          color: AppColors.benekGrey,
+                                          fontSize: 12.0,
+                                        ),
+                                      ) : const SizedBox(),
+                                    Text(
+                                      '${comment.likeCount} ${BenekStringHelpers.locale('like')}',
+                                      style: regularTextWithoutColorStyle().copyWith(
+                                        color: AppColors.benekGrey,
+                                        fontSize: 12.0,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                widget.isSelectedComment
+                                  ? Text(
+                                    BenekStringHelpers.getDateAsString(comment.createdAt!),
                                     style: regularTextWithoutColorStyle().copyWith(
                                       color: AppColors.benekGrey,
                                       fontSize: 12.0,
                                     ),
-                                  ),
-                                ),
-                                Text(
-                                  '  |  ',
-                                  style: regularTextWithoutColorStyle().copyWith(
-                                    color: AppColors.benekGrey,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                                Text(
-                                  '${comment.likeCount} ${BenekStringHelpers.locale('like')}',
-                                  style: regularTextWithoutColorStyle().copyWith(
-                                    color: AppColors.benekGrey,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
+                                  ) : const SizedBox(),
                               ],
                             ),
                           ],

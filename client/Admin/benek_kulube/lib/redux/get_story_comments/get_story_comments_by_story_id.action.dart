@@ -1,5 +1,3 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers
-
 import 'dart:developer';
 
 import 'package:benek_kulube/data/services/api.dart';
@@ -34,6 +32,18 @@ ThunkAction<AppState> getStoryCommentsByStoryIdRequestAction( String? storyId, S
       // await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };
+}
+
+ThunkAction<AppState> resetStoryCommentsAction( String? storyId ){
+  return (Store<AppState> store) async {
+    await store.dispatch(ResetStoryCommentsAction( storyId ));
+  };
+}
+
+class ResetStoryCommentsAction {
+  final String? _storyId;
+  String? get storyId => _storyId;
+  ResetStoryCommentsAction(this._storyId);
 }
 
 class GetStoryCommentsByStoryIdRequestAction {

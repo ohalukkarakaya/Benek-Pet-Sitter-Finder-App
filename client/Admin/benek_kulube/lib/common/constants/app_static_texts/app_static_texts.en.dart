@@ -89,6 +89,7 @@ class AppStaticTextsEn{
     'writeAComment': 'Write a comment...',
     'writeAReply': 'Write a reply...',
     'commentEmptyState': 'No Comment Yet!',
+    'replyEmptyState': 'No Reply Yet!',
     'tagPetInfoCaption': 'Stories has to be about A pet! Please tag a pet!',
     'addDescriptionCaption': 'Writing a description for the Story is mandatory!',
     'invalidPath': 'Invalid File Path!',
@@ -99,5 +100,6 @@ class AppStaticTextsEn{
     'reply': 'Reply',
     'approveStoryDelete': 'Slide to delete story...',
     'approveCommentDelete': 'Slide to delete comment...',
+    'approveReplyDelete': 'Slide to delete reply...',
   };
 }

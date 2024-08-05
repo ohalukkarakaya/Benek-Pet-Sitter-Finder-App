@@ -287,17 +287,9 @@ class StoryApi {
       List<QueryParam> queryParams = [];
       Map<String, String> headerParams = {};
       Map<String, String> formParams = {};
-      List<String> contentTypes = [];
       List<String> authNames = [];
 
-      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
-
-      if( contentType.startsWith("multipart/form-data") ){
-        bool hasFields = false;
-        MultipartRequest mp = MultipartRequest("", Uri.parse(""));
-        // ignore: dead_code
-        if ( hasFields ) postBody = mp;
-      }
+      String contentType = "application/json";
 
       var response = await apiClient.invokeAPI(path, 'GET', queryParams, postBody, headerParams, formParams, contentType, authNames);
       if (response.statusCode >= 400 && response.statusCode != 404) {
@@ -312,6 +304,40 @@ class StoryApi {
       }
     } catch (err) {
       log('ERROR: getCommentsByStoryId - $err');
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> getStoryCommentReplies( String storyId, String commentId, int? limit, String? lastElementId ) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      int limitCount = limit ?? 15;
+      String lastElement = lastElementId ?? 'null';
+
+      String path = '/api/user/interractions/story/comments/getReplies/$storyId/$commentId/$lastElement/$limitCount';
+
+      Object? postBody;
+
+      // Query Params
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> authNames = [];
+
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'GET', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 && response.statusCode != 404 ){
+        throw ApiException(code: response.statusCode, message: response.body);
+      }else if(response.statusCode == 404){
+        return {'totalReplyCount': 0, 'list': <CommentModel>[]};
+        // ignore: unnecessary_null_comparison
+      }else if( response.body != null && response.statusCode == 200 ){
+        return apiClient.deserialize( response.body, 'ReplyList' ) as Map<String, dynamic>;
+      }
+    }catch( err ){
+      log('ERROR: getStoryCommentReplies - $err');
     }
     return null;
   }

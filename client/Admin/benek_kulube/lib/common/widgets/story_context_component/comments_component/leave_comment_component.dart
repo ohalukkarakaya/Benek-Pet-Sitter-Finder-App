@@ -180,7 +180,7 @@ class _LeaveCommentComponentState extends State<LeaveCommentComponent> {
                           await store.dispatch(
                               postStoryCommentOrReplyRequestAction(
                                 widget.storyId,
-                                  _textController.text,
+                                _textController.text,
                                 widget.selectedCommentId
                               )
                           );

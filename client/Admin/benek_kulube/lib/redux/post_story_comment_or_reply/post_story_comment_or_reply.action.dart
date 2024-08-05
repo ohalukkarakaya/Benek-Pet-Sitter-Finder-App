@@ -16,7 +16,6 @@ ThunkAction<AppState> postStoryCommentOrReplyRequestAction( String storyId, Stri
     bool isReply = commentId != null;
 
     CommentModel comment = CommentModel(
-      isReply: isReply,
       user: store.state.userInfo!,
       comment: !isReply ? desc : null,
       reply: isReply ? desc : null,
@@ -24,11 +23,7 @@ ThunkAction<AppState> postStoryCommentOrReplyRequestAction( String storyId, Stri
     );
 
     try{
-      String? registerId = await api.postCommentOrReply(
-          storyId,
-          desc,
-          commentId
-      );
+      String? registerId = await api.postCommentOrReply( storyId, desc, commentId);
 
       if( registerId == null ){
         log('ERROR: postStoryCommentOrReplyRequestAction - registerId is null');
@@ -36,20 +31,26 @@ ThunkAction<AppState> postStoryCommentOrReplyRequestAction( String storyId, Stri
       }
 
       comment.id = registerId;
-      Map<String, dynamic> data = {
-        'storyId': storyId,
-        'comment': comment
-      };
 
-      await store.dispatch(PostStoryCommentOrReplyRequestAction(data));
+      await store.dispatch(PostStoryCommentOrReplyRequestAction( storyId, commentId, comment ));
     }catch( err ){
-      log('ERROR: postStoryRequestAction - $err');
+      log('ERROR: postStoryCommentOrReplyRequestAction - $err');
     }
   };
 }
 
 class PostStoryCommentOrReplyRequestAction {
-  final Map<String, dynamic>? _data;
-  Map<String, dynamic>? get data => _data;
-  PostStoryCommentOrReplyRequestAction(this._data);
+  final String? _storyId;
+  final String? _commentId;
+  final CommentModel? _comment;
+
+  String? get storyId => _storyId;
+  String? get commentId => _commentId;
+  CommentModel? get comment => _comment;
+
+  PostStoryCommentOrReplyRequestAction(
+    this._storyId,
+    this._commentId,
+    this._comment
+  );
 }

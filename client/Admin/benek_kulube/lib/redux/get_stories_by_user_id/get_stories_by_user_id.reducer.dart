@@ -34,8 +34,13 @@ List<StoryModel>? getStoriesByUserIdRequestReducer( List<StoryModel>? stories, d
 
     return stories;
   }else if( action is PostStoryCommentOrReplyRequestAction ){
-    int index = stories!.indexWhere((element) => element.storyId == action.data?['storyId']);
-    stories[index].addComment( action.data?['comment'] );
+    int index = stories!.indexWhere((element) => element.storyId == action.storyId);
+
+    if( action.commentId == null ){
+      stories[index].addComment( action.comment! );
+    }else{
+      stories[index].addReplyToComment( action.commentId!, action.comment! );
+    }
 
     stories[index].commentCount = stories[index].commentCount! + 1;
 
@@ -55,6 +60,32 @@ List<StoryModel>? getStoriesByUserIdRequestReducer( List<StoryModel>? stories, d
     }else{
       stories[index].insertComments( action.data?['list'] );
     }
+
+    return stories;
+  }else if( action is ResetStoryCommentsAction ){
+    int index = stories!.indexWhere((element) => element.storyId == action.storyId);
+
+    stories[index].comments = null;
+
+    return stories;
+
+  }else if( action is GetStoryCommentRepliesRequestAction ){
+    int storyIndex = stories!.indexWhere((element) => element.storyId == action.storyId);
+    int commentIndex = stories[storyIndex].comments!.indexWhere((element) => element.id == action.commentId);
+
+    stories[storyIndex].comments?[commentIndex].setReplyCount( action.totalReplyCount! );
+    if( action.isPagination! ) {
+      stories[storyIndex].comments?[commentIndex].addReplies( action.replies ?? <CommentModel>[] );
+    }else{
+      stories[storyIndex].comments?[commentIndex].insertReplies( action.replies ?? <CommentModel>[] );
+    }
+
+    return stories;
+  }else if( action is ResetStoryCommentRepliesAction ){
+    int storyIndex = stories!.indexWhere((element) => element.storyId == action.storyId);
+    int commentIndex = stories[storyIndex].comments!.indexWhere((element) => element.id == action.commentId);
+
+    stories[storyIndex].comments?[commentIndex].replies = null;
 
     return stories;
   }else if( action is LikeStoryCommentOrReplyRequestAction ){

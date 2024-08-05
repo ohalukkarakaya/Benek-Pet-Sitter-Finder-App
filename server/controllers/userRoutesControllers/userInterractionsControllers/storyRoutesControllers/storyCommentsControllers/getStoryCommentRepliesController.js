@@ -68,8 +68,8 @@ const getStoryCommentRepliesController = async ( req, res ) => {
                     replyObject.userId.toString() !== userId
             );
 
-            const limitedReplies = commentList.slice(skip, skip + limit);
-            comments.push(...limitedReplies);
+            const limitedReplies = replyList.slice(skip, skip + limit);
+            replies.push(...limitedReplies);
         }
 
         if( replies.length > 0 ){

@@ -5,7 +5,11 @@ import 'package:shimmer/shimmer.dart';
 import '../../../constants/app_colors.dart';
 
 class CommentLoadingElement extends StatelessWidget {
-  const CommentLoadingElement({super.key});
+  final bool isReply;
+  const CommentLoadingElement({
+    super.key,
+    this.isReply = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,66 +44,69 @@ class CommentLoadingElement extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(100.0),
                               )
                             ),
-                            const SizedBox( height: 35 ),
+                            SizedBox( height: isReply ? 0 : 35 ),
 
-                            SizedBox(
-                              width: 30,
-                              height: 30,
-                              child: Stack(
-                                children: [
-                                  Positioned(
-                                      right: 0,
-                                      top: 0,
-                                      child: Container(
-                                        width: 30 / 2,
-                                        height: 30 / 2,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.benekWhite,
-                                          borderRadius: BorderRadius.circular(100.0),
+                            if(!isReply)
+                              SizedBox(
+                                width: 30,
+                                height: 30,
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: Container(
+                                          width: 30 / 2,
+                                          height: 30 / 2,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.benekWhite,
+                                            borderRadius: BorderRadius.circular(100.0),
+                                          )
                                         )
-                                      )
-                                  ),
-
-                                Positioned(
-                                      left: 0,
-                                      top: 30 / 2.7,
-                                      child: Container(
-                                        width: 30 / 2.3,
-                                        height: 30 / 2.3,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.benekWhite,
-                                          borderRadius: BorderRadius.circular(100.0),
-                                        )
-                                      )
-                                  ),
+                                    ),
 
                                   Positioned(
-                                      left: 30 / 2.0,
-                                      bottom: 0,
-                                      child: Container(
-                                        width: 30 / 2.8,
-                                        height: 30 / 2.8,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.benekWhite,
-                                          borderRadius: BorderRadius.circular(100.0),
+                                        left: 0,
+                                        top: 30 / 2.7,
+                                        child: Container(
+                                          width: 30 / 2.3,
+                                          height: 30 / 2.3,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.benekWhite,
+                                            borderRadius: BorderRadius.circular(100.0),
+                                          )
                                         )
-                                      )
-                                  )
-                                ],
-                              ),
-                            )
+                                    ),
+
+                                    Positioned(
+                                        left: 30 / 2.0,
+                                        bottom: 0,
+                                        child: Container(
+                                          width: 30 / 2.8,
+                                          height: 30 / 2.8,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.benekWhite,
+                                            borderRadius: BorderRadius.circular(100.0),
+                                          )
+                                        )
+                                    )
+                                  ],
+                                ),
+                              )
                           ],
                         ),
-                        Positioned(
-                          top: 40,
-                          bottom: 40,
-                          left: 15,
-                          child: Container(
-                            width: 1.0,
-                            color: AppColors.benekWhite,
-                            height: constraints.maxHeight,
+
+                        if( !isReply )
+                          Positioned(
+                            top: 40,
+                            bottom: 40,
+                            left: 15,
+                            child: Container(
+                              width: 1.0,
+                              color: AppColors.benekWhite,
+                              height: constraints.maxHeight,
+                            ),
                           ),
-                        ),
                       ],
                     );
                   },

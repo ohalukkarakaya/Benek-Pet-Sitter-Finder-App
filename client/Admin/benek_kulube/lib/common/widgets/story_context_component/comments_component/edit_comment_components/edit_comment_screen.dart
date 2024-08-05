@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:benek_kulube/data/models/content_models/comment_model.dart';
+import 'package:benek_kulube/presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
 import 'package:benek_kulube/presentation/shared/components/loading_components/benek_blured_modal_barier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -267,16 +268,15 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
                                 },
                                 icon: !isSendingRequest
                                     ? Icon(
-                                  Icons.send,
-                                  color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                  size: 15,
-                                )
-                                    : CircularProgressIndicator(
-                                  strokeWidth: 2.0,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                  ),
-                                ),
+                                      Icons.send,
+                                      color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                      size: 15,
+                                    )
+                                    : BenekProcessIndicator(
+                                      color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                      width: 15.0,
+                                      height: 15.0,
+                                    ),
                               ),
                             ],
                           ),
