@@ -38,11 +38,10 @@ List<StoryModel>? getStoriesByUserIdRequestReducer( List<StoryModel>? stories, d
 
     if( action.commentId == null ){
       stories[index].addComment( action.comment! );
+      stories[index].commentCount = stories[index].commentCount! + 1;
     }else{
       stories[index].addReplyToComment( action.commentId!, action.comment! );
     }
-
-    stories[index].commentCount = stories[index].commentCount! + 1;
 
     return stories;
   }else if( action is PutEditStoryCommentOrReplyRequestAction ){

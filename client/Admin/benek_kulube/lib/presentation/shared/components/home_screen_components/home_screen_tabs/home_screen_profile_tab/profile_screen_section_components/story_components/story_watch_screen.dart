@@ -46,9 +46,7 @@ class _StoryWatchScreenState extends State<StoryWatchScreen> {
         shouldPop = false;
       });
 
-      Navigator.pop(context);
-
-      store.dispatch(resetStoryCommentsAction(store.state.storiesToDisplay![selectedStoryIndex].storyId));
+      Navigator.of(context).pop( store.state.selectedStory!.storyId );
     }
 
     return BenekBluredModalBarier(

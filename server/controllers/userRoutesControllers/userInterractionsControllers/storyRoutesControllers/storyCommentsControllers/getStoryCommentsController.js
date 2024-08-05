@@ -74,12 +74,20 @@ const getStoryCommentsController = async (req, res) => {
                 }
 
                 const replyCount = commentObject.replies.length;
+
                 let lastReply = replyCount > 0 ? commentObject.replies[replyCount - 1] : {};
 
                 if (lastReply.likes) {
                     lastReply.likeCount = lastReply.likes.length;
                     delete lastReply.likes;
                 }
+
+                const matchingRepliesCount = commentObject.replies.filter(
+                    reply =>
+                        reply.userId.toString() === userId
+                ).length;
+
+                commentObject.usersReplyCount = matchingRepliesCount;
 
                 let lastThreeRepliedUsers = [];
                 if (commentObject.replies.length > 0) {

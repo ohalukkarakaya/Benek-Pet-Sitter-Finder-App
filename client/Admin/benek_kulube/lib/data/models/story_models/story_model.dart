@@ -169,8 +169,24 @@ class StoryModel {
   void deleteCommentOrReply( String commentId, String? replyId ){
     CommentModel? comment = comments?.firstWhere((element) => element.id == commentId );
     if( replyId != null ){
-      comment!.replies!.removeWhere((element) => element.id == replyId);
+      String replyUserId = comment!.replies!.firstWhere((element) => element.id == replyId).user!.userId!;
+
+      comment.replies!.removeWhere((element) => element.id == replyId);
       comment.replyCount = comment.replyCount! - 1;
+
+      // TO DO: delete users photo from last three repliers list if there is no other comment user has
+      List<String?>? userIdList = comment.lastThreeRepliedUsers?.map((e) => e.userId).toList();
+
+      if(
+          userIdList != null
+          && userIdList.isNotEmpty
+          && userIdList.contains( replyUserId )
+          && comment.usersReplyCount! <= 1
+      ){
+        comment.lastThreeRepliedUsers = comment.lastThreeRepliedUsers?.where((element) => element.userId != replyUserId).toList();
+      }
+
+      comment.usersReplyCount = comment.usersReplyCount! - 1;
     }else{
       comments?.removeWhere((element) => element.id == commentId);
       commentCount = commentCount! - 1;

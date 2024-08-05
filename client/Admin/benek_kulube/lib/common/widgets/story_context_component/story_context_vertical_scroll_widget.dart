@@ -52,7 +52,6 @@ class _StoryContextVerticalScrollWidgetState extends State<StoryContextVerticalS
         curve: Curves.easeInOut,
       ).then((_) {
         Store<AppState> store = StoreProvider.of<AppState>(context);
-        log("activePageIndex: ${widget.activePageIndex}, oldWidget.activePageIndex: ${oldWidget.activePageIndex}");
         store.dispatch(resetStoryCommentsAction(store.state.storiesToDisplay![oldWidget.activePageIndex].storyId));
       });
     }

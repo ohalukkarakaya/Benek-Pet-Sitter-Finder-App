@@ -156,7 +156,7 @@ class _ProfileTabState extends State<ProfileTab> {
                             await selectStoryFunction();
                           }
 
-                          await Navigator.push(
+                          String storyId = await Navigator.push(
                             context,
                             PageRouteBuilder(
                               opaque: false,
@@ -164,6 +164,8 @@ class _ProfileTabState extends State<ProfileTab> {
                               pageBuilder: (context, _, __) => const StoryWatchScreen(),
                             ),
                           );
+
+                          await store.dispatch(resetStoryCommentsAction(storyId));
                         },
                         createStoryPageBuilderFunction: createStoryPageBuilderFunction,
                       ),

@@ -21,6 +21,7 @@ class CommentModel {
   List<String>? likes;
   int? likeCount;
   int? replyCount;
+  int? usersReplyCount;
   List<UserInfo>? lastThreeRepliedUsers;
 
   CommentModel({
@@ -36,6 +37,7 @@ class CommentModel {
     this.likes,
     this.likeCount = 0,
     this.replyCount = 0,
+    this.usersReplyCount = 0,
     this.lastThreeRepliedUsers,
   });
 
@@ -70,7 +72,7 @@ class CommentModel {
           ? int.parse(json['likeCount'].toString())
           : 0;
     replyCount = json['replyCount'] != null ? int.parse(json['replyCount'].toString()) : 0;
-
+    usersReplyCount = json['usersReplyCount'] != null ? int.parse(json['usersReplyCount'].toString()) : 0;
     if (json['user'] != null) {
       user = UserInfo.fromJson(json['user']);
     } else if (json['userId'] != null) {
@@ -138,11 +140,12 @@ class CommentModel {
     if(
       userIdList == null
       || (userIdList != null && userIdList.isEmpty)
-      || (userIdList != null && !userIdList.contains(reply.user!.userId))
+      || (userIdList != null && userIdList.length < 3 && !userIdList.contains(reply.user!.userId))
     ){
       lastThreeRepliedUsers?.insert(0, reply.user!);
     }
 
+    usersReplyCount = usersReplyCount! + 1;
     replyCount = replyCount! + 1;
   }
 
@@ -220,6 +223,16 @@ class CommentModel {
       likeCount = didUserLiked!
           ? likeCount! + 1
           : likeCount! - 1;
+    }
+  }
+
+  void increaseUsersReplyCount(){
+    usersReplyCount = usersReplyCount! + 1;
+  }
+
+  void decreaseUsersReplyCount(){
+    if( usersReplyCount! > 0 ){
+      usersReplyCount = usersReplyCount! - 1;
     }
   }
 }
