@@ -54,8 +54,11 @@ class _StoryElementState extends State<StoryElement> {
       child: GestureDetector(
         onTap: () => widget.onTapPageBuilder(
             () async {
+              await store.dispatch(IncreaseProcessCounterAction());
+              await store.dispatch(resetStoryCommentsAction(widget.story!.storyId));
               store.dispatch(getStoryCommentsByStoryIdRequestAction(widget.story!.storyId, null));
               await store.dispatch(selectStoryAction(widget.story!));
+              await store.dispatch(DecreaseProcessCounterAction());
             },
             widget.stories,
             widget.index

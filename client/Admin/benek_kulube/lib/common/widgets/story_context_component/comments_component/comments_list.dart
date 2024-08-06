@@ -12,6 +12,7 @@ import '../../../../data/models/content_models/comment_model.dart';
 import '../../../../data/models/story_models/story_model.dart';
 import '../../../../redux/get_story_comment_replies/get_story_comment_replies.action.dart';
 import '../../../../redux/get_story_comments/get_story_comments_by_story_id.action.dart';
+import '../../../../redux/process_counter/process_counter.action.dart';
 import 'comment_card.dart';
 
 class CommentsList extends StatefulWidget {
@@ -73,6 +74,8 @@ class _CommentsListState extends State<CommentsList> {
       return null;
     }
 
+    await store.dispatch(IncreaseProcessCounterAction());
+
     StoryModel? story = store.state.storiesToDisplay!.firstWhere(
           (element) => element.storyId == widget.storyId,
     );
@@ -111,6 +114,8 @@ class _CommentsListState extends State<CommentsList> {
     if (callBackAfterRequestDone != null && mounted) {
       callBackAfterRequestDone();
     }
+
+    await store.dispatch(DecreaseProcessCounterAction());
   }
 
   Widget _buildCommentCard(int index) {

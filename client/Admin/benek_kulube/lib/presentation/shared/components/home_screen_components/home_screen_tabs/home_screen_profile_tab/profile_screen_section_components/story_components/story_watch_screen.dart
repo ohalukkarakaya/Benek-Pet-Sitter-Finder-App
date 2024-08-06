@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../../../../../../../common/widgets/story_context_component/story_context_vertical_scroll_widget.dart';
 import '../../../../../../../../common/widgets/vertical_video_companent/vertical_scroll_widget.dart';
+import '../../../../../../../../redux/process_counter/process_counter.action.dart';
 import '../../../../../loading_components/benek_blured_modal_barier.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 // ignore: depend_on_referenced_packages
@@ -41,7 +42,7 @@ class _StoryWatchScreenState extends State<StoryWatchScreen> {
         ? store.state.storiesToDisplay!.indexWhere((StoryModel story) => story.storyId == store.state.selectedStory!.storyId)
         : 0;
 
-    if( shouldPop ){
+    if( shouldPop && store.state.processCounter == 0  ){
       setState(() {
         shouldPop = false;
       });
@@ -86,11 +87,13 @@ class _StoryWatchScreenState extends State<StoryWatchScreen> {
                           width: MediaQuery.of(context).size.width / 3,
                           startFrom: selectedStoryIndex,
                           storiesToDisplay: store.state.storiesToDisplay!,
-                          onStoryChange: (int index) {
+                          onStoryChange: (int index) async {
+                            await store.dispatch(IncreaseProcessCounterAction());
                             store.dispatch(getStoryCommentsByStoryIdRequestAction(store.state.storiesToDisplay![index].storyId, null));
                             setState(() {
                               selectedStoryIndex = index;
                             });
+                            await store.dispatch(DecreaseProcessCounterAction());
                           },
                       ),
                     ),
