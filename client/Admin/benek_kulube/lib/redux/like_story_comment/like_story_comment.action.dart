@@ -23,7 +23,6 @@ ThunkAction<AppState> likeStoryCommentOrReplyRequestAction( String storyId, Stri
       await store.dispatch(LikeStoryCommentOrReplyRequestAction(didRequestDone, storyId, commentId, replyId));
     } on ApiException catch (e) {
       log('ERROR: getStoriesByUserId - $e');
-      // await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };
 }

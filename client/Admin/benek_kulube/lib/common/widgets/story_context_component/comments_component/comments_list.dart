@@ -117,7 +117,7 @@ class _CommentsListState extends State<CommentsList> {
     Store<AppState> store = StoreProvider.of<AppState>(context);
 
     return CommentCardWidget(
-      slectCommentFunction: widget.selectedComment == null
+      selectCommentFunction: widget.selectedComment == null
           ? () => widget.selectCommentFunction!( widget.commentList![ index ].id! )
           : null,
       replyId: widget.selectedComment != null ? widget.commentList![ widget.commentList!.indexWhere((element) => element.id == widget.selectedComment!.id) ].replies![ index ].id : null,

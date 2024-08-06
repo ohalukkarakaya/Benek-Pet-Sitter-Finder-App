@@ -165,7 +165,10 @@ class _ProfileTabState extends State<ProfileTab> {
                             ),
                           );
 
-                          await store.dispatch(resetStoryCommentsAction(storyId));
+                          if (storyId != null && storyId.isNotEmpty) {
+                            await Future.delayed(const Duration(milliseconds: 200));
+                            await store.dispatch(resetStoryCommentsAction(storyId));
+                          }
                         },
                         createStoryPageBuilderFunction: createStoryPageBuilderFunction,
                       ),

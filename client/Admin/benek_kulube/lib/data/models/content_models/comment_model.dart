@@ -208,21 +208,16 @@ class CommentModel {
     }
   }
 
-  void likeCommentOrReply( String? replyId ) {
+  void likeCommentOrReply(String? replyId) {
     bool isReply = replyId != null;
-    didUserLiked = isReply
-        ? replies!.firstWhere((element) => element.id == replyId).didUserLiked ?? false
-        : didUserLiked ?? false;
-    if( isReply ) {
-      replies!.firstWhere(
-          (element) =>
-              element.id == replyId
-      ).likeCommentOrReply( null );
-    }else{
-      didUserLiked = !didUserLiked!;
-      likeCount = didUserLiked!
-          ? likeCount! + 1
-          : likeCount! - 1;
+
+    if (isReply) {
+      var reply = replies!.firstWhere((element) => element.id == replyId);
+      reply.didUserLiked = !(reply.didUserLiked ?? false);
+      reply.likeCount = reply.didUserLiked! ? reply.likeCount! + 1 : reply.likeCount! - 1;
+    } else {
+      didUserLiked = !(didUserLiked ?? false);
+      likeCount = didUserLiked! ? likeCount! + 1 : likeCount! - 1;
     }
   }
 
