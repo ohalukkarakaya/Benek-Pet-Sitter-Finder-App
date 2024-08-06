@@ -16,6 +16,7 @@ import 'package:benek_kulube/redux/delete_story_comment_or_reply/delete_story_co
 import 'package:benek_kulube/common/utils/styles.text.dart';
 
 import '../../../constants/app_colors.dart';
+import '../../../constants/benek_icons.dart';
 import '../../../utils/benek_string_helpers.dart';
 import 'last_three_comment_replier_profile_stack_widget.dart';
 
@@ -147,7 +148,7 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
               IconButton(
                 onPressed: widget.resetSelectedCommentFunction,
                 icon: const Icon(
-                  Icons.arrow_back_ios,
+                  BenekIcons.left,
                   color: AppColors.benekWhite,
                   size: 14,
                 ),

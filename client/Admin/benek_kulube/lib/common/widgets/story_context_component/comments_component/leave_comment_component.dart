@@ -162,7 +162,7 @@ class _LeaveCommentComponentState extends State<LeaveCommentComponent> {
               },
               child: Container(
                 height: 80.0,
-                padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 25.0),
+                padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 30.0),
                 decoration: BoxDecoration(
                   color: isReadyToSend
                     && !isSendingRequest
@@ -199,8 +199,8 @@ class _LeaveCommentComponentState extends State<LeaveCommentComponent> {
                       size: 20,
                     )
                   : const BenekProcessIndicator(
-                    width: 5.0,
-                    height: 5.0,
+                    width: 3.0,
+                    height: 3.0,
                   )
                 )
               ),
