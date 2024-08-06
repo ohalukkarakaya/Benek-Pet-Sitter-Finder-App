@@ -248,7 +248,10 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
           _buildCommentActions(comment, isLiked, isCommentBelongsToUser),
 
           widget.isSelectedComment
-              ? const Divider(color: AppColors.benekGrey)
+              ? const Padding(
+                padding: EdgeInsets.symmetric( vertical: 5.0),
+                child: Divider(color: AppColors.benekGrey),
+              )
               : const SizedBox(height: 10.0),
 
           _buildLikesAndRepliesRow(comment, isLiked),
@@ -283,7 +286,7 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
               )
               : const SizedBox(),
 
-          SizedBox(width: widget.replyId == null ? 15.0 : 0.0),
+          SizedBox(width: widget.replyId == null && !widget.isSelectedComment ? 15.0 : 0.0),
           MouseRegion(
             cursor: SystemMouseCursors.click,
             child: LikeButton(
