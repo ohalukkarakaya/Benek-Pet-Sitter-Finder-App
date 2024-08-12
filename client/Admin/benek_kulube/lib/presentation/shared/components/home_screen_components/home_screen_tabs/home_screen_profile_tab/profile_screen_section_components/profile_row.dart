@@ -11,14 +11,18 @@ import '../../../../../../../common/utils/benek_string_helpers.dart';
 import '../../../../../../../data/models/user_profile_models/auth_role_model.dart';
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../benek_circle_avatar/benek_circle_avatar.dart';
+import 'edit_profile_button.dart';
+import 'edit_profile_screen/edit_profile_screen.dart';
 import 'give_auth_role_button.dart';
 
 class ProfileRowWidget extends StatelessWidget {
   final int authRoleId;
+  final bool isUsersProfile;
   final UserInfo selectedUserInfo;
   const ProfileRowWidget({
     super.key,
     required this.authRoleId,
+    required this.isUsersProfile,
     required this.selectedUserInfo
   });
 
@@ -35,12 +39,42 @@ class ProfileRowWidget extends StatelessWidget {
           children: [
             Hero(
               tag: 'user_avatar_${selectedUserInfo.userId}',
-              child: BenekCircleAvatar(
-                width: 70,
-                height: 70,
-                radius: 100,
-                isDefaultAvatar: selectedUserInfo.profileImg!.isDefaultImg!,
-                imageUrl: selectedUserInfo.profileImg!.imgUrl!,
+              child: Stack(
+                children: [
+                  SizedBox(
+                    width: isUsersProfile ? 75 : 70,
+                    height: isUsersProfile ? 75 : 70,
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: BenekCircleAvatar(
+                      width: 70,
+                      height: 70,
+                      radius: 100,
+                      isDefaultAvatar: selectedUserInfo.profileImg!.isDefaultImg!,
+                      imageUrl: selectedUserInfo.profileImg!.imgUrl!,
+                    ),
+                  ),
+                  isUsersProfile
+                    ? Positioned(
+                      left: 0.0,
+                      bottom: 0.0,
+                      child: EditProfileButton(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              opaque: false,
+                              barrierDismissible: false,
+                              pageBuilder: (context, _, __) => const EditProfileScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                    : const SizedBox()
+                ],
               ),
             ),
 

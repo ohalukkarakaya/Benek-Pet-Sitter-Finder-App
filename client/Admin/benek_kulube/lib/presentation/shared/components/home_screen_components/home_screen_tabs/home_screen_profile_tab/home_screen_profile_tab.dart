@@ -178,6 +178,7 @@ class _ProfileTabState extends State<ProfileTab> {
 
                 ProfileRowWidget(
                     authRoleId: store.state.userRoleId,
+                    isUsersProfile: store.state.userInfo!.userId == selectedUserInfo.userId,
                     selectedUserInfo: selectedUserInfo,
                 ),
 
