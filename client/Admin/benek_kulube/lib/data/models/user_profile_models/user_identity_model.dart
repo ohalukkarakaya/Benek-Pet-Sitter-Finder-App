@@ -7,6 +7,7 @@ class UserIdentity {
   String? openAdress;
   String? job;
   String? bio;
+  String? nationalIdentityNumber;
   List<UserCareGiverCertificates>? certificates;
 
   UserIdentity(
@@ -17,6 +18,7 @@ class UserIdentity {
       this.openAdress,
       this.job,
       this.bio,
+      this.nationalIdentityNumber,
       this.certificates
     }
   );

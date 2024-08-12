@@ -9,13 +9,19 @@ import '../constants/app_colors.dart';
 class BenekSmallButton extends StatefulWidget {
   final IconData iconData;
   final Function()? onTap;
+  final double iconSize;
+  final bool isLight;
   final String? tooltipMessage;
+  final double size;
 
   const BenekSmallButton({
     super.key,
     required this.iconData,
     this.onTap,
-    this.tooltipMessage
+    this.iconSize = 20,
+    this.isLight = false,
+    this.tooltipMessage,
+    this.size = 50,
   });
 
   @override
@@ -43,16 +49,20 @@ class _BenekSmallButtonState extends State<BenekSmallButton> {
           });
         },
         child: Container(
-          width: 50,
-          height: 50,
+          width: widget.size,
+          height: widget.size,
           decoration: BoxDecoration(
-            color: isHovering ? AppColors.benekLightBlue : AppColors.benekBlackWithOpacity,
+            color: isHovering
+                ? AppColors.benekLightBlue
+                : !widget.isLight
+                    ? AppColors.benekBlackWithOpacity
+                    : AppColors.benekWhite.withOpacity(0.1),
             borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
           ),
           child: Center(
             child: Icon(
               widget.iconData,
-              size: 20,
+              size: widget.iconSize,
               color: isHovering ? AppColors.benekBlack : AppColors.benekWhite,
             )
           ),

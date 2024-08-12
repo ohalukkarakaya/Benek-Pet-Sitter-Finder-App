@@ -1,0 +1,49 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+import '../../../../../../../../common/constants/app_colors.dart';
+
+class EditBioButton extends StatefulWidget {
+  const EditBioButton({super.key});
+
+  @override
+  State<EditBioButton> createState() => _EditBioButtonState();
+}
+
+class _EditBioButtonState extends State<EditBioButton> {
+  bool isHovered = false;
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onHover: (event) {
+        setState(() {
+          isHovered = true;
+        });
+      },
+      onExit: (event) {
+        setState(() {
+          isHovered = false;
+        });
+      },
+      child: GestureDetector(
+        onTap: () {},
+        child: Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(
+            color: !isHovered ? AppColors.benekWhite.withOpacity(0.1) : AppColors.benekLightBlue,
+            borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+          ),
+          child: Center(
+            child: Icon(
+              Icons.edit,
+              color: isHovered ? AppColors.benekBlack : AppColors.benekWhite,
+              size: 15,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

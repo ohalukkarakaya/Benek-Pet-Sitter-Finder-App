@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 
 import auth from "../../middleware/auth.js";
 import uploadProfileAssetsHelper from "../../utils/fileHelpers/uploadProfileAssetsHelper.js";
+import uploadProfileImageAssetsHelper from "../../utils/fileHelpers/uploadProfileImageAssetsHelper.js";
 
 import userSetingsRoutes from './userSettings.js';
 import userInterractionsRoutes from "./userInterractions.js"
@@ -18,6 +19,12 @@ import getCareGiversByLocationController from "../../controllers/userRoutesContr
 import getCareGiversBySearchValueController from "../../controllers/userRoutesControllers/userControllers/getCareGiversBySearchValueController.js";
 import getLightWeightUserInfoController from "../../controllers/userRoutesControllers/userControllers/getLightWeightUserInfoController.js";
 import getAllInvitationsController from "../../controllers/userRoutesControllers/userControllers/getAllInvitationsController.js";
+import getPrivateUserInfoController from "../../controllers/userRoutesControllers/userControllers/getPrivateUserInfoController.js";
+import updateProfileImageController from "../../controllers/userRoutesControllers/userControllers/updateProfileImageController.js";
+import userEditBioController from "../../controllers/userRoutesControllers/userControllers/userEditBioController.js";
+import userEditAdressController from "../../controllers/userRoutesControllers/userControllers/userEditAdressController.js";
+import userEditFullNameController from "../../controllers/userRoutesControllers/userControllers/userEditFullNameController.js";
+
 dotenv.config();
 const router = express.Router();
 
@@ -28,6 +35,39 @@ router.post(
   auth,
   uploadProfileAssetsHelper,
   userGetMoreInfoController
+);
+
+// - tested
+// update profile image
+router.put(
+  "/profileImage",
+  auth,
+  uploadProfileImageAssetsHelper,
+  updateProfileImageController
+);
+
+// - tested
+// update bio
+router.put(
+  "/bio",
+  auth,
+  userEditBioController
+);
+
+// - tested
+// edit adress data
+router.put(
+    "/adress",
+    auth,
+    userEditAdressController
+);
+
+// - tested
+// edit full name data
+router.put(
+    "/fullname",
+    auth,
+    userEditFullNameController
 );
 
 // - tested
@@ -44,6 +84,14 @@ router.get(
   "/getLoggedInUserInfo",
   auth,
   getLoggedInUserInfoController
+);
+
+// - tested
+// get private info of the user
+router.get(
+    "/getPrivateUserInfo",
+    auth,
+    getPrivateUserInfoController
 );
 
 // - tested

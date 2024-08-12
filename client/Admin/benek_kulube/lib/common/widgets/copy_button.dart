@@ -10,10 +10,12 @@ import '../utils/benek_string_helpers.dart';
 class BenekCopyButton extends StatefulWidget {
   final double widthAndHeight;
   final String valueToCopy;
+  final bool isLight;
   const BenekCopyButton({
     super.key,
     this.widthAndHeight = 40,
-    required this.valueToCopy
+    required this.valueToCopy,
+    this.isLight = false,
   });
 
   @override
@@ -63,7 +65,11 @@ class _BenekCopyButtonState extends State<BenekCopyButton> {
               width: widget.widthAndHeight,
               height: widget.widthAndHeight,
               decoration: BoxDecoration(
-                color: !isHovering ? AppColors.benekBlackWithOpacity : AppColors.benekLightBlue,
+                color: !isHovering
+                    ? !widget.isLight
+                      ? AppColors.benekBlackWithOpacity
+                      : AppColors.benekWhite.withOpacity(0.1)
+                    : AppColors.benekLightBlue,
                 borderRadius: const BorderRadius.all(Radius.circular(6.0)),
               ),
               child: Center(

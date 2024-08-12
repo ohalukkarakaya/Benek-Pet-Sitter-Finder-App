@@ -44,25 +44,25 @@ const userGetMoreInfoController = async (req, res, next) => {
 
         //save job info if its not null
         if(req.body.job){
-        req.user.identity.job = req.body.job;
-        jobSucces = req.user.identity.job;
-        req.user.markModified('identity');
+            req.user.identity.job = req.body.job;
+            jobSucces = req.user.identity.job;
+            req.user.markModified('identity');
         }
 
         //save bio info if its not null
         if(req.body.bio){
-        if(req.body.bio.length <= 150){
-            req.user.identity.bio = req.body.bio;
-            bioSucces = req.user.identity.bio;
-            req.user.markModified('identity');
-        }else{
-            return res.status(418).json(
-            {
-                error: true,
-                message: "Bio info can't take more than 150 character."
+            if(req.body.bio.length <= 150){
+                req.user.identity.bio = req.body.bio;
+                bioSucces = req.user.identity.bio;
+                req.user.markModified('identity');
+            }else{
+                return res.status(418).json(
+                {
+                    error: true,
+                    message: "Bio info can't take more than 150 character."
+                }
+                );
             }
-            );
-        }
         }
 
         //check what did updated

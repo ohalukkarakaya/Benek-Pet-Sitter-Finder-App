@@ -241,21 +241,21 @@ class _ProfileTabState extends State<ProfileTab> {
 
                 selectedUserInfo.location != null
                     ? Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ProfileAdresMapWidget(
-                        userLocation: selectedUserInfo.location!,
-                      ),
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ProfileAdresMapWidget(
+                            userLocation: selectedUserInfo.location!,
+                          ),
 
-                      ProfileAdressWidget(
-                        openAdress: selectedUserInfo.identity?.openAdress,
-                        location: selectedUserInfo.location,
+                          ProfileAdressWidget(
+                            openAdress: selectedUserInfo.identity?.openAdress,
+                            location: selectedUserInfo.location,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                )
+                    )
                     : const SizedBox(),
 
                 const SizedBox(height: 15.0),

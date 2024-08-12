@@ -94,6 +94,8 @@ class ApiClient {
             'replyCount': replyCount,
             'list': list
           };
+        case 'PrivateInfoModel':
+          return PrivateInfoModel.fromJson(value['data']);
 
         default:
           {

@@ -1,5 +1,6 @@
 import 'package:benek_kulube/data/models/chat_models/chat_state_model.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
+import 'package:benek_kulube/data/models/user_profile_models/private_info_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_care_giver_career_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_deactivation_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_following_users_or_pets_model.dart';
@@ -43,6 +44,7 @@ class UserInfo {
   ChatStateModel? chatData;
   List<LogModel>? logs;
   PunishmentInfoModel? punishmentInfo;
+  String? iban;
 
   UserInfo(
     {
@@ -75,6 +77,7 @@ class UserInfo {
       this.chatData,
       this.logs,
       this.punishmentInfo,
+      this.iban
     }
   );
 
@@ -275,5 +278,17 @@ class UserInfo {
 
   dynamic addRecommendedPets( List<PetModel> inComingRecommendedPets ){
     recommendedPets = inComingRecommendedPets;
+  }
+
+  void addPrivateInfo( PrivateInfoModel data ){
+    email = data.email;
+    phone = data.phone;
+    identity = identity ?? UserIdentity();
+    if( data.iban != null ){
+      iban = data.iban;
+    }
+    if( data.identityNumber != null ){
+      identity?.nationalIdentityNumber = data.identityNumber;
+    }
   }
 }

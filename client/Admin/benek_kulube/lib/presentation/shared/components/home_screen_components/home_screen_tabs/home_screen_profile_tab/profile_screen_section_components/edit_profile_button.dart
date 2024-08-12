@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../../../../../common/constants/app_colors.dart';
@@ -42,8 +43,8 @@ class _EditProfileButtonState extends State<EditProfileButton> {
             ),
             child: Center(
               child: Icon(
-                BenekIcons.edit,
-                size: 10.0,
+                Icons.edit,
+                size: 13.0,
                 color: !isHovered ? AppColors.benekWhite : AppColors.benekBlack,
               ),
             )

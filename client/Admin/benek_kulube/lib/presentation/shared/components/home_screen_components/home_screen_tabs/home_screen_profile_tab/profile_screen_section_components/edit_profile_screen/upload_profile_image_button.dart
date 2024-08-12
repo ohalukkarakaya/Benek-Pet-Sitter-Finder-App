@@ -81,11 +81,11 @@ class _UploadProfileImageButtonState extends State<UploadProfileImageButton> {
                 : const SizedBox(),
 
               Positioned(
-                top: 27.5,
+                top: 20,
                 left: 20,
                 child: Container(
                     width: 40,
-                    height: 25,
+                    height: 40,
                     decoration: BoxDecoration(
                       color: !isHovered
                           ? AppColors.benekBlack.withOpacity(0.82)

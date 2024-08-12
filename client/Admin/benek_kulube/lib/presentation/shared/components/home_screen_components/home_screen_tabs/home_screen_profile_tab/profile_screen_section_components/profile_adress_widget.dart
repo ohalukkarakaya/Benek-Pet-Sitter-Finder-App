@@ -18,12 +18,23 @@ import '../../../../../../../common/widgets/benek_horizontal_button.dart';
 import '../../../../../../../common/widgets/copy_button.dart';
 
 class ProfileAdressWidget extends StatelessWidget {
+  final bool isEdit;
+  final Function()? onEdit;
   final String? openAdress;
+  final bool isDark;
   final UserLocation? location;
+  final double width;
+  final double longButtonWidth;
+
   const ProfileAdressWidget({
     Key? key,
+    this.isEdit = false,
+    this.onEdit,
     required this.openAdress,
+    this.isDark = false,
     required this.location,
+    this.width = 320,
+    this.longButtonWidth = 230,
   }) : super(key: key);
 
   @override
@@ -33,7 +44,7 @@ class ProfileAdressWidget extends StatelessWidget {
           baseColor: AppColors.benekBlack.withOpacity(0.4),
           highlightColor: AppColors.benekBlack.withOpacity(0.2),
           child: Container(
-            width: 150,
+            width: width,
             height: 200,
             decoration: BoxDecoration(
               color: AppColors.benekBlack.withOpacity(0.5),
@@ -43,7 +54,7 @@ class ProfileAdressWidget extends StatelessWidget {
         )
         : Container(
           height: 200,
-          width: 320,
+          width: width,
           padding: const EdgeInsets.only(
               left: 16.0,
               top: 16.0,
@@ -51,7 +62,7 @@ class ProfileAdressWidget extends StatelessWidget {
               right: 16.0,
           ),
           decoration: BoxDecoration(
-            color: AppColors.benekBlack.withOpacity(0.2),
+            color: !isDark ? AppColors.benekBlack.withOpacity(0.2) : AppColors.benekBlack,
             borderRadius: const BorderRadius.all(Radius.circular(6.0)),
           ),
           child: Column(
@@ -66,7 +77,18 @@ class ProfileAdressWidget extends StatelessWidget {
                     style: mediumTextStyle( textColor: AppColors.benekWhite ),
                   ),
 
-                  BenekCopyButton( valueToCopy: openAdress ?? "",),
+                  !isEdit
+                    ? BenekCopyButton(
+                      valueToCopy: openAdress ?? "",
+                      isLight: isDark,
+                    )
+                    : BenekSmallButton(
+                      iconData: Icons.edit,
+                      isLight: isDark,
+                      onTap: onEdit,
+                      iconSize: 15,
+                      size: 40,
+                    )
                 ],
               ),
               Wrap(
@@ -85,9 +107,12 @@ class ProfileAdressWidget extends StatelessWidget {
                     iconData: BenekIcons.compass,
                     tooltipMessage: BenekStringHelpers.locale('copied'),
                     onTap: () async { Clipboard.setData(ClipboardData(text: '${location!.lat},${location!.lng}')); },
+                    isLight: isDark,
                   ),
                   BenekHorizontalButton(
                     text: BenekStringHelpers.locale('showOnMap'),
+                    isLight: isDark,
+                    width: longButtonWidth,
                     onTap: () async {
                       if( location != null ){
                         await GoogleMapsHelpers.launchMap(location!.lat!, location!.lng!);

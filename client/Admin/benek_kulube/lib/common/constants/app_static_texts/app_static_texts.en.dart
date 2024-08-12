@@ -101,5 +101,10 @@ class AppStaticTextsEn{
     'approveStoryDelete': 'Slide to delete story...',
     'approveCommentDelete': 'Slide to delete comment...',
     'approveReplyDelete': 'Slide to delete reply...',
+    'accountInfo': 'Account Info',
+    'deactivateAccount': 'Deactivate Account',
+    'approveChanges' : 'Slide to save changes...',
+    'youRNotACareGiverYet': 'You are not a caregiver yet!',
+    'becomeACareGiverInfo': 'You have to be a caregiver to participate in any commercial activity within the app...',
   };
 }

@@ -8,6 +8,9 @@ UserInfo? getUserInfoRequestReducer( UserInfo? userInfo, dynamic action ){
   }else if( action is GetRecommendedPetsRequestAction ){
     userInfo?.addRecommendedPets(action.dataList!);
     return userInfo;
+  }else if( action is GetUsersPrivateInfoRequestAction ){
+    userInfo?.addPrivateInfo(action.userPrivateInfo!);
+    return userInfo;
   }
 
   return userInfo;

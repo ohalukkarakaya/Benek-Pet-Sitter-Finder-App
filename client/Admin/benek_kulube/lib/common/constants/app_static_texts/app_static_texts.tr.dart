@@ -101,5 +101,10 @@ class AppStaticTextsTr{
     'approveStoryDelete': 'Anıyı silmek için kaydır...',
     'approveCommentDelete': 'Yorumu silmek için kaydır...',
     'approveReplyDelete': 'Yanıtı silmek için kaydır...',
+    'accountInfo': 'Hesap Bilgileri',
+    'deactivateAccount': 'Hesabı Deaktive Et',
+    'approveChanges': 'Değişiklikleri kaydetmek için kaydır...',
+    'youRNotACareGiverYet': 'Henüz bir bakıcı değilsiniz!',
+    'becomeACareGiverInfo': 'Uygulama içerisinde, herhangi bir ticari faaliyete katılabilmek için bakıcı olmalısın...',
   };
 }

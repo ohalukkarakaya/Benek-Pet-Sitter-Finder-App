@@ -7,12 +7,14 @@ class BenekHorizontalButton extends StatefulWidget {
   final String text;
   final double width;
   final double height;
+  final bool isLight;
   final Function()? onTap;
   const BenekHorizontalButton({
     super.key,
     required this.text,
     this.width = 230,
     this.height = 50,
+    this.isLight = false,
     this.onTap
   });
 
@@ -43,7 +45,11 @@ class _BenekHorizontalButtonState extends State<BenekHorizontalButton> {
           height: widget.height,
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           decoration: BoxDecoration(
-            color: !isHovering ? AppColors.benekBlackWithOpacity : AppColors.benekLightBlue,
+            color: !isHovering
+                ? !widget.isLight
+                  ? AppColors.benekBlackWithOpacity
+                  : AppColors.benekWhite.withOpacity(0.1)
+                : AppColors.benekLightBlue,
             borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
           ),
           child: Row(
