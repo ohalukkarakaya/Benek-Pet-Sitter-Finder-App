@@ -4,7 +4,11 @@ import 'package:flutter/widgets.dart';
 import '../../../../../../../../common/constants/app_colors.dart';
 
 class EditBioButton extends StatefulWidget {
-  const EditBioButton({super.key});
+  final Function()? onTap;
+  const EditBioButton({
+    super.key,
+    this.onTap,
+  });
 
   @override
   State<EditBioButton> createState() => _EditBioButtonState();
@@ -27,7 +31,7 @@ class _EditBioButtonState extends State<EditBioButton> {
         });
       },
       child: GestureDetector(
-        onTap: () {},
+        onTap: widget.onTap,
         child: Container(
           width: 30,
           height: 30,

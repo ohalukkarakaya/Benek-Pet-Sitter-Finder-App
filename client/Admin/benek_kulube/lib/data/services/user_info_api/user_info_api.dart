@@ -83,12 +83,44 @@ class UserInfoApi {
         postBody = mp;
       }
 
-      // Eğer filePath null ise, sadece headers ile boş bir PUT isteği yapar
       var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
       if (response.statusCode >= 400 && response.statusCode != 404) {
         throw ApiException(code: response.statusCode, message: response.body);
       } else if (response.body != null) {
         return apiClient.deserialize(response.body, 'UserProfileImg') as UserProfileImg;
+      }
+    } catch (err) {
+      log('ERROR: putUpdateProfileImage - $err');
+    }
+    return null;
+  }
+
+  Future<String?> putUpdateBio(String newBio) async {
+    try {
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/bio';
+
+      newBio = newBio.length > 150
+          ? "${newBio.substring(0, 147)}..."
+          : newBio;
+
+      Object? postBody = {
+        'bio': newBio,
+      };
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> authNames = [];
+
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      } else if (response.body != null) {
+        var decodedJson = json.decode(response.body);
+        return decodedJson['data'];
       }
     } catch (err) {
       log('ERROR: putUpdateProfileImage - $err');

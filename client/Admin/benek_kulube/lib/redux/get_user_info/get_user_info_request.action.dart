@@ -43,6 +43,20 @@ ThunkAction<AppState> updateProfileImageRequestAction(String? filePath) {
   };
 }
 
+ThunkAction<AppState> updateBioRequestAction(String newBio) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      String? _userInfo = await api.putUpdateBio(newBio);
+
+      await store.dispatch(UpdateBioRequestAction(_userInfo, store.state.userInfo!.userId!));
+    } on ApiException catch (e) {
+      log('ERROR: updateBioRequestAction - $e');
+    }
+  };
+}
+
 class GetUserInfoRequestAction {
   final UserInfo? _userInfo;
   UserInfo? get userInfo => _userInfo;
@@ -57,4 +71,14 @@ class UpdateProfileImageRequestAction {
   String? get userId => _userId;
 
   UpdateProfileImageRequestAction(this._userProfileImage, this._userId);
+}
+
+class UpdateBioRequestAction {
+  final String? _newBio;
+  final String? _userId;
+
+  String? get newBio => _newBio;
+  String? get userId => _userId;
+
+  UpdateBioRequestAction(this._newBio, this._userId);
 }

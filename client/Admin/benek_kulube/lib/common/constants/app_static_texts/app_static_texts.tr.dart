@@ -115,5 +115,6 @@ class AppStaticTextsTr{
     'edit': 'Düzenle',
     'uploadNewOne': 'Yenisini Yükle',
     'approveProfilePhotoDelete': 'Profil Resmini silmek için kaydır...',
+    'writeBio': 'Biyografi Yaz',
   };
 }

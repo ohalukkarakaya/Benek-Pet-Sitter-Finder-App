@@ -115,5 +115,6 @@ class AppStaticTextsEn{
     'edit': 'Edit',
     'uploadNewOne': 'Upload New One',
     'approveProfilePhotoDelete': 'Slide to delete profile photo...',
+    'writeBio': 'Write Bio',
   };
 }
