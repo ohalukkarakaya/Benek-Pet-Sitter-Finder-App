@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/widgets/benek_horizontal_button.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_profile_image_model.dart';
+import 'package:benek_kulube/presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -30,6 +31,7 @@ class EditProfileImageScreen extends StatefulWidget {
 class _EditProfileImageScreenState extends State<EditProfileImageScreen> {
   String imagePath = '';
   bool isIconHovered = false;
+  bool isLoading = false;
 
   @override
   void didChangeDependencies() {
@@ -64,35 +66,51 @@ class _EditProfileImageScreenState extends State<EditProfileImageScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: generalWidth,
-                  height: generalWidth,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6.0),
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 4.0,
-                    ),
-                    image: isNetWorkImage
-                    ? DecorationImage(
-                        image: NetworkImage(
-                            imagePath,
-                            headers: { "private-key": dotenv.env['MEDIA_SERVER_API_KEY']! },
-                        ),
-                        fit: BoxFit.cover,
-                      )
-                    : null
-                  ),
-                  child: !isNetWorkImage
-                    ? BenekDefaultAvatar(
-                      backgroundImagePath: defaultAvatarUrlObject!.backgroundPath,
-                      avatarImagePath: defaultAvatarUrlObject!.avatarPath,
+                Stack(
+                  children: [
+                    Container(
                       width: generalWidth,
                       height: generalWidth,
-                      borderRadius: 0.0,
-                      isPet: userInfo.profileImg!.imgUrl!.startsWith('P/'),
-                    )
-                    : null,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6.0),
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 4.0,
+                        ),
+                        image: isNetWorkImage
+                        ? DecorationImage(
+                            image: NetworkImage(
+                                imagePath,
+                                headers: { "private-key": dotenv.env['MEDIA_SERVER_API_KEY']! },
+                            ),
+                            fit: BoxFit.cover,
+                          )
+                        : null
+                      ),
+                      child: !isNetWorkImage
+                        ? BenekDefaultAvatar(
+                          backgroundImagePath: defaultAvatarUrlObject!.backgroundPath,
+                          avatarImagePath: defaultAvatarUrlObject!.avatarPath,
+                          width: generalWidth,
+                          height: generalWidth,
+                          borderRadius: 0.0,
+                          isPet: userInfo.profileImg!.imgUrl!.startsWith('P/'),
+                        )
+                        : null,
+                    ),
+
+                    isLoading
+                    ? const Positioned(
+                        top: 100,
+                        left: 100,
+                        child: BenekProcessIndicator(
+                          width: 50,
+                          height: 50,
+                          color: AppColors.benekWhite,
+                        ),
+                      )
+                    : const SizedBox(),
+                  ],
                 ),
 
                 const SizedBox(height: 20.0,),
@@ -139,6 +157,10 @@ class _EditProfileImageScreenState extends State<EditProfileImageScreen> {
 
                                   if(didApprove != true) return;
 
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+
                                   await store.dispatch(updateProfileImageRequestAction(null));
 
                                   Navigator.of(context).pop(store.state.userInfo!.profileImg);
@@ -160,6 +182,10 @@ class _EditProfileImageScreenState extends State<EditProfileImageScreen> {
                           onTap: () async {
                             String? newImagePath = await ImageVideoHelpers.pickFile(['jpg', 'jpeg']);
                             if( newImagePath == null ) return;
+
+                            setState(() {
+                              isLoading = true;
+                            });
 
                             await store.dispatch(updateProfileImageRequestAction(newImagePath));
 
