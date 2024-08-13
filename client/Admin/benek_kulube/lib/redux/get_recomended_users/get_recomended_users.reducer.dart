@@ -7,6 +7,26 @@ UserList? userSearchRequestReducer( UserList? recomendedUsers, dynamic action ){
   }else if( action is SetRecentlySeenUserAction ){
     recomendedUsers?.addNewSeenUser( action.userInfo );
     return recomendedUsers;
+  }else if( action is UpdateProfileImageRequestAction ){
+    if(recomendedUsers != null && recomendedUsers.recentlySeenUsers != null) {
+      bool isUserExist = recomendedUsers.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).profileImg = action.userProfileImage;
+      }
+    }
+
+    if(recomendedUsers != null && recomendedUsers.users != null) {
+      bool isUserExist = recomendedUsers.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        recomendedUsers.users?.firstWhere(
+              (element) => element.userId == action.userId,
+        ).profileImg = action.userProfileImage;
+      }
+    }
+
+    return recomendedUsers;
   }
 
   return recomendedUsers;

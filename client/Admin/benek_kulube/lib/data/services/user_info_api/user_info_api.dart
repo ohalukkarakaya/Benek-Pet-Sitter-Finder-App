@@ -49,4 +49,50 @@ class UserInfoApi {
       await AuthUtils.killUserSessionAndRestartApp( store );
     }
   }
+
+  Future<UserProfileImg?> putUpdateProfileImage(String? filePath) async {
+    Store<AppState> store = AppReduxStore.currentStore!;
+    try {
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/profileImage';
+
+      Object? postBody;
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = ["multipart/form-data"];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      if (contentType.startsWith("multipart/form-data") && filePath != null) {
+        MultipartRequest mp = MultipartRequest("PUT", Uri.parse(AppConfig.baseUrl + path));
+
+        String mimeType = 'application/octet-stream';
+        if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg') || filePath.endsWith('.JPG') || filePath.endsWith('.JPEG')) {
+          mimeType = 'image/jpeg';
+        }
+
+        mp.files.add(await http.MultipartFile.fromPath(
+          'profileImg',
+          filePath,
+          contentType: MediaType.parse(mimeType),
+        ));
+
+        postBody = mp;
+      }
+
+      // Eğer filePath null ise, sadece headers ile boş bir PUT isteği yapar
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      } else if (response.body != null) {
+        return apiClient.deserialize(response.body, 'UserProfileImg') as UserProfileImg;
+      }
+    } catch (err) {
+      log('ERROR: putUpdateProfileImage - $err');
+    }
+    return null;
+  }
 }

@@ -67,6 +67,7 @@ class ProfileAdressWidget extends StatelessWidget {
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -110,10 +111,12 @@ class ProfileAdressWidget extends StatelessWidget {
                     isLight: isDark,
                   ),
                   BenekHorizontalButton(
-                    text: BenekStringHelpers.locale('showOnMap'),
+                    text: !isEdit ? BenekStringHelpers.locale('showOnMap') : BenekStringHelpers.locale('edit'),
                     isLight: isDark,
                     width: longButtonWidth,
-                    onTap: () async {
+                    onTap: isEdit
+                    ? onEdit
+                    : () async {
                       if( location != null ){
                         await GoogleMapsHelpers.launchMap(location!.lat!, location!.lng!);
                       }

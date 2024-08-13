@@ -96,6 +96,8 @@ class ApiClient {
           };
         case 'PrivateInfoModel':
           return PrivateInfoModel.fromJson(value['data']);
+        case 'UserProfileImg':
+          return UserProfileImg.fromJson(value['data']);
 
         default:
           {

@@ -11,6 +11,9 @@ UserInfo? getUserInfoRequestReducer( UserInfo? userInfo, dynamic action ){
   }else if( action is GetUsersPrivateInfoRequestAction ){
     userInfo?.addPrivateInfo(action.userPrivateInfo!);
     return userInfo;
+  }else if( action is UpdateProfileImageRequestAction ){
+    userInfo?.profileImg = action.userProfileImage;
+    return userInfo;
   }
 
   return userInfo;

@@ -30,6 +30,7 @@ class _BenekHorizontalButtonState extends State<BenekHorizontalButton> {
     return GestureDetector(
       onTap: widget.onTap,
       child: MouseRegion(
+        cursor: SystemMouseCursors.click,
         onHover: (event) {
           setState(() {
             isHovering = true;

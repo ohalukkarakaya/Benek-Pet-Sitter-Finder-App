@@ -3,6 +3,7 @@
 import 'dart:developer';
 
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
+import 'package:benek_kulube/data/models/user_profile_models/user_profile_image_model.dart';
 import 'package:benek_kulube/data/services/api.dart';
 import 'package:benek_kulube/data/services/api_exception.dart';
 // ignore: depend_on_referenced_packages
@@ -28,8 +29,32 @@ ThunkAction<AppState> getUserInfoRequestAction() {
   };
 }
 
+ThunkAction<AppState> updateProfileImageRequestAction(String? filePath) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      UserProfileImg? _userInfo = await api.putUpdateProfileImage(filePath);
+
+      await store.dispatch(UpdateProfileImageRequestAction(_userInfo, store.state.userInfo!.userId!));
+    } on ApiException catch (e) {
+      log('ERROR: updateProfileImageRequestAction - $e');
+    }
+  };
+}
+
 class GetUserInfoRequestAction {
   final UserInfo? _userInfo;
   UserInfo? get userInfo => _userInfo;
   GetUserInfoRequestAction(this._userInfo);
+}
+
+class UpdateProfileImageRequestAction {
+  final UserProfileImg? _userProfileImage;
+  final String? _userId;
+
+  UserProfileImg? get userProfileImage => _userProfileImage;
+  String? get userId => _userId;
+
+  UpdateProfileImageRequestAction(this._userProfileImage, this._userId);
 }

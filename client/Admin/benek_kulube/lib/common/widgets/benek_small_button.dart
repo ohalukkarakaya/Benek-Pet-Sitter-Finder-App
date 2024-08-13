@@ -38,6 +38,7 @@ class _BenekSmallButtonState extends State<BenekSmallButton> {
           ? widget.onTap
           : null,
       child: MouseRegion(
+        cursor: SystemMouseCursors.click,
         onHover: (event) {
           setState(() {
             isHovering = true;

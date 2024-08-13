@@ -29,6 +29,7 @@ import '../models/pet_models/pet_list_model.dart';
 import '../models/pet_models/pet_model.dart';
 import '../models/story_models/story_model.dart';
 import '../models/user_profile_models/private_info_model.dart';
+import '../models/user_profile_models/user_profile_image_model.dart';
 
 part 'api_client.dart';
 part 'authentication.dart';

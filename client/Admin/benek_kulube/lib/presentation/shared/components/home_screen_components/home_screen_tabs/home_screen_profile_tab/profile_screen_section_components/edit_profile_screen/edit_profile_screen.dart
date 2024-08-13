@@ -7,10 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../../../../../common/constants/app_colors.dart';
-import '../../../../../../../../common/constants/benek_icons.dart';
 import '../../../../../../../../common/utils/benek_string_helpers.dart';
-import '../../../../../../../../common/utils/styles.text.dart';
-import '../../../../../../../../common/widgets/slide_to_act.dart';
 import '../../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../../../../../store/actions/app_actions.dart';
 import '../../../../../loading_components/benek_blured_modal_barier.dart';
@@ -19,13 +16,11 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:benek_kulube/store/app_state.dart';
 
-import '../adress_row/adress_map.dart';
-import '../profile_adress_widget.dart';
-import '../text_with_character_limit_component/text_with_character_limit_controlled_component.dart';
 import 'become_care_giver_button.dart';
-import 'change_account_info_button.dart';
-import 'deactivate_account_button.dart';
+import 'deactivte_account_button.dart';
 import 'edit_account_info_menu_item.dart';
+import 'edit_adress_widget.dart';
+import 'edit_profile_profile_widget.dart';
 import 'edited_bio_row.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -39,9 +34,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final FocusNode _editProfileFocusNode = FocusNode();
 
   bool shouldPop = false;
-  bool didApprove = false;
   bool isLoading = true;
-  bool didChanged = false;
 
   @override
   void initState() {
@@ -103,91 +96,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                UploadProfileImageButton(
-                                  userInfo: userInfo,
-                                ),
-                                const SizedBox(width: 20.0,),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    TextWithCharacterLimitControlledComponent(
-                                      text: BenekStringHelpers.getUsersFullName(
-                                          userInfo.identity!.firstName!,
-                                          userInfo.identity!.lastName!,
-                                          userInfo.identity!.middleName
-                                      ),
-                                      characterLimit: 20,
-                                      fontSize: 15.0,
-                                    ),
-                                    const SizedBox(height: 2.0,),
-                                    Text(
-                                        "@${userInfo.userName}",
-                                        style: regularTextWithoutColorStyle()
-                                    ),
-                                  ],
-                                ),
-                              ],
+                            EditProfileProfileWidget(
+                              userInfo: userInfo,
                             ),
-                            IgnorePointer(
-                              ignoring: !didChanged,
-                              child: SizedBox(
-                                width: 275,
-                                height: 65,
-                                child: Builder(
-                                  builder: (context) {
-                                    return SlideAction(
-                                      sliderButtonIconSize: 15,
-                                      sliderButtonIconPadding: 15,
-                                      text: BenekStringHelpers.locale('approveChanges'),
-                                      borderRadius: 6.0,
-                                      textStyle: regularTextStyle(
-                                        textColor: didChanged ? AppColors.benekBlack : Colors.grey,
-                                        textFontSize: 9.0,
-                                      ),
-                                      onSubmit: () async {
-                                        setState(() {
-                                          didApprove = true;
-                                        });
-                                        Navigator.of(context).pop(didApprove);
-                                      },
-                                      innerColor: didChanged ? AppColors.benekBlack : Colors.grey,
-                                      outerColor: didChanged ? AppColors.benekLightBlue : Colors.grey[300]!,
-                                      submittedIcon: const Icon(
-                                        Icons.done,
-                                        color: AppColors.benekBlack,
-                                        size: 20,
-                                      ),
-                                      sliderButtonYOffset: 4,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
+
+                            const DeactivteAccountButton(),
                           ],
                         ),
                         const SizedBox(height: 20.0,),
+
                         EditedBioRow(bio: userInfo.identity!.bio!),
+
                         const SizedBox(height: 20.0,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ProfileAdresMapWidget(
-                              userLocation: userInfo.location!,
-                            ),
-                            ProfileAdressWidget(
-                              isEdit: true,
-                              openAdress: userInfo.identity?.openAdress,
-                              isDark: true,
-                              location: userInfo.location,
-                              width: 450,
-                              longButtonWidth: 350,
-                            ),
-                          ],
-                        ),
+
+                        EditAdressWidget(userInfo: userInfo),
+
                         const SizedBox(height: 20.0,),
 
                         userInfo.isCareGiver == null
@@ -226,6 +149,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             children: [
                               EditAccountInfoMenuItem(
                                 icon: Icons.perm_identity,
+                                desc: BenekStringHelpers.locale('fullname'),
                                 text: BenekStringHelpers.getUsersFullName(
                                     userInfo.identity!.firstName!,
                                     userInfo.identity!.lastName!,
@@ -235,16 +159,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               const Divider(color: AppColors.benekGrey,),
                               EditAccountInfoMenuItem(
                                 icon: FontAwesomeIcons.at,
+                                desc: BenekStringHelpers.locale('username'),
                                 text: userInfo.userName!
                               ),
                               const Divider(color: AppColors.benekGrey,),
                               EditAccountInfoMenuItem(
                                 icon: Icons.email,
+                                desc: BenekStringHelpers.locale('email'),
                                 text: userInfo.email!,
                               ),
                               const Divider(color: AppColors.benekGrey,),
                               EditAccountInfoMenuItem(
                                 icon: Icons.phone,
+                                desc: BenekStringHelpers.locale('phoneNumber'),
                                 text: userInfo.phone!,
                               ),
                               const Divider(color: AppColors.benekGrey,),
@@ -252,7 +179,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               userInfo.identity != null && userInfo.identity!.nationalIdentityNumber != null
                                   ? EditAccountInfoMenuItem(
                                     icon: Icons.verified_user,
-                                    text: 'TC No: ${userInfo.identity!.nationalIdentityNumber}',
+                                    desc: BenekStringHelpers.locale('TCNo'),
+                                    text: userInfo.identity!.nationalIdentityNumber!,
                                   )
                                   : const SizedBox(),
 
@@ -260,7 +188,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                               EditAccountInfoMenuItem(
                                 icon: Icons.attach_money_rounded,
-                                text: 'IBAN: ${userInfo.iban!}',
+                                desc: BenekStringHelpers.locale('iban'),
+                                text: userInfo.iban!,
                               )
                             ],
                           ),

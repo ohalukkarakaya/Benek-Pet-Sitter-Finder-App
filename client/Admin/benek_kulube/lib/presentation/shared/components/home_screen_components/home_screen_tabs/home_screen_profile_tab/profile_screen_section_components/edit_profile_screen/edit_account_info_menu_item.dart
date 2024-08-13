@@ -7,11 +7,13 @@ import '../../../../../../../../common/utils/styles.text.dart';
 
 class EditAccountInfoMenuItem extends StatefulWidget {
   final String text;
+  final String? desc;
   final IconData icon;
 
   const EditAccountInfoMenuItem({
     super.key,
     required this.text,
+    this.desc,
     required this.icon,
   });
 
@@ -52,21 +54,39 @@ class _EditAccountInfoMenuItemState extends State<EditAccountInfoMenuItem> {
                   Icon(
                     widget.icon,
                     color: didHover ? AppColors.benekBlack : AppColors.benekWhite,
-                    size: 20,
+                    size: 25,
                   ),
                   const SizedBox(width: 20),
-                  Text(
-                      widget.text,
-                      style: semiBoldTextStyle(
-                        textColor: didHover ? AppColors.benekBlack : AppColors.benekWhite,
-                      )
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      widget.desc != null
+                          ? Text(
+                              '${widget.desc!} : ',
+                              style: semiBoldTextStyle(
+                                textColor: didHover ? AppColors.benekAirForceBlue : AppColors.benekLightBlue,
+                                textFontSize: 10.0,
+                              )
+                          )
+                          : const SizedBox(),
+
+                      SizedBox( height: widget.desc != null ? 5.0 : 0.0, ),
+
+                      Text(
+                          widget.text,
+                          style: semiBoldTextStyle(
+                            textColor: didHover ? AppColors.benekBlack : AppColors.benekWhite,
+                            textFontSize: 14.0,
+                          )
+                      ),
+                    ],
                   ),
                 ],
               ),
               Icon(
-                Icons.edit,
+                BenekIcons.right,
                 color: didHover ? AppColors.benekBlack : AppColors.benekWhite,
-                size: 20,
+                size: 15,
               ),
             ],
           ),

@@ -10,10 +10,12 @@ import '../../../../../benek_circle_avatar/benek_circle_avatar.dart';
 
 class UploadProfileImageButton extends StatefulWidget {
   final UserInfo userInfo;
+  final Function()? onTap;
 
   const UploadProfileImageButton({
     super.key,
     required this.userInfo,
+    this.onTap,
   });
 
   @override
@@ -37,7 +39,7 @@ class _UploadProfileImageButtonState extends State<UploadProfileImageButton> {
         });
       },
       child: GestureDetector(
-        onTap: () {},
+        onTap: widget.onTap,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(100),
           child: Stack(
@@ -94,8 +96,8 @@ class _UploadProfileImageButtonState extends State<UploadProfileImageButton> {
                     ),
                     child: const Center(
                       child: Icon(
-                        BenekIcons.upload,
-                        size: 10.0,
+                        Icons.edit,
+                        size: 15.0,
                         color: AppColors.benekWhite,
                       ),
                     )

@@ -37,6 +37,9 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
     userInfo?.punishmentInfo?.setPunishmentCount(action.usersPunishmentCount);
 
     return userInfo;
+  }else if( action is UpdateProfileImageRequestAction ){
+    userInfo?.profileImg = action.userProfileImage;
+    return userInfo;
   }
 
   return userInfo;

@@ -7,6 +7,26 @@ UserList? userSearchRequestReducer( UserList? userSearchListData, dynamic action
   }else if( action is SetRecentlySeenUserAction ){
     userSearchListData?.addNewSeenUser( action.userInfo );
     return userSearchListData;
+  }else if( action is UpdateProfileImageRequestAction ){
+    if(userSearchListData != null && userSearchListData.recentlySeenUsers != null) {
+      bool isUserExist = userSearchListData.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).profileImg = action.userProfileImage;
+      }
+    }
+
+    if(userSearchListData != null && userSearchListData.users != null) {
+      bool isUserExist = userSearchListData.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        userSearchListData.users?.firstWhere(
+              (element) => element.userId == action.userId,
+        ).profileImg = action.userProfileImage;
+      }
+    }
+
+    return userSearchListData;
   }
 
   return userSearchListData;
