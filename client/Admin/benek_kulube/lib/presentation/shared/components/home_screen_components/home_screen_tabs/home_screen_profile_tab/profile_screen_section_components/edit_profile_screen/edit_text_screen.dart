@@ -2,12 +2,6 @@ import 'package:benek_kulube/presentation/shared/components/loading_components/b
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:flutter_redux/flutter_redux.dart';
-// ignore: depend_on_referenced_packages
-import 'package:redux/redux.dart';
-import 'package:benek_kulube/store/actions/app_actions.dart';
-import 'package:benek_kulube/store/app_state.dart';
-
 import '../../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../../common/utils/benek_string_helpers.dart';
 import '../../../../../../../../common/utils/styles.text.dart';
@@ -15,10 +9,12 @@ import '../../../../../benek_process_indicator/benek_process_indicator.dart';
 
 class EditTextScreen extends StatefulWidget {
   final String textToEdit;
+  final Future<void> Function(String) onDispatch;
 
   const EditTextScreen({
     super.key,
     required this.textToEdit,
+    required this.onDispatch,
   });
 
   @override
@@ -68,7 +64,7 @@ class _EditTextScreenState extends State<EditTextScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Store<AppState> store = StoreProvider.of<AppState>(context);
+
 
     return BenekBluredModalBarier(
       isDismissible: true,
@@ -140,7 +136,7 @@ class _EditTextScreenState extends State<EditTextScreen> {
                                     setState(() {
                                       isSendingRequest = true;
                                     });
-                                    await store.dispatch(updateBioRequestAction(_textControllerEditProfileTex.text),);
+                                    await widget.onDispatch(_textControllerEditProfileTex.text);
                                     setState(() {
                                       isSendingRequest = false;
                                     });

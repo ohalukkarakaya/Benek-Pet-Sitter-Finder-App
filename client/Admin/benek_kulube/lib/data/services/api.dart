@@ -29,6 +29,7 @@ import '../models/pet_models/pet_list_model.dart';
 import '../models/pet_models/pet_model.dart';
 import '../models/story_models/story_model.dart';
 import '../models/user_profile_models/private_info_model.dart';
+import '../models/user_profile_models/user_location_model.dart';
 import '../models/user_profile_models/user_profile_image_model.dart';
 
 part 'api_client.dart';
@@ -48,5 +49,6 @@ part 'chat_moderating_apies/get_users_chat_as_admin/get_users_chat_as_admin_api.
 part 'get_log_apies/get_logs_by_user_id_api.dart';
 part 'get_punishment_info_apies/get_users_punishment_info_api.dart';
 part 'user_info_api/user_get_private_info_api.dart';
+part 'geocoding_api.dart';
 
 ApiClient defaultApiClient = ApiClient();

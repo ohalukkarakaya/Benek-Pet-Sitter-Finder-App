@@ -5,12 +5,39 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../../../../../data/models/user_profile_models/user_location_model.dart';
 
-class ProfileAdresMapWidget extends StatelessWidget {
+class ProfileAdresMapWidget extends StatefulWidget {
   final UserLocation userLocation;
   const ProfileAdresMapWidget({
     super.key,
     required this.userLocation
   });
+
+  @override
+  State<ProfileAdresMapWidget> createState() => _ProfileAdresMapWidgetState();
+}
+
+class _ProfileAdresMapWidgetState extends State<ProfileAdresMapWidget> {
+  late final MapController _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapController = MapController();
+  }
+
+  @override
+  void didUpdateWidget(covariant ProfileAdresMapWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Eğer userLocation değiştiyse haritanın merkezini güncelle
+    if (oldWidget.userLocation.lat != widget.userLocation.lat ||
+        oldWidget.userLocation.lng != widget.userLocation.lng) {
+      _mapController.move(
+        LatLng(widget.userLocation.lat!, widget.userLocation.lng!),
+        15.0,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +49,9 @@ class ProfileAdresMapWidget extends StatelessWidget {
         child: IgnorePointer(
           ignoring: true,
           child: FlutterMap(
+              mapController: _mapController,
               options: MapOptions(
-                initialCenter: LatLng(userLocation.lat!, userLocation.lng!),
+                initialCenter: LatLng(widget.userLocation.lat!, widget.userLocation.lng!),
                 initialZoom: 15.0,
               ),
               children: [
@@ -36,7 +64,7 @@ class ProfileAdresMapWidget extends StatelessWidget {
                     Marker(
                       width: 40.0,
                       height: 40.0,
-                      point: LatLng(userLocation.lat!, userLocation.lng!),
+                      point: LatLng(widget.userLocation.lat!, widget.userLocation.lng!),
                       child: Container(
                         width: 40.0,
                         height: 40.0,

@@ -127,4 +127,51 @@ class UserInfoApi {
     }
     return null;
   }
+
+  Future<Map<String, dynamic>?> putUpdateAddress(String country, String city, String openAdress, double lat, double lng) async {
+    try {
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/adress';
+
+      Object? postBody = {
+        'country': country,
+        'city': city,
+        'openAdress': openAdress,
+        'lat': lat,
+        'lng': lng,
+      };
+
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> authNames = [];
+
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      } else if (response.body != null) {
+        var decodedJson = json.decode(response.body);
+        var data = decodedJson['data'];
+        UserLocation userLocation = UserLocation(
+          country: data['country'],
+          city: data['city'],
+          lat: data['lat'],
+          lng: data['lng'],
+        );
+
+        String openAdress = data['openAdress'];
+
+        return {
+          'userLocation': userLocation,
+          'openAdress': openAdress,
+        };
+      }
+    } catch (err) {
+      log('ERROR: putUpdateProfileImage - $err');
+    }
+    return null;
+  }
 }

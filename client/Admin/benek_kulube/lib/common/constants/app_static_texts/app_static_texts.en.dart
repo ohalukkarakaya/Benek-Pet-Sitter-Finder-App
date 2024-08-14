@@ -116,5 +116,10 @@ class AppStaticTextsEn{
     'uploadNewOne': 'Upload New One',
     'approveProfilePhotoDelete': 'Slide to delete profile photo...',
     'writeBio': 'Write Bio',
+    'outOfTurkey': 'You have chosen a location outside of Türkiye.',
+    'approveCancelChanges': 'Slide to cancel changes...',
+    'next': 'Edit',
+    'chooseYourLocationCaption': 'Choose Your Location',
+    'chooseYourLocationDesc': 'Mark your official address on the map, edit the open address and save...',
   };
 }

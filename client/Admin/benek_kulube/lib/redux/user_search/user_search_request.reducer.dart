@@ -47,6 +47,31 @@ UserList? userSearchRequestReducer( UserList? userSearchListData, dynamic action
     }
 
     return userSearchListData;
+  }else if( action is UpdateAddressRequestAction ){
+    if(userSearchListData != null && userSearchListData.recentlySeenUsers != null) {
+      bool isUserExist = userSearchListData.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.openAdress = action.newOpenAddress;
+        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).location = action.newLocation;
+      }
+    }
+
+    if(userSearchListData != null && userSearchListData.users != null) {
+      bool isUserExist = userSearchListData.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        userSearchListData.users?.firstWhere(
+              (element) => element.userId == action.userId,
+        ).identity?.openAdress = action.newOpenAddress;
+
+        userSearchListData.users?.firstWhere(
+              (element) => element.userId == action.userId,
+        ).location = action.newLocation;
+      }
+    }
+
+    return userSearchListData;
   }
 
   return userSearchListData;

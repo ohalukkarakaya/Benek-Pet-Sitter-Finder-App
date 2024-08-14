@@ -43,6 +43,10 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
   }else if( action is UpdateBioRequestAction ){
     userInfo?.identity?.bio = action.newBio;
     return userInfo;
+  }else if( action is UpdateAddressRequestAction ) {
+    userInfo?.identity?.openAdress = action.newOpenAddress;
+    userInfo?.location = action.newLocation;
+    return userInfo;
   }
 
   return userInfo;

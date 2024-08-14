@@ -83,13 +83,7 @@ class ProfileAdressWidget extends StatelessWidget {
                       valueToCopy: openAdress ?? "",
                       isLight: isDark,
                     )
-                    : BenekSmallButton(
-                      iconData: Icons.edit,
-                      isLight: isDark,
-                      onTap: onEdit,
-                      iconSize: 15,
-                      size: 40,
-                    )
+                    : const SizedBox(),
                 ],
               ),
               Wrap(
@@ -104,12 +98,18 @@ class ProfileAdressWidget extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  BenekSmallButton(
-                    iconData: BenekIcons.compass,
-                    tooltipMessage: BenekStringHelpers.locale('copied'),
-                    onTap: () async { Clipboard.setData(ClipboardData(text: '${location!.lat},${location!.lng}')); },
-                    isLight: isDark,
-                  ),
+                  !isEdit
+                  ? BenekSmallButton(
+                      iconData: BenekIcons.compass,
+                      tooltipMessage: BenekStringHelpers.locale('copied'),
+                      onTap: () async { Clipboard.setData(ClipboardData(text: '${location!.lat},${location!.lng}')); },
+                      isLight: isDark,
+                    )
+                  : BenekSmallButton(
+                      iconData: Icons.edit,
+                      isLight: isDark,
+                      onTap: onEdit,
+                    ),
                   BenekHorizontalButton(
                     text: !isEdit ? BenekStringHelpers.locale('showOnMap') : BenekStringHelpers.locale('edit'),
                     isLight: isDark,

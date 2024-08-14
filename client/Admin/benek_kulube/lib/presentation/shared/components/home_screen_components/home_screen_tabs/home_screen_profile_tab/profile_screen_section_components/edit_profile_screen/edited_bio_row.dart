@@ -1,5 +1,11 @@
 import 'package:flutter/widgets.dart';
 
+import 'package:flutter_redux/flutter_redux.dart';
+// ignore: depend_on_referenced_packages
+import 'package:redux/redux.dart';
+import 'package:benek_kulube/store/actions/app_actions.dart';
+import 'package:benek_kulube/store/app_state.dart';
+
 import '../../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../../common/utils/styles.text.dart';
 import 'edit_bio_button.dart';
@@ -27,6 +33,8 @@ class _EditedBioRowState extends State<EditedBioRow> {
 
   @override
   Widget build(BuildContext context) {
+    Store<AppState> store = StoreProvider.of<AppState>(context);
+
     return Row(
       children: [
         Stack(
@@ -69,7 +77,10 @@ class _EditedBioRowState extends State<EditedBioRow> {
                       PageRouteBuilder(
                         opaque: false,
                         barrierDismissible: false,
-                        pageBuilder: (context, _, __) => EditTextScreen( textToEdit: widget.bio, ),
+                        pageBuilder: (context, _, __) => EditTextScreen(
+                          textToEdit: widget.bio,
+                          onDispatch: (text) => store.dispatch(updateBioRequestAction(text)),
+                        ),
                       ),
                     );
 

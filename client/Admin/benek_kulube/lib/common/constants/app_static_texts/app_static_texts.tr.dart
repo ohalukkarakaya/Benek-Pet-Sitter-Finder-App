@@ -116,5 +116,10 @@ class AppStaticTextsTr{
     'uploadNewOne': 'Yenisini Yükle',
     'approveProfilePhotoDelete': 'Profil Resmini silmek için kaydır...',
     'writeBio': 'Biyografi Yaz',
+    'outOfTurkey': 'Türkiye sınırları dışında bir konum seçtiniz.',
+    'approveCancelChanges': 'Değişiklikleri iptal etmek için kaydır...',
+    'next': 'Düzenle',
+    'chooseYourLocationCaption': 'Konumunuzu seçin',
+    'chooseYourLocationDesc': 'Haritada, ikametgah adresinizi işaretleyin, açık adresi düzenleyin ve kaydedin...',
   };
 }
