@@ -40,7 +40,7 @@ class _MapBackAndCancelButtonState extends State<MapBackAndCancelButton> {
                 PageRouteBuilder(
                   opaque: false,
                   barrierDismissible: false,
-                  pageBuilder: (context, _, __) => ApproveScreen(title: BenekStringHelpers.locale('approveCancelChanges')),
+                  pageBuilder: (context, _, __) => ApproveScreen(isNegative: true, title: BenekStringHelpers.locale('approveCancelChanges')),
                 ),
               )
               : true;

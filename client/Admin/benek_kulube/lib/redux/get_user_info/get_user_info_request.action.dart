@@ -72,6 +72,20 @@ ThunkAction<AppState> updateAddressRequestAction(String country, String city, St
   };
 }
 
+ThunkAction<AppState> updateFullNameRequestAction(String fullname) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      Map<String, dynamic>? _nameInfo = await api.putUpdateFullname(fullname);
+
+      await store.dispatch(UpdateFullNameRequestAction(_nameInfo?['firstName'], _nameInfo?['middleName'], _nameInfo?['lastName'], store.state.userInfo?.userId));
+    } on ApiException catch (e) {
+      log('ERROR: updateBioRequestAction - $e');
+    }
+  };
+}
+
 class GetUserInfoRequestAction {
   final UserInfo? _userInfo;
   UserInfo? get userInfo => _userInfo;
@@ -108,4 +122,18 @@ class UpdateAddressRequestAction {
   String? get userId => _userId;
 
   UpdateAddressRequestAction(this._newLocation, this._newOpenAddress, this._userId);
+}
+
+class UpdateFullNameRequestAction {
+  final String? _firstName;
+  final String? _middleName;
+  final String? _lastName;
+  final String? _userId;
+
+  String? get firstName => _firstName;
+  String? get middleName => _middleName;
+  String? get lastName => _lastName;
+  String? get userId => _userId;
+
+  UpdateFullNameRequestAction(this._firstName, this._middleName, this._lastName, this._userId);
 }

@@ -118,8 +118,11 @@ class AppStaticTextsTr{
     'writeBio': 'Biyografi Yaz',
     'outOfTurkey': 'Türkiye sınırları dışında bir konum seçtiniz.',
     'approveCancelChanges': 'Değişiklikleri iptal etmek için kaydır...',
-    'next': 'Düzenle',
+    'save': 'Kaydet',
     'chooseYourLocationCaption': 'Konumunuzu seçin',
     'chooseYourLocationDesc': 'Haritada, ikametgah adresinizi işaretleyin, açık adresi düzenleyin ve kaydedin...',
+    'missingLastName': 'Lütfen tam isim soyisim girin!',
+    'approveNameChanges': 'İsmini değiştirmek için kaydır...',
+    'slideToApprove': 'Onaylamak için kaydır..',
   };
 }

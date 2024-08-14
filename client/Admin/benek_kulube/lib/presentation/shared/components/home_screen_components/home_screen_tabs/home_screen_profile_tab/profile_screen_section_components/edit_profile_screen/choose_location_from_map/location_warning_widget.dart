@@ -16,7 +16,7 @@ class LocationWarningWidget extends StatelessWidget {
         child: Container(
           width: 500,
           height: 80,
-          color: AppColors.benekLightBeige.withOpacity(0.8), // Açık turuncu arkaplan rengi
+          color: AppColors.benekBlack.withOpacity(0.8), // Açık turuncu arkaplan rengi
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -24,7 +24,7 @@ class LocationWarningWidget extends StatelessWidget {
               Container(
                 width: 5.0, // Sol taraf ince koyu turuncu dikdörtgen
                 height: 80.0,
-                color: AppColors.benekWarningOrange.withOpacity(0.8), // Koyu turuncu renk
+                color: AppColors.benekWarningOrange, // Koyu turuncu renk
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -35,8 +35,8 @@ class LocationWarningWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Icon(
-                        Icons.warning, // Uyarı ikonu
-                        color: Color(0xFFFF8C00), // Koyu turuncu renk
+                        Icons.warning_rounded, // Uyarı ikonu
+                        color: AppColors.benekWarningOrange, // Koyu turuncu renk
                       ),
                       const SizedBox(width: 10.0), // Boşluk
                       Expanded(
@@ -46,14 +46,16 @@ class LocationWarningWidget extends StatelessWidget {
                             Text(
                                 BenekStringHelpers.locale('chooseYourLocationCaption'), // Başlık
                                 style: boldTextStyle(
-                                  textColor: Color(0xFFFF8C00), // Koyu turuncu renk
+                                  textColor: AppColors.benekWarningOrange, // Koyu turuncu renk
                                   textFontSize: 14.0,
                                 )
                             ),
                             SizedBox(height: 5.0), // Başlık ile açıklama arası boşluk
                             Text(
                                 BenekStringHelpers.locale('chooseYourLocationDesc'), // Açıklama
-                                style: regularTextStyle()
+                                style: regularTextStyle(
+                                  textColor: AppColors.benekWhite,
+                                )
                             ),
                           ],
                         ),

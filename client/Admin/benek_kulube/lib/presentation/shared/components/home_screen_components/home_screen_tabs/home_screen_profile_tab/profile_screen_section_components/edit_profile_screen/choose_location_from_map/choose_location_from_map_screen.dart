@@ -25,6 +25,8 @@ class ChooseLocationFromMapScreen extends StatefulWidget {
 }
 
 class _ChooseLocationFromMapScreenState extends State<ChooseLocationFromMapScreen> {
+  bool isOutOfTurkey = false;
+
   bool didChanged = false;
   double? newLat;
   double? newLng;
@@ -105,11 +107,18 @@ class _ChooseLocationFromMapScreenState extends State<ChooseLocationFromMapScree
                         BenekStringHelpers.locale('outOfTurkey'),
                         context
                       );
+
+                      setState(() {
+                        isOutOfTurkey = true;
+                      });
+
                       return;
                     }
                     setState(() {
                       adress = newAdressData['display_name'];
                       if ( newAdressData['city'] != null ) city = newAdressData['city'];
+
+                      isOutOfTurkey = false;
                     });
                   }
                 }
@@ -166,7 +175,7 @@ class _ChooseLocationFromMapScreenState extends State<ChooseLocationFromMapScree
                 Align(
                   alignment: Alignment.bottomRight,
                   child: AddressSaveButton(
-                    didEdit: didChanged,
+                    didEdit: didChanged && !isOutOfTurkey,
                     address: adress,
                     city: city,
                     lat: newLat,

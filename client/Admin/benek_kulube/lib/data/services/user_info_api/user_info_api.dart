@@ -174,4 +174,49 @@ class UserInfoApi {
     }
     return null;
   }
+
+  Future<Map<String, dynamic>?> putUpdateFullname(String fullname) async {
+    try {
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/fullname';
+
+      List<String> names = fullname.split(' ');
+      if( names.length < 2 ){
+        return null;
+      }
+
+      Object? postBody = {
+        'fullname': fullname,
+      };
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> authNames = [];
+
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      } else if (response.body != null) {
+        var decodedJson = json.decode(response.body);
+
+        String firstName = decodedJson['data']['firstName'];
+        String? middleName = decodedJson['data']['middleName'];
+        String lastName = decodedJson['data']['lastName'];
+
+        Map<String, dynamic> data = {
+          'firstName': firstName,
+          'middleName': middleName,
+          'lastName': lastName,
+        };
+
+        return data;
+      }
+    } catch (err) {
+      log('ERROR: putUpdateProfileImage - $err');
+    }
+    return null;
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/care_giver_badge.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/edit_profile_screen/single_line_edit_text.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/edit_profile_screen/upload_profile_image_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,10 +18,11 @@ import 'package:redux/redux.dart';
 import 'package:benek_kulube/store/app_state.dart';
 
 import 'become_care_giver_button.dart';
-import 'deactivte_account_button.dart';
+import 'deactivate_account_button.dart';
 import 'edit_account_info_menu_item.dart';
 import 'edit_adress_widget.dart';
 import 'edit_profile_profile_widget.dart';
+import 'edit_text_screen.dart';
 import 'edited_bio_row.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -35,6 +37,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   bool shouldPop = false;
   bool isLoading = true;
+
+  bool idle = false;
 
   @override
   void initState() {
@@ -100,7 +104,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               userInfo: userInfo,
                             ),
 
-                            const DeactivteAccountButton(),
+                            const DeactivateAccountButton(),
                           ],
                         ),
                         const SizedBox(height: 20.0,),
@@ -155,6 +159,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     userInfo.identity!.lastName!,
                                     userInfo.identity!.middleName
                                 ),
+
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      opaque: false,
+                                      barrierDismissible: false,
+                                      pageBuilder: (context, _, __) => SingleLineEditTextScreen(
+                                        info: BenekStringHelpers.locale('fullname'),
+                                        textToEdit: BenekStringHelpers.getUsersFullName(
+                                            userInfo.identity!.firstName!,
+                                            userInfo.identity!.lastName!,
+                                            userInfo.identity!.middleName
+                                        ),
+                                        validation: (text) => text.split(' ').length >= 2,
+                                        validationErrorMessage: BenekStringHelpers.locale('missingLastName'),
+                                        onDispatch: (text) => store.dispatch(updateFullNameRequestAction(text)),
+                                        shouldApprove: true,
+                                        approvalTitle: BenekStringHelpers.locale('approveNameChanges'),
+                                      ),
+                                    ),
+                                  );
+
+                                  setState(() {
+                                    idle = !idle;
+                                  });
+                                },
                               ),
                               const Divider(color: AppColors.benekGrey,),
                               EditAccountInfoMenuItem(

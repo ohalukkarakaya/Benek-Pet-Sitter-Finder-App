@@ -9,10 +9,12 @@ import '../../presentation/shared/components/loading_components/benek_blured_mod
 
 
 class ApproveScreen extends StatefulWidget {
+  final bool isNegative;
   final String title;
 
   const ApproveScreen({
     super.key,
+    this.isNegative = false,
     required this.title,
   });
 
@@ -59,10 +61,11 @@ class _ApproveScreenState extends State<ApproveScreen> {
               child: Builder(builder: (context) {
                 return SlideAction(
                   text: widget.title,
-                  textColor: AppColors.benekBlack,
+                  textColor: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
                   borderRadius: 6.0,
                   textStyle: regularTextStyle(
-                    textColor: AppColors.benekBlack, textFontSize: 15.0,
+                    textColor: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
+                    textFontSize: 15.0,
                   ),
                   onSubmit: () async {
                     setState(() {
@@ -70,11 +73,11 @@ class _ApproveScreenState extends State<ApproveScreen> {
                     });
                     Navigator.of(context).pop(didApprove);
                   },
-                  innerColor: AppColors.benekBlack,
-                  outerColor: AppColors.benekLightBlue,
-                  submittedIcon: const Icon(
+                  innerColor: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
+                  outerColor: !widget.isNegative ? AppColors.benekLightBlue : AppColors.benekLightRed,
+                  submittedIcon: Icon(
                     Icons.done,
-                    color: AppColors.benekBlack,
+                    color: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
                     size: 32,
                   ),
                 );

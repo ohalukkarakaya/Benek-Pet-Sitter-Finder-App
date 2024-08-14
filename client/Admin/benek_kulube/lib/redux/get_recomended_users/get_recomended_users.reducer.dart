@@ -68,6 +68,26 @@ UserList? userSearchRequestReducer( UserList? recomendedUsers, dynamic action ){
         ).location = action.newLocation;
       }
     }
+  } else if( action is UpdateFullNameRequestAction ){
+    if(recomendedUsers != null && recomendedUsers.recentlySeenUsers != null) {
+      bool isUserExist = recomendedUsers.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.firstName;
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.middleName;
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.lastName;
+      }
+    }
+
+    if(recomendedUsers != null && recomendedUsers.users != null) {
+      bool isUserExist = recomendedUsers.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        recomendedUsers.users?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.firstName;
+        recomendedUsers.users?.firstWhere((element) => element.userId == action.userId).identity?.middleName = action.middleName;
+        recomendedUsers.users?.firstWhere((element) => element.userId == action.userId).identity?.lastName = action.lastName;
+      }
+    }
   }
 
   return recomendedUsers;

@@ -1,10 +1,10 @@
-import 'package:flutter/widgets.dart';
-import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
-import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../../../../../../../common/constants/app_colors.dart';
-import '../../../../../../../../common/constants/benek_icons.dart';
+import '../../../../../../../../common/utils/benek_string_helpers.dart';
+import '../../../../../../../../common/utils/styles.text.dart';
+import '../../../../../../../../common/widgets/slide_to_act.dart';
 
 class DeactivateAccountButton extends StatefulWidget {
   const DeactivateAccountButton({super.key});
@@ -14,52 +14,40 @@ class DeactivateAccountButton extends StatefulWidget {
 }
 
 class _DeactivateAccountButtonState extends State<DeactivateAccountButton> {
-  bool isHovering = false;
+  bool didApprove = false;
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) {
-        setState(() {
-          isHovering = true;
-        });
-      },
-      onExit: (_) {
-        setState(() {
-          isHovering = false;
-        });
-      },
-      child: GestureDetector(
-        onTap: () {},
-        child: Container(
-          width: 150,
-          height: 50,
-          decoration: BoxDecoration(
-            color: !isHovering ? AppColors.benekBlack : AppColors.benekRed,
-            borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
-          ),
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                  BenekStringHelpers.locale('deactivateAccount'),
-                  style: semiBoldTextStyle(
-                    textColor: isHovering ? AppColors.benekWhite : AppColors.benekRed,
-                  )
-              ),
-
-              const SizedBox(width: 5),
-
-              Icon(
-                Icons.logout,
-                color: isHovering ? AppColors.benekWhite : AppColors.benekRed,
-                size: 15,
-              ),
-            ],
-          ),
-        ),
+    return SizedBox(
+      width: 275,
+      height: 65,
+      child: Builder(
+        builder: (context) {
+          return SlideAction(
+            sliderButtonIconSize: 15,
+            sliderButtonIconPadding: 15,
+            text: BenekStringHelpers.locale('deactivateAccount'),
+            borderRadius: 6.0,
+            textStyle: regularTextStyle(
+              textColor: AppColors.benekRed,
+              textFontSize: 9.0,
+            ),
+            onSubmit: () async {
+              setState(() {
+                didApprove = true;
+              });
+              Navigator.of(context).pop(didApprove);
+            },
+            innerColor: AppColors.benekRed,
+            outerColor: AppColors.benekLightRed,
+            submittedIcon: const Icon(
+              Icons.done,
+              color: AppColors.benekRed,
+              size: 20,
+            ),
+            sliderButtonYOffset: 5,
+          );
+        },
       ),
     );
   }

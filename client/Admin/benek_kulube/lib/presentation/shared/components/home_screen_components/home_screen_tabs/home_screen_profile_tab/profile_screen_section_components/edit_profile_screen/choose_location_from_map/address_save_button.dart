@@ -106,10 +106,10 @@ class _AddressSaveButtonState extends State<AddressSaveButton> {
                       size: 25.0,
                     ),
 
-                    const SizedBox(width: 10.0),
+                    const SizedBox(width: 15.0),
 
                     Text(
-                        BenekStringHelpers.locale('next'),
+                        BenekStringHelpers.locale('save'),
                       style: boldTextStyle(
                         textColor: !widget.didEdit
                             ? AppColors.benekGrey

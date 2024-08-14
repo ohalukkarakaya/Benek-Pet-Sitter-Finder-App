@@ -9,12 +9,14 @@ class EditAccountInfoMenuItem extends StatefulWidget {
   final String text;
   final String? desc;
   final IconData icon;
+  final Function()? onTap;
 
   const EditAccountInfoMenuItem({
     super.key,
     required this.text,
     this.desc,
     required this.icon,
+    this.onTap,
   });
 
   @override
@@ -38,7 +40,7 @@ class _EditAccountInfoMenuItemState extends State<EditAccountInfoMenuItem> {
         });
       },
       child: GestureDetector(
-        onTap: () {},
+        onTap: widget.onTap,
         child: Container(
           padding: const EdgeInsets.all(15.0),
           decoration: BoxDecoration(

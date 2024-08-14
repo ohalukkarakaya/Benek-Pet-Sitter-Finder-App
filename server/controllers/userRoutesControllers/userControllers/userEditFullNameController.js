@@ -11,6 +11,13 @@ const userEditFullNameController = async (req, res) => {
 
         let nameParts = fullName.split(' ');
 
+        if( nameParts.length < 2 ){
+            return res.status(400).json({
+                error: true,
+                message: "Full Name must contain at least 2 parts"
+            });
+        }
+
         let firstName = capitalize(nameParts[0]);
         let middleName = nameParts.slice(1, -1).map(capitalize).join(' ');
         let lastName = capitalize(nameParts[nameParts.length - 1]);

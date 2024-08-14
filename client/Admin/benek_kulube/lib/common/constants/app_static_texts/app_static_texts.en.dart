@@ -118,8 +118,11 @@ class AppStaticTextsEn{
     'writeBio': 'Write Bio',
     'outOfTurkey': 'You have chosen a location outside of Türkiye.',
     'approveCancelChanges': 'Slide to cancel changes...',
-    'next': 'Edit',
+    'save': 'Save',
     'chooseYourLocationCaption': 'Choose Your Location',
     'chooseYourLocationDesc': 'Mark your official address on the map, edit the open address and save...',
+    'missingLastName': 'Please enter full name and surname!',
+    'approveNameChanges': 'Slide to change your name...',
+    'slideToApprove': 'Slide to approve...',
   };
 }
