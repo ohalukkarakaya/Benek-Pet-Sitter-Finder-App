@@ -52,10 +52,13 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
     userInfo?.identity?.middleName = action.middleName;
     userInfo?.identity?.lastName = action.lastName;
     return userInfo;
-  }else if( action is UpdateUserNameAction ){
+  } else if( action is UpdateUserNameAction ){
     userInfo?.userName = action.userName;
-  }else if( action is UpdateEmailAction ){
+  } else if( action is UpdateEmailAction ){
     userInfo?.email = action.email;
+    return userInfo;
+  } else if( action is UpdateTcIdNoAction ){
+    userInfo?.identity?.nationalIdentityNumber = action.tcIdNo;
     return userInfo;
   }
 

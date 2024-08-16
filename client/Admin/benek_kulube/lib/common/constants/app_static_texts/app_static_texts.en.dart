@@ -126,6 +126,7 @@ class AppStaticTextsEn{
     'approveNameChanges': 'Slide to change your name...',
     'approveEmailChanges': 'Slide to change your e-mail...',
     'approveUsernameChanges': 'Slide to change your username...',
+    'approveTCNOChanges': 'Slide to change your Turkish ID Number...',
     'slideToApprove': 'Slide to approve...',
     'reSendEmail': 'Resend the code',
     'missingOtpCode': 'Missing verification code!',

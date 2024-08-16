@@ -343,4 +343,35 @@ class UserInfoApi {
       return false;
     }
   }
+
+  Future<bool?> putUpdateTCIdNo(String tcNo) async {
+    try {
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/profileSettings/addIdNo';
+
+      Object? postBody = {
+        'isTCCitizen': "true", //for now, only Turkish citizens can update their TC ID
+        'countryCode': 'TR',
+        'idNo': tcNo,
+      };
+
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> authNames = [];
+
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        return false;
+      } else if (response.body != null) {
+        return true;
+      }
+    } catch (err) {
+      log('ERROR: updateTCIdNo - $err');
+    }
+    return false;
+  }
 }

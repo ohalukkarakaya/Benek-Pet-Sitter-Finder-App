@@ -165,6 +165,25 @@ ThunkAction<AppState> verifyEmailOtpRequestAction(String email, String otp) {
   };
 }
 
+ThunkAction<AppState> updateTcIdNoAction( String TcNo ){
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      bool? _didErrorOccured = await api.putUpdateTCIdNo(TcNo);
+      if(_didErrorOccured == null || _didErrorOccured == false){
+        throw CustomException(1, BenekStringHelpers.locale('operationFailed') );
+      }
+
+      await store.dispatch(UpdateTcIdNoAction(TcNo, store.state.userInfo!.userId!));
+    } on ApiException catch (e) {
+      log('ERROR: updateTcIdNoAction - $e');
+      throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+    }
+  };
+
+}
+
 class GetUserInfoRequestAction {
   final UserInfo? _userInfo;
   UserInfo? get userInfo => _userInfo;
@@ -235,4 +254,14 @@ class UpdateEmailAction {
   String? get userId => _userId;
 
   UpdateEmailAction(this._email, this._userId);
+}
+
+class UpdateTcIdNoAction {
+  final String? _tcIdNo;
+  final String? _userId;
+
+  String? get tcIdNo => _tcIdNo;
+  String? get userId => _userId;
+
+  UpdateTcIdNoAction(this._tcIdNo, this._userId);
 }

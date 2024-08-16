@@ -26,6 +26,7 @@ import 'edit_text_screen.dart';
 import 'edited_bio_row.dart';
 import 'menu_items/edit_email_button.dart';
 import 'menu_items/edit_full_name_button.dart';
+import 'menu_items/edit_tc_no_button.dart';
 import 'menu_items/edit_user_name_button.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -187,10 +188,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               const Divider(color: AppColors.benekGrey,),
 
                               userInfo.identity != null && userInfo.identity!.nationalIdentityNumber != null
-                                  ? EditAccountInfoMenuItem(
-                                    icon: Icons.verified_user,
-                                    desc: BenekStringHelpers.locale('TCNo'),
-                                    text: userInfo.identity!.nationalIdentityNumber!,
+                                  ? EditTcNoButton(
+                                    userInfo: userInfo,
+                                    onDispatch: (text) => store.dispatch(updateTcIdNoAction(text)),
                                   )
                                   : const SizedBox(),
 

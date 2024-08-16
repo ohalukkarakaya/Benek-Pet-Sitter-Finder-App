@@ -125,6 +125,24 @@ UserList? userSearchRequestReducer( UserList? recomendedUsers, dynamic action ){
     }
 
     return recomendedUsers;
+  } else if( action is UpdateTcIdNoAction ){
+    if(recomendedUsers != null && recomendedUsers.recentlySeenUsers != null) {
+      bool isUserExist = recomendedUsers.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.nationalIdentityNumber = action.tcIdNo;
+      }
+    }
+
+    if(recomendedUsers != null && recomendedUsers.users != null) {
+      bool isUserExist = recomendedUsers.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        recomendedUsers.users?.firstWhere((element) => element.userId == action.userId).identity?.nationalIdentityNumber = action.tcIdNo;
+      }
+    }
+
+    return recomendedUsers;
   }
 
   return recomendedUsers;

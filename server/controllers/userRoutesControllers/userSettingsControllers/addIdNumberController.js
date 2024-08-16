@@ -10,9 +10,7 @@ dotenv.config();
 
 const addIdNumberController = async ( req, res ) => {
     try{
-        const userId = req.user
-                          ._id
-                          .toString();
+        const userId = req.user._id.toString();
 
         const isCitizenOfTurkey = req.body.isTCCitizen;
         const idNo = req.body.idNo;
@@ -22,13 +20,10 @@ const addIdNumberController = async ( req, res ) => {
           || !isCitizenOfTurkey
           || ( isCitizenOfTurkey === "false" && !passportCountryCode )
         ){
-          return res.status( 400 )
-                    .json(
-                      {
-                        error: true,
-                        message: "Missing required params"
-                      }
-                    );
+          return res.status( 400 ).json({
+            error: true,
+            message: "Missing required params"
+          });
         }
 
         const isTCCitizen = isCitizenOfTurkey === "true";  
@@ -43,54 +38,42 @@ const addIdNumberController = async ( req, res ) => {
         const nationalIdCryptoAlgorithm = process.env.NATIONAL_ID_CRYPTO_ALGORITHM;
         const iv = crypto.randomBytes( 16 ).toString( 'hex' );
         const cipher = crypto.createCipheriv(
-                                  nationalIdCryptoAlgorithm, 
-                                  Buffer.from( nationalIdCryptoKey ), 
-                                  Buffer.from( iv, 'hex' )
-                              );
+              nationalIdCryptoAlgorithm,
+              Buffer.from( nationalIdCryptoKey ),
+              Buffer.from( iv, 'hex' )
+        );
         let encrypted = cipher.update( trimedIdNo, 'utf8', 'hex' );
         encrypted += cipher.final( 'hex' );
   
         if( !isTcNo && !isPassportNo ){
-          return res.status( 400 )
-                    .json(
-                      {
-                        error: true,
-                        message: "Id number is not valid"
-                      }
-                    );
+          return res.status( 400 ).json({
+            error: true,
+            message: "Id number is not valid"
+          });
         }
         
         const user = await User.findById( userId );
         if( !user || user.deactivation.isDeactive ){
-          return res.status( 404 )
-                    .json(
-                      {
-                        error: true,
-                        message: "User not found"
-                      }
-                    );
+          return res.status( 404 ).json({
+            error: true,
+            message: "User not found"
+          });
         }
   
         if( isTCCitizen ){
           if( !isTcNo || isPassportNo  ){
-            return res.status( 400 )
-                      .json(
-                        {
-                          error: true,
-                          message: "TC ID No is required for you"
-                        }
-                      );
+            return res.status( 400 ).json({
+              error: true,
+              message: "TC ID No is required for you"
+            });
           }
   
         }else if( !isTCCitizen ){
           if( isTcNo || !isPassportNo ){
-            return res.status( 400 )
-                      .json(
-                        {
-                          error: true,
-                          message: "Passport No is required for you"
-                        }
-                      );
+            return res.status( 400 ).json({
+              error: true,
+              message: "Passport No is required for you"
+            });
           }
         }
   
@@ -104,37 +87,28 @@ const addIdNumberController = async ( req, res ) => {
         user.save(
           ( err ) => {
             if( err ){
-                return res.status( 500 )
-                          .json(
-                              {
-                                  error: true,
-                                  message: "ERROR: while saving user data"
-                              }
-                          );
+                return res.status( 500 ).json({
+                      error: true,
+                      message: "ERROR: while saving user data"
+                });
             }
           }
         );
   
         const firstSplicedId = trimedIdNo.slice( 0, 3 );
         const lastSplicedId = trimedIdNo.slice( -2 );
-        return res.status( 200 )
-                  .json(
-                    {
-                      error: false,
-                      message: `Id number inserted succesfully`,
-                      idNumber: `${ firstSplicedId }...${ lastSplicedId }`
-                    }
-                  );
+        return res.status( 200 ).json({
+          error: false,
+          message: `Id number inserted succesfully`,
+          idNumber: `${ firstSplicedId }...${ lastSplicedId }`
+        });
   
       }catch( err ){
         console.log( "Error: add ID number", err );
-        return res.status( 500 )
-                  .json(
-                    {
-                      error: true,
-                      message: "Internal server error"
-                    }
-                  );
+        return res.status( 500 ).json({
+          error: true,
+          message: "Internal server error"
+        });
       }
 }
 

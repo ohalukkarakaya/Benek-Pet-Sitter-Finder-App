@@ -131,6 +131,24 @@ UserList? userSearchRequestReducer( UserList? userSearchListData, dynamic action
     }
 
     return userSearchListData;
+  }else if( action is UpdateTcIdNoAction ){
+    if(userSearchListData != null && userSearchListData.recentlySeenUsers != null) {
+      bool isUserExist = userSearchListData.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.nationalIdentityNumber = action.tcIdNo;
+      }
+    }
+
+    if(userSearchListData != null && userSearchListData.users != null) {
+      bool isUserExist = userSearchListData.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        userSearchListData.users?.firstWhere((element) => element.userId == action.userId).identity?.nationalIdentityNumber = action.tcIdNo;
+      }
+    }
+
+    return userSearchListData;
   }
 
   return userSearchListData;
