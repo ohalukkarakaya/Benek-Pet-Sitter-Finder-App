@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_location_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_profile_image_model.dart';
@@ -88,6 +89,24 @@ ThunkAction<AppState> updateFullNameRequestAction(String fullname) {
   };
 }
 
+ThunkAction<AppState> updateUserNameAction(String username) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      bool? _didErrorOccured = await api.putUpdateUserName(username);
+      if(_didErrorOccured == null || _didErrorOccured == false){
+        throw CustomException(1, BenekStringHelpers.locale('operationFailed') );
+      }
+
+      await store.dispatch(UpdateUserNameAction( username, store.state.userInfo!.userId! ));
+    } on ApiException catch (e) {
+      log('ERROR: updateUserNameAction - $e');
+      throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+    }
+  };
+}
+
 ThunkAction<AppState> updateEmailRequestAction(String email) {
   return (Store<AppState> store) async {
     UserInfoApi api = UserInfoApi();
@@ -95,13 +114,13 @@ ThunkAction<AppState> updateEmailRequestAction(String email) {
     try {
       bool? _email = await api.postResetEmail(email);
       if(_email != true){
-        throw CustomException(1, 'Email update failed');
+        throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
       }
 
       return true;
     } on ApiException catch (e) {
       log('ERROR: updateEmailRequestAction - $e');
-      throw CustomException(1, 'Email update failed');
+      throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
     }
   };
 }
@@ -115,13 +134,13 @@ ThunkAction<AppState> resendEmailOtpRequestAction(String email) {
 
       bool? _email = await api.postResendEmailOtp(userId, email);
       if(_email != true){
-        throw CustomException(1, 'Email update failed');
+        throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
       }
 
       return true;
     } on ApiException catch (e) {
       log('ERROR: resendEmailOtpRequestAction - $e');
-      throw CustomException(1, 'Email update failed');
+      throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
     }
   };
 }
@@ -135,13 +154,13 @@ ThunkAction<AppState> verifyEmailOtpRequestAction(String email, String otp) {
 
       bool? _email = await api.postVerifyEmailOtp(otp, email);
       if(_email != true){
-        throw CustomException(1, 'Email update failed');
+        throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
       }
 
       await store.dispatch(UpdateEmailAction(email, userId));
     } on ApiException catch (e) {
       log('ERROR: verifyEmailOtpRequestAction - $e');
-      throw CustomException(1, 'Email update failed');
+      throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
     }
   };
 }
@@ -196,6 +215,16 @@ class UpdateFullNameRequestAction {
   String? get userId => _userId;
 
   UpdateFullNameRequestAction(this._firstName, this._middleName, this._lastName, this._userId);
+}
+
+class UpdateUserNameAction {
+  final String? _userName;
+  final String? _userId;
+
+  String? get userName => _userName;
+  String? get userId => _userId;
+
+  UpdateUserNameAction(this._userName, this._userId);
 }
 
 class UpdateEmailAction {

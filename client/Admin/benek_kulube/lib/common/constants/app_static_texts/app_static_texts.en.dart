@@ -125,8 +125,10 @@ class AppStaticTextsEn{
     'invalidEmail': 'Invalid e-mail address!',
     'approveNameChanges': 'Slide to change your name...',
     'approveEmailChanges': 'Slide to change your e-mail...',
+    'approveUsernameChanges': 'Slide to change your username...',
     'slideToApprove': 'Slide to approve...',
     'reSendEmail': 'Resend the code',
     'missingOtpCode': 'Missing verification code!',
+    'operationFailed': 'Operation failed!',
   };
 }

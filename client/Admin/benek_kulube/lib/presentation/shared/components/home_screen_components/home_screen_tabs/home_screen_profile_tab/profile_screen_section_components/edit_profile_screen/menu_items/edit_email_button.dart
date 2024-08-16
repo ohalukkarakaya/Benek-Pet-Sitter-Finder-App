@@ -40,7 +40,9 @@ class _EditEmailButtonState extends State<EditEmailButton> {
       icon: Icons.email,
       desc: BenekStringHelpers.locale('email'),
       text: userInfo.email!,
+
       onTap: () async {
+
         setState(() {
           isDone = false;
         });
@@ -56,11 +58,11 @@ class _EditEmailButtonState extends State<EditEmailButton> {
                 textToEdit: !isResend || newEmailForResend == null
                     ? userInfo.email!
                     : newEmailForResend!,
-                validation: (text) => text.contains('@'),
+                validation: (text) => text.contains('@') && text.toUpperCase().contains('.COM'),
                 validationErrorMessage: BenekStringHelpers.locale('invalidEmail'),
                 onDispatch: !isResend
-                    ? (text) => widget.onDispatch(text)
-                    : (text) => widget.onResendDispatch(text),
+                    ? (text) => widget.onDispatch(text.toLowerCase())
+                    : (text) => widget.onResendDispatch(text.toLowerCase()),
                 shouldApprove: true,
                 approvalTitle: BenekStringHelpers.locale('approveEmailChanges'),
               ),
@@ -84,7 +86,7 @@ class _EditEmailButtonState extends State<EditEmailButton> {
               barrierDismissible: false,
               pageBuilder: (context, _, __) => PasswordTextfield(
                 verifyingString: newEmail,
-                onDispatch: (text) => widget.onVerifyDispatch(newEmail, text),
+                onDispatch: (text) => widget.onVerifyDispatch(newEmail.toLowerCase(), text.toLowerCase()),
               ),
             ),
           );
@@ -92,7 +94,7 @@ class _EditEmailButtonState extends State<EditEmailButton> {
           if(resp != null && resp.isNotEmpty && resp == "reSend"){
             setState(() {
               isResend = true;
-              newEmailForResend = newEmail;
+              newEmailForResend = newEmail.toLowerCase();
             });
             continue;
           }

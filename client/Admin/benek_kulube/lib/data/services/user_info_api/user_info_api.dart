@@ -215,9 +215,38 @@ class UserInfoApi {
         return data;
       }
     } catch (err) {
-      log('ERROR: putUpdateProfileImage - $err');
+      log('ERROR: putUpdateFullname - $err');
     }
     return null;
+  }
+
+  Future<bool?> putUpdateUserName(String newUserName) async {
+    try {
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/profileSettings/resetUsername';
+
+      Object? postBody = {
+        'newUserName': newUserName,
+      };
+
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> authNames = [];
+
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if (response.statusCode >= 400 && response.statusCode != 404) {
+        return false;
+      } else if (response.body != null) {
+        return true;
+      }
+    } catch (err) {
+      log('ERROR: putUpdateUserName - $err');
+    }
+    return false;
   }
 
   Future<bool?> postResetEmail (String newEmail) async {

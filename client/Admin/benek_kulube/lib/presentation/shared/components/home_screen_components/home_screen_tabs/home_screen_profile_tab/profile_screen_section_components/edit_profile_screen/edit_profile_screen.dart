@@ -26,6 +26,7 @@ import 'edit_text_screen.dart';
 import 'edited_bio_row.dart';
 import 'menu_items/edit_email_button.dart';
 import 'menu_items/edit_full_name_button.dart';
+import 'menu_items/edit_user_name_button.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -161,10 +162,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                               const Divider(color: AppColors.benekGrey,),
 
-                              EditAccountInfoMenuItem(
-                                icon: FontAwesomeIcons.at,
-                                desc: BenekStringHelpers.locale('username'),
-                                text: userInfo.userName!
+                              EditUserNameButton(
+                                userInfo: userInfo,
+                                onDispatch: (text) => store.dispatch(updateUserNameAction(text)),
+                                updateParentWidgetFunction: () => setState(() { idle = !idle; }),
                               ),
 
                               const Divider(color: AppColors.benekGrey,),

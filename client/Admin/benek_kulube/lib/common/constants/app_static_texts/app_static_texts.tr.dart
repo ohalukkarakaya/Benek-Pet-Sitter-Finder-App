@@ -125,8 +125,10 @@ class AppStaticTextsTr{
     'invalidEmail': 'Geçersiz e-posta adresi!',
     'approveNameChanges': 'İsmini değiştirmek için kaydır...',
     'approveEmailChanges': 'E-Postanı değiştirmek için kaydır...',
+    'approveUsernameChanges': 'Kullanıcı Adını değiştirmek için kaydır...',
     'slideToApprove': 'Onaylamak için kaydır..',
     'reSendEmail': 'Kodu tekrar gönder',
     'missingOtpCode': 'Doğrulama kodu eksik!',
+    'operationFailed': 'İşlem başarısız!',
   };
 }

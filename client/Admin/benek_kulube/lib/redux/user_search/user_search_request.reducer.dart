@@ -94,6 +94,25 @@ UserList? userSearchRequestReducer( UserList? userSearchListData, dynamic action
     }
 
     return userSearchListData;
+  }else if( action is UpdateUserNameAction ) {
+    if(userSearchListData != null && userSearchListData.recentlySeenUsers != null) {
+      bool isUserExist = userSearchListData.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).userName = action.userName;
+      }
+    }
+
+    if(userSearchListData != null && userSearchListData.users != null) {
+      bool isUserExist = userSearchListData.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        userSearchListData.users?.firstWhere((element) => element.userId == action.userId).userName = action.userName;
+      }
+    }
+
+    return userSearchListData;
+
   }else if( action is UpdateEmailAction ){
     if(userSearchListData != null && userSearchListData.recentlySeenUsers != null) {
       bool isUserExist = userSearchListData.recentlySeenUsers!.any((element) => element.userId == action.userId);
