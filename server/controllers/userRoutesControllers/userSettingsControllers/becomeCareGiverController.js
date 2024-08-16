@@ -186,8 +186,7 @@ const becomeCareGiverController = async ( req, res ) => {
           }
   
           if( 
-            mokaRequest.data
-                       .sonuc !== 1 
+            mokaRequest.data.sonuc !== 1
           ){
 
             return res.status( 500 )
@@ -201,11 +200,7 @@ const becomeCareGiverController = async ( req, res ) => {
                       );
           }
   
-          user.careGiveGUID = mokaRequest.data
-                                         .altUyeIsyeriData
-                                         .DealerCode
-                                         .toString();
-
+          user.careGiveGUID = mokaRequest.data.altUyeIsyeriData.DealerCode.toString();
           user.markModified( "careGiveGUID" );
   
         } else {

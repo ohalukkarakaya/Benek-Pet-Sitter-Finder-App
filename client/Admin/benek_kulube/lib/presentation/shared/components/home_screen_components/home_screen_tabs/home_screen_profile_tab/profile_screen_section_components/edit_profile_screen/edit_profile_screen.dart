@@ -26,6 +26,7 @@ import 'edit_text_screen.dart';
 import 'edited_bio_row.dart';
 import 'menu_items/edit_email_button.dart';
 import 'menu_items/edit_full_name_button.dart';
+import 'menu_items/edit_paymen_info_button.dart';
 import 'menu_items/edit_tc_no_button.dart';
 import 'menu_items/edit_user_name_button.dart';
 
@@ -196,11 +197,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                               const Divider(color: AppColors.benekGrey,),
 
-                              EditAccountInfoMenuItem(
-                                icon: Icons.attach_money_rounded,
-                                desc: BenekStringHelpers.locale('iban'),
-                                text: userInfo.iban!,
-                              )
+                              EditPaymenInfoButton(
+                                userInfo: userInfo,
+                                onDispatch: (text) => store.dispatch(updatePaymentInfoAction(text)),
+                              ),
                             ],
                           ),
                         )

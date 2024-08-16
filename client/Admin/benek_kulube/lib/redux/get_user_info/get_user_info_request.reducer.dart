@@ -34,6 +34,8 @@ UserInfo? getUserInfoRequestReducer( UserInfo? userInfo, dynamic action ){
   } else if ( action is UpdateTcIdNoAction ){
     userInfo?.identity!.nationalIdentityNumber = action.tcIdNo;
     return userInfo;
+  } else if ( action is UpdatePaymentInfoAction ){
+    userInfo?.iban = action.iban;
   }
 
   return userInfo;

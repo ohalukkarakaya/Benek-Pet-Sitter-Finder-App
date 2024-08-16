@@ -8,6 +8,13 @@ import dotenv from "dotenv";
 dotenv.config();
 const env = process.env;
 
+function truncateString(str, maxLength) {
+    if (str.length <= maxLength) {
+        return str;
+    }
+    return str.substring(0, (maxLength - 3)) + "...";
+}
+
 const mokaUpdateSubsellerRequest = async (
     mokaSubSellerCode,
     firstName,
@@ -53,7 +60,7 @@ const mokaUpdateSubsellerRequest = async (
 
             const phoneNumberFinal = phoneNumber.replaceAll( "+90", "" );
 
-            let updateDealerRequest;
+            let updateDealerRequest = {};
 
             updateDealerRequest.SubDealerCode = mokaSubSellerCode;
 

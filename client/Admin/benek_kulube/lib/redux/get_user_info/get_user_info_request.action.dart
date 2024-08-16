@@ -184,6 +184,31 @@ ThunkAction<AppState> updateTcIdNoAction( String TcNo ){
 
 }
 
+ThunkAction<AppState> updatePaymentInfoAction( String iban ){
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      String fullName = BenekStringHelpers.getUsersFullName(
+        store.state.userInfo!.identity!.firstName!,
+        store.state.userInfo!.identity!.lastName!,
+        store.state.userInfo!.identity!.middleName
+      );
+
+      bool? _didErrorOccured = await api.putUpdateCareGiverPaymentInfo(fullName, iban);
+      if(_didErrorOccured == null || _didErrorOccured == false){
+        throw CustomException(1, BenekStringHelpers.locale('operationFailed') );
+      }
+
+      await store.dispatch(UpdatePaymentInfoAction(iban, store.state.userInfo!.userId!));
+    } on ApiException catch (e) {
+      log('ERROR: updateTcIdNoAction - $e');
+      throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+    }
+  };
+
+}
+
 class GetUserInfoRequestAction {
   final UserInfo? _userInfo;
   UserInfo? get userInfo => _userInfo;
@@ -264,4 +289,14 @@ class UpdateTcIdNoAction {
   String? get userId => _userId;
 
   UpdateTcIdNoAction(this._tcIdNo, this._userId);
+}
+
+class UpdatePaymentInfoAction {
+  final String? _iban;
+  final String? _userId;
+
+  String? get iban => _iban;
+  String? get userId => _userId;
+
+  UpdatePaymentInfoAction(this._iban, this._userId);
 }

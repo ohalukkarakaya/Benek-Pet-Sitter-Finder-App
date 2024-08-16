@@ -127,6 +127,7 @@ class AppStaticTextsTr{
     'approveEmailChanges': 'E-Postanı değiştirmek için kaydır...',
     'approveUsernameChanges': 'Kullanıcı Adını değiştirmek için kaydır...',
     'approveTCNOChanges': 'TC Kimlik Numarasını değiştirmek için kaydır...',
+    'approveIbanChanges': 'IBAN numarasını değiştirmek için kaydır...',
     'slideToApprove': 'Onaylamak için kaydır..',
     'reSendEmail': 'Kodu tekrar gönder',
     'missingOtpCode': 'Doğrulama kodu eksik!',
