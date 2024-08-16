@@ -10,28 +10,23 @@ dotenv.config();
 
 let transporter = nodemailer.createTransport(
     {
-      host: process.env
-                   .AUTH_EMAIL_HOST,
-      port: process.env
-                   .AUTH_EMAIL_PORT,
+      host: process.env.AUTH_EMAIL_HOST,
+      port: process.env.AUTH_EMAIL_PORT,
       secure: true,
       dkim: {
-        domainName: process.env
-                           .DKIM_DOMAIN,
-        keySelector: process.env
-                            .DKIM_SELECTOR,
+        domainName: process.env.DKIM_DOMAIN,
+        keySelector: process.env.DKIM_SELECTOR,
         privateKey: fs.readFileSync(
-                              process.env
-                                     .DKIM_PRIVATE_KEY_FILE_PATH, 
-                              "utf8"
-                       ),
+          process.env.DKIM_PRIVATE_KEY_FILE_PATH,
+          "utf8"
+       ),
         cacheDir: '/tmp',
         cacheTreshold: 2048,
       },
       auth: {
         user: process.env.AUTH_EMAIL,
         pass: process.env.AUTH_PASS,
-      }
+      },
     }
   );
 

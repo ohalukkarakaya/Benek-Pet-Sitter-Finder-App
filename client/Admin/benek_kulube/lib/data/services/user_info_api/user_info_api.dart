@@ -219,4 +219,99 @@ class UserInfoApi {
     }
     return null;
   }
+
+  Future<bool?> postResetEmail (String newEmail) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/profileSettings/resetEmail';
+
+      Object? postBody = {
+        'newEmail': newEmail,
+      };
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = ["application/json"];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'POST', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 && response.statusCode != 404 ){
+        log('ERROR: postResetEmail - ${json.decode(response.body)["message"]}');
+        return false;
+      }else if( response.body != null ){
+        return true;
+      }
+      return false;
+    }catch( err ){
+      log('ERROR: postResetEmail - $err');
+      return false;
+    }
+  }
+
+  Future<bool?> postResendEmailOtp (String userId, String email) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      const String path = '/auth/resendOtp';
+
+      Object? postBody = {
+        'userId': userId,
+        'email': email,
+      };
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = ["application/json"];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'POST', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 && response.statusCode != 404 ){
+        log('ERROR: postResendEmailOtp - ${json.decode(response.body)["message"]}');
+        return false;
+      }else if( response.body != null ){
+        return true;
+      }
+      return false;
+    }catch( err ){
+      log('ERROR: postResendEmailOtp - $err');
+      return false;
+    }
+  }
+
+  Future<bool?> postVerifyEmailOtp (String otp, String email) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/profileSettings/verifyResetEmailOTP';
+
+      Object? postBody = {
+        'otp': otp,
+        'email': email,
+      };
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = ["application/json"];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'POST', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 && response.statusCode != 404 ){
+        log('ERROR: postVerifyEmailOtp - ${json.decode(response.body)["message"]}');
+        return false;
+      }else if( response.body != null ){
+        return true;
+      }
+      return false;
+    }catch( err ){
+      log('ERROR: postVerifyEmailOtp - $err');
+      return false;
+    }
+  }
 }

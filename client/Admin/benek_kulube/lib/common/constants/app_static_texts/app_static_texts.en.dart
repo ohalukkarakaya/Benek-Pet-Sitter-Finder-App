@@ -122,7 +122,11 @@ class AppStaticTextsEn{
     'chooseYourLocationCaption': 'Choose Your Location',
     'chooseYourLocationDesc': 'Mark your official address on the map, edit the open address and save...',
     'missingLastName': 'Please enter full name and surname!',
+    'invalidEmail': 'Invalid e-mail address!',
     'approveNameChanges': 'Slide to change your name...',
+    'approveEmailChanges': 'Slide to change your e-mail...',
     'slideToApprove': 'Slide to approve...',
+    'reSendEmail': 'Resend the code',
+    'missingOtpCode': 'Missing verification code!',
   };
 }

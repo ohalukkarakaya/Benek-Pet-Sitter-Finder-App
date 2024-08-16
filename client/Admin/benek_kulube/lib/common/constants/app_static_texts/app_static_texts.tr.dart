@@ -122,7 +122,11 @@ class AppStaticTextsTr{
     'chooseYourLocationCaption': 'Konumunuzu seçin',
     'chooseYourLocationDesc': 'Haritada, ikametgah adresinizi işaretleyin, açık adresi düzenleyin ve kaydedin...',
     'missingLastName': 'Lütfen tam isim soyisim girin!',
+    'invalidEmail': 'Geçersiz e-posta adresi!',
     'approveNameChanges': 'İsmini değiştirmek için kaydır...',
+    'approveEmailChanges': 'E-Postanı değiştirmek için kaydır...',
     'slideToApprove': 'Onaylamak için kaydır..',
+    'reSendEmail': 'Kodu tekrar gönder',
+    'missingOtpCode': 'Doğrulama kodu eksik!',
   };
 }

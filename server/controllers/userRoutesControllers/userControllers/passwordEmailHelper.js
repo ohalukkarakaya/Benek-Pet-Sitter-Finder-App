@@ -14,8 +14,8 @@ const sendEmailHelper = (
     let style;
 
     if( type === "otp" ){
-        title = "👋 &nbsp; Benek'e Hoş Geldiniz"
-        message = "Lütfen aşağıdaki altı haneli kodu BenekApp'te ilgili alana girerek <br> Eposta adresinizi onaylayıp, üyeliğinizi tamamlayın.";
+        title = "Doğrulama Kodu"
+        message = "Lütfen aşağıdaki altı haneli kodu BenekApp'te ilgili alana girerek <br> Eposta adresinizi onaylayın.";
         warning = "Bu kodun <b>1 saat içerisinde süresi dolar.</b> Benek'te bir hesap oluşturmaya çalışmadıysanız, bu epostayı görmezden gelebilirsiniz.";
         style = `style="max-width: 320px; min-width: 500px; display: table-cell; vertical-align: top;"`
         messageComponent = `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0" style="font-family: arial, helvetica, sans-serif;">
@@ -23,8 +23,8 @@ const sendEmailHelper = (
                                 <tr>
                                     <td align="left" style="word-break: break-word; padding: 10px 32px; font-family: arial, helvetica, sans-serif;">
                                     <div>
-                                        <div style=" text-align: center; background-color: #D0EAF2 !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
-                                        <strong style="color: #000 !important; letter-spacing: 10px !important;">${ password }</strong>
+                                        <div style=" text-align: center; background-color: #D1EBF3 !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
+                                        <strong style="color: #000000 !important; letter-spacing: 10px !important;">${ password }</strong>
                                         </div>
                                     </div>
                                     </td>
@@ -41,8 +41,8 @@ const sendEmailHelper = (
                                 <tr>
                                     <td align="left" style="word-break: break-word; padding: 10px 32px; font-family: arial, helvetica, sans-serif;">
                                     <div>
-                                        <div style=" text-align: center; background-color: #D0EAF2 !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
-                                        <strong style="color: #000 !important; letter-spacing: 10px !important;">${ password }</strong>
+                                        <div style=" text-align: center; background-color: #D1EBF3 !important; padding: 50px; font-size: 20px; font-family: monaco; border-radius: 16px;">
+                                        <strong style="color: #000000 !important; letter-spacing: 10px !important;">${ password }</strong>
                                         </div>
                                     </div>
                                     </td>

@@ -15,6 +15,8 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 
+import '../../data/services/custom_exception.dart';
+
 ThunkAction<AppState> getUserInfoRequestAction() {
   return (Store<AppState> store) async {
     UserInfoApi api = UserInfoApi();
@@ -86,6 +88,64 @@ ThunkAction<AppState> updateFullNameRequestAction(String fullname) {
   };
 }
 
+ThunkAction<AppState> updateEmailRequestAction(String email) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      bool? _email = await api.postResetEmail(email);
+      if(_email != true){
+        throw CustomException(1, 'Email update failed');
+      }
+
+      return true;
+    } on ApiException catch (e) {
+      log('ERROR: updateEmailRequestAction - $e');
+      throw CustomException(1, 'Email update failed');
+    }
+  };
+}
+
+ThunkAction<AppState> resendEmailOtpRequestAction(String email) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      String userId = store.state.userInfo!.userId!;
+
+      bool? _email = await api.postResendEmailOtp(userId, email);
+      if(_email != true){
+        throw CustomException(1, 'Email update failed');
+      }
+
+      return true;
+    } on ApiException catch (e) {
+      log('ERROR: resendEmailOtpRequestAction - $e');
+      throw CustomException(1, 'Email update failed');
+    }
+  };
+}
+
+ThunkAction<AppState> verifyEmailOtpRequestAction(String email, String otp) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      String userId = store.state.userInfo!.userId!;
+
+      bool? _email = await api.postVerifyEmailOtp(otp, email);
+      if(_email != true){
+        throw CustomException(1, 'Email update failed');
+      }
+
+      await store.dispatch(UpdateEmailAction(email, userId));
+    } on ApiException catch (e) {
+      log('ERROR: verifyEmailOtpRequestAction - $e');
+      throw CustomException(1, 'Email update failed');
+    }
+  };
+}
+
 class GetUserInfoRequestAction {
   final UserInfo? _userInfo;
   UserInfo? get userInfo => _userInfo;
@@ -136,4 +196,14 @@ class UpdateFullNameRequestAction {
   String? get userId => _userId;
 
   UpdateFullNameRequestAction(this._firstName, this._middleName, this._lastName, this._userId);
+}
+
+class UpdateEmailAction {
+  final String? _email;
+  final String? _userId;
+
+  String? get email => _email;
+  String? get userId => _userId;
+
+  UpdateEmailAction(this._email, this._userId);
 }

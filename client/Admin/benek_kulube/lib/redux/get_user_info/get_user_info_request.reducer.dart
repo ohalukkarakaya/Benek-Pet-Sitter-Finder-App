@@ -26,6 +26,9 @@ UserInfo? getUserInfoRequestReducer( UserInfo? userInfo, dynamic action ){
     userInfo?.identity!.middleName = action.middleName;
     userInfo?.identity!.lastName = action.lastName;
     return userInfo;
+  } else if ( action is UpdateEmailAction ){
+    userInfo?.email = action.email;
+    return userInfo;
   }
 
   return userInfo;

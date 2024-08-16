@@ -7,6 +7,7 @@ import '../../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../../common/utils/benek_string_helpers.dart';
 import '../../../../../../../../common/utils/styles.text.dart';
 import '../../../../../../../../common/widgets/approve_screen.dart';
+import '../../../../../../../../data/services/custom_exception.dart';
 import '../../../../../benek_process_indicator/benek_process_indicator.dart';
 
 class SingleLineEditTextScreen extends StatefulWidget {
@@ -190,10 +191,22 @@ class _SingleLineEditTextScreenState extends State<SingleLineEditTextScreen> {
                           setState(() {
                             isSendingRequest = true;
                           });
-                          await widget.onDispatch(_textControllerEditProfileTex.text);
-                          setState(() {
-                            isSendingRequest = false;
-                          });
+                          try {
+                            await widget.onDispatch(_textControllerEditProfileTex.text);
+                            setState(() {
+                              isSendingRequest = false;
+                            });
+                          }on CustomException catch (e) {
+                            setState(() {
+                              isSendingRequest = false;
+                            });
+                            BenekToastHelper.showErrorToast(
+                                BenekStringHelpers.locale('error'),
+                                e.message,
+                                context
+                            );
+                            return;
+                          }
                           Navigator.of(context).pop(_textControllerEditProfileTex.text);
                         }
                       },

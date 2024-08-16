@@ -78,8 +78,8 @@ UserList? userSearchRequestReducer( UserList? userSearchListData, dynamic action
 
       if(isUserExist) {
         userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.firstName;
-        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.middleName;
-        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.lastName;
+        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.middleName = action.middleName;
+        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.lastName = action.lastName;
       }
     }
 
@@ -90,6 +90,24 @@ UserList? userSearchRequestReducer( UserList? userSearchListData, dynamic action
         userSearchListData.users?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.firstName;
         userSearchListData.users?.firstWhere((element) => element.userId == action.userId).identity?.middleName = action.middleName;
         userSearchListData.users?.firstWhere((element) => element.userId == action.userId).identity?.lastName = action.lastName;
+      }
+    }
+
+    return userSearchListData;
+  }else if( action is UpdateEmailAction ){
+    if(userSearchListData != null && userSearchListData.recentlySeenUsers != null) {
+      bool isUserExist = userSearchListData.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).email = action.email;
+      }
+    }
+
+    if(userSearchListData != null && userSearchListData.users != null) {
+      bool isUserExist = userSearchListData.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        userSearchListData.users?.firstWhere((element) => element.userId == action.userId).email = action.email;
       }
     }
 

@@ -74,8 +74,8 @@ UserList? userSearchRequestReducer( UserList? recomendedUsers, dynamic action ){
 
       if(isUserExist) {
         recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.firstName;
-        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.middleName;
-        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.firstName = action.lastName;
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.middleName = action.middleName;
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).identity?.lastName = action.lastName;
       }
     }
 
@@ -88,6 +88,24 @@ UserList? userSearchRequestReducer( UserList? recomendedUsers, dynamic action ){
         recomendedUsers.users?.firstWhere((element) => element.userId == action.userId).identity?.lastName = action.lastName;
       }
     }
+  }else if( action is UpdateEmailAction ){
+    if(recomendedUsers != null && recomendedUsers.recentlySeenUsers != null) {
+      bool isUserExist = recomendedUsers.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).email = action.email;
+      }
+    }
+
+    if(recomendedUsers != null && recomendedUsers.users != null) {
+      bool isUserExist = recomendedUsers.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        recomendedUsers.users?.firstWhere((element) => element.userId == action.userId).email = action.email;
+      }
+    }
+
+    return recomendedUsers;
   }
 
   return recomendedUsers;

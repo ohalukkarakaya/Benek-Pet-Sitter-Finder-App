@@ -215,21 +215,23 @@ class ApiClient {
               || resp.statusCode == 400
               || resp.statusCode >= 500
             ){
-              AuthUtils.killUserSessionAndRestartApp( store ).then(
-                ( value ) => log("User Session Killed!!")
-              );
+              log('API Error: ${resp.statusCode} ${resp.body}');
             }
+            //   AuthUtils.killUserSessionAndRestartApp( store ).then(
+            //     ( value ) => log("User Session Killed!!")
+            //   );
+            // }
           }
         ).catchError(
           ( exception ){
             var errorMessage = getApiExceptionMessage(path, method, exception);
             log(errorMessage);
-            AuthUtils.killUserSessionAndRestartApp( store );
+            // AuthUtils.killUserSessionAndRestartApp( store );
           }
         );
       } catch (exception) {
         log(getApiExceptionMessage(path, method, exception));
-        AuthUtils.killUserSessionAndRestartApp( store );
+        // AuthUtils.killUserSessionAndRestartApp( store );
       }
 
       return await response ?? Response('', 500);

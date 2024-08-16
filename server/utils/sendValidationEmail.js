@@ -59,24 +59,10 @@ let transporter = nodemailer.createTransport(
       };
 
       //hesh the otp
-      const salt = await bcrypt.genSalt(
-                                    Number(
-                                        process.env
-                                               .SALT
-                                    )
-                                );
+      const salt = await bcrypt.genSalt(Number(process.env.SALT));
 
-      const hashedOtp = await bcrypt.hash(
-                                        otp, 
-                                        salt
-                                     );
-
-      const newOtpVerification = await new UserOTPVerification(
-                                              {
-                                                userId: _id,
-                                                otp: hashedOtp,
-                                              }
-                                           );
+      const hashedOtp = await bcrypt.hash(otp, salt);
+      const newOtpVerification = await new UserOTPVerification({userId: _id, otp: hashedOtp,});
 
       //save otp record
       await newOtpVerification.save();

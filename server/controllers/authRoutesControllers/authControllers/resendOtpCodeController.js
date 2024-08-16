@@ -17,24 +17,20 @@ const resendOtpCodeController = async (req, res, next) => {
             }
           );
         }else{
-          //delete existing records and re send
+          //delete existing records and re-send
           await UserOTPVerification.deleteMany({ userId });
-          sendOTPVerificationEmail(
-            {
+          sendOTPVerificationEmail({
               _id: userId,
               email
             },
             res,
             null
-          );
-        }
+          );}
       }catch(err){
-        res.status(500).json(
-          {
-            error: true,
-            message: err.message
-          }
-        );
+        res.status(500).json({
+          error: true,
+          message: err.message
+        });
       }
 }
 

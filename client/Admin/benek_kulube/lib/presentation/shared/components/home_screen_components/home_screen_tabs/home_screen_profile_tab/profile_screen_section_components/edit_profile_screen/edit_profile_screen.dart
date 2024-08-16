@@ -24,6 +24,8 @@ import 'edit_adress_widget.dart';
 import 'edit_profile_profile_widget.dart';
 import 'edit_text_screen.dart';
 import 'edited_bio_row.dart';
+import 'menu_items/edit_email_button.dart';
+import 'menu_items/edit_full_name_button.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -151,55 +153,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             )
                            : Column(
                             children: [
-                              EditAccountInfoMenuItem(
-                                icon: Icons.perm_identity,
-                                desc: BenekStringHelpers.locale('fullname'),
-                                text: BenekStringHelpers.getUsersFullName(
-                                    userInfo.identity!.firstName!,
-                                    userInfo.identity!.lastName!,
-                                    userInfo.identity!.middleName
-                                ),
 
-                                onTap: () async {
-                                  await Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      opaque: false,
-                                      barrierDismissible: false,
-                                      pageBuilder: (context, _, __) => SingleLineEditTextScreen(
-                                        info: BenekStringHelpers.locale('fullname'),
-                                        textToEdit: BenekStringHelpers.getUsersFullName(
-                                            userInfo.identity!.firstName!,
-                                            userInfo.identity!.lastName!,
-                                            userInfo.identity!.middleName
-                                        ),
-                                        validation: (text) => text.split(' ').length >= 2,
-                                        validationErrorMessage: BenekStringHelpers.locale('missingLastName'),
-                                        onDispatch: (text) => store.dispatch(updateFullNameRequestAction(text)),
-                                        shouldApprove: true,
-                                        approvalTitle: BenekStringHelpers.locale('approveNameChanges'),
-                                      ),
-                                    ),
-                                  );
-
-                                  setState(() {
-                                    idle = !idle;
-                                  });
-                                },
+                              EditFullNameButton(
+                                userInfo: userInfo,
+                                onDispatch: (text) => store.dispatch(updateFullNameRequestAction(text)),
                               ),
+
                               const Divider(color: AppColors.benekGrey,),
+
                               EditAccountInfoMenuItem(
                                 icon: FontAwesomeIcons.at,
                                 desc: BenekStringHelpers.locale('username'),
                                 text: userInfo.userName!
                               ),
+
                               const Divider(color: AppColors.benekGrey,),
-                              EditAccountInfoMenuItem(
-                                icon: Icons.email,
-                                desc: BenekStringHelpers.locale('email'),
-                                text: userInfo.email!,
+
+                              EditEmailButton(
+                                userInfo: userInfo,
+                                onDispatch: (text) => store.dispatch(updateEmailRequestAction(text)),
+                                onVerifyDispatch: (email, text) => store.dispatch(verifyEmailOtpRequestAction(email, text)),
+                                onResendDispatch: (text) => store.dispatch(resendEmailOtpRequestAction(text)),
                               ),
+
                               const Divider(color: AppColors.benekGrey,),
+
                               EditAccountInfoMenuItem(
                                 icon: Icons.phone,
                                 desc: BenekStringHelpers.locale('phoneNumber'),
