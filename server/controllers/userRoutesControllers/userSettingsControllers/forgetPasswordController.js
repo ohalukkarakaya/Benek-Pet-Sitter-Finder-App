@@ -6,6 +6,7 @@ import sendOneTimePassword from "../../../utils/sendOneTimePasswordEmail.js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import crypto from "crypto";
+import UserToken from "../../../models/UserToken.js";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ const forgetPasswordController = async ( req, res, next ) => {
 
         sendOneTimePassword({ newPassword: oneTimePassword, email }, null, next );
 
+        await UserToken.deleteMany({ userId: user._id.toString() });
         await new TempPassword(
             {
                 userId: user._id.toString(),
@@ -43,6 +45,7 @@ const forgetPasswordController = async ( req, res, next ) => {
         ).save()
          .then(
             ( tempPassword ) => {
+
                 return res.status( 200 ).json({
                       error: false,
                       message: "New password send to your email"

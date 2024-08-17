@@ -237,7 +237,8 @@ ThunkAction<AppState> forgetMyPasswordRequestAction(String email) {
         throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
       }
 
-      return true;
+      // log out user
+      AuthUtils.killUserSessionAndRestartApp(store);
     } on ApiException catch (e) {
       log('ERROR: forgetMyPasswordRequestAction - $e');
       throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
