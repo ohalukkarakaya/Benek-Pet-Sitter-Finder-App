@@ -5,6 +5,8 @@ import validator from "validator";
 
 import crypto from "crypto";
 import dotenv from "dotenv";
+import mokaUpdateSubsellerRequest
+    from "../../../utils/mokaPosRequests/mokaSubsellerRequests/mokaUpdateSubsellerRequest.js";
 
 dotenv.config();
 
@@ -84,6 +86,44 @@ const addIdNumberController = async ( req, res ) => {
         user.identity.nationalId.idNumber = encrypted;
 
         user.markModified( "identity" );
+
+        if( user.careGiveGUID ){
+
+            const mokaRequest = await mokaUpdateSubsellerRequest(
+                user.careGiveGUID,
+                user.identity.firstName,
+                user.identity.middleName,
+                user.identity.lastName,
+                user.email,
+                trimedIdNo,
+                user.phone,
+                user.identity.openAdress,
+                user.iban
+            )
+
+            if( !mokaRequest ){
+                return res.status( 500 ).json({
+                    error: true,
+                    message: "Internal server error"
+                });
+            }
+
+            if( mokaRequest.error ){
+                return res.status( 500 ).json({
+                    error: true,
+                    message: paramRequest.response.data.sonucStr
+                });
+            }
+
+            if( mokaRequest.data.sonuc !== 1 ){
+                return res.status( 500 ).json({
+                    error: true,
+                    message: "Internal server error",
+                    data: mokaRequest.data.sonucStr
+                });
+            }
+        }
+
         user.save(
           ( err ) => {
             if( err ){

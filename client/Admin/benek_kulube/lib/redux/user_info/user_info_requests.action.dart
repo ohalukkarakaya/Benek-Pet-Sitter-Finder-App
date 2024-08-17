@@ -209,6 +209,42 @@ ThunkAction<AppState> updatePaymentInfoAction( String iban ){
 
 }
 
+ThunkAction<AppState> updatePasswordRequestAction(String oldPassword, String oldPasswordReply, String newPassword) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      bool? _password = await api.putUpdatePassword(oldPassword, oldPasswordReply, newPassword);
+      if(_password != true){
+        throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+      }
+
+      return true;
+    } on ApiException catch (e) {
+      log('ERROR: updatePasswordRequestAction - $e');
+      throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+    }
+  };
+}
+
+ThunkAction<AppState> forgetMyPasswordRequestAction(String email) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      bool? _password = await api.putForgetPassword(email);
+      if(_password != true){
+        throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+      }
+
+      return true;
+    } on ApiException catch (e) {
+      log('ERROR: forgetMyPasswordRequestAction - $e');
+      throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+    }
+  };
+}
+
 class GetUserInfoRequestAction {
   final UserInfo? _userInfo;
   UserInfo? get userInfo => _userInfo;

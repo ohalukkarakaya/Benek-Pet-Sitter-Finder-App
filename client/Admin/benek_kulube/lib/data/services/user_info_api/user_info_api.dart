@@ -404,4 +404,61 @@ class UserInfoApi {
     }
     return false;
   }
+
+  Future<bool?> putUpdatePassword( String newPassword, String oldPassword, String oldPasswordReply ) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/profileSettings/resetPassword';
+
+      Object? postBody = {
+        'oldPassword': oldPassword,
+        'oldPasswordReply': oldPasswordReply,
+        'newPassword': newPassword
+      };
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> authNames = [];
+
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 && response.statusCode != 404 ){
+        return false;
+      }else if( response.body != null ){
+        return true;
+      }
+    }catch( err ){
+      log('ERROR: putUpdatePassword - $err');
+    }
+    return false;
+  }
+
+  Future<bool?> putForgetPassword( String email ) async {
+    try{
+      const String path = '/api/user/profileSettings/forgetMyPassword';
+
+      Object? postBody = {
+        'email': email,
+      };
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = ["application/json"];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 && response.statusCode != 404 ){
+        return false;
+      }else if( response.body != null ){
+        return true;
+      }
+    }catch( err ){
+      log('ERROR: putForgetPassword - $err');
+    }
+    return false;
+  }
 }

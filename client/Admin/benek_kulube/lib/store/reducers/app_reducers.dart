@@ -8,7 +8,7 @@ import '../../redux/get_access_token_and_role_id/set_access_token.reducer.dart' 
 import '../../redux/get_access_token_and_role_id/set_role_id.reducer.dart' as set_role_id;
 import '../../redux/change_screen_tab/change_screen_tab.reducer.dart' as change_screen_tab;
 import '../../redux/is_loading_state/is_loading_state.reducer.dart' as is_loading_state;
-import '../../redux/get_user_info/get_user_info_request.reducer.dart' as get_user_info_request;
+import '../../redux/user_info/user_info_requests.reducer.dart' as user_info_requests;
 import '../../redux/admin_login_qr_code/admin_login_qr_code.reducer.dart' as get_admin_login_qr_code;
 import '../../redux/set_current_location/set_current_location.reducer.dart' as set_current_location;
 import '../../redux/user_search/user_search_request.reducer.dart' as user_search;
@@ -33,7 +33,7 @@ AppState appReducer(AppState state, dynamic action) {
     userRefreshToken: set_refresh_token.setRefreshTokenReducer(state.userRefreshToken, action),
     userAccessToken:  set_access_token.setAccessTokenReducer(state.userAccessToken, action),
     userRoleId: set_role_id.setRoleIdReducer(state.userRoleId, action),
-    userInfo: get_user_info_request.getUserInfoRequestReducer(state.userInfo, action),
+    userInfo: user_info_requests.getUserInfoRequestReducer(state.userInfo, action),
     isLoading: is_loading_state.isLoadingStateReducer(state.isLoading, action),
     currentLocation: set_current_location.setCurrentLocationReducer(state.currentLocation, action),
     recomendedUsersList: get_recomended_users.userSearchRequestReducer(state.recomendedUsersList, action),
