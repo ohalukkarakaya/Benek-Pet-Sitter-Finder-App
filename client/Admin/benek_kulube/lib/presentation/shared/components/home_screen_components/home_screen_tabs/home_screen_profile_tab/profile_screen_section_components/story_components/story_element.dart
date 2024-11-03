@@ -41,6 +41,7 @@ class _StoryElementState extends State<StoryElement> {
     Store<AppState> store = StoreProvider.of<AppState>(context);
 
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onHover: (_) {
         setState(() {
           isHovered = true;

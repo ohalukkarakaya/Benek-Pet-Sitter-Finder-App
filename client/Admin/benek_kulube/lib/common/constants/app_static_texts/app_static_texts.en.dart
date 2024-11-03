@@ -132,5 +132,8 @@ class AppStaticTextsEn{
     'reSendEmail': 'Resend the code',
     'missingOtpCode': 'Missing verification code!',
     'operationFailed': 'Operation failed!',
+    'changePassword': 'Change Your Password!',
+    'enterYourCurrentPassword': 'Enter your current password...',
+    'forgetPassword': 'Forget your password?',
   };
 }

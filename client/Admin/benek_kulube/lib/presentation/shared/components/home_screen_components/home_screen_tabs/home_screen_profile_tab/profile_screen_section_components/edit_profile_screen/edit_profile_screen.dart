@@ -1,4 +1,6 @@
+import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/care_giver_badge.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/edit_profile_screen/password_input_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/edit_profile_screen/single_line_edit_text.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/edit_profile_screen/upload_profile_image_button.dart';
 import 'package:flutter/material.dart';
@@ -38,9 +40,6 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final FocusNode _editProfileFocusNode = FocusNode();
-
-  bool shouldPop = false;
   bool isLoading = true;
 
   bool idle = false;
@@ -48,7 +47,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _editProfileFocusNode.requestFocus();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       Store<AppState> store = StoreProvider.of<AppState>(context);
       await store.dispatch(getUsersPrivateInfoRequestAction());
@@ -64,148 +62,189 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     UserInfo userInfo = store.state.userInfo!;
 
-    if (shouldPop && store.state.processCounter == 0) {
-      setState(() {
-        shouldPop = false;
-      });
-
-      Navigator.of(context).pop();
-    }
-
     return BenekBluredModalBarier(
-      isDismissible: false,
+      isDismissible: true,
       onDismiss: () {
-        setState(() {
-          shouldPop = true;
-        });
+        Navigator.of(context).pop();
       },
-      child: KeyboardListener(
-        focusNode: _editProfileFocusNode,
-        onKeyEvent: (KeyEvent event) {
-          if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-            setState(() {
-              shouldPop = true;
-            });
-          }
-        },
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 260.0),
-            child: Center(
-              child: ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 150.0, bottom: 80),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            EditProfileProfileWidget(
-                              userInfo: userInfo,
-                            ),
-
-                            const DeactivateAccountButton(),
-                          ],
-                        ),
-                        const SizedBox(height: 20.0,),
-
-                        EditedBioRow(bio: userInfo.identity!.bio!),
-
-                        const SizedBox(height: 20.0,),
-
-                        EditAdressWidget(userInfo: userInfo),
-
-                        const SizedBox(height: 20.0,),
-
-                        userInfo.isCareGiver == null
-                        || userInfo.isCareGiver != null
-                           && !(userInfo.isCareGiver!)
-                            ? const BecomeCareGiverButton()
-                            : const SizedBox(),
-
-                        const SizedBox(height: 20.0,),
-
-                        Container(
-                          padding: const EdgeInsets.all(25.0),
-                          decoration: const BoxDecoration(
-                            color: AppColors.benekBlack,
-                            borderRadius: BorderRadius.all(Radius.circular(6.0)),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 260.0),
+          child: Center(
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 150.0, bottom: 80),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          EditProfileProfileWidget(
+                            userInfo: userInfo,
                           ),
-                          child: isLoading
-                              ? Column(
-                                children: List.generate(6, (index) => Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 5.0),
-                                  child: Shimmer.fromColors(
-                                    baseColor: AppColors.benekWhite.withOpacity(0.4),
-                                    highlightColor: AppColors.benekWhite.withOpacity(0.2),
-                                    child: Container(
-                                      height: 50.0,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.benekBlack.withOpacity(0.4),
-                                        borderRadius: BorderRadius.circular(6.0),
-                                      ),
+
+                          const DeactivateAccountButton(),
+                        ],
+                      ),
+                      const SizedBox(height: 20.0,),
+
+                      EditedBioRow(bio: userInfo.identity!.bio!),
+
+                      const SizedBox(height: 20.0,),
+
+                      EditAdressWidget(userInfo: userInfo),
+
+                      const SizedBox(height: 20.0,),
+
+                      userInfo.isCareGiver == null
+                      || userInfo.isCareGiver != null
+                         && !(userInfo.isCareGiver!)
+                          ? const BecomeCareGiverButton()
+                          : const SizedBox(),
+
+                      const SizedBox(height: 20.0,),
+
+                      Container(
+                        padding: const EdgeInsets.all(25.0),
+                        decoration: const BoxDecoration(
+                          color: AppColors.benekBlack,
+                          borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                        ),
+                        child: isLoading
+                            ? Column(
+                              children: List.generate(6, (index) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                child: Shimmer.fromColors(
+                                  baseColor: AppColors.benekWhite.withOpacity(0.4),
+                                  highlightColor: AppColors.benekWhite.withOpacity(0.2),
+                                  child: Container(
+                                    height: 50.0,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.benekBlack.withOpacity(0.4),
+                                      borderRadius: BorderRadius.circular(6.0),
                                     ),
                                   ),
+                                ),
+                              )
+                              )
+                          )
+                         : Column(
+                          children: [
+
+                            EditFullNameButton(
+                              userInfo: userInfo,
+                              onDispatch: (text) => store.dispatch(updateFullNameRequestAction(text)),
+                            ),
+
+                            const Divider(color: AppColors.benekGrey,),
+
+                            EditUserNameButton(
+                              userInfo: userInfo,
+                              onDispatch: (text) => store.dispatch(updateUserNameAction(text)),
+                              updateParentWidgetFunction: () => setState(() { idle = !idle; }),
+                            ),
+
+                            const Divider(color: AppColors.benekGrey,),
+
+                            EditEmailButton(
+                              userInfo: userInfo,
+                              onDispatch: (text) => store.dispatch(updateEmailRequestAction(text)),
+                              onVerifyDispatch: (email, text) => store.dispatch(verifyEmailOtpRequestAction(email, text)),
+                              onResendDispatch: (text) => store.dispatch(resendEmailOtpRequestAction(text)),
+                            ),
+
+                            const Divider(color: AppColors.benekGrey,),
+
+                            EditAccountInfoMenuItem(
+                              icon: Icons.phone,
+                              desc: BenekStringHelpers.locale('phoneNumber'),
+                              text: userInfo.phone!,
+                            ),
+                            const Divider(color: AppColors.benekGrey,),
+
+                            userInfo.identity != null && userInfo.identity!.nationalIdentityNumber != null
+                                ? EditTcNoButton(
+                                  userInfo: userInfo,
+                                  onDispatch: (text) => store.dispatch(updateTcIdNoAction(text)),
                                 )
-                                )
-                            )
-                           : Column(
+                                : const SizedBox(),
+
+                            const Divider(color: AppColors.benekGrey,),
+
+                            EditPaymenInfoButton(
+                              userInfo: userInfo,
+                              onDispatch: (text) => store.dispatch(updatePaymentInfoAction(text)),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 20.0,),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-
-                              EditFullNameButton(
-                                userInfo: userInfo,
-                                onDispatch: (text) => store.dispatch(updateFullNameRequestAction(text)),
+                              Container(
+                                decoration: const BoxDecoration(
+                                  color: AppColors.benekBlack,
+                                  borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                                ),
+                                padding: const EdgeInsets.symmetric( horizontal: 21.2, vertical: 25.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    const FaIcon(
+                                        FontAwesomeIcons.lock,
+                                        color: AppColors.benekWhite,
+                                        size: 20.0
+                                    ),
+                                    const SizedBox(width: 10.0,),
+                                    Text(
+                                      BenekStringHelpers.locale('changePassword'),
+                                      style: semiBoldTextStyle(
+                                        textColor: AppColors.benekWhite,
+                                        textFontSize: 14.0,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
 
-                              const Divider(color: AppColors.benekGrey,),
+                              const SizedBox(width: 10.0,),
 
-                              EditUserNameButton(
-                                userInfo: userInfo,
-                                onDispatch: (text) => store.dispatch(updateUserNameAction(text)),
-                                updateParentWidgetFunction: () => setState(() { idle = !idle; }),
-                              ),
-
-                              const Divider(color: AppColors.benekGrey,),
-
-                              EditEmailButton(
-                                userInfo: userInfo,
-                                onDispatch: (text) => store.dispatch(updateEmailRequestAction(text)),
-                                onVerifyDispatch: (email, text) => store.dispatch(verifyEmailOtpRequestAction(email, text)),
-                                onResendDispatch: (text) => store.dispatch(resendEmailOtpRequestAction(text)),
-                              ),
-
-                              const Divider(color: AppColors.benekGrey,),
-
-                              EditAccountInfoMenuItem(
-                                icon: Icons.phone,
-                                desc: BenekStringHelpers.locale('phoneNumber'),
-                                text: userInfo.phone!,
-                              ),
-                              const Divider(color: AppColors.benekGrey,),
-
-                              userInfo.identity != null && userInfo.identity!.nationalIdentityNumber != null
-                                  ? EditTcNoButton(
-                                    userInfo: userInfo,
-                                    onDispatch: (text) => store.dispatch(updateTcIdNoAction(text)),
-                                  )
-                                  : const SizedBox(),
-
-                              const Divider(color: AppColors.benekGrey,),
-
-                              EditPaymenInfoButton(
-                                userInfo: userInfo,
-                                onDispatch: (text) => store.dispatch(updatePaymentInfoAction(text)),
-                              ),
+                              const PasswordInputWidget()
                             ],
                           ),
-                        )
-                      ],
-                    ),
+
+                          const SizedBox(height: 20.0,),
+
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () {},
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 21.2),
+                                child: Text(
+                                  BenekStringHelpers.locale('forgetPassword'),
+                                  style: regularTextStyle(
+                                    textColor: AppColors.benekWhite,
+                                    textFontSize: 14.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
                   ),
                 ),
               ),

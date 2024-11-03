@@ -26,6 +26,7 @@ class _AddStoryButtonState extends State<AddStoryButton> {
         child: ClipRRect(
           borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
           child: MouseRegion(
+            cursor: SystemMouseCursors.click,
             onHover: (_) {
               setState(() {
                 isHovered = true;

@@ -32,7 +32,7 @@ ThunkAction<AppState> petSearchRequestAction(String searchValue, bool isPaginati
         if( store.state.petSearchResultList?.pets != null ){
           Map<String, PetModel> petsMap = {};
           for (PetModel pet in store.state.petSearchResultList!.pets??[]) {
-            if (pet.id != null) {
+            if( null != pet.id ){
               petsMap[pet.id!] = pet;
             }
           }

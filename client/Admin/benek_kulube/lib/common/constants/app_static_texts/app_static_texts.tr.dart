@@ -132,5 +132,8 @@ class AppStaticTextsTr{
     'reSendEmail': 'Kodu tekrar gönder',
     'missingOtpCode': 'Doğrulama kodu eksik!',
     'operationFailed': 'İşlem başarısız!',
+    'changePassword': 'Şifreni Değiştir!',
+    'enterYourCurrentPassword': 'Mevcut şifrenizi girin...',
+    'forgetPassword': 'Şifreni mi unuttun?',
   };
 }
