@@ -11303,13 +11303,1082 @@ x-access-token: <your_access_token>
 - If the token has expired, the response explicitly mentions the expiration.
 - If any unexpected error occurs during database operations, a `500 Internal Server Error` is returned.
 
-#### 3. 
+#### 3. Get Secondary Owner Invitations
+
+**Endpoint:** `/api/petOwner/secondaryOwnerInvitations/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of secondary owner invitations sent to the authenticated user.
+
+**Authentication:**
+The endpoint requires a valid JWT token to be passed in the `x-access-token` header.
+
+**Request Headers:**
+```http
+x-access-token: <your_access_token>
+```
+
+**Request Path Parameters:**
+| Parameter     | Type   | Required | Description                                         |
+|---------------|--------|----------|-----------------------------------------------------|
+| lastItemId    | String | No       | The ID of the last item retrieved in the previous request. Use `null` for the first request. |
+| limit         | Number | No       | The maximum number of invitations to retrieve (default: 15). |
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Related Invitation List Prepared Successfully",
+     "totalInvitationCount": 100,
+     "invitations": [
+       {
+         "invitationId": "invitation123",
+         "from": "user123",
+         "to": "user456",
+         "petId": "pet789",
+         "createdAt": "2025-01-10T10:00:00Z"
+       },
+       {
+         "invitationId": "invitation124",
+         "from": "user124",
+         "to": "user456",
+         "petId": "pet790",
+         "createdAt": "2025-01-11T11:00:00Z"
+       }
+     ]
+   }
+   ```
+
+2. **No Invitations Found**
+   ```json
+   {
+     "error": true,
+     "message": "No Invitation Found"
+   }
+   ```
+
+3. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality:**
+1. Validates the `lastItemId` and `limit` parameters.
+2. Retrieves the user ID from the JWT token.
+3. If `lastItemId` is provided, retrieves the invitations created after the corresponding item.
+4. Queries the `SecondaryOwnerInvitation` collection to retrieve invitations sent to the authenticated user.
+5. Uses the `prepareSecondaryOwnerInvitationDataHelper` to format the retrieved invitations.
+6. Returns the paginated list of invitations or appropriate error messages.
+
+**Edge Cases:**
+- If the `lastItemId` is invalid, a `404 No Invitations Found` error is returned.
+- If the `x-access-token` is missing or invalid, a `403 Unauthorized` error is returned.
+- If the token has expired, the response explicitly mentions the expiration.
+- If any unexpected error occurs during database operations, a `500 Internal Server Error` is returned.
+
+#### 4. Get Sended Secondary Owner Invitations
+
+**Endpoint:** `/api/petOwner/sendedSecondaryOwnerInvitations/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of secondary owner invitations sent by the authenticated user.
+
+**Authentication:**
+The endpoint requires a valid JWT token to be passed in the `x-access-token` header.
+
+**Request Headers:**
+```http
+x-access-token: <your_access_token>
+```
+
+**Request Path Parameters:**
+| Parameter     | Type   | Required | Description                                         |
+|---------------|--------|----------|-----------------------------------------------------|
+| lastItemId    | String | No       | The ID of the last item retrieved in the previous request. Use `null` for the first request. |
+| limit         | Number | No       | The maximum number of invitations to retrieve (default: 15). |
+
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Sended Invitation List Prepared Successfully",
+     "totalInvitationCount": 50,
+     "invitations": [
+       {
+         "invitationId": "invitation123",
+         "to": {
+           "userId": "user456",
+           "username": "secondaryOwnerUser",
+           "email": "secondary@example.com"
+         },
+         "pet": {
+           "petId": "pet789",
+           "name": "Buddy",
+           "type": "Dog",
+           "age": 4
+         },
+         "createdAt": "2025-01-10T10:00:00Z"
+       },
+       {
+         "invitationId": "invitation124",
+         "to": {
+           "userId": "user457",
+           "username": "anotherUser",
+           "email": "another@example.com"
+         },
+         "pet": {
+           "petId": "pet790",
+           "name": "Kitty",
+           "type": "Cat",
+           "age": 2
+         },
+         "createdAt": "2025-01-11T11:00:00Z"
+       }
+     ]
+   }
+   ```
+
+2. **No Invitations Found**
+   ```json
+   {
+     "error": true,
+     "message": "No Invitation Found"
+   }
+   ```
+
+3. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality:**
+1. Validates the `lastItemId` and `limit` parameters.
+2. Retrieves the user ID from the JWT token.
+3. If `lastItemId` is provided, retrieves the invitations created after the corresponding item.
+4. Queries the `SecondaryOwnerInvitation` collection to retrieve invitations sent by the authenticated user.
+5. Enhances the invitation data with lightweight information about the secondary owner and the pet using `getLightWeightUserInfoHelper` and `getLightWeightPetInfoHelper` utilities.
+6. Returns the paginated list of invitations or appropriate error messages.
+
+**Edge Cases:**
+- If the `lastItemId` is invalid, a `404 No Invitations Found` error is returned.
+- If the `x-access-token` is missing or invalid, a `403 Unauthorized` error is returned.
+- If the token has expired, the response explicitly mentions the expiration.
+- If any unexpected error occurs during database operations, a `500 Internal Server Error` is returned.
+
+#### 5. Remove Secondary Owner from Pet
+
+**Endpoint:** `/api/petOwner/removeSecondaryOwner/:petId/:secondaryOwnerId`
+
+**Method:** `PUT`
+
+**Description:** This endpoint allows the primary owner of a pet or the secondary owner to remove the secondary owner's association with the pet. The user must be authenticated to perform this action.
+
+**Authentication:**
+The endpoint requires a valid JWT token to be passed in the `x-access-token` header.
+
+**Request Headers:**
+```http
+x-access-token: <your_access_token>
+```
+
+**Request Path Parameters:**
+| Parameter        | Type   | Required | Description                                      |
+|------------------|--------|----------|--------------------------------------------------|
+| petId            | String | Yes      | The ID of the pet from which the secondary owner is being removed. |
+| secondaryOwnerId | String | Yes      | The ID of the secondary owner being removed.     |
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "@username is not owner of @petName anymore."
+   }
+   ```
+
+2. **Unauthorized Access**
+   ```json
+   {
+     "error": false,
+     "message": "You are unauthorized to remove this user"
+   }
+   ```
+
+3. **User Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "User not found"
+   }
+   ```
+
+4. **Pet Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Pet not found"
+   }
+   ```
+
+5. **User Not an Owner**
+   ```json
+   {
+     "error": false,
+     "message": "This user is not recorded as owner"
+   }
+   ```
+
+6. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+7. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality:**
+1. Retrieves the pet using the `petId` parameter.
+2. Validates the requesting user's authorization to remove the secondary owner (must be the primary owner or the secondary owner).
+3. Checks if the `secondaryOwnerId` exists in the pet's `allOwners` array.
+4. Updates the `allOwners` array to remove the `secondaryOwnerId`.
+5. Ensures the dependency relationships between the primary and secondary owners are updated to reflect the change.
+6. Saves the changes to the database and returns a success response.
+
+**Edge Cases:**
+- If the `petId` or `secondaryOwnerId` is invalid, a `404 Pet Not Found` or `404 User Not Found` error is returned.
+- If the user attempting the action is not authorized, a `403 Unauthorized Access` error is returned.
+- If the `secondaryOwnerId` is not listed in the pet's `allOwners` array, a `400 User Not an Owner` response is returned.
+- If the `x-access-token` is missing or invalid, a `403 Unauthorized` error is returned.
+- If the token has expired, the response explicitly mentions the expiration.
+- If any unexpected error occurs during database operations, a `500 Internal Server Error` is returned.
+
+#### 6. Create Pet Hand Over Invitation
+
+**Endpoint:** `/api/petOwner/petHandOverInvitation/:petId/:invitedUserId`
+
+**Method:** `POST`
+
+**Description:** This endpoint allows the primary owner of a pet to send an invitation to another user for handing over the ownership of the pet. The user must be authenticated to perform this action.
+
+**Authentication:**
+The endpoint requires a valid JWT token to be passed in the `x-access-token` header.
+
+**Request Headers:**
+```http
+x-access-token: <your_access_token>
+```
+
+**Request Path Parameters:**
+| Parameter        | Type   | Required | Description                                      |
+|------------------|--------|----------|--------------------------------------------------|
+| petId            | String | Yes      | The ID of the pet for which ownership is being transferred. |
+| invitedUserId    | String | Yes      | The ID of the user being invited to take ownership of the pet. |
+
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "invitation": {
+       "from": "currentOwnerId",
+       "to": "invitedUserId",
+       "petId": "petId",
+       "_id": "invitationId"
+     }
+   }
+   ```
+
+2. **Validation Error**
+   ```json
+   {
+     "error": true,
+     "message": "<Validation error message>"
+   }
+   ```
+
+3. **Pet Not Found or Unauthorized**
+   ```json
+   {
+     "error": true,
+     "message": "Pet couldn't found or it doesn't belong to you"
+   }
+   ```
+
+4. **Invited User Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "invited user couldn't found or it is you"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality:**
+1. Validates the `petId` and `invitedUserId` parameters using `handOverInvitationReqParamsValidation`.
+2. Retrieves the authenticated user ID from the JWT token.
+3. Checks if the invited user exists, is not deactivated, and has not blocked the requesting user.
+4. Verifies that the pet exists and belongs to the authenticated user.
+5. Creates a `PetHandOverInvitation` record in the database linking the primary owner, the invited user, and the pet.
+6. Sends a notification to the invited user about the handover invitation.
+7. Returns the created invitation details upon success.
+
+**Edge Cases:**
+- If the `petId` or `invitedUserId` is invalid, a `400 Validation Error` is returned.
+- If the pet does not belong to the authenticated user, a `400 Pet Not Found or Unauthorized` error is returned.
+- If the invited user is deactivated or does not exist, a `404 Invited User Not Found` error is returned.
+- If the `x-access-token` is missing or invalid, a `403 Unauthorized` error is returned.
+- If the token has expired, the response explicitly mentions the expiration.
+- If any unexpected error occurs during database operations, a `500 Internal Server Error` is returned.
+
+#### 7. Reply to Pet Hand Over Invitation
+
+**Endpoint:** `/api/petOwner/petHandOverInvitation/:invitationId/:usersResponse`
+
+**Method:** `PUT`
+
+**Description:** This endpoint allows a user to respond to a pet handover invitation. The user can either accept or reject the invitation. The user must be authenticated to perform this action.
+
+**Authentication:**
+The endpoint requires a valid JWT token to be passed in the `x-access-token` header.
+
+**Request Headers:**
+```http
+x-access-token: <your_access_token>
+```
+
+**Request Path Parameters:**
+| Parameter        | Type   | Required | Description                                         |
+|------------------|--------|----------|-----------------------------------------------------|
+| invitationId     | String | Yes      | The ID of the handover invitation.                 |
+| usersResponse    | String | Yes      | The user's response to the invitation (`true` or `false`). |
+
+**Response Examples:**
+
+1. **Success (Invitation Accepted)**
+   ```json
+   {
+     "error": false,
+     "message": "Pet Buddy hand over successfully to @newOwner"
+   }
+   ```
+
+2. **Success (Invitation Rejected)**
+   ```json
+   {
+     "error": false,
+     "message": "Invitation rejected successfully"
+   }
+   ```
+
+3. **Validation Error (Missing Parameters)**
+   ```json
+   {
+     "error": true,
+     "message": "invitation id is required"
+   }
+   ```
+
+4. **Invalid Response Type**
+   ```json
+   {
+     "error": true,
+     "message": "response must be boolean"
+   }
+   ```
+
+5. **Invitation Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "couldn't find the invitation"
+   }
+   ```
+
+6. **Pet or User Validation Failed**
+   ```json
+   {
+     "error": true,
+     "message": "Pet, user or invited user couldn't found or there is an issue with authorization"
+   }
+   ```
+
+7. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+8. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality:**
+1. Validates the `invitationId` and `usersResponse` parameters.
+2. Ensures the `usersResponse` is either `true` (accept) or `false` (reject).
+3. If the user rejects the invitation:
+   - Deletes the handover invitation.
+   - Returns a success message.
+4. If the user accepts the invitation:
+   - Validates the existence of the pet, owner, and invited user.
+   - Ensures the invited user is not deactivated or blocked.
+   - Removes all secondary owners from the pet's `allOwners` list.
+   - Updates the `primaryOwner` of the pet to the invited user.
+   - Updates the dependency relationships between the owner, invited user, and secondary owners.
+   - Deletes the handover invitation and sends a success response.
+
+**Edge Cases:**
+- If the `invitationId` or `usersResponse` is invalid, a `400 Validation Error` is returned.
+- If the invitation does not exist, a `404 Invitation Not Found` error is returned.
+- If the pet or user validation fails, a `404 Pet or User Validation Failed` error is returned.
+- If the `x-access-token` is missing or invalid, a `403 Unauthorized` error is returned.
+- If the token has expired, the response explicitly mentions the expiration.
+- If any unexpected error occurs during database operations, a `500 Internal Server Error` is returned.
+
+#### 8. Get Pet Hand Over Invitations
+
+**Endpoint:** `/api/petOwner/petHandOverInvitations/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of pet handover invitations sent to the authenticated user.
+
+**Authentication:**
+The endpoint requires a valid JWT token to be passed in the `x-access-token` header.
+
+**Request Headers:**
+```http
+x-access-token: <your_access_token>
+```
+
+**Request Path Parameters:**
+| Parameter     | Type   | Required | Description                                         |
+|---------------|--------|----------|-----------------------------------------------------|
+| lastItemId    | String | No       | The ID of the last item retrieved in the previous request. Use `null` for the first request. |
+| limit         | Number | No       | The maximum number of invitations to retrieve (default: 15). |
+
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Related Invitation List Prepared Successfully",
+     "totalInvitationQuery": 25,
+     "invitations": [
+       {
+         "invitationId": "invitation123",
+         "from": {
+           "userId": "user456",
+           "username": "currentOwnerUser",
+           "email": "currentowner@example.com"
+         },
+         "pet": {
+           "petId": "pet789",
+           "name": "Buddy",
+           "type": "Dog",
+           "age": 4
+         },
+         "createdAt": "2025-01-10T10:00:00Z"
+       },
+       {
+         "invitationId": "invitation124",
+         "from": {
+           "userId": "user457",
+           "username": "anotherOwner",
+           "email": "another@example.com"
+         },
+         "pet": {
+           "petId": "pet790",
+           "name": "Kitty",
+           "type": "Cat",
+           "age": 2
+         },
+         "createdAt": "2025-01-11T11:00:00Z"
+       }
+     ]
+   }
+   ```
+
+2. **No Invitations Found**
+   ```json
+   {
+     "error": true,
+     "message": "No Invitation Found"
+   }
+   ```
+
+3. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality:**
+1. Validates the `lastItemId` and `limit` parameters.
+2. Retrieves the user ID from the JWT token.
+3. If `lastItemId` is provided, retrieves the invitations created after the corresponding item.
+4. Queries the `PetHandOverInvitation` collection to retrieve invitations sent to the authenticated user.
+5. Uses the `preparePetHandOverInvitationDataHelper` to format the retrieved invitations.
+6. Returns the paginated list of invitations or appropriate error messages.
+
+**Edge Cases:**
+- If the `lastItemId` is invalid, a `404 No Invitations Found` error is returned.
+- If the `x-access-token` is missing or invalid, a `403 Unauthorized` error is returned.
+- If the token has expired, the response explicitly mentions the expiration.
+- If any unexpected error occurs during database operations, a `500 Internal Server Error` is returned.
+
+#### 9. Get Sent Pet Hand Over Invitations
+
+**Endpoint:** `/api/petOwner/petSendedHandOverInvitations/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of pet handover invitations sent by the authenticated user.
+
+**Authentication:**
+The endpoint requires a valid JWT token to be passed in the `x-access-token` header.
+
+**Request Headers:**
+```http
+x-access-token: <your_access_token>
+```
+
+**Request Path Parameters:**
+| Parameter     | Type   | Required | Description                                         |
+|---------------|--------|----------|-----------------------------------------------------|
+| lastItemId    | String | No       | The ID of the last item retrieved in the previous request. Use `null` for the first request. |
+| limit         | Number | No       | The maximum number of invitations to retrieve (default: 15). |
+
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Sended Invitation List Prepared Successfully",
+     "totalInvitationCount": 10,
+     "invitations": [
+       {
+         "invitationId": "invitation123",
+         "to": {
+           "userId": "user456",
+           "username": "recipientUser",
+           "email": "recipient@example.com"
+         },
+         "pet": {
+           "petId": "pet789",
+           "name": "Buddy",
+           "type": "Dog",
+           "age": 4
+         },
+         "createdAt": "2025-01-10T10:00:00Z"
+       },
+       {
+         "invitationId": "invitation124",
+         "to": {
+           "userId": "user457",
+           "username": "anotherRecipient",
+           "email": "another@example.com"
+         },
+         "pet": {
+           "petId": "pet790",
+           "name": "Kitty",
+           "type": "Cat",
+           "age": 2
+         },
+         "createdAt": "2025-01-11T11:00:00Z"
+       }
+     ]
+   }
+   ```
+
+2. **No Invitations Found**
+   ```json
+   {
+     "error": true,
+     "message": "No Invitation Found"
+   }
+   ```
+
+3. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality:**
+1. Validates the `lastItemId` and `limit` parameters.
+2. Retrieves the user ID from the JWT token.
+3. If `lastItemId` is provided, retrieves the invitations created after the corresponding item.
+4. Queries the `PetHandOverInvitation` collection to retrieve invitations sent by the authenticated user.
+5. Retrieves additional details about the recipient user and pet using helper functions.
+6. Formats the invitation data for the response.
+
+**Edge Cases:**
+- If the `lastItemId` is invalid, a `404 No Invitations Found` error is returned.
+- If the `x-access-token` is missing or invalid, a `403 Unauthorized` error is returned.
+- If the token has expired, the response explicitly mentions the expiration.
+- If any unexpected error occurs during database operations, a `500 Internal Server Error` is returned.
 
 ### Animal Keyword Routes
-_Coming soon..._
+
+#### 1. Get Pet Keywords by Language
+
+**Endpoint:** `/api/keywords/animals/:language`
+
+**Method:** `GET`
+
+**Description:** Retrieve a list of pet names and their corresponding species based on the specified language (`tr` for Turkish or `en` for English). The request requires authentication via a valid JWT token.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_jwt_token>
+```
+
+**Path Parameters:**
+```http
+:language - The language code for the desired response (e.g., 'tr' for Turkish, 'en' for English).
+```
+
+**Response Examples:**
+
+1. **Success (Turkish Language)**
+   ```json
+   {
+     "trResponse": [
+       {
+         "id": 1,
+         "pet": "Kedi",
+         "species": [
+           { "id": 101, "name": "Van Kedisi" },
+           { "id": 102, "name": "Ankara Kedisi" }
+         ]
+       },
+       {
+         "id": 2,
+         "pet": "Köpek",
+         "species": [
+           { "id": 201, "name": "Golden Retriever" },
+           { "id": 202, "name": "Kangal" }
+         ]
+       }
+     ]
+   }
+   ```
+
+2. **Success (English Language)**
+   ```json
+   {
+     "enResponse": [
+       {
+         "id": 1,
+         "pet": "Cat",
+         "species": [
+           { "id": 101, "name": "Van Cat" },
+           { "id": 102, "name": "Ankara Cat" }
+         ]
+       },
+       {
+         "id": 2,
+         "pet": "Dog",
+         "species": [
+           { "id": 201, "name": "Golden Retriever" },
+           { "id": 202, "name": "Kangal" }
+         ]
+       }
+     ]
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Controller Logic:**
+- Retrieves the language from the `:language` path parameter.
+- Loads pet data from a dataset file (`pet_dataset.json`).
+- If `:language` is `tr`:
+  - Constructs a response object with Turkish pet names and species.
+- If `:language` is `en`:
+  - Constructs a response object with English pet names and species.
+- Returns the response as a JSON object.
+
+**Authentication Middleware (`auth`):**
+- Validates the presence of a JWT token in the `x-access-token` header.
+- Verifies the token using a private key from environment variables.
+- Rejects requests with:
+  - Missing token (`403 - Access Denied: No token provided`)
+  - Expired token (`403 - Access Denied: token expired`).
+- Attaches the decoded user object to the `req` object if validation succeeds.
+
+**Possible Errors:**
+1. Missing or invalid token.
+2. Expired token.
+3. Invalid language code.
+4. Server-side issues while parsing the dataset.
+
+**Notes:**
+- Ensure `pet_dataset.json` is correctly formatted and accessible.
+- Update environment variables to include the `ACCESS_TOKEN_PRIVATE_KEY` for JWT verification.
+
+#### 2. Insert Interested Pets Keywords
+
+**Endpoint:** `/api/keywords/animals/insertInterestedPets`
+
+**Method:** `POST`
+
+**Description:** Allows authenticated users to add or remove interested pet categories. If a pet category already exists in the user's list, it will be removed. If not, it will be added. This operation requires a valid JWT token.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "selectedPetCategories": [
+    {
+      "petId": "<pet_id>",
+      "speciesId": "<species_id>"
+    },
+    {
+      "petId": "<pet_id>",
+      "speciesId": "<species_id>"
+    }
+  ]
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Tag process successful"
+   }
+   ```
+
+2. **Validation Error**
+   ```json
+   {
+     "error": true,
+     "message": "Validation error message here"
+   }
+   ```
+
+3. **User Not Found or Deactivated**
+   ```json
+   {
+     "error": true,
+     "message": "User can not found"
+   }
+   ```
+
+4. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+5. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+6. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+7. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Controller Logic:**
+1. Validates the request body against a predefined schema (`animalCategoryReqValidation`).
+2. Retrieves the authenticated user's data using their ID from the JWT token.
+3. Checks if the user exists and if their account is active. If not, returns an error.
+4. Iterates through the provided `selectedPetCategories` array:
+   - For each category:
+     - If it exists in the user's `interestingPetTags`, it removes it.
+     - Otherwise, it adds it to the list.
+5. Marks the `interestingPetTags` field as modified and saves the user document.
+6. Returns a success message if the operation completes without issues.
+
+**Possible Errors:**
+1. Missing or invalid JWT token.
+2. Invalid request body structure.
+3. User not found or account deactivated.
+4. Server-side issues during user data update.
+
+**Notes:**
+- Ensure `animalCategoryReqValidation` is up-to-date to match the expected request structure.
+- The `selectedPetCategories` array must contain valid `petId` and `speciesId` values.
+
+#### 3. Get Users By Tag
+
+**Endpoint:** `/api/keywords/animals/getUsersByTag/:lastItemId/:limit`
+
+**Method:** `POST`
+
+**Description:** Retrieve a paginated list of users who have expressed interest in a specific pet and species combination. Results are sorted by creation date and support pagination.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_jwt_token>
+```
+
+**Path Parameters:**
+```http
+:lastItemId - (Optional) The ID of the last user from the previous query for pagination. Use 'null' for the first page.
+:limit - The number of users to retrieve per page. Default is 15.
+```
+
+**Request Body:**
+```json
+{
+  "petId": "<pet_id>",
+  "speciesId": "<species_id>"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "User List Prepared Successfully",
+     "totalUserCount": 42,
+     "users": [
+       {
+         "_id": "64b7fdb8f44d3b001fbb6a8d",
+         "name": "John Doe",
+         "email": "john.doe@example.com",
+         "interestingPetTags": [
+           { "petId": "1", "speciesId": "101" }
+         ],
+         "createdAt": "2025-01-01T10:00:00Z"
+       },
+       {
+         "_id": "64b7fdb8f44d3b001fbb6a8e",
+         "name": "Jane Smith",
+         "email": "jane.smith@example.com",
+         "interestingPetTags": [
+           { "petId": "1", "speciesId": "101" }
+         ],
+         "createdAt": "2025-01-01T10:05:00Z"
+       }
+     ]
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Params"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Controller Logic:**
+1. Retrieves `lastItemId` and `limit` from the URL parameters.
+2. Parses `petId` and `speciesId` from the request body.
+3. Validates that `petId` and `speciesId` are provided. If not, returns a `400` error.
+4. Constructs a query to find users with matching `interestingPetTags`.
+5. If `lastItemId` is provided:
+   - Retrieves the creation date of the last item.
+   - Adds a condition to fetch only users created after the last item.
+6. Counts the total number of matching users.
+7. Fetches users sorted by creation date with a limit applied.
+8. Returns the user list and total count.
+
+**Possible Errors:**
+1. Missing or invalid JWT token.
+2. Missing `petId` or `speciesId` in the request body.
+3. Invalid `lastItemId` resulting in a failed lookup.
+4. Server-side errors during query execution.
+
+**Notes:**
+- Ensure `petId` and `speciesId` values match the database schema.
+- Pagination logic uses `createdAt` for consistent ordering.
 
 ### Care Give Routes
-_Coming soon..._
+
+#### 1.
 
 ### Chat Routes
 _Coming soon..._
