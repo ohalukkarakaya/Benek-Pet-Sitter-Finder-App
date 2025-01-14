@@ -19,7 +19,7 @@ router.put(
     "/followPet/:petId",
     auth,
     followPetController
-)
+);
 
 // - tested
 //like image or remove like

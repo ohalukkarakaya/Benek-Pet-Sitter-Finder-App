@@ -144,7 +144,7 @@ router.get(
     "/getPetsBySearchValue/:searchValue/:lastItemId/:limit",
     auth,
     getPetsBySearchValueController
-)
+);
 
 // - tested
 //get recommended pets
@@ -152,7 +152,7 @@ router.get(
     "/getRecommendedPets",
     auth,
     getRecommendedPetsController
-)
+);
 
 // - tested
 //get image comments
