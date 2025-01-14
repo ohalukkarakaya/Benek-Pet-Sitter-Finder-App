@@ -15704,13 +15704,4480 @@ x-access-token: <your_jwt_token>
 6. **Internal Errors:** Returns a `500 Internal Server Error` for unexpected issues.
 
 ### Chat Routes
-_Coming soon..._
+
+#### 1. Create Chat
+
+**Endpoint:** `/api/chat/create`
+
+**Method:** `POST`
+
+**Description:** Creates a new chat with specified members and optional description. Ensures the uniqueness of chat members and validates user permissions and constraints.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Request Body:**
+```json
+{
+  "memberList": ["userId1", "userId2", "userId3"],
+  "chatDesc": "Optional description of the chat"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "chatId": "63f1234567abcd1234567890",
+     "message": "New chat created successfully"
+   }
+   ```
+
+2. **Chat Already Exists**
+   ```json
+   {
+     "error": false,
+     "chatId": "63f1234567abcd1234567890",
+     "message": "There is already a chat with the same members"
+   }
+   ```
+
+3. **Missing Member List**
+   ```json
+   {
+     "error": true,
+     "message": "MemberUserList is necessary"
+   }
+   ```
+
+4. **Invalid Member List**
+   ```json
+   {
+     "error": true,
+     "message": "memberList must be a list"
+   }
+   ```
+
+5. **Max User Limit Reached**
+   ```json
+   {
+     "error": true,
+     "message": "Group chat reached to max user limit"
+   }
+   ```
+
+6. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+7. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+8. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `memberList` in the request body.
+  - Filters out invalid or blocked users from the list.
+  - Ensures the creator’s ID is included in the member list.
+  - Validates that the chat has at least one other member besides the creator.
+
+- **Business Logic:**
+  - Limits group chat to a maximum of 5 members.
+  - Checks if a chat with the exact same members already exists. If so, returns the existing chat ID.
+  - Adds `joinDate` for all members to record the date they joined the chat.
+
+- **Chat Creation:**
+  - Creates a new chat document in the database with the validated members and description.
+  - Emits a `sendMessage` event via WebSocket to notify members of the new chat.
+
+- **Error Handling:**
+  - Catches any server-side exceptions and responds with a generic error message.
+
+#### 2. Add Member to Chat
+
+**Endpoint:** `/api/chat/addMember/:chatId/:userId`
+
+**Method:** `POST`
+
+**Description:** Adds a new member to an existing chat. Ensures the chat exists, the user is not already a member, and adheres to the group chat member limit.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat",
+  "userId": "Unique identifier of the user to add"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "chatId": "63f1234567abcd1234567890",
+     "message": "New user added successfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing params"
+   }
+   ```
+
+3. **Chat Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "chat not found"
+   }
+   ```
+
+4. **Unauthorized Access or User Already Member**
+   ```json
+   {
+     "error": true,
+     "message": "You are not a member of this chat or the user you are trying to add is already a member"
+   }
+   ```
+
+5. **Group Chat Member Limit Reached**
+   ```json
+   {
+     "error": true,
+     "message": "Group chat reached to max user limit"
+   }
+   ```
+
+6. **Blocked User**
+   ```json
+   {
+     "error": true,
+     "message": "There are users who blocked \"addingUserId\" in this chat"
+   }
+   ```
+
+7. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+8. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+9. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires both `chatId` and `userId` as path parameters.
+  - Checks if the chat exists and if the requesting user is a member of the chat.
+  - Verifies that the user to be added is not already an active member.
+
+- **Business Logic:**
+  - Ensures that the group chat does not exceed the maximum member limit of 5.
+  - Validates that no existing chat has the exact same members.
+  - Prevents adding users who have blocked the requester or are blocked by existing members.
+
+- **Member Management:**
+  - Updates the chat member list and persists changes to the database.
+  - Ensures data integrity by validating all active members before adding a new member.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, member limit breaches, and blocked users gracefully.
+  - Logs unexpected errors and returns a generic internal server error message.
+
+#### 3. Leave Chat
+
+**Endpoint:** `/api/chat/leave/:chatId`
+
+**Method:** `DELETE`
+
+**Description:** Allows a user to leave a chat. If the user is the last member, the chat and its assets will be deleted. If the chat matches another chat's member list, the chat history and membership will be merged into the existing chat.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat to leave"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "newChat": "63f1234567abcd1234567890",
+     "message": "chat left successfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing params"
+   }
+   ```
+
+3. **Chat Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "chat not found"
+   }
+   ```
+
+4. **User Not a Member**
+   ```json
+   {
+     "error": true,
+     "message": "You are not member"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+7. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `chatId` as a path parameter.
+  - Checks if the chat exists and if the user is a member of the chat.
+
+- **Business Logic:**
+  - Marks the user as having left the chat by updating the `leaveDate` field in the chat document.
+  - If the user is the last member, deletes the chat and its associated assets.
+  - If there is an existing chat with the same members (excluding the leaving user), merges the chat history and membership into the existing chat.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, and non-existent chats gracefully.
+  - Logs unexpected errors and returns a generic internal server error message.
+
+- **Asset Management:**
+  - Deletes associated chat assets if the chat is deleted.
+
+- **Chat History Migration:**
+  - Transfers chat messages and membership data to a matching chat, ensuring continuity for remaining members.
+
+#### 4. Upload Chat Image
+
+**Endpoint:** `/api/chat/image/:chatId`
+
+**Method:** `POST`
+
+**Description:** Uploads an image for a specific chat. Ensures the user is a member of the chat and handles image validation, storage, and association with the chat object.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat"
+}
+```
+
+**Request Body:**
+- **File Upload:** The image file must be included in the request under the `file` field.
+- **Accepted Formats:** Only `image/jpeg` or `image/jpg` are allowed.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Chat Image Uploaded Successfully",
+     "imageUrl": "chatAssets/63f1234567abcd1234567890/chatImage.jpg"
+   }
+   ```
+
+2. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Un Authorized"
+   }
+   ```
+
+3. **Wrong File Format**
+   ```json
+   {
+     "error": true,
+     "message": "Wrong File Format"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **No Token Provided**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Verifies the presence of the `chatId` parameter and the uploaded file.
+  - Checks if the file type is either `image/jpeg` or `image/jpg`. If not, returns an error.
+
+- **Business Logic:**
+  - Ensures the user is a member of the chat before proceeding with the upload.
+  - Deletes the existing chat image (if any) before saving the new one.
+  - Generates a unique file name for the uploaded image to avoid conflicts.
+  - Saves the image file temporarily before uploading it to the media server.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, unsupported file formats, and unexpected server errors gracefully.
+  - Logs unexpected errors and provides a generic error response.
+
+- **File Management:**
+  - Deletes any existing chat image before uploading the new one.
+  - Uses a helper function (`uploadFileHelper`) to upload the image to the media server.
+
+- **Chat Object Update:**
+  - Updates the `chatImageUrl` field in the chat document with the new image path.
+  - Ensures the changes are saved to the database and properly marked as modified.
+
+#### 5. Update Chat Name
+
+**Endpoint:** `/api/chat/name/:chatId`
+
+**Method:** `POST`
+
+**Description:** Updates the name of a specific chat. Ensures the user is a member of the chat and validates the provided data before updating the chat name.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat"
+}
+```
+
+**Request Body:**
+```json
+{
+  "chatNme": "New name for the chat"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Chat name updated successfully",
+     "chatId": "63f1234567abcd1234567890"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing params"
+   }
+   ```
+
+3. **Chat Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Chat Not Found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Un authorized"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **No Token Provided**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+7. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `chatId` as a path parameter and `chatNme` in the request body.
+  - Returns an error if any parameter is missing.
+
+- **Business Logic:**
+  - Ensures the user is a member of the specified chat and has not left it.
+  - Updates the `chatName` field of the chat document.
+  - Saves the updated chat object to the database.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, and non-existent chats gracefully.
+  - Logs unexpected errors and returns a generic internal server error message.
+
+#### 6. Update Chat Description
+
+**Endpoint:** `/api/chat/desc/:chatId`
+
+**Method:** `POST`
+
+**Description:** Updates the description of a specific chat. Ensures the user is a member of the chat and validates the provided data before updating the chat description.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat"
+}
+```
+
+**Request Body:**
+```json
+{
+  "chatDesc": "New description for the chat"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Chat description updated successfully",
+     "chatId": "63f1234567abcd1234567890"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing params"
+   }
+   ```
+
+3. **Chat Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Chat not found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Un Authorized"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **No Token Provided**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+7. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `chatId` as a path parameter and `chatDesc` in the request body.
+  - Returns an error if any parameter is missing.
+
+- **Business Logic:**
+  - Ensures the user is a member of the specified chat and has not left it.
+  - Updates the `chatDesc` field of the chat document.
+  - Saves the updated chat object to the database.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, and non-existent chats gracefully.
+  - Logs unexpected errors and returns a generic internal server error message.
+
+#### 7. Get Chats
+
+**Endpoint:** `/api/chat/get/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieves a list of chats for the authenticated user, starting from the specified `lastItemId`, and limited to the specified number of results. This endpoint also provides the total count of available chats for pagination purposes.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "lastItemId": "ObjectId of the last chat retrieved, or 'null' if fetching the first page",
+  "limit": "Number of chats to retrieve per request"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "list prepared successfully",
+     "totalChatCount": 25,
+     "chats": [
+       {
+         "_id": "63f1234567abcd1234567890",
+         "members": [
+           {
+             "userId": "63f9876543abcd1234567890",
+             "username": "johndoe",
+             "isProfileImageDefault": false,
+             "profileImg": "https://example.com/profile/63f9876543abcd1234567890.jpg"
+           }
+         ],
+         "chatStartDate": "2025-01-01T12:00:00Z",
+         "chatName": "Project Team",
+         "chatDesc": "Discussion for project updates",
+         "chatImageUrl": "https://example.com/chat/63f1234567abcd1234567890.jpg",
+         "lastMessage": {
+           "sendDate": "2025-01-01T15:00:00Z",
+           "message": "Meeting at 3 PM"
+         },
+         "unreadMessageCount": 2
+       }
+     ]
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Accepts `lastItemId` (optional) and `limit` (required) as path parameters.
+  - Default limit is set to 15 if not provided or invalid.
+
+- **Business Logic:**
+  - Fetches chats from the database where the authenticated user is a member and has not left the chat.
+  - Applies pagination based on `lastItemId`.
+  - Sorts chats by the `sendDate` of the last message in descending order.
+
+- **Chat Details:**
+  - Includes member details such as `userId`, `username`, and profile image.
+  - Provides the total number of chats for the user.
+  - Returns the last message and unread message count for each chat.
+
+- **Error Handling:**
+  - Handles invalid or missing parameters, unauthorized access, and unexpected server errors gracefully.
+  - Logs unexpected errors and returns a generic internal server error message.
+
+#### 8. Search Chats
+
+**Endpoint:** `/api/chat/search/:searchValue`
+
+**Method:** `GET`
+
+**Description:** Searches for chats matching the given search value. The search includes chat names, descriptions, member names, and message content within the authenticated user's chats.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "searchValue": "The search term to look for in chat names, descriptions, members, or messages"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Chat Searched",
+     "chats": [
+       {
+         "_id": "63f1234567abcd1234567890",
+         "members": [
+           {
+             "userId": "63f9876543abcd1234567890",
+             "username": "johndoe",
+             "isProfileImageDefault": false,
+             "profileImg": "https://example.com/profile/63f9876543abcd1234567890.jpg"
+           }
+         ],
+         "chatName": "Project Team",
+         "chatDesc": "Discussion for project updates",
+         "lastMessage": {
+           "message": "Meeting at 3 PM",
+           "sendDate": "2025-01-01T15:00:00Z",
+           "seenBy": [
+             {
+               "userId": "63f123abcd4567890abcd1234",
+               "username": "janedoe",
+               "isProfileImageDefault": true,
+               "profileImg": null
+             }
+           ]
+         }
+       }
+     ]
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing params"
+   }
+   ```
+
+3. **No Matching Chats Found**
+   ```json
+   {
+     "error": true,
+     "message": "message not found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `searchValue` as a path parameter.
+  - Returns an error if the parameter is missing.
+
+- **Business Logic:**
+  - Searches within the user's chats for matches in chat names, descriptions, member names, or message content.
+  - Prepares chat details, including lightweight user information for members and the last message data.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, and cases where no matching chats are found gracefully.
+  - Logs unexpected errors and provides a generic internal server error message.
+
+- **Search Scope:**
+  - Matches are performed on chat names, descriptions, member usernames, and first/middle/last names.
+  - Includes matches in message content for messages within the chat.
+
+#### 9. Get Unread Message Count
+
+**Endpoint:** `/api/chat/unreadMessageCount/:chatId/:userId`
+
+**Method:** `GET`
+
+**Description:** Retrieves the count of unread messages for a specific user in a chat. Ensures proper authentication and authorization before processing the request.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat",
+  "userId": "Unique identifier of the user for whom unread messages are being counted"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "unreadMessageCount": 5
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing params"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Chat Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "chat not found"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **No Token Provided**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+7. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `chatId` and `userId` as path parameters.
+  - Returns an error if any parameter is missing.
+
+- **Authorization:**
+  - Ensures the requesting user matches the `userId` in the path or has the appropriate roles (`1` or `3`).
+
+- **Business Logic:**
+  - Fetches the chat by `chatId` and verifies its existence.
+  - Filters the chat messages to count those not seen by the specified `userId`.
+  - Returns the count of unread messages.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, non-existent chats, and unexpected server errors gracefully.
+  - Logs unexpected errors and provides a generic internal server error message.
+
+#### Messages Routes
+
+##### 1. Send Message
+
+**Endpoint:** `/api/chat/messages/send/:chatId/:messageType`
+
+**Method:** `POST`
+
+**Description:** Sends a message to a specific chat. The message can be of various types (e.g., text, file, payment offer, user profile, or pet profile). Handles file uploads, validates input, and sends the message to other chat members.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat",
+  "messageType": "Type of the message (Text, File, PaymentOffer, UserProfile, PetProfile)"
+}
+```
+
+**Request Body:**
+- **For Text Messages:**
+  ```json
+  {
+    "message": "Your text message here"
+  }
+  ```
+
+- **For File Messages:**
+  - File upload under `file` key.
+
+- **For Payment Offers:**
+  ```json
+  {
+    "paymentType": "EventInvitation | CareGive",
+    "paymentReleatedRecordId": "Unique identifier for payment-related record"
+  }
+  ```
+
+- **For UserProfile or PetProfile Messages:**
+  ```json
+  {
+    "IdOfTheUserWhichProfileSended": "User or pet profile ID"
+  }
+  ```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "message sent successfully",
+     "chat": {
+       "id": "63f1234567abcd1234567890",
+       "members": [
+         {
+           "userId": "63f9876543abcd1234567890",
+           "username": "johndoe",
+           "profileImg": "https://example.com/profile/63f9876543abcd1234567890.jpg",
+           "joinDate": "2025-01-01T12:00:00Z"
+         }
+       ],
+       "chatStartDate": "2025-01-01T12:00:00Z",
+       "chatName": "Team Chat",
+       "chatDesc": "Chat for project team",
+       "chatImageUrl": "https://example.com/chat/63f1234567abcd1234567890.jpg",
+       "message": {
+         "message": "Your text message here",
+         "sendDate": "2025-01-01T15:00:00Z",
+         "seenBy": [
+           {
+             "userId": "63f123abcd4567890abcd1234",
+             "username": "janedoe",
+             "profileImg": null
+           }
+         ]
+       }
+     }
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing params"
+   }
+   ```
+
+3. **Wrong Message Type**
+   ```json
+   {
+     "error": true,
+     "message": "wrong message type"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `chatId` and `messageType` as path parameters.
+  - Validates the message type and additional fields based on the type.
+
+- **Business Logic:**
+  - Checks if the user is a member of the specified chat.
+  - Processes different message types (e.g., validates text, uploads files, handles payment offers).
+  - Writes the message to the chat and saves it to the database.
+
+- **File Handling:**
+  - Supports file uploads for images (`jpeg`, `jpg`) and videos (`mp4`).
+  - Uploads files to a media server and associates the file path with the message.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, invalid message types, and unexpected server errors gracefully.
+  - Logs unexpected errors and provides a generic internal server error message.
+
+- **Notification:**
+  - Sends notifications to other chat members about the new message.
+  - Emits the updated chat data to the socket server for real-time updates.
+
+##### 2. Mark Messages as Seen
+
+**Endpoint:** `/api/chat/messages/see/:chatId`
+
+**Method:** `POST`
+
+**Description:** Marks specified messages in a chat as seen by the authenticated user. Updates the chat messages' `seenBy` field and notifies other members in the chat via a socket event.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat"
+}
+```
+
+**Request Body:**
+```json
+{
+  "messagesIdsList": ["messageId1", "messageId2"]
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "messages seen successfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing param"
+   }
+   ```
+
+3. **Chat Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Chat not found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "You can't see those messages"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `chatId` as a path parameter and `messagesIdsList` in the request body.
+  - Returns an error if any parameter is missing.
+
+- **Business Logic:**
+  - Fetches the chat by `chatId` and verifies its existence.
+  - Checks if the authenticated user is a member of the chat.
+  - Iterates through the provided `messagesIdsList` and adds the user ID to the `seenBy` field for each message if not already present.
+  - Saves the updated chat object to the database.
+
+- **Socket Notification:**
+  - Emits a `seeMessage` event via the socket server to notify other chat members of the updated `seenBy` statuses.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, non-existent chats, and unexpected server errors gracefully.
+  - Logs unexpected errors and provides a generic internal server error message.
+
+##### 3. Get Chat Messages
+
+**Endpoint:** `/api/chat/messages/get/:chatId/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieves messages for a specific chat with pagination support. Messages are filtered based on the authenticated user's join date and sorted by send date.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat",
+  "lastItemId": "Message ID to start retrieving messages from, or 'null' for the first page",
+  "limit": "Number of messages to retrieve per page"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Messages listed successfully",
+     "totalMessageCount": 20,
+     "messages": [
+       {
+         "_id": "63f1234567abcd1234567890",
+         "message": "Hello, how are you?",
+         "sendDate": "2025-01-01T12:00:00Z",
+         "seenBy": [
+           {
+             "userId": "63f9876543abcd1234567890",
+             "username": "johndoe",
+             "profileImg": "https://example.com/profile/63f9876543abcd1234567890.jpg"
+           }
+         ]
+       }
+     ]
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing param"
+   }
+   ```
+
+3. **Chat Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "chat not found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "UnAuthorized"
+   }
+   ```
+
+5. **Empty Chat**
+   ```json
+   {
+     "error": false,
+     "message": "chat is empty",
+     "totalMessageCount": 0,
+     "messages": []
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `chatId` and `limit` as path parameters.
+  - Supports `lastItemId` for pagination, defaults to retrieving the first page if `null`.
+
+- **Business Logic:**
+  - Fetches the chat by `chatId` and verifies its existence.
+  - Checks if the authenticated user is a member of the chat.
+  - Filters messages based on the user's join date in the chat.
+  - Supports pagination using `lastItemId` and `limit`.
+
+- **SeenBy List:**
+  - Enriches each message's `seenBy` list with user details (e.g., `userId`, `username`, `profileImg`).
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, non-existent chats, and unexpected server errors gracefully.
+  - Logs unexpected errors and provides a generic internal server error message.
+
+- **Sorting and Pagination:**
+  - Messages are sorted by `sendDate`.
+  - Pagination allows efficient retrieval of messages in chunks.
+
+#### Meeting Routes
+
+##### 1. Get All Meeting Users
+
+**Endpoint:** `/api/chat/meeting/getAllUsers/:chatId/:meetingId`
+
+**Method:** `GET`
+
+**Description:** Retrieves all users participating in a specific meeting within a chat. This endpoint ensures that the authenticated user has access to the requested meeting and returns the list of meeting participants.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat",
+  "meetingId": "Unique identifier of the meeting"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "meetingUsers": [
+       {
+         "userId": "63f9876543abcd1234567890",
+         "username": "johndoe",
+         "profileImg": "https://example.com/profile/63f9876543abcd1234567890.jpg"
+       },
+       {
+         "userId": "63f1234567abcd1234567890",
+         "username": "janedoe",
+         "profileImg": "https://example.com/profile/63f1234567abcd1234567890.jpg"
+       }
+     ]
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing param"
+   }
+   ```
+
+3. **Meeting Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Meeting not found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: Unauthorized"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `chatId` and `meetingId` as path parameters.
+  - Returns an error if any parameter is missing.
+
+- **Business Logic:**
+  - Fetches the chat by `chatId` and verifies the existence of the specified meeting.
+  - Uses the `meetingService.getAllMeetingUsers` function to retrieve the meeting participants.
+  - Returns the list of participants if the operation is successful.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, non-existent meetings, and unexpected server errors gracefully.
+  - Logs unexpected errors and provides a generic internal server error message.
+
+##### 2. Create Meeting
+
+**Endpoint:** `/api/chat/meeting/createMeet/:chatId`
+
+**Method:** `POST`
+
+**Description:** Creates a new meeting within a specific chat. The authenticated user initiates the meeting.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "data": {
+       "meetingId": "63f9876543abcd1234567890",
+       "userId": "63f1234567abcd1234567890",
+       "name": "John Doe",
+       "joined": false,
+       "isAlive": true
+     }
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `chatId` as a path parameter.
+  - Returns an error if the parameter is missing.
+
+- **Business Logic:**
+  - Retrieves the authenticated user's details from the database.
+  - Constructs a model containing user details, including `userId`, `name`, and initial meeting state (`joined: false`, `isAlive: true`).
+  - Calls the `meetingService.createMeeting` function to create the meeting.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, and unexpected server errors gracefully.
+  - Logs unexpected errors and provides a generic internal server error message.
+
+##### 3. Check if Meeting Exists
+
+**Endpoint:** `/api/chat/meeting/isMeetingExist/:chatId/:meetingId`
+
+**Method:** `GET`
+
+**Description:** Checks if a specific meeting exists within a chat for the authenticated user.
+
+**Request Headers:**
+```http
+x-access-token: <your_valid_user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "chatId": "Unique identifier of the chat",
+  "meetingId": "Unique identifier of the meeting"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "isUserExist": true
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Params"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Functionality Overview:**
+
+- **Authentication:**
+  - Validates the `x-access-token` header using `jsonwebtoken`.
+  - Ensures the token is valid and not expired. If invalid, responds with appropriate error messages.
+
+- **Input Validation:**
+  - Requires `chatId` and `meetingId` as path parameters.
+  - Returns an error if any of the parameters are missing.
+
+- **Business Logic:**
+  - Verifies that the user is a member of the chat.
+  - Calls the `meetingService.isMeetingExists` function to check the existence of the meeting.
+
+- **Error Handling:**
+  - Handles missing parameters, unauthorized access, and unexpected server errors gracefully.
+  - Logs unexpected errors and provides a generic internal server error message.
 
 ### Notification
-_Coming soon..._
+
+#### 1. Get Notifications
+
+**Endpoint:** `/api/notification/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of notifications for the logged-in user. Notifications are filtered to show only unread ones.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Request Path Parameters:**
+```json
+{
+  "lastItemId": "<notification_id>" (Optional, "null" if fetching from the beginning),
+  "limit": <integer> (Number of notifications to retrieve, defaults to 15 if not provided)
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Notification List Prepared Succesfully",
+     "totalNotificationCount": 42,
+     "notifications": [
+       {
+         "id": "64f8d3c7b3e2345a89d12345",
+         "type": "MESSAGE",
+         "content": "You have a new message from John",
+         "createdAt": "2025-01-01T12:00:00Z",
+         "isOpened": false
+       },
+       {
+         "id": "64f8d3c7b3e2345a89d12346",
+         "type": "REMINDER",
+         "content": "Your meeting starts in 10 minutes",
+         "createdAt": "2025-01-01T11:50:00Z",
+         "isOpened": false
+       }
+     ]
+   }
+   ```
+
+2. **No Notifications Found**
+   ```json
+   {
+     "error": true,
+     "message": "No Notification Found"
+   }
+   ```
+
+3. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+#### 2. Get Unseen Notification Count
+
+**Endpoint:** `/api/notification/unSeenCount`
+
+**Method:** `GET`
+
+**Description:** Retrieve the count of unseen notifications for the authenticated user.
+
+**Request Headers:**
+```http
+x-access-token: <your_access_token>
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Notifications Counted Succesfully",
+     "unSeenNotificationCount": 5
+   }
+   ```
+
+2. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+3. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+4. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Controller Details:**
+
+- **Auth Middleware:**
+  - Validates the `x-access-token` header.
+  - Decodes the token to authenticate the user.
+  - Returns an error if the token is missing, expired, or invalid.
+
+- **Controller Logic:**
+  1. Extracts the authenticated user's ID from the token.
+  2. Queries the database for notifications that:
+     - Are directed to the user (`to` field includes the user ID).
+     - Have not been seen (`seenBy` does not include the user ID).
+     - Have not been opened (`openedBy` does not include the user ID).
+  3. Returns the count of such notifications.
+
+- **Key Query:**
+  ```json
+  {
+    "$and": [
+      { "to": { "$in": [ <userId> ] } },
+      { "seenBy": { "$nin": [ <userId> ] } },
+      { "openedBy": { "$nin": [ <userId> ] } }
+    ]
+  }
+  ```
+
+### **Errors and Edge Cases:**
+- Missing token results in a `403` response.
+- Expired or invalid token results in a `403` response with appropriate error message.
+- Any server-side issue returns a `500` error.
+
+#### 3. See Notifications
+
+**Endpoint:** `/api/notification/seen`
+
+**Method:** `POST`
+
+**Description:** Mark notifications as seen for a user. Requires authentication.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Request Body:**
+```json
+{
+  "notificationIdList": ["notification_id_1", "notification_id_2"]
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Notifications seen successfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+#### 4. Open Notifications
+
+**Endpoint:** `/api/notification/opened`
+
+**Method:** `POST`
+
+**Description:** Marks notifications as opened for the requesting user. If all recipients have opened the notification, it will be deleted.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Request Body:**
+```json
+{
+  "notificationIdList": ["<notification_id_1>", "<notification_id_2>", "<notification_id_3>"]
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Notifications opened succesfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
 
 ### Admin Routes
-_Coming soon..._
+
+#### 1. Get Admin Login QR Code
+
+**Endpoint:** `/api/admin/getLoginQrCode/:clientId`
+
+**Method:** `GET`
+
+**Description:** This endpoint generates a QR code for admin login purposes. The QR code contains encrypted login credentials and is valid for a single session. It is intended for use in secure admin workflows.
+
+**Request Parameters:**
+
+- **Path Parameters:**
+  - `clientId` (string, required): A unique identifier for the client requesting the QR code.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "clientId": "12345",
+     "code": "<base64_encoded_png_data>"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Params"
+   }
+   ```
+
+3. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Input Handling:**
+   - The endpoint extracts the `clientId` from the URL path.
+   - If the `clientId` is missing or invalid, a `400 Bad Request` response is returned with an appropriate error message.
+
+2. **Database Cleanup:**
+   - Deletes any existing login codes associated with the provided `clientId` to ensure that only the latest QR code is valid.
+
+3. **QR Code Generation:**
+   - Generates a random password (`generatedQrCodePassword`) using Node.js's `crypto` module.
+   - Hashes the password using `bcrypt` with a salt value from the environment variables.
+   - Constructs a data object containing the `clientId` and the plaintext password.
+   - Encodes the data object as a JSON string for inclusion in the QR code.
+
+4. **QR Code Configuration:**
+   - Utilizes the `qr-code-styling-node` library to generate a styled QR code in SVG format.
+   - Configures visual options such as dimensions, dot style, background transparency, and logo inclusion.
+
+5. **Database Save:**
+   - Stores the hashed password in the `AdminLoginCode` collection along with the `clientId`.
+
+6. **Response:**
+   - Encodes the QR code as a Base64 string.
+   - Returns the Base64 string in the response along with the `clientId`.
+
+**Possible Errors:**
+
+- **400 Bad Request:**
+  - Occurs if the `clientId` parameter is missing or invalid.
+
+- **500 Internal Server Error:**
+  - Triggered by unexpected errors such as database operation failures or QR code generation issues.
+
+**Dependencies:**
+
+- **Models:**
+  - `AdminLoginCode`: Handles database operations for storing and retrieving admin login codes.
+
+- **Libraries:**
+  - `crypto`: Generates secure random passwords.
+  - `bcrypt`: Hashes passwords for secure storage.
+  - `qr-code-styling-node`: Generates styled QR codes.
+  - `dotenv`: Loads environment variables from `.env` files.
+  - `canvas`, `jsdom`: Required for QR code generation with custom styles.
+
+**Notes:**
+
+- Ensure the `benek_amblem.png` file is accessible at the specified path for QR code branding.
+- Configure the `SALT` environment variable appropriately to ensure consistent password hashing.
+- Handle potential edge cases like database connection failures gracefully to avoid exposing sensitive details in error responses.
+
+#### 2. Admin Login
+
+**Endpoint:** `/api/admin/login`
+
+**Method:** `POST`
+
+**Description:** This endpoint handles the login process for admin users. It validates the provided QR code credentials and establishes a session for the admin via a secure token exchange mechanism.
+
+**Request Headers:**
+```http
+x-access-token: <admin_access_token>
+```
+
+**Request Body Parameters:**
+```json
+{
+  "codePassword": "<qr_code_password>",
+  "clientId": "<unique_client_id>"
+}
+```
+
+- **codePassword** (string, required): The password embedded in the QR code, provided during the login attempt.
+- **clientId** (string, required): A unique identifier for the client initiating the login request.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Loged In Succesfully, you will be loged in from desktop app"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Params"
+   }
+   ```
+
+3. **Code Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "There is no code for your user"
+   }
+   ```
+
+4. **Code Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Code Expired"
+   }
+   ```
+
+5. **Wrong Password**
+   ```json
+   {
+     "error": true,
+     "message": "Wrong Password"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated to ensure the request is from an authorized admin.
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - The `codePassword` and `clientId` fields in the request body are validated.
+   - If any of these fields are missing, a `400 Bad Request` response is returned.
+
+3. **QR Code Validation:**
+   - The `clientId` is used to locate the QR code entry in the `AdminLoginCode` collection.
+   - If no entry exists, a `404 Not Found` response is returned.
+   - If the code is expired (created over an hour ago), it is deleted, and a `401 Unauthorized` response is returned.
+
+4. **Password Verification:**
+   - The `codePassword` is compared with the stored hashed password in the database.
+   - If the password is incorrect, a `401 Unauthorized` response is returned.
+
+5. **User Token Handling:**
+   - Retrieves or generates a refresh token for the user.
+   - If an existing token is invalid or missing, a new token is created using `generateTokens`.
+
+6. **WebSocket Notification:**
+   - Sends user information to the desktop application via WebSocket for session initialization.
+
+7. **Code Cleanup:**
+   - Deletes the used QR code entry from the database to prevent reuse.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized user role.
+
+- **400 Bad Request:**
+  - Missing `codePassword` or `clientId` in the request body.
+
+- **404 Not Found:**
+  - No QR code entry found for the provided `clientId`.
+
+- **401 Unauthorized:**
+  - QR code expired or incorrect password provided.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues.
+
+**Dependencies:**
+
+- **Models:**
+  - `AdminLoginCode`: Manages QR code entries for admin logins.
+  - `UserToken`: Stores refresh tokens for user sessions.
+  - `User`: Represents the user details.
+
+- **Libraries:**
+  - `jsonwebtoken`: Validates and decodes JWTs.
+  - `bcrypt`: Hashes and compares passwords securely.
+  - `dotenv`: Manages environment variables.
+  - `socket.io-client`: Handles WebSocket communication with the desktop application.
+
+- **Utilities:**
+  - `generateTokens`: Generates new access and refresh tokens.
+  - `verifyRefreshToken`: Verifies the validity of a refresh token.
+
+**Notes:**
+
+- Ensure that the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- The WebSocket URL should be correctly defined in the `.env` file.
+- Consider implementing rate limiting to prevent brute-force attacks on this endpoint.
+
+#### 3. Get Reported Mission By ID
+
+**Endpoint:** `/api/admin/reportedMissionById/:reportId`
+
+**Method:** `GET`
+
+**Description:** Retrieves detailed information about a reported mission based on the provided report ID. Only accessible by evaluators or admins with the appropriate roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_evaluator_access_token>
+```
+
+**Path Parameters:**
+- **reportId** (string, required): The unique identifier of the report to fetch.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Mission Data Prepared Successfully",
+     "report": {
+       "id": "60d21b4667d0d8992e610c85",
+       "missionDetails": {
+         "name": "Sample Mission",
+         "description": "Details about the reported mission."
+       },
+       "reporter": {
+         "id": "5f67dc19e5b68b1c2b6b54ef",
+         "name": "John Doe"
+       },
+       "createdAt": "2025-01-10T15:30:00Z"
+     }
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Params"
+   }
+   ```
+
+3. **Report Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Report Not Found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthEvaluator` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `evaluator` (role 3).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of the `reportId` parameter in the path.
+   - If missing, a `500 Internal Server Error` response is returned with an error message.
+
+3. **Report Retrieval:**
+   - Fetches the report from the `ReportMission` collection using the provided `reportId`.
+   - If no report is found, a `404 Not Found` response is returned.
+
+4. **Data Preparation:**
+   - Calls the `prepareReportedMissionHelper` utility to format and structure the report data for response.
+
+5. **Response:**
+   - Returns the prepared mission data with a success message if all steps succeed.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **500 Internal Server Error:**
+  - Missing `reportId` in the path parameters.
+
+- **404 Not Found:**
+  - No report entry found for the provided `reportId`.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during the data retrieval or processing stages.
+
+**Dependencies:**
+
+- **Models:**
+  - `ReportMission`: Manages reported mission entries in the database.
+
+- **Libraries:**
+  - `jsonwebtoken`: Validates and decodes JWTs.
+  - `mongoose`: Handles database operations for MongoDB.
+
+- **Utilities:**
+  - `prepareReportedMissionHelper`: Formats and enriches raw report data for the response.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 4. Get Reported Mission List
+
+**Endpoint:** `/api/admin/reportedMissionList/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieves a paginated list of reported missions. Only accessible by evaluators or admins with the appropriate roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_evaluator_access_token>
+```
+
+**Path Parameters:**
+- **lastItemId** (string, optional): The ID of the last item from the previous request for pagination. Use `null` if retrieving the first page.
+- **limit** (number, optional): The number of items to retrieve. Defaults to 15.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "List Prepared Successfully",
+     "reportedMissionCount": 100,
+     "reportedMissionList": [
+       {
+         "id": "60d21b4667d0d8992e610c85",
+         "missionDetails": {
+           "name": "Sample Mission",
+           "description": "Details about the reported mission."
+         },
+         "reporter": {
+           "id": "5f67dc19e5b68b1c2b6b54ef",
+           "name": "John Doe"
+         },
+         "createdAt": "2025-01-10T15:30:00Z"
+       },
+       {
+         "id": "60d21b4667d0d8992e610c86",
+         "missionDetails": {
+           "name": "Another Mission",
+           "description": "Details about another reported mission."
+         },
+         "reporter": {
+           "id": "5f67dc19e5b68b1c2b6b54ef",
+           "name": "Jane Doe"
+         },
+         "createdAt": "2025-01-11T09:00:00Z"
+       }
+     ]
+   }
+   ```
+
+2. **No Reported Missions Found**
+   ```json
+   {
+     "error": false,
+     "message": "No Reported Mission Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthEvaluator` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `evaluator` (role 3).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of `lastItemId` and `limit` path parameters.
+   - If `lastItemId` is `null`, fetches the first page of results.
+
+3. **Pagination Logic:**
+   - If `lastItemId` is provided, fetches items created after the referenced item.
+   - Limits the results based on the `limit` parameter.
+
+4. **Report List Retrieval:**
+   - Fetches the count of all reported missions.
+   - Retrieves the filtered list of reported missions from the `ReportMission` collection, sorted by `createdAt` in ascending order.
+
+5. **Data Preparation:**
+   - Calls the `prepareReportedMissionHelper` utility to format and structure the report data for the response.
+
+6. **Response:**
+   - Returns the paginated list of reported missions with a success message if all steps succeed.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **404 Not Found:**
+  - No reported missions found for the given filter criteria.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during the data retrieval or processing stages.
+
+**Dependencies:**
+
+- **Models:**
+  - `ReportMission`: Manages reported mission entries in the database.
+
+- **Libraries:**
+  - `jsonwebtoken`: Validates and decodes JWTs.
+  - `mongoose`: Handles database operations for MongoDB.
+
+- **Utilities:**
+  - `prepareReportedMissionHelper`: Formats and enriches raw report data for the response.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 5. Get User's Chats (Admin)
+
+**Endpoint:** `/api/admin/getUsersChat/:userId/:limit/:lastItemId`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of chat conversations for a specific user. This endpoint is accessible only to evaluators and admins with the appropriate roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_evaluator_access_token>
+```
+
+**Path Parameters:**
+- **userId** (string, required): The unique identifier of the user whose chats are being retrieved.
+- **limit** (number, optional): The number of chat conversations to retrieve. Defaults to 15.
+- **lastItemId** (string, optional): The ID of the last chat item from the previous request for pagination. Use `null` if retrieving the first page.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "List prepared successfully",
+     "totalChatCount": 100,
+     "chats": [
+       {
+         "_id": "60d21b4667d0d8992e610c85",
+         "members": [
+           {
+             "userId": "5f67dc19e5b68b1c2b6b54ef",
+             "username": "John Doe",
+             "isProfileImageDefault": true,
+             "profileImg": "default.jpg"
+           }
+         ],
+         "chatStartDate": "2025-01-01T12:00:00Z",
+         "chatName": "Support Chat",
+         "chatDesc": "This is a support chat",
+         "chatImageUrl": "chat_image.jpg",
+         "lastMessage": {
+           "content": "Hello",
+           "sendDate": "2025-01-02T15:30:00Z"
+         },
+         "unreadMessageCount": 5
+       }
+     ]
+   }
+   ```
+
+2. **No Chats Found**
+   ```json
+   {
+     "error": false,
+     "message": "No chats found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthEvaluator` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `evaluator` (role 3).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of `userId`, `limit`, and `lastItemId` path parameters.
+   - Defaults `limit` to 15 and `lastItemId` to `null` if not provided.
+
+3. **Chat List Retrieval:**
+   - Constructs a MongoDB aggregation pipeline to filter and retrieve chats matching the specified user ID and pagination criteria.
+   - Sorts chats by the date of the last message or the chat start date in descending order.
+   - Limits the number of chats returned based on the `limit` parameter.
+
+4. **Chat Member Data Enrichment:**
+   - For each chat, fetches additional details for its members (e.g., username, profile image).
+
+5. **Response:**
+   - Returns the total chat count and the list of chats with enriched member details if successful.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **404 Not Found:**
+  - No chats found for the given user.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `Chat`: Manages chat conversation entries in the database.
+  - `User`: Provides user details for enriching chat member data.
+
+- **Libraries:**
+  - `jsonwebtoken`: Validates and decodes JWTs.
+  - `mongoose`: Handles database operations for MongoDB.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 6. Search User's Chats (Admin)
+
+**Endpoint:** `/api/admin/searchUsersChat/:userId/:searchText`
+
+**Method:** `GET`
+
+**Description:** Search for specific chats involving a particular user based on a search text. This endpoint allows searching within chat names, descriptions, messages, and user details. It is accessible only to evaluators and admins with the appropriate roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_evaluator_access_token>
+```
+
+**Path Parameters:**
+- **userId** (string, required): The unique identifier of the user whose chats are being searched.
+- **searchText** (string, required): The text to search for within chats, user names, or messages.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Chat Searched",
+     "chats": [
+       {
+         "_id": "60d21b4667d0d8992e610c85",
+         "members": [
+           {
+             "userId": "5f67dc19e5b68b1c2b6b54ef",
+             "username": "John Doe",
+             "profileImg": "profile.jpg",
+             "isProfileImageDefault": false
+           }
+         ],
+         "chatName": "General Support",
+         "chatDesc": "Support chat for general inquiries",
+         "lastMessage": {
+           "content": "How can I assist you?",
+           "sendDate": "2025-01-02T15:30:00Z",
+           "seenBy": [
+             {
+               "userId": "5f67dc19e5b68b1c2b6b54ef",
+               "username": "John Doe",
+               "profileImg": "profile.jpg"
+             }
+           ]
+         }
+       }
+     ]
+   }
+   ```
+
+2. **Message Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "message not found"
+   }
+   ```
+
+3. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing params"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthEvaluator` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `evaluator` (role 3).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of `userId` and `searchText` path parameters.
+   - Returns an error if `searchText` is missing or empty.
+
+3. **Chat Search Logic:**
+   - Fetches all chats where the user is a member and has not left the chat.
+   - Searches within:
+     - Usernames, first names, middle names, and last names of other members.
+     - Chat names and descriptions.
+     - Messages within the chat.
+
+4. **Data Enrichment:**
+   - Enriches chat member data with user details such as username and profile image.
+   - Prepares the last message details for each chat, including the list of users who have seen the message.
+
+5. **Response:**
+   - Returns the list of matching chats along with enriched details if successful.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **404 Not Found:**
+  - No matching chats found for the given user and search text.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `Chat`: Manages chat conversation entries in the database.
+  - `User`: Provides user details for enriching chat member data.
+
+- **Utilities:**
+  - `getLightWeightUserInfoHelper`: Prepares lightweight user information for response.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 7. Get User's Messages (Admin)
+
+**Endpoint:** `/api/admin/getUsersMessages/:userId/:chatId/:limit/:lastItemId`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of messages for a specific chat involving a particular user. This endpoint is accessible only to evaluators and admins with the appropriate roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_evaluator_access_token>
+```
+
+**Path Parameters:**
+- **userId** (string, required): The unique identifier of the user whose chat messages are being retrieved.
+- **chatId** (string, required): The unique identifier of the chat from which messages are retrieved.
+- **limit** (number, optional): The number of messages to retrieve. Defaults to 15.
+- **lastItemId** (string, optional): The ID of the last message from the previous request for pagination. Use `null` if retrieving the first page.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Messages listed successfully",
+     "totalMessageCount": 50,
+     "messages": [
+       {
+         "_id": "60d21b4667d0d8992e610c85",
+         "content": "Hello, how can I assist you?",
+         "sendDate": "2025-01-01T12:00:00Z",
+         "seenBy": [
+           {
+             "userId": "5f67dc19e5b68b1c2b6b54ef",
+             "username": "John Doe",
+             "profileImg": "profile.jpg"
+           }
+         ]
+       },
+       {
+         "_id": "60d21b4667d0d8992e610c86",
+         "content": "I need help with my account.",
+         "sendDate": "2025-01-01T12:05:00Z",
+         "seenBy": []
+       }
+     ]
+   }
+   ```
+
+2. **Chat Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "chat not found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "UnAuthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthEvaluator` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `evaluator` (role 3).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of `userId` and `chatId` path parameters.
+   - Returns an error if `chatId` is missing or invalid.
+
+3. **Chat Retrieval:**
+   - Fetches the chat object by `chatId` and validates its existence.
+   - Verifies if the requesting user is a member of the chat.
+
+4. **Message Filtering:**
+   - Filters messages sent after the user's join date to the chat.
+   - Implements pagination based on `limit` and `lastItemId`.
+
+5. **Data Enrichment:**
+   - Enriches message data with user information for `seenBy` lists.
+   - Sorts messages by their send date in ascending order.
+
+6. **Response:**
+   - Returns the list of messages with enriched details if successful.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **404 Not Found:**
+  - Chat or user not found for the given identifiers.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `Chat`: Manages chat conversation entries in the database.
+  - `User`: Provides user details for enriching message data.
+
+- **Utilities:**
+  - `getLightWeightUserInfoHelper`: Prepares lightweight user information for response.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 8. Reply to Report (Admin)
+
+**Endpoint:** `/api/admin/replyReport/:reportId/:response`
+
+**Method:** `POST`
+
+**Description:** Allows an admin or evaluator to respond to a reported mission. Depending on the response, punitive actions can be taken against the caregiver, including payment cancellations.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_evaluator_access_token>
+```
+
+**Path Parameters:**
+- **reportId** (string, required): The unique identifier of the report to respond to.
+- **response** (string, required): The admin's response to the report. Valid values are `true` or `false`.
+
+**Request Body Parameters:**
+```json
+{
+  "responseDesc": "<description of the admin's decision>"
+}
+```
+- **responseDesc** (string, required if `response` is `true`): A detailed explanation of the admin's decision.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Reply Operation Made Successfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+3. **Missing Description**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Desc"
+   }
+   ```
+
+4. **Report Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Report Not Found"
+   }
+   ```
+
+5. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+6. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+7. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthEvaluator` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `evaluator` (role 3).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of `reportId` and `response` path parameters.
+   - Returns an error if required parameters are missing or invalid.
+
+3. **Report Retrieval:**
+   - Fetches the report by `reportId` from the `ReportMission` collection.
+   - Returns an error if the report is not found.
+
+4. **Response Handling:**
+   - If the admin's response is `true`, the following actions are performed:
+     - Validates the presence of `responseDesc`.
+     - Fetches payment details related to the caregiver and creates an entry in the `AdminPaymentCancellation` collection.
+   - Deletes the report after processing the admin's response.
+
+5. **Response:**
+   - Returns a success message upon completing the operation.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **404 Not Found:**
+  - Report not found for the given `reportId`.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `ReportMission`: Manages reported mission entries in the database.
+  - `PaymentData`: Provides payment details for punitive actions.
+  - `AdminPaymentCancellation`: Logs details of payment cancellations initiated by the admin.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 9. Get Invoice Paper By ID
+
+**Endpoint:** `/api/admin/getInvoicePaperById/:invoiceId`
+
+**Method:** `GET`
+
+**Description:** Retrieves detailed information about an invoice document by its unique ID. Only accessible by admin or accounting roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_accounting_access_token>
+```
+
+**Path Parameters:**
+- **invoiceId** (string, required): The unique identifier of the invoice to retrieve.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "invoiceDocumentData": {
+       "_id": "60d21b4667d0d8992e610c85",
+       "invoiceNumber": "INV-2025-001",
+       "date": "2025-01-01T12:00:00Z",
+       "customerDetails": {
+         "name": "John Doe",
+         "address": "123 Main Street",
+         "email": "john.doe@example.com"
+       },
+       "items": [
+         {
+           "description": "Pet Sitting Service",
+           "quantity": 1,
+           "unitPrice": 50.00,
+           "totalPrice": 50.00
+         }
+       ],
+       "totalAmount": 50.00
+     }
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Params"
+   }
+   ```
+
+3. **Invoice Record Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Invoice Record Not Found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthAccounting` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `accounting` (role 4).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of the `invoiceId` path parameter.
+   - Returns an error if `invoiceId` is missing or invalid.
+
+3. **Invoice Retrieval:**
+   - Fetches the invoice record by `invoiceId` from the `InvoiceRecord` collection.
+   - Returns an error if the invoice record is not found.
+
+4. **Data Preparation:**
+   - Calls the `prepareInvoiceRecordHelper` utility to structure the invoice data for response.
+   - Ensures the response is formatted with all necessary details.
+
+5. **Response:**
+   - Returns the invoice document data in a structured format if successful.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **404 Not Found:**
+  - Invoice record not found for the given `invoiceId`.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `InvoiceRecord`: Manages invoice document entries in the database.
+
+- **Utilities:**
+  - `prepareInvoiceRecordHelper`: Prepares structured invoice data for the response.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 10. Get Invoice Paper List
+
+**Endpoint:** `/api/admin/getInvoicePaperList/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieves a paginated list of invoice records. Only accessible by admin or accounting roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_accounting_access_token>
+```
+
+**Path Parameters:**
+- **lastItemId** (string, optional): The ID of the last item from the previous request for pagination. Use `null` if retrieving the first page.
+- **limit** (number, optional): The number of invoice records to retrieve. Defaults to 10.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Invoice Data Prepared Successfully",
+     "totalInvoiceRecordsCount": 100,
+     "invoiceInfoList": [
+       {
+         "_id": "60d21b4667d0d8992e610c85",
+         "invoiceNumber": "INV-2025-001",
+         "date": "2025-01-01T12:00:00Z",
+         "customerDetails": {
+           "name": "John Doe",
+           "address": "123 Main Street",
+           "email": "john.doe@example.com"
+         },
+         "items": [
+           {
+             "description": "Pet Sitting Service",
+             "quantity": 1,
+             "unitPrice": 50.00,
+             "totalPrice": 50.00
+           }
+         ],
+         "totalAmount": 50.00
+       },
+       {
+         "_id": "60d21b4667d0d8992e610c86",
+         "invoiceNumber": "INV-2025-002",
+         "date": "2025-01-02T12:00:00Z",
+         "customerDetails": {
+           "name": "Jane Smith",
+           "address": "456 Elm Street",
+           "email": "jane.smith@example.com"
+         },
+         "items": [
+           {
+             "description": "Dog Walking Service",
+             "quantity": 3,
+             "unitPrice": 20.00,
+             "totalPrice": 60.00
+           }
+         ],
+         "totalAmount": 60.00
+       }
+     ]
+   }
+   ```
+
+2. **No Invoice Record Found**
+   ```json
+   {
+     "error": false,
+     "message": "No Invoice Record Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthAccounting` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `accounting` (role 4).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of `lastItemId` and `limit` path parameters.
+   - Defaults `limit` to 10 and `lastItemId` to `null` if not provided.
+
+3. **Invoice Record Retrieval:**
+   - Fetches the total count of invoice records in the database.
+   - If `lastItemId` is provided, retrieves records created after the last item.
+   - Limits the results based on the `limit` parameter and sorts them by creation date.
+
+4. **Data Preparation:**
+   - Calls the `prepareInvoiceRecordHelper` utility to structure the invoice data for response.
+   - Ensures the response contains all necessary details.
+
+5. **Response:**
+   - Returns the total count of invoice records and a list of structured invoice data if successful.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **404 Not Found:**
+  - No invoice records found for the given filter criteria.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `InvoiceRecord`: Manages invoice document entries in the database.
+
+- **Utilities:**
+  - `prepareInvoiceRecordHelper`: Prepares structured invoice data for the response.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 11. Get Expense Paper By ID
+
+**Endpoint:** `/api/admin/getExpensePaperById/:expenseId`
+
+**Method:** `GET`
+
+**Description:** Retrieves detailed information about a specific expense document by its unique ID. Only accessible by admin or accounting roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_accounting_access_token>
+```
+
+**Path Parameters:**
+- **expenseId** (string, required): The unique identifier of the expense document to retrieve.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Expense Record Prepared Successfully",
+     "expenseDocumentInfo": {
+       "_id": "60d21b4667d0d8992e610c85",
+       "expenseNumber": "EXP-2025-001",
+       "date": "2025-01-01T12:00:00Z",
+       "details": {
+         "description": "Office supplies purchase",
+         "amount": 150.00,
+         "category": "Office Supplies"
+       },
+       "payerDetails": {
+         "name": "John Doe",
+         "method": "Credit Card",
+         "transactionId": "TXN-12345678"
+       }
+     }
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthAccounting` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `accounting` (role 4).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of the `expenseId` path parameter.
+   - Returns an error if `expenseId` is missing or invalid.
+
+3. **Expense Document Retrieval:**
+   - Fetches the expense document details by `expenseId` using the `prepareExpenseRecordHelper` utility.
+   - Returns an error if the document preparation fails.
+
+4. **Response:**
+   - Returns the structured expense document data if successful.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Utilities:**
+  - `prepareExpenseRecordHelper`: Prepares and structures expense document data for response.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 12. Get Expense Paper List
+
+**Endpoint:** `/api/admin/getExpensePaperList/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieves a paginated list of expense records. Only accessible by admin or accounting roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_accounting_access_token>
+```
+
+**Path Parameters:**
+- **lastItemId** (string, optional): The ID of the last item from the previous request for pagination. Use `null` if retrieving the first page.
+- **limit** (number, optional): The number of expense records to retrieve. Defaults to 10.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "List Prepared Successfully",
+     "totalExpenseRecordCount": 100,
+     "expenseRecordList": [
+       {
+         "_id": "60d21b4667d0d8992e610c85",
+         "expenseNumber": "EXP-2025-001",
+         "date": "2025-01-01T12:00:00Z",
+         "details": {
+           "description": "Office supplies purchase",
+           "amount": 150.00,
+           "category": "Office Supplies"
+         },
+         "payerDetails": {
+           "name": "John Doe",
+           "method": "Credit Card",
+           "transactionId": "TXN-12345678"
+         }
+       },
+       {
+         "_id": "60d21b4667d0d8992e610c86",
+         "expenseNumber": "EXP-2025-002",
+         "date": "2025-01-02T12:00:00Z",
+         "details": {
+           "description": "Travel expenses",
+           "amount": 200.00,
+           "category": "Travel"
+         },
+         "payerDetails": {
+           "name": "Jane Smith",
+           "method": "Bank Transfer",
+           "transactionId": "TXN-87654321"
+         }
+       }
+     ]
+   }
+   ```
+
+2. **No Expense Record Found**
+   ```json
+   {
+     "error": false,
+     "message": "No Expense Record Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthAccounting` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `accounting` (role 4).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of `lastItemId` and `limit` path parameters.
+   - Defaults `limit` to 10 and `lastItemId` to `null` if not provided.
+
+3. **Expense Record Retrieval:**
+   - Fetches the total count of expense records in the database.
+   - If `lastItemId` is provided, retrieves records created after the last item.
+   - Limits the results based on the `limit` parameter and sorts them by creation date.
+
+4. **Data Preparation:**
+   - Calls the `prepareExpenseRecordHelper` utility to structure the expense data for response.
+   - Ensures the response contains all necessary details.
+
+5. **Response:**
+   - Returns the total count of expense records and a list of structured expense data if successful.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **404 Not Found:**
+  - No expense records found for the given filter criteria.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `ExpenseRecord`: Manages expense document entries in the database.
+
+- **Utilities:**
+  - `prepareExpenseRecordHelper`: Prepares structured expense data for the response.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 13. Punish User
+
+**Endpoint:** `/api/admin/punishUser/:userId`
+
+**Method:** `POST`
+
+**Description:** Allows an admin or evaluator to punish a user by adding a punishment record to the database and notifying the user via email.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_evaluator_access_token>
+```
+
+**Path Parameters:**
+- **userId** (string, required): The unique identifier of the user to be punished.
+
+**Request Body Parameters:**
+```json
+{
+  "punishmentDesc": "<description of the punishment>"
+}
+```
+- **punishmentDesc** (string, required): A detailed description of the punishment being applied.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "User Punished Successfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthEvaluator` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `evaluator` (role 3).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of `userId` and `punishmentDesc` parameters.
+   - Returns an error if any required parameters are missing.
+
+3. **Punishment Record Management:**
+   - Checks if the user already has a punishment record in the `PunishmentRecord` collection.
+   - If a record exists, appends the new punishment to the `punishmentList`.
+   - If no record exists, creates a new punishment record for the user.
+
+4. **User Notification:**
+   - If the user exists and is not deactivated, sends a notification email using the `sendPunishmentEmailHelper` utility.
+
+5. **Response:**
+   - Returns a success message upon completing the punishment process.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **400 Bad Request:**
+  - Missing required parameters in the request body or path.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `User`: Manages user information in the database.
+  - `PunishmentRecord`: Stores punishment records for users.
+
+- **Utilities:**
+  - `sendPunishmentEmailHelper`: Sends a notification email to the punished user.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 14. Get Punishment Count
+
+**Endpoint:** `/api/admin/punishmentCount/:userId`
+
+**Method:** `GET`
+
+**Description:** Retrieves the total number of punishments a user has received. Only accessible by admin or evaluator roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_evaluator_access_token>
+```
+
+**Path Parameters:**
+- **userId** (string, required): The unique identifier of the user whose punishment count is to be retrieved.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "punishmentCount": 3
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthEvaluator` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `evaluator` (role 3).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of the `userId` path parameter.
+   - Returns an error if the `userId` is missing.
+
+3. **Punishment Count Retrieval:**
+   - Fetches the punishment record for the specified `userId` from the `PunishmentRecord` collection.
+   - Calculates the total number of punishments by counting entries in the `punishmentList` array.
+
+4. **Response:**
+   - Returns the total punishment count for the user if successful.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **400 Bad Request:**
+  - Missing required parameters in the request path.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `PunishmentRecord`: Stores punishment records for users.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 15. Get Punishment Records
+
+**Endpoint:** `/api/admin/getPunishmentRecords/:userId`
+
+**Method:** `GET`
+
+**Description:** Retrieves all punishment records for a specific user. Only accessible by admin or evaluator roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_evaluator_access_token>
+```
+
+**Path Parameters:**
+- **userId** (string, required): The unique identifier of the user whose punishment records are to be retrieved.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "punishmentRecords": [
+       {
+         "date": "2025-01-01T12:00:00Z",
+         "description": "Violation of community guidelines",
+         "admin": {
+           "_id": "60d21b4667d0d8992e610c85",
+           "username": "admin123",
+           "email": "admin@example.com"
+         }
+       },
+       {
+         "date": "2025-01-10T15:00:00Z",
+         "description": "Repeated inappropriate behavior",
+         "admin": {
+           "_id": "60d21b4667d0d8992e610c86",
+           "username": "moderator456",
+           "email": "mod@example.com"
+         }
+       }
+     ]
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthEvaluator` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `evaluator` (role 3).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of the `userId` path parameter.
+   - Returns an error if the `userId` is missing.
+
+3. **Punishment Records Retrieval:**
+   - Fetches the punishment record for the specified `userId` from the `PunishmentRecord` collection.
+   - For each punishment record, retrieves admin information using the `getLightWeightUserInfoHelper` utility.
+
+4. **Response:**
+   - Returns a list of punishment records, including the description, date, and information about the admin who issued each punishment.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **400 Bad Request:**
+  - Missing required parameters in the request path.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `PunishmentRecord`: Stores punishment records for users.
+  - `User`: Stores information about admins.
+
+- **Utilities:**
+  - `getLightWeightUserInfoHelper`: Extracts lightweight user information for response.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 16. Ban User
+
+**Endpoint:** `/api/admin/banUser/:userId`
+
+**Method:** `POST`
+
+**Description:** Bans a user by deactivating their account, recording the ban in the banned users list, and sending an email notification to the user. Only accessible by admin or evaluator roles.
+
+**Request Headers:**
+```http
+x-access-token: <admin_or_evaluator_access_token>
+```
+
+**Path Parameters:**
+- **userId** (string, required): The unique identifier of the user to be banned.
+
+**Request Body Parameters:**
+```json
+{
+  "punishmentDesc": "<reason for the ban>"
+}
+```
+- **punishmentDesc** (string, required): A detailed reason for banning the user.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "User Banned Successfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Param"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+6. **Error Sending Email**
+   ```json
+   {
+     "error": true,
+     "message": "Error Occurred While Sending Email"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthEvaluator` middleware.
+   - Ensures the user has a role of either `admin` (role 1) or `evaluator` (role 3).
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Input Validation:**
+   - Validates the presence of the `userId` path parameter and `punishmentDesc` body parameter.
+   - Returns an error if any required parameters are missing.
+
+3. **User Lookup:**
+   - Retrieves the user specified by the `userId` from the `User` collection.
+   - Returns an error if the user does not exist.
+
+4. **Ban Record Management:**
+   - Checks if the user is already banned in the `BannedUsers` collection.
+   - If not, creates a new record in the `BannedUsers` collection with the ban details.
+
+5. **Email Notification:**
+   - Sends an email to the user informing them of the ban using the `sendBanEmailHelper` utility.
+   - Returns an error if the email fails to send.
+
+6. **User Deactivation:**
+   - Updates the user’s `deactivation` status to mark the account as deactivated and schedules it for deletion.
+
+7. **Response:**
+   - Returns a success message upon completing the ban process.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or does not belong to an authorized role.
+
+- **400 Bad Request:**
+  - Missing required parameters in the request path or body.
+
+- **404 Not Found:**
+  - The user specified by `userId` does not exist.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+- **500 Email Sending Error:**
+  - An issue occurred while attempting to send the ban notification email.
+
+**Dependencies:**
+
+- **Models:**
+  - `User`: Stores user information.
+  - `BannedUsers`: Maintains a record of banned users.
+
+- **Utilities:**
+  - `sendBanEmailHelper`: Sends a notification email to the banned user.
+  - `getLightWeightUserInfoHelper`: Extracts lightweight user information for logging and response.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 17. Get Active User Count
+
+**Endpoint:** `/api/admin/activeUserCount`
+
+**Method:** `GET`
+
+**Description:** Retrieves the total count of active users on the platform. Only accessible by authorized users.
+
+**Request Headers:**
+```http
+x-access-token: <valid_access_token>
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Active Users Counted Successfully",
+     "activeUserCount": 1500
+   }
+   ```
+
+2. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+3. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+4. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthAny` middleware.
+   - Ensures the user has a valid token and appropriate roles.
+   - If the token is missing, invalid, or expired, appropriate error messages are returned.
+
+2. **Active User Query:**
+   - Filters users in the `User` collection where `deactivation.isDeactive` is `false`.
+   - Counts the number of matching documents.
+
+3. **Response:**
+   - Returns the total count of active users in the system along with a success message.
+
+**Possible Errors:**
+
+- **403 Forbidden:**
+  - Missing or invalid token in the request header.
+  - Token expired or belongs to an unauthorized role.
+
+- **500 Internal Server Error:**
+  - Unhandled server-side issues during data retrieval or processing.
+
+**Dependencies:**
+
+- **Models:**
+  - `User`: Stores user information and activation status.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement rate limiting to prevent abuse of the endpoint.
+
+#### 18. Get Payments on Pool
+
+**Endpoint:** `/api/admin/getPaymentsOnPool`
+
+**Method:** `GET`
+
+**Description:** Retrieves the total money in the payment pool and calculates the distribution of shares, taxes, and profit.
+
+**Request Headers:**
+```http
+x-access-token: <valid_access_token>
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Price Count Successfully",
+     "profit": 2000.00,
+     "customersShare": 7000.00,
+     "customersTax": 1000.00,
+     "totalMoneyOnPool": 10000.00
+   }
+   ```
+
+2. **No Payments Found**
+   ```json
+   {
+     "error": false,
+     "message": "No Payment On Pool"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Detailed Functionality:**
+
+1. **Token Validation:**
+   - The `x-access-token` header is validated using the `adminAuthAccounting` middleware.
+   - Ensures the user has a valid token and appropriate roles (admin or accounting).
+
+2. **Data Processing:**
+   - Fetches all records from the `PaymentData` collection.
+   - If no records are found, a success response with a message indicating no payments is returned.
+   - Calculates the total price, customer share, customer tax, and profit based on the payment data.
+   - Handles different price types (e.g., TL, USD, EUR). Currently, conversion for foreign currencies is planned but not implemented.
+
+3. **Response:**
+   - Returns the calculated distribution of shares, taxes, and profit along with the total money in the pool.
+
+**Dependencies:**
+
+- **Models:**
+  - `PaymentData`: Stores payment information, including price and currency type.
+
+**Notes:**
+
+- Ensure the `ACCESS_TOKEN_PRIVATE_KEY` environment variable is securely configured.
+- Proper error handling should be in place to avoid exposing sensitive information in the response.
+- Implement currency conversion logic for non-TL price types if required.
+- Test edge cases, such as empty datasets or large numbers, for accurate calculations.
+- Apply rate limiting to prevent abuse of the endpoint.
+
+#### 19. Give User Authorization Role
+
+**Endpoint:** `/api/admin/giveUserAuthorizationRole/:userId/:roleId`
+
+**Method:** `PUT`
+
+**Description:** Assigns an authorization role to a specified user. Only accessible by Super Admins.
+
+**Request Headers:**
+```http
+x-access-token: <your_super_admin_token>
+```
+
+**Request Path Parameters:**
+```json
+{
+  "userId": "<The ID of the user to be authorized>",
+  "roleId": "<The role ID to be assigned>"
+}
+```
+
+**Role ID Mapping:**
+- `0`: Regular User
+- `1`: Super Admin
+- `2`: Developer
+- `3`: Evaluator
+- `4`: Accounting
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "User with Id 123456, authorized as Developer. User needs to logout and login again"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Params"
+   }
+   ```
+
+3. **Invalid Role ID**
+   ```json
+   {
+     "error": true,
+     "message": "Wrong Auth Role Id",
+     "authRoleIdies": {
+       "0": "RegularUser",
+       "1": "SuperAmin",
+       "2": "Developer",
+       "3": "Evaluator",
+       "4": "Accounting"
+     }
+   }
+   ```
+
+4. **User Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "User Not Found"
+   }
+   ```
+
+5. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "UnAuthorized"
+   }
+   ```
+
+6. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+7. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+#### 20. Get Banned Users List
+
+**Endpoint:** `/api/admin/getBannedUsersList/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of banned users along with details of the administrator who issued the ban. Only accessible by admin or evaluator roles.
+
+**Request Headers:**
+```http
+x-access-token: <your_admin_or_evaluator_token>
+```
+
+**Request Path Parameters:**
+```json
+{
+  "lastItemId": "<string|ObjectId>",
+  "limit": "<number>"
+}
+```
+- `lastItemId`: ID of the last item from the previous request to enable pagination (default: `null`).
+- `limit`: Maximum number of records to retrieve (default: `15`).
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "List Prepared Succesfully",
+     "totalBannedUserCount": 42,
+     "banedUserList": [
+       {
+         "userEmail": "user@example.com",
+         "userPhoneNumber": "1234567890",
+         "userFullName": "John Doe",
+         "adminDesc": "Violation of platform policies",
+         "createdAt": "2025-01-10T10:00:00Z",
+         "bannedAdmin": {
+           "userId": "63f1e0b1a1b2c3d4e5f67890",
+           "username": "adminUser",
+           "email": "admin@example.com"
+         }
+       }
+     ]
+   }
+   ```
+
+2. **No Banned Users Found**
+   ```json
+   {
+     "error": false,
+     "message": "No Banned User Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "UnAuthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+#### 21. Remove Ban Record
+
+**Endpoint:** `/api/admin/removeBan/:banId`
+
+**Method:** `DELETE`
+
+**Description:** Removes a specific ban record from the system. Only accessible by admin or evaluator roles.
+
+**Request Headers:**
+```http
+x-access-token: <your_admin_or_evaluator_token>
+```
+
+**Request Path Parameters:**
+```json
+{
+  "banId": "string" // The unique ID of the ban record to be removed.
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Ban Removed Succesfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Params"
+   }
+   ```
+
+3. **Ban Record Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Ban Record Not Found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Notes:**
+- The endpoint checks the `x-access-token` header for a valid token.
+- Admin or evaluator roles are required to access this endpoint.
+- If the `banId` parameter is missing or invalid, the response will indicate the error.
+- If the specified ban record does not exist in the system, an appropriate error message is returned.
+- Upon successful removal of the ban record, a success message is returned.
+
+#### 22. Get All Employees
+
+**Endpoint:** `/api/admin/getEmployees/:lasItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of employees, excluding regular users (authRole = 0). This endpoint is accessible to all admin roles.
+
+### Request Headers:
+```http
+x-access-token: <your_admin_token>
+```
+
+### Request Path Parameters:
+```json
+{
+  "lasItemId": "<last_processed_employee_id>",
+  "limit": "<number_of_employees_to_retrieve>"
+}
+```
+- `lasItemId` (optional): The ID of the last employee retrieved in the previous request. Pass `null` if this is the first request.
+- `limit` (optional): The maximum number of employees to retrieve per request (default is 15).
+
+### Response Examples:
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Operation Succesful",
+     "totalEmployeecount": 45,
+     "employeeData": [
+       {
+         "userId": "12345abcde",
+         "fullName": "John Doe",
+         "email": "johndoe@example.com",
+         "phone": "123-456-7890",
+         "authRole": 3
+       },
+       {
+         "userId": "67890fghij",
+         "fullName": "Jane Smith",
+         "email": "janesmith@example.com",
+         "phone": "098-765-4321",
+         "authRole": 4
+       }
+     ]
+   }
+   ```
+
+2. **No Employees Found**
+   ```json
+   {
+     "error": false,
+     "message": "No Employees Found",
+     "totalEmployeecount": 0,
+     "employeeData": []
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Unauthorized"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+### Notes:
+- **Authorization Levels:** The endpoint checks for admin-level roles (`authRole` > 0).
+- **Pagination:** Use the `lasItemId` parameter for pagination.
+- **Role Details:**
+  - `1`: Super Admin
+  - `2`: Developer
+  - `3`: Evaluator
+  - `4`: Accounting
+
+**Errors and Validation:**
+- Missing or invalid `lasItemId` or `limit` values will not block the request, as defaults are applied.
+- Invalid or expired tokens result in `403` or `401` responses.
 
 ---
 
