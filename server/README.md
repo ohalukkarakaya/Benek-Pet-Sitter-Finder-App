@@ -12378,7 +12378,3330 @@ x-access-token: <your_valid_jwt_token>
 
 ### Care Give Routes
 
-#### 1.
+#### 1. Care Give Invitation
+
+**Endpoint:** `/api/careGive/`
+
+**Method:** `POST`
+
+**Description:** This endpoint allows a verified caregiver to send an invitation to care for a pet owned by another user.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Request Body:**
+```json
+{
+  "petId": "string",                 // Required. ID of the pet.
+  "startDate": "DD.MM.YYYY",        // Required. Start date of caregiving.
+  "endDate": "DD.MM.YYYY",          // Optional. End date of caregiving.
+  "meetingAdress": {                 // Required. Meeting address information.
+    "adressDesc": "string",         // Address description.
+    "lng": "number",                // Longitude of the meeting location.
+    "lat": "number"                 // Latitude of the meeting location.
+  },
+  "price": {                         // Optional. Pricing details.
+    "petTypeCode": "number",        // Required if price provided. Code for pet type.
+    "serviceTypeCode": "number",    // Required if price provided. Code for service type.
+    "type": "string"                // Required if price provided. Pricing type.
+  }
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "User with the id \"123456\" invited to careGive"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing params"
+   }
+   ```
+
+3. **Pet Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Pet not found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Pet Already with Caregiver**
+   ```json
+   {
+     "error": true,
+     "message": "Pet is already with a caregiver currently"
+   }
+   ```
+
+7. **Caregiver Not Verified**
+   ```json
+   {
+     "error": true,
+     "message": "You need to verify your phone number, email, and bank account's IBAN number"
+   }
+   ```
+
+8. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal server error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Validation:**
+   - Ensures the required fields (`petId`, `startDate`, `meetingAdress`) are present.
+   - If `price` is provided, checks for valid `petTypeCode`, `serviceTypeCode`, and `type`.
+
+3. **Data Retrieval and Checks:**
+   - Fetches the pet and its owner using `petId`.
+   - Confirms the pet does not belong to the caregiver.
+   - Verifies no active caregiving session exists for the pet.
+   - Validates the caregiver and pet owner are verified and active.
+
+4. **Pricing Calculation:**
+   - Matches the `petTypeCode` and `serviceTypeCode` from the pricing dataset.
+   - Computes the service price, extra mission price, and maximum task count.
+
+5. **Care Giving Invitation Creation:**
+   - Saves a new `CareGive` object in the database.
+   - Sends a notification to the pet owner regarding the caregiving invitation.
+
+6. **Error Handling:**
+   - Returns appropriate error messages for missing data, invalid dates, or unauthorized access.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- Pet and caregiver verification is mandatory for successful invitation creation.
+- Pricing data is dynamically fetched from a JSON file, ensuring flexibility in pricing model updates.
+
+#### 2. Get Care Give Invitations
+
+**Endpoint:** `/api/careGive/invitations/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a list of caregiving invitations sent to the authenticated user, ordered by creation date. Invitations are paginated based on the `lastItemId` and `limit` parameters.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `lastItemId` (string, optional): ID of the last invitation retrieved. Pass `'null'` for the first request.
+- `limit` (integer, optional): Number of invitations to retrieve. Defaults to `15` if not provided.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Releated Care Give Inventations Listed",
+     "totalInvitationCount": 10,
+     "invitations": [
+       {
+         "id": "invitationId123",
+         "petName": "Buddy",
+         "careGiverName": "John Doe",
+         "startDate": "2025-01-01",
+         "endDate": "2025-01-07",
+         "meetingAddress": "123 Pet Street, City, Country",
+         "price": {
+           "servicePrice": 100,
+           "extraMissionPrice": 20,
+           "totalPrice": 120
+         }
+       },
+       {
+         "id": "invitationId124",
+         "petName": "Milo",
+         "careGiverName": "Jane Smith",
+         "startDate": "2025-01-02",
+         "endDate": "2025-01-08",
+         "meetingAddress": "456 Pet Avenue, City, Country",
+         "price": {
+           "servicePrice": 150,
+           "extraMissionPrice": 30,
+           "totalPrice": 180
+         }
+       }
+     ]
+   }
+   ```
+
+2. **No Invitations Found**
+   ```json
+   {
+     "error": true,
+     "message": "No Invitation Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Query Construction:**
+   - Filters caregiving invitations targeted to the authenticated user (`invitation.to`) and ensures they are not yet accepted (`invitation.isAccepted: false`).
+   - If `lastItemId` is provided and not `'null'`, retrieves the creation date of the last invitation to paginate results.
+
+3. **Data Retrieval:**
+   - Counts the total number of invitations matching the query.
+   - Retrieves a limited number of invitations ordered by `createdAt` date.
+
+4. **Data Preparation:**
+   - Processes each invitation using a helper function (`prepareCareGiveInvitationDataHelper`) to format data for the response.
+
+5. **Error Handling:**
+   - Returns appropriate error messages for missing data, invalid parameters, or unauthorized access.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- Pagination is based on the `createdAt` timestamp of the last retrieved invitation.
+- The response includes pricing details, pet and caregiver information, and the meeting address.
+
+#### 3. Get Sent Care Give Invitations
+
+**Endpoint:** `/api/careGive/sendedInvitations/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a list of caregiving invitations sent by the authenticated user, ordered by creation date. Invitations are paginated based on the `lastItemId` and `limit` parameters.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `lastItemId` (string, optional): ID of the last invitation retrieved. Pass `'null'` for the first request.
+- `limit` (integer, optional): Number of invitations to retrieve. Defaults to `15` if not provided.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Sended Care Give Inventations Listed",
+     "totalInvitationCount": 8,
+     "invitations": [
+       {
+         "id": "invitationId001",
+         "petName": "Charlie",
+         "ownerName": "Alice Johnson",
+         "startDate": "2025-02-01",
+         "endDate": "2025-02-07",
+         "meetingAddress": "789 Pet Way, City, Country",
+         "price": {
+           "servicePrice": 80,
+           "extraMissionPrice": 25,
+           "totalPrice": 105
+         }
+       },
+       {
+         "id": "invitationId002",
+         "petName": "Bella",
+         "ownerName": "Mark Spencer",
+         "startDate": "2025-02-10",
+         "endDate": "2025-02-17",
+         "meetingAddress": "321 Pet Lane, City, Country",
+         "price": {
+           "servicePrice": 120,
+           "extraMissionPrice": 30,
+           "totalPrice": 150
+         }
+       }
+     ]
+   }
+   ```
+
+2. **No Invitations Found**
+   ```json
+   {
+     "error": true,
+     "message": "No Invitation Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Query Construction:**
+   - Filters caregiving invitations sent by the authenticated user (`invitation.from`) and ensures they are not yet accepted (`invitation.isAccepted: false`).
+   - If `lastItemId` is provided and not `'null'`, retrieves the creation date of the last invitation to paginate results.
+
+3. **Data Retrieval:**
+   - Counts the total number of invitations matching the query.
+   - Retrieves a limited number of invitations ordered by `createdAt` date.
+
+4. **Data Preparation:**
+   - Processes each invitation using helper functions (`prepareCareGiveInvitationDataHelper`, `getLightWeightPetInfoHelper`, and `getLightWeightUserInfoHelper`) to format data for the response.
+
+5. **Error Handling:**
+   - Returns appropriate error messages for missing data, invalid parameters, or unauthorized access.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- Pagination is based on the `createdAt` timestamp of the last retrieved invitation.
+- The response includes pricing details, pet and owner information, and the meeting address.
+
+#### 4. Start Care Give
+
+**Endpoint:** `/api/careGive/start/:careGiveId`
+
+**Method:** `PUT`
+
+**Description:** Start a caregiving session by verifying the provided action code and generating a finish code for the session.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `careGiveId` (string, required): ID of the caregiving session to be started.
+
+**Request Body:**
+```json
+{
+  "actionCodePassword": "string",          // Required. The password for the action code.
+  "petOwnerIdFromCode": "string",         // Required. The pet owner's ID from the code.
+  "petIdFromCode": "string",              // Required. The pet's ID from the code.
+  "careGiverIdFromCode": "string",        // Required. The caregiver's ID from the code.
+  "codeType": "string"                    // Required. The type of code (must be "Start").
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "care give started successfully",
+     "finishCode": "<svg_qr_code_data>"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing params"
+   }
+   ```
+
+3. **Invalid Code Type**
+   ```json
+   {
+     "error": true,
+     "message": "This is not a start code"
+   }
+   ```
+
+4. **Care Give Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Care give not found"
+   }
+   ```
+
+5. **Invalid User Access**
+   ```json
+   {
+     "error": true,
+     "message": "care giver should scan this code"
+   }
+   ```
+
+6. **Pet Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Pet not found"
+   }
+   ```
+
+7. **Invalid Code Data**
+   ```json
+   {
+     "error": true,
+     "message": "data in code is invalid"
+   }
+   ```
+
+8. **Invalid Password**
+   ```json
+   {
+     "error": true,
+     "message": "Invalid password"
+   }
+   ```
+
+9. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal server error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Validation:**
+   - Ensures all required parameters (`careGiveId`, `actionCodePassword`, `petOwnerIdFromCode`, `petIdFromCode`, `careGiverIdFromCode`, `codeType`) are present.
+   - Confirms the `codeType` is "Start".
+
+3. **Data Retrieval:**
+   - Retrieves the caregiving session, pet, caregiver, and pet owner from the database.
+   - Ensures all entities are active and not blocked.
+   - Validates that the provided code data matches the caregiving session details.
+
+4. **Password Verification:**
+   - Compares the provided `actionCodePassword` with the hashed password stored in the caregiving session.
+
+5. **QR Code Generation:**
+   - Generates a random password for the finish code and hashes it.
+   - Creates a new QR code containing the finish code data.
+
+6. **Session Update:**
+   - Updates the caregiving session with the new finish code and sets `isStarted` to `true`.
+   - Saves the updated session to the database.
+
+7. **Error Handling:**
+   - Returns appropriate error messages for missing data, invalid parameters, or unauthorized access.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- QR code generation uses `qr-code-styling-node` and custom options to create a finish code.
+- The `startDate` must match the current date for the session to start.
+
+#### 5. Get Care Give List
+
+**Endpoint:** `/api/careGive/getCareGiveList/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a list of caregiving sessions where the authenticated user is either the caregiver or the pet owner. Sessions are paginated based on the `lastItemId` and `limit` parameters.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `lastItemId` (string, optional): ID of the last caregiving session retrieved. Pass `'null'` for the first request.
+- `limit` (integer, optional): Number of caregiving sessions to retrieve. Defaults to `15` if not provided.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "CareGive List Prepared Succesfully",
+     "totalCareGiveCount": 5,
+     "careGiveList": [
+       {
+         "id": "careGiveId123",
+         "careGiveRoleId": 1,
+         "careGiverContact": {
+           "careGiverPhone": "123-456-7890",
+           "careGiverEmail": "caregiver@example.com"
+         },
+         "petOwnerContact": {
+           "petOwnerPhone": "987-654-3210",
+           "petOwnerEmail": "petowner@example.com"
+         },
+         "careGiver": {
+           "name": "John Doe",
+           "rating": 4.8
+         },
+         "petOwner": {
+           "name": "Jane Smith",
+           "rating": 4.5
+         },
+         "pet": {
+           "name": "Buddy",
+           "type": "Dog"
+         },
+         "startDate": "2025-01-01",
+         "endDate": "2025-01-07",
+         "adress": {
+           "adressDesc": "123 Pet Street, City, Country",
+           "long": 45.678,
+           "lat": -123.456
+         },
+         "actionCode": {
+           "codeType": "Finish",
+           "code": "<svg_qr_code_data>"
+         },
+         "isStarted": true,
+         "price": "100 USD",
+         "missionCount": 3
+       }
+     ]
+   }
+   ```
+
+2. **No CareGive Found**
+   ```json
+   {
+     "error": true,
+     "message": "CareGive Not Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Query Construction:**
+   - Filters caregiving sessions where the user is either the caregiver (`invitation.from`) or the pet owner (`invitation.to`), and the session is not finished (`finishProcess.isFinished: false`).
+   - If `lastItemId` is provided and not `'null'`, retrieves the creation date of the last session to paginate results.
+
+3. **Data Retrieval:**
+   - Counts the total number of caregiving sessions matching the query.
+   - Retrieves a limited number of sessions ordered by `createdAt` date.
+
+4. **Data Preparation:**
+   - Fetches detailed information about the caregiver, pet owner, and pet for each session.
+   - Determines the user's role in the caregiving session (1 for pet owner, 2 for caregiver).
+   - Prepares the action code and price details for the response.
+
+5. **Error Handling:**
+   - Returns appropriate error messages for missing data, invalid parameters, or unauthorized access.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- Pagination is based on the `createdAt` timestamp of the last retrieved caregiving session.
+- The response includes detailed session information, user roles, and action codes where applicable.
+
+#### 6. Get Finished Care Give List
+
+**Endpoint:** `/api/careGive/getFinishedCareGiveList/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a list of completed caregiving sessions where the authenticated user is either the caregiver or the pet owner. Sessions are paginated based on the `lastItemId` and `limit` parameters.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `lastItemId` (string, optional): ID of the last caregiving session retrieved. Pass `'null'` for the first request.
+- `limit` (integer, optional): Number of caregiving sessions to retrieve. Defaults to `15` if not provided.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "CareGive List Prepared Succesfully",
+     "totalCareGiveCount": 5,
+     "careGiveList": [
+       {
+         "id": "careGiveId123",
+         "careGiveRoleId": 1,
+         "careGiverContact": {
+           "careGiverPhone": "123-456-7890",
+           "careGiverEmail": "caregiver@example.com"
+         },
+         "petOwnerContact": {
+           "petOwnerPhone": "987-654-3210",
+           "petOwnerEmail": "petowner@example.com"
+         },
+         "careGiver": {
+           "name": "John Doe",
+           "rating": 4.8
+         },
+         "petOwner": {
+           "name": "Jane Smith",
+           "rating": 4.5
+         },
+         "pet": {
+           "name": "Buddy",
+           "type": "Dog"
+         },
+         "startDate": "2025-01-01",
+         "endDate": "2025-01-07",
+         "adress": {
+           "adressDesc": "123 Pet Street, City, Country",
+           "long": 45.678,
+           "lat": -123.456
+         },
+         "actionCode": {
+           "codeType": "Finish",
+           "code": "<svg_qr_code_data>"
+         },
+         "isStarted": true,
+         "isFinished": true,
+         "finishDate": "2025-01-07",
+         "price": "100 USD",
+         "missionCount": 3
+       }
+     ]
+   }
+   ```
+
+2. **No CareGive Found**
+   ```json
+   {
+     "error": true,
+     "message": "CareGive Not Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Query Construction:**
+   - Filters caregiving sessions where the user is either the caregiver (`invitation.from`) or the pet owner (`invitation.to`), and the session is completed (`finishProcess.isFinished: true`).
+   - If `lastItemId` is provided and not `'null'`, retrieves the creation date of the last session to paginate results.
+
+3. **Data Retrieval:**
+   - Counts the total number of completed caregiving sessions matching the query.
+   - Retrieves a limited number of sessions ordered by `createdAt` date.
+
+4. **Data Preparation:**
+   - Fetches detailed information about the caregiver, pet owner, and pet for each session.
+   - Determines the user's role in the caregiving session (1 for pet owner, 2 for caregiver).
+   - Prepares the action code and price details for the response.
+
+5. **Error Handling:**
+   - Returns appropriate error messages for missing data, invalid parameters, or unauthorized access.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- Pagination is based on the `createdAt` timestamp of the last retrieved caregiving session.
+- The response includes detailed session information, user roles, and action codes where applicable.
+
+#### 7. Get Care Give Details
+
+**Endpoint:** `/api/careGive/getCareGive/:careGiveId`
+
+**Method:** `GET`
+
+**Description:** Retrieve detailed information about a specific caregiving session where the authenticated user is either the caregiver or the pet owner.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `careGiveId` (string, required): ID of the caregiving session to retrieve.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "CareGive Data Prepared Succesfully",
+     "careGive": {
+       "id": "careGiveId123",
+       "careGiveRoleId": 1,
+       "careGiverContact": {
+         "careGiverPhone": "123-456-7890",
+         "careGiverEmail": "caregiver@example.com"
+       },
+       "petOwnerContact": {
+         "petOwnerPhone": "987-654-3210",
+         "petOwnerEmail": "petowner@example.com"
+       },
+       "careGiver": {
+         "name": "John Doe",
+         "rating": 4.8
+       },
+       "petOwner": {
+         "name": "Jane Smith",
+         "rating": 4.5
+       },
+       "pet": {
+         "name": "Buddy",
+         "type": "Dog"
+       },
+       "startDate": "2025-01-01",
+       "endDate": "2025-01-07",
+       "adress": {
+         "adressDesc": "123 Pet Street, City, Country",
+         "long": 45.678,
+         "lat": -123.456
+       },
+       "actionCode": {
+         "codeType": "Finish",
+         "code": "<svg_qr_code_data>"
+       },
+       "isStarted": true,
+       "isFinished": true,
+       "finishDate": "2025-01-07",
+       "price": "100 USD",
+       "missionCount": 3
+     }
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing Params"
+   }
+   ```
+
+3. **Care Give Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "CareGive Not Found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "UnAuthorized"
+   }
+   ```
+
+5. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Validation:**
+   - Ensures the `careGiveId` parameter is provided.
+
+3. **Data Retrieval:**
+   - Retrieves the caregiving session by `careGiveId`.
+   - Confirms the authenticated user is either the caregiver or the pet owner for the session.
+
+4. **Detailed Data Preparation:**
+   - Fetches detailed information about the caregiver, pet owner, and pet.
+   - Determines the user's role in the caregiving session (1 for pet owner, 2 for caregiver).
+   - Prepares the action code and price details for the response.
+
+5. **Error Handling:**
+   - Returns appropriate error messages for missing data, unauthorized access, or non-existent caregiving sessions.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- The response includes detailed session information, user roles, and action codes where applicable.
+
+#### 8. Get Pet Owner Care Give List
+
+**Endpoint:** `/api/careGive/getPetOwnerCareGiveList/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a list of ongoing caregiving sessions for pets owned by the authenticated user. Sessions are paginated based on the `lastItemId` and `limit` parameters.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `lastItemId` (string, optional): ID of the last caregiving session retrieved. Pass `'null'` for the first request.
+- `limit` (integer, optional): Number of caregiving sessions to retrieve. Defaults to `15` if not provided.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "CareGive List Prepared Succesfully",
+     "totalCareGiveCount": 3,
+     "careGiveList": [
+       {
+         "id": "careGiveId123",
+         "careGiveRoleId": 1,
+         "careGiverContact": {
+           "careGiverPhone": "123-456-7890",
+           "careGiverEmail": "caregiver@example.com"
+         },
+         "careGiver": {
+           "name": "John Doe",
+           "rating": 4.8
+         },
+         "petOwner": {
+           "name": "Jane Smith",
+           "rating": 4.5
+         },
+         "pet": {
+           "name": "Buddy",
+           "type": "Dog"
+         },
+         "startDate": "2025-01-01",
+         "endDate": "2025-01-07",
+         "adress": {
+           "adressDesc": "123 Pet Street, City, Country",
+           "long": 45.678,
+           "lat": -123.456
+         },
+         "actionCode": {
+           "codeType": "Start",
+           "code": "<svg_qr_code_data>"
+         },
+         "isStarted": true,
+         "price": "100 USD",
+         "missionCount": 3
+       }
+     ]
+   }
+   ```
+
+2. **No CareGive Found**
+   ```json
+   {
+     "error": true,
+     "message": "CareGive Not Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Query Construction:**
+   - Filters caregiving sessions where the authenticated user is the pet owner (`petOwner.petOwnerId`) and the session is ongoing (`finishProcess.isFinished: false`).
+   - If `lastItemId` is provided and not `'null'`, retrieves the creation date of the last session to paginate results.
+
+3. **Data Retrieval:**
+   - Counts the total number of caregiving sessions matching the query.
+   - Retrieves a limited number of sessions ordered by `createdAt` date.
+
+4. **Data Preparation:**
+   - Fetches detailed information about the caregiver and pet for each session.
+   - Prepares the action code and price details for the response.
+
+5. **Error Handling:**
+   - Returns appropriate error messages for missing data, unauthorized access, or non-existent caregiving sessions.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- Pagination is based on the `createdAt` timestamp of the last retrieved caregiving session.
+- The response includes detailed session information, user roles, and action codes where applicable.
+
+#### 9. Get Pet Owner Finished Care Give List
+
+**Endpoint:** `/api/careGive/getPetOwnerFinishedCareGiveList/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a list of completed caregiving sessions for pets owned by the authenticated user. Sessions are paginated based on the `lastItemId` and `limit` parameters.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `lastItemId` (string, optional): ID of the last caregiving session retrieved. Pass `'null'` for the first request.
+- `limit` (integer, optional): Number of caregiving sessions to retrieve. Defaults to `15` if not provided.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "CareGive List Prepared Succesfully",
+     "totalCareGiveCount": 5,
+     "careGiveList": [
+       {
+         "id": "careGiveId123",
+         "careGiveRoleId": 1,
+         "careGiverContact": {
+           "careGiverPhone": "123-456-7890",
+           "careGiverEmail": "caregiver@example.com"
+         },
+         "careGiver": {
+           "name": "John Doe",
+           "rating": 4.8
+         },
+         "petOwner": {
+           "name": "Jane Smith",
+           "rating": 4.5
+         },
+         "pet": {
+           "name": "Buddy",
+           "type": "Dog"
+         },
+         "startDate": "2025-01-01",
+         "endDate": "2025-01-07",
+         "adress": {
+           "adressDesc": "123 Pet Street, City, Country",
+           "long": 45.678,
+           "lat": -123.456
+         },
+         "actionCode": {
+           "codeType": "Finish",
+           "code": "<svg_qr_code_data>"
+         },
+         "isStarted": true,
+         "price": "100 USD",
+         "missionCount": 3
+       }
+     ]
+   }
+   ```
+
+2. **No CareGive Found**
+   ```json
+   {
+     "error": true,
+     "message": "CareGive Not Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Query Construction:**
+   - Filters caregiving sessions where the authenticated user is the pet owner (`petOwner.petOwnerId`) and the session is completed (`finishProcess.isFinished: true`).
+   - If `lastItemId` is provided and not `'null'`, retrieves the creation date of the last session to paginate results.
+
+3. **Data Retrieval:**
+   - Counts the total number of caregiving sessions matching the query.
+   - Retrieves a limited number of sessions ordered by `createdAt` date.
+
+4. **Data Preparation:**
+   - Fetches detailed information about the caregiver and pet for each session.
+   - Prepares the action code and price details for the response.
+
+5. **Error Handling:**
+   - Returns appropriate error messages for missing data, unauthorized access, or non-existent caregiving sessions.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- Pagination is based on the `createdAt` timestamp of the last retrieved caregiving session.
+- The response includes detailed session information, user roles, and action codes where applicable.
+
+#### 10. Get Care Giver Care Give List
+
+**Endpoint:** `/api/careGive/getCareGiverCareGiveList/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a list of ongoing caregiving sessions where the authenticated user is the caregiver. Sessions are paginated based on the `lastItemId` and `limit` parameters.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `lastItemId` (string, optional): ID of the last caregiving session retrieved. Pass `'null'` for the first request.
+- `limit` (integer, optional): Number of caregiving sessions to retrieve. Defaults to `15` if not provided.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "CareGive List Prepared Succesfully",
+     "totalCareGiveCount": 4,
+     "careGiveList": [
+       {
+         "id": "careGiveId123",
+         "careGiveRoleId": 2,
+         "petOwnerContact": {
+           "petOwnerPhone": "987-654-3210",
+           "petOwnerEmail": "petowner@example.com"
+         },
+         "careGiver": {
+           "name": "John Doe",
+           "rating": 4.8
+         },
+         "petOwner": {
+           "name": "Jane Smith",
+           "rating": 4.5
+         },
+         "pet": {
+           "name": "Buddy",
+           "type": "Dog"
+         },
+         "startDate": "2025-01-01",
+         "endDate": "2025-01-07",
+         "adress": {
+           "adressDesc": "123 Pet Street, City, Country",
+           "long": 45.678,
+           "lat": -123.456
+         },
+         "actionCode": {
+           "codeType": "Finish",
+           "code": "<svg_qr_code_data>"
+         },
+         "isStarted": true,
+         "price": "100 USD",
+         "missionCount": 3
+       }
+     ]
+   }
+   ```
+
+2. **No CareGive Found**
+   ```json
+   {
+     "error": true,
+     "message": "CareGive Not Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Query Construction:**
+   - Filters caregiving sessions where the authenticated user is the caregiver (`careGiver.careGiverId`) and the session is ongoing (`finishProcess.isFinished: false`).
+   - If `lastItemId` is provided and not `'null'`, retrieves the creation date of the last session to paginate results.
+
+3. **Data Retrieval:**
+   - Counts the total number of caregiving sessions matching the query.
+   - Retrieves a limited number of sessions ordered by `createdAt` date.
+
+4. **Data Preparation:**
+   - Fetches detailed information about the pet owner and pet for each session.
+   - Prepares the action code and price details for the response.
+
+5. **Error Handling:**
+   - Returns appropriate error messages for missing data, unauthorized access, or non-existent caregiving sessions.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- Pagination is based on the `createdAt` timestamp of the last retrieved caregiving session.
+- The response includes detailed session information, user roles, and action codes where applicable.
+
+#### 11. Get Care Giver Finished Care Give List
+
+**Endpoint:** `/api/careGive/getCareGiverFinishedCareGiveList/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a list of completed caregiving sessions where the authenticated user is the caregiver. Sessions are paginated based on the `lastItemId` and `limit` parameters.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `lastItemId` (string, optional): ID of the last caregiving session retrieved. Pass `'null'` for the first request.
+- `limit` (integer, optional): Number of caregiving sessions to retrieve. Defaults to `15` if not provided.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "CareGive List Prepared Succesfully",
+     "totalCareGiveCount": 4,
+     "careGiveList": [
+       {
+         "id": "careGiveId123",
+         "careGiveRoleId": 2,
+         "petOwnerContact": {
+           "petOwnerPhone": "987-654-3210",
+           "petOwnerEmail": "petowner@example.com"
+         },
+         "careGiver": {
+           "name": "John Doe",
+           "rating": 4.8
+         },
+         "petOwner": {
+           "name": "Jane Smith",
+           "rating": 4.5
+         },
+         "pet": {
+           "name": "Buddy",
+           "type": "Dog"
+         },
+         "startDate": "2025-01-01",
+         "endDate": "2025-01-07",
+         "adress": {
+           "adressDesc": "123 Pet Street, City, Country",
+           "long": 45.678,
+           "lat": -123.456
+         },
+         "actionCode": {
+           "codeType": "Finish",
+           "code": "<svg_qr_code_data>"
+         },
+         "isStarted": true,
+         "price": "100 USD",
+         "missionCount": 3
+       }
+     ]
+   }
+   ```
+
+2. **No CareGive Found**
+   ```json
+   {
+     "error": true,
+     "message": "CareGive Not Found"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: No token provided"
+   }
+   ```
+
+4. **Token Expired**
+   ```json
+   {
+     "error": true,
+     "message": "Access Denied: token expired"
+   }
+   ```
+
+5. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Query Construction:**
+   - Filters caregiving sessions where the authenticated user is the caregiver (`careGiver.careGiverId`) and the session is completed (`finishProcess.isFinished: true`).
+   - If `lastItemId` is provided and not `'null'`, retrieves the creation date of the last session to paginate results.
+
+3. **Data Retrieval:**
+   - Counts the total number of caregiving sessions matching the query.
+   - Retrieves a limited number of sessions ordered by `createdAt` date.
+
+4. **Data Preparation:**
+   - Fetches detailed information about the pet owner and pet for each session.
+   - Prepares the action code and price details for the response.
+
+5. **Error Handling:**
+   - Returns appropriate error messages for missing data, unauthorized access, or non-existent caregiving sessions.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- Tokens must be valid and not expired.
+- Pagination is based on the `createdAt` timestamp of the last retrieved caregiving session.
+- The response includes detailed session information, user roles, and action codes where applicable.
+
+#### 12. Extend Care Give
+
+**Endpoint:** `/api/careGive/extend/:careGiveId`
+
+**Method:** `PUT`
+
+**Description:** Extend an existing caregiving session by adding a specified time period. The extension requires payment processing.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `careGiveId` (string): ID of the caregiving session to extend.
+
+**Request Body:**
+```json
+{
+  "price": {
+    "petTypeCode": "<pet_type_code>",
+    "serviceTypeCode": "<service_type_code>",
+    "type": "<pricing_type>"
+  },
+  "cardGuid": "<card_guid_optional>",
+  "cardNo": "<card_number>",
+  "cvv": "<cvv>",
+  "cardExpiryDate": "MM/YY",
+  "recordCard": "<true_or_false>"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Waiting for 3d payment approve",
+     "payData": {
+       "transactionId": "12345",
+       "redirectUrl": "https://payment-gateway-url.com/approve"
+     }
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Missing params"
+   }
+   ```
+
+3. **Invalid Price Model**
+   ```json
+   {
+     "error": true,
+     "message": "In valid price model"
+   }
+   ```
+
+4. **CareGive Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Care Give Not Found"
+   }
+   ```
+
+5. **Error During Payment**
+   ```json
+   {
+     "error": true,
+     "message": "Error While Payment",
+     "payError": {
+       "message": "Daily Limit Exceeded",
+       "details": "..."
+     }
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal server error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Validation:**
+   - Ensures `careGiveId` and `price` details are provided.
+   - Verifies that the caregiving session exists and matches the provided price type.
+
+3. **Pricing Model Verification:**
+   - Matches the `petTypeCode` and `serviceTypeCode` in the pricing dataset.
+   - Retrieves the duration (in milliseconds) and price for the extension.
+
+4. **Payment Processing:**
+   - Uses the `mokaCreatePaymentHelper` to initiate payment.
+   - Handles credit card details, card GUID, and 3D secure redirection.
+   - Checks for payment errors such as daily transaction limits.
+
+5. **Response:**
+   - On successful payment initiation, returns a redirection URL for 3D payment approval.
+   - Handles errors during payment or parameter validation.
+
+**Notes:**
+- Payment must be approved via 3D secure before the caregiving session is extended.
+- Only valid price models are accepted for extension.
+- Tokens must be valid and not expired.
+
+#### 13. Finish Care Give
+
+**Endpoint:** `/api/careGive/finish/:careGiveId`
+
+**Method:** `PUT`
+
+**Description:** Marks a caregiving session as finished. This involves verifying the provided action code and ensuring the session details match.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Path Parameters:**
+- `careGiveId` (string): ID of the caregiving session to be marked as finished.
+
+**Request Body:**
+```json
+{
+  "actionCodePassword": "<action_code_password>",
+  "petOwnerIdFromCode": "<pet_owner_id>",
+  "petIdFromCode": "<pet_id>",
+  "careGiverIdFromCode": "<care_giver_id>",
+  "codeType": "Finish"
+}
+```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "Care give finished successfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing params"
+   }
+   ```
+
+3. **Invalid Code Type**
+   ```json
+   {
+     "error": true,
+     "message": "This is not a finish code"
+   }
+   ```
+
+4. **CareGive Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Care give not found"
+   }
+   ```
+
+5. **Unauthorized User**
+   ```json
+   {
+     "error": true,
+     "message": "Care giver should scan this code"
+   }
+   ```
+
+6. **Invalid Data in Code**
+   ```json
+   {
+     "error": true,
+     "message": "data in code is invalid"
+   }
+   ```
+
+7. **Invalid Password**
+   ```json
+   {
+     "error": true,
+     "message": "Invalid password"
+   }
+   ```
+
+8. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal server error"
+   }
+   ```
+
+**Working Logic:**
+1. **Authentication:**
+   - Validates the `x-access-token` in the request header.
+   - Decodes and verifies the token using `jwt.verify()`.
+   - Attaches the authenticated user's information to the request object.
+
+2. **Validation:**
+   - Ensures all required parameters are provided in the request body.
+   - Verifies the `codeType` is `Finish`.
+
+3. **CareGive Session Verification:**
+   - Retrieves the caregiving session using `careGiveId`.
+   - Confirms the authenticated user is the pet owner associated with the session.
+   - Validates the session details against the provided data.
+
+4. **Action Code Verification:**
+   - Verifies the `actionCodePassword` matches the stored password for the session.
+
+5. **Marking Session as Finished:**
+   - Updates the session's `finishProcess` to mark it as finished.
+   - Saves the changes to the database.
+
+6. **Error Handling:**
+   - Returns appropriate error messages for missing parameters, invalid data, or unauthorized access.
+   - Logs errors for internal debugging.
+
+**Notes:**
+- The `actionCodePassword` must match the stored password for the session.
+- Tokens must be valid and not expired.
+- Only the pet owner can mark a session as finished.
+
+#### 14. Cancel Care Give
+
+**Endpoint:** `/api/careGive/cancel/:careGiveId`
+
+**Method:** `POST`
+
+**Description:** Cancels an ongoing care give request before it starts. Both the pet owner and the caregiver can initiate cancellation. Payments, if any, will be refunded, and all related data will be removed.
+
+**Request Headers:**
+```http
+x-access-token: <user_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "careGiveId": "<unique_careGive_id>"
+}
+```
+
+**Request Body:**
+No additional parameters required.
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "careGive canceled successfully"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing params"
+   }
+   ```
+
+3. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "You're unauthorized to cancel this care give"
+   }
+   ```
+
+4. **Invalid Timing**
+   ```json
+   {
+     "error": true,
+     "message": "It is too late to cancel"
+   }
+   ```
+
+5. **Care Give Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "Care give not found"
+   }
+   ```
+
+6. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal Server Error"
+   }
+   ```
+
+**Process Flow:**
+1. **Authorization:** Verifies the user’s identity using the token provided in the `x-access-token` header.
+2. **Fetch CareGive Data:** Retrieves the care give details based on the provided `careGiveId`.
+3. **Check Permissions:** Confirms the user is either the pet owner or the caregiver associated with the care give.
+4. **Validate Timing:** Ensures the cancellation request is made before the care give start date and it is not already started or completed.
+5. **Process Payments (if applicable):**
+   - If payments exist, they are canceled and refunded.
+   - Errors in payment cancellation result in a failure response.
+6. **Remove Associations:**
+   - Cleans up references to the care give in pet owner, caregiver, and pet data.
+   - Removes the care give’s assets and database entry.
+7. **Return Response:** Sends a success response if all operations are completed without errors.
+
+**Notes:**
+- This endpoint ensures that no ongoing or completed care gives can be canceled.
+- Payments are handled through the `mokaVoid3dPaymentRequest` utility.
+- Proper error logging and handling mechanisms are implemented for robustness.
+
+#### 15. Give Star To Care Giver
+
+**Endpoint:** `/api/careGive/giveStar/:careGiveId/:star`
+
+**Method:** `POST`
+
+**Description:** Allow a pet owner to give a star rating to a caregiver after the care service has been completed.
+
+**Request Headers:**
+```http
+x-access-token: <your_user_token>
+```
+
+**Request Parameters:**
+- **Path Parameters:**
+  ```json
+  {
+    "careGiveId": "<string> (ID of the CareGive record)",
+    "star": "<integer> (Rating between 0 and 5)"
+  }
+  ```
+
+**Response Examples:**
+
+1. **Success**
+   ```json
+   {
+     "error": false,
+     "message": "5 star given to care giver"
+   }
+   ```
+
+2. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "Something wrong with params"
+   }
+   ```
+
+3. **CareGive Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "CareGive not found"
+   }
+   ```
+
+4. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "You are not authorized to give star for this pet owner"
+   }
+   ```
+
+5. **Too Early to Give Star**
+   ```json
+   {
+     "error": true,
+     "message": "too early to give star"
+   }
+   ```
+
+6. **Care Giver Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "care giver not found"
+   }
+   ```
+
+7. **Internal Server Error**
+   ```json
+   {
+     "error": true,
+     "message": "Internal server error"
+   }
+   ```
+
+**Workflow:**
+1. **Authentication:** The request header must include a valid JWT token (`x-access-token`).
+2. **Parameter Validation:** Validate the `careGiveId` and `star` parameters. Ensure `star` is an integer between 0 and 5.
+3. **CareGive Existence:** Check if the `careGiveId` exists in the database. If not, return a 404 error.
+4. **Authorization:** Verify that the user making the request is the pet owner associated with the `careGiveId`.
+5. **Eligibility Check:** Ensure the care service is marked as finished before allowing a rating.
+6. **CareGiver Verification:** Confirm the caregiver associated with the `careGiveId` exists and is active.
+7. **Rating Storage:**
+   - Add the star rating to the caregiver's `stars` array.
+   - Save the caregiver's updated record.
+8. **Notification:** Send a notification to the caregiver regarding the new star rating.
+9. **Response:** Return a success response with a confirmation message.
+
+**Error Handling:**
+- Invalid or missing parameters will return a `400` error.
+- Unauthorized access will return a `401` error.
+- Non-existent CareGive or caregiver will return a `404` error.
+- Internal errors will return a `500` error with appropriate logging for debugging.
+
+#### 16. Reply to CareGive Invitation
+
+**Endpoint:** `/api/careGive/:careGiveId/:response`
+
+**Method:** `PUT`
+
+**Description:** Allows a user to accept or reject a caregiving invitation. If the invitation is accepted, a payment process may be initiated depending on the caregiving service type (free or paid).
+
+**Request Headers:**
+```http
+x-access-token: <user_access_token>
+```
+
+**Path Parameters:**
+```json
+{
+  "careGiveId": "string", // ID of the caregiving invitation
+  "response": "string" // Accept or reject the invitation: 'true' (accept) or 'false' (reject)
+}
+```
+
+**Request Body (if response is 'true' and service is paid):**
+```json
+{
+  "cardGuid": "string", // (optional) GUID of the saved card
+  "cardNo": "string", // Credit card number
+  "cvc": "string", // CVC code of the card
+  "cardExpiryDate": "string", // Expiry date of the card in MM/YYYY format
+  "recordCard": "boolean" // Whether to save the card for future payments
+}
+```
+
+**Response Examples:**
+
+1. **Success - Free Service Accepted**
+   ```json
+   {
+     "error": false,
+     "message": "careGive accepted",
+     "code": "<base64_ticket_url>"
+   }
+   ```
+
+2. **Success - Paid Service Accepted, Payment Pending**
+   ```json
+   {
+     "error": false,
+     "message": "Waiting for 3d payment approve",
+     "payData": {
+       "paymentUrl": "<3d_payment_url>"
+     },
+     "code": null
+   }
+   ```
+
+3. **Success - Invitation Rejected**
+   ```json
+   {
+     "error": false,
+     "message": "Invitation rejected successfully"
+   }
+   ```
+
+4. **Missing Parameters**
+   ```json
+   {
+     "error": true,
+     "message": "missing params"
+   }
+   ```
+
+5. **Invalid Response Value**
+   ```json
+   {
+     "error": true,
+     "message": "Invalid response"
+   }
+   ```
+
+6. **Unauthorized Access**
+   ```json
+   {
+     "error": true,
+     "message": "you are not authorized to accept this invitation"
+   }
+   ```
+
+7. **Invitation Already Accepted**
+   ```json
+   {
+     "error": true,
+     "message": "Already Accepted"
+   }
+   ```
+
+8. **Email Not Verified**
+   ```json
+   {
+     "error": true,
+     "message": "please verify your email firstly"
+   }
+   ```
+
+9. **CareGive Not Found**
+   ```json
+   {
+     "error": true,
+     "message": "care give not found"
+   }
+   ```
+
+10. **Payment Failed**
+    ```json
+    {
+      "error": true,
+      "message": "Error While Payment",
+      "payError": {
+        "serverStatus": 2,
+        "message": "Insufficient funds"
+      }
+    }
+    ```
+
+11. **Internal Server Error**
+    ```json
+    {
+      "error": true,
+      "message": "Internal Server Error"
+    }
+    
+
+#### Mission End Points
+
+##### 1. Get Time Code for Upload Mission
+
+**Endpoint:** `/api/careGive/mission/timeSignatureCode/:careGiveId/:missionId`
+
+**Method:** `PUT`
+
+**Description:** This endpoint generates a time signature code for uploading a mission in a caregiving schedule. The generated code expires after 10 minutes.
+
+**Authentication**
+
+**Header:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+- The JWT token is validated using the `auth` middleware.
+- If the token is missing, expired, or invalid, the request is denied.
+
+**Request Parameters:**
+
+**URL Parameters:**
+- `careGiveId` (String): The ID of the caregiving document.
+- `missionId` (String): The ID of the specific mission.
+
+**Headers:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+**Response Examples:**
+
+**1. Success**
+```json
+{
+  "error": false,
+  "message": "Password created successfully, it will expire in 10 min",
+  "timeSignature": "ABC123"
+}
+```
+
+**2. Missing Parameters**
+```json
+{
+  "error": true,
+  "message": "Missing params"
+}
+```
+
+**3. Caregiving Document Not Found**
+```json
+{
+  "error": true,
+  "message": "Care give not found"
+}
+```
+
+**4. Unauthorized Access**
+```json
+{
+  "error": true,
+  "message": "You are not authorized to upload this mission"
+}
+```
+
+**5. Mission Not Found**
+```json
+{
+  "error": true,
+  "message": "Mission not found"
+}
+```
+
+**6. Token Expired**
+```json
+{
+  "error": true,
+  "message": "Access Denied: token expired"
+}
+```
+
+**7. Internal Server Error**
+```json
+{
+  "error": true,
+  "message": "Internal Server Error"
+}
+```
+
+**Workflow:**
+
+1. The `auth` middleware checks for the presence and validity of the `x-access-token` header.
+   - If the token is missing, expired, or invalid, the middleware returns an error response.
+2. The endpoint extracts the `careGiveId`, `missionId`, and `userId` from the URL parameters and JWT payload.
+   - If any parameter is missing, a `400 Bad Request` error is returned.
+3. The `careGiveId` is used to locate the caregiving document in the database.
+   - If the document is not found, a `404 Not Found` error is returned.
+4. The `missionId` is matched within the caregiving document's `missionCallender`.
+   - If the mission is not found, a `404 Not Found` error is returned.
+5. A random 6-character alphanumeric password is generated using `crypto.randomBytes`.
+   - This password is added to the mission's `timeSignature` field along with an expiration timestamp (10 minutes from creation).
+6. The caregiving document is saved to the database.
+   - On success, the password is returned in the response.
+   - On failure, a `500 Internal Server Error` is returned.
+
+ **Potential Data Extractions:**
+
+1. **From JWT:**
+   - `userId` (String): Extracted from the token to validate the user's identity.
+
+2. **From URL Parameters:**
+   - `careGiveId` (String): Used to locate the caregiving document.
+   - `missionId` (String): Used to locate the specific mission within the caregiving document.
+
+3. **Generated Data:**
+   - `timeSignature` (String): A random alphanumeric code (e.g., `ABC123`).
+   - `expiresAt` (Timestamp): The expiration time for the generated code (10 minutes from creation).
+
+**Error Handling:**
+
+1. **Missing Parameters:** Returns a `400 Bad Request` with an appropriate message.
+2. **Authentication Failure:** Returns a `403 Forbidden` if the token is missing, expired, or invalid.
+3. **Database Errors:** Returns a `500 Internal Server Error` if database operations fail.
+4. **Unauthorized Access:** Returns a `401 Unauthorized` if the user does not have permission to update the mission.
+
+##### 2. Upload Mission
+
+**Endpoint:** `/api/careGive/mission/:careGiveId/:missionId`
+
+**Method:** `POST`
+
+**Description:** This endpoint allows caregivers to upload mission content (e.g., video files) for a specific mission. Authentication, mission validation, and file handling are performed before the content is uploaded.
+
+**Authentication**
+
+**Header:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+- The JWT token is validated using the `auth` middleware.
+- If the token is missing, expired, or invalid, the request is denied.
+
+**Request Parameters:**
+
+**URL Parameters:**
+- `careGiveId` (String): The ID of the caregiving document.
+- `missionId` (String): The ID of the specific mission.
+
+**Headers:**
+```http
+x-access-token: <your_jwt_token>
+timeSignaturePassword: <generated_time_signature_code>
+```
+
+**Body:**
+- `file` (File): A video file in MP4 format.
+
+**Response Examples:**
+
+**1. Success**
+```json
+{
+  "error": false,
+  "message": "Mission Content Uploaded",
+  "videoUrl": "CareGive/<careGiveId>/<file_name>"
+}
+```
+
+**2. Missing Parameters**
+```json
+{
+  "error": true,
+  "message": "missing params"
+}
+```
+
+**3. Caregiving Document Not Found**
+```json
+{
+  "error": true,
+  "message": "careGive not found"
+}
+```
+
+**4. Unauthorized Access**
+```json
+{
+  "error": true,
+  "message": "You are not authorized to upload content in this mission"
+}
+```
+
+**5. Mission Not Found**
+```json
+{
+  "error": true,
+  "message": "mission not found"
+}
+```
+
+**6. Invalid Time Signature Password**
+```json
+{
+  "error": true,
+  "message": "invalid time signature password"
+}
+```
+
+**7. Wrong File Format**
+```json
+{
+  "error": true,
+  "message": "Wrong File Format"
+}
+```
+
+**8. Token Expired**
+```json
+{
+  "error": true,
+  "message": "Access Denied: token expired"
+}
+```
+
+**9. Internal Server Error**
+```json
+{
+  "error": true,
+  "message": "Internal Server Error"
+}
+```
+
+**Workflow:**
+
+1. The `auth` middleware checks for the presence and validity of the `x-access-token` header.
+   - If the token is missing, expired, or invalid, the middleware returns an error response.
+2. The `validateMission` middleware validates the mission ID, caregiving document ID, and time signature password.
+   - If any parameter is missing or invalid, an appropriate error response is returned.
+   - The time signature password is checked for validity and expiration.
+   - If the mission content already exists, the existing file is deleted before proceeding.
+3. The `serverHandleMissionContentHelper` middleware handles file uploads:
+   - The file is validated to ensure it is an MP4 video.
+   - The file is saved temporarily and uploaded to the appropriate location.
+   - Temporary files are removed after uploading.
+4. The `uploadMissionController` saves the mission content's URL to the caregiving document and sends a notification.
+   - The updated caregiving document is saved in the database.
+   - Notifications are sent to relevant users.
+
+**Potential Data Extractions:**
+
+1. **From JWT:**
+   - `userId` (String): Extracted from the token to validate the user's identity.
+
+2. **From URL Parameters:**
+   - `careGiveId` (String): Used to locate the caregiving document.
+   - `missionId` (String): Used to locate the specific mission within the caregiving document.
+
+3. **From Headers:**
+   - `timeSignaturePassword` (String): Used to validate the mission's time signature.
+
+4. **Generated Data:**
+   - `videoUrl` (String): The path to the uploaded mission content (e.g., `CareGive/<careGiveId>/<file_name>`).
+
+**Error Handling:**
+
+1. **Missing Parameters:** Returns a `400 Bad Request` with an appropriate message.
+2. **Authentication Failure:** Returns a `403 Forbidden` if the token is missing, expired, or invalid.
+3. **Validation Failure:** Returns a `400 Bad Request` or `401 Unauthorized` if parameters or permissions are invalid.
+4. **File Handling Errors:** Returns a `500 Internal Server Error` if file operations fail.
+5. **Unauthorized Access:** Returns a `401 Unauthorized` if the user does not have permission to update the mission.
+
+##### 3. Approve Mission
+
+**Endpoint:** `/api/careGive/mission/approve/:careGiveId/:missionId`
+
+**Method:** `PUT`
+
+**Description:** This endpoint allows pet owners to approve a specific mission once the content has been uploaded. Authentication is required, and only the pet owner associated with the caregiving record can approve the mission.
+
+**Authentication**
+
+**Header:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+- The JWT token is validated using the `auth` middleware.
+- If the token is missing, expired, or invalid, the request is denied.
+
+**Request Parameters:**
+
+**URL Parameters:**
+- `careGiveId` (String): The ID of the caregiving document.
+- `missionId` (String): The ID of the specific mission.
+
+**Headers:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+**Response Examples:**
+
+**1. Success**
+```json
+{
+  "error": false,
+  "message": "mission approved successfully"
+}
+```
+
+**2. Missing Parameters**
+```json
+{
+  "error": true,
+  "message": "Missing params"
+}
+```
+
+**3. Caregiving Document Not Found**
+```json
+{
+  "error": true,
+  "message": "CareGive not found"
+}
+```
+
+**4. Unauthorized Access**
+```json
+{
+  "error": true,
+  "message": "You are not authorized to approve this mission"
+}
+```
+
+**5. Mission Not Found**
+```json
+{
+  "error": true,
+  "message": "Mission not found"
+}
+```
+
+**6. Mission Content Not Uploaded**
+```json
+{
+  "error": true,
+  "message": "mission content not uploaded"
+}
+```
+
+**7. Token Expired**
+```json
+{
+  "error": true,
+  "message": "Access Denied: token expired"
+}
+```
+
+**8. Internal Server Error**
+```json
+{
+  "error": true,
+  "message": "Internal server error"
+}
+```
+
+**Workflow:**
+
+1. The `auth` middleware checks for the presence and validity of the `x-access-token` header.
+   - If the token is missing, expired, or invalid, the middleware returns an error response.
+2. The `approveMissionController` validates the `careGiveId` and `missionId` from the URL parameters.
+   - If any parameter is missing, an appropriate error response is returned.
+3. The caregiving document is fetched from the database using the `careGiveId`.
+   - If the document is not found, a `404 Not Found` error is returned.
+4. The `missionId` is validated to ensure the mission exists within the caregiving document.
+   - If the mission is not found, a `404 Not Found` error is returned.
+5. The mission is checked to ensure the video content has been uploaded.
+   - If the content is missing, a `400 Bad Request` error is returned.
+6. The mission is marked as approved, and the caregiving document is updated in the database.
+   - A notification is sent to the caregiver.
+7. If the operation succeeds, a success response is returned.
+
+**Potential Data Extractions:**
+
+1. **From JWT:**
+   - `userId` (String): Extracted from the token to validate the user's identity.
+
+2. **From URL Parameters:**
+   - `careGiveId` (String): Used to locate the caregiving document.
+   - `missionId` (String): Used to locate the specific mission within the caregiving document.
+
+3. **Generated Data:**
+   - `isApproved` (Boolean): Indicates whether the mission has been approved.
+
+**Error Handling:**
+
+1. **Missing Parameters:** Returns a `400 Bad Request` with an appropriate message.
+2. **Authentication Failure:** Returns a `403 Forbidden` if the token is missing, expired, or invalid.
+3. **Validation Failure:** Returns a `404 Not Found` or `401 Unauthorized` if parameters or permissions are invalid.
+4. **Approval Errors:** Returns a `400 Bad Request` if the mission content has not been uploaded.
+5. **Internal Errors:** Returns a `500 Internal Server Error` for unexpected issues.
+
+##### 4. Report Mission
+
+**Endpoint:** `/api/careGive/mission/report/:careGiveId/:missionId`
+
+**Method:** `PUT`
+
+**Description:** This endpoint allows caregivers or pet owners to report a specific mission. Reports include mission details and a description provided by the reporting user. Authentication is required.
+
+**Authentication**
+
+**Header:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+- The JWT token is validated using the `auth` middleware.
+- If the token is missing, expired, or invalid, the request is denied.
+
+**Request Parameters:**
+
+**URL Parameters:**
+- `careGiveId` (String): The ID of the caregiving document.
+- `missionId` (String): The ID of the specific mission.
+
+**Headers:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+**Body:**
+- `reportDesc` (String): A description of the issue being reported.
+
+**Response Examples:**
+
+**1. Success**
+```json
+{
+  "error": false,
+  "message": "mission reported with the id: <report_id>"
+}
+```
+
+**2. Missing Parameters**
+```json
+{
+  "error": true,
+  "message": "Missing params"
+}
+```
+
+**3. Caregiving Document Not Found**
+```json
+{
+  "error": true,
+  "message": "Care Give not found"
+}
+```
+
+**4. Unauthorized Access**
+```json
+{
+  "error": true,
+  "message": "You are not authorized to report this mission"
+}
+```
+
+**5. Mission Not Found**
+```json
+{
+  "error": true,
+  "message": "Mission not found"
+}
+```
+
+**6. Mission Already Reported**
+```json
+{
+  "error": true,
+  "message": "This Mission is Already Reported"
+}
+```
+
+**7. Token Expired**
+```json
+{
+  "error": true,
+  "message": "Access Denied: token expired"
+}
+```
+
+**8. Internal Server Error**
+```json
+{
+  "error": true,
+  "message": "Internal server error"
+}
+```
+
+**Workflow:**
+
+1. The `auth` middleware checks for the presence and validity of the `x-access-token` header.
+   - If the token is missing, expired, or invalid, the middleware returns an error response.
+2. The `reportMissionController` validates the `careGiveId`, `missionId`, and `reportDesc`.
+   - If any parameter is missing, an appropriate error response is returned.
+3. The caregiving document is fetched using the `careGiveId`.
+   - If the document is not found, a `404 Not Found` error is returned.
+4. The `missionId` is validated to ensure the mission exists within the caregiving document.
+   - If the mission is not found, a `404 Not Found` error is returned.
+5. The user's authorization is checked to ensure they are the caregiver or pet owner associated with the caregiving document.
+   - If unauthorized, a `401 Unauthorized` error is returned.
+6. The system checks if the mission has already been reported.
+   - If it has, a `400 Bad Request` error is returned.
+7. A new report is created with the provided `reportDesc` and mission details.
+   - The report is saved in the database.
+8. If successful, the report ID is returned in the response.
+
+**Potential Data Extractions:**
+
+1. **From JWT:**
+   - `userId` (String): Extracted from the token to validate the user's identity.
+
+2. **From URL Parameters:**
+   - `careGiveId` (String): Used to locate the caregiving document.
+   - `missionId` (String): Used to locate the specific mission within the caregiving document.
+
+3. **From Body:**
+   - `reportDesc` (String): Description provided by the user to explain the issue.
+
+4. **Generated Data:**
+   - `reportId` (String): The ID of the newly created report.
+
+**Error Handling:**
+
+1. **Missing Parameters:** Returns a `400 Bad Request` with an appropriate message.
+2. **Authentication Failure:** Returns a `403 Forbidden` if the token is missing, expired, or invalid.
+3. **Validation Failure:** Returns a `404 Not Found`, `401 Unauthorized`, or `400 Bad Request` for invalid parameters or unauthorized access.
+4. **Report Errors:** Returns a `400 Bad Request` if the mission has already been reported.
+5. **Internal Errors:** Returns a `500 Internal Server Error` for unexpected issues.
+
+##### 5. Get Mission List By Care Give Id
+
+**Endpoint:** `/api/careGive/mission/getMissionCalenderByCareGiveId/:careGiveId/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of missions for a specific caregiving record. The list includes detailed information about each mission, including pet and user information.
+
+**Authentication**
+
+**Header:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+- The JWT token is validated using the `auth` middleware.
+- If the token is missing, expired, or invalid, the request is denied.
+
+**Request Parameters:**
+
+**URL Parameters:**
+- `careGiveId` (String): The ID of the caregiving document.
+- `lastItemId` (String): The ID of the last mission retrieved in the previous request. Use `'null'` for the first page.
+- `limit` (Integer): The maximum number of missions to retrieve.
+
+**Headers:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+**Response Examples:**
+
+**1. Success**
+```json
+{
+  "error": false,
+  "message": "Mission List prepared successfully",
+  "totalMissionCount": 25,
+  "missions": [
+    {
+      "id": "mission12345",
+      "roleId": 1,
+      "pet": {
+        "name": "Buddy",
+        "type": "Dog",
+        "age": 3
+      },
+      "careGiver": {
+        "name": "John Doe",
+        "contact": "john.doe@example.com"
+      },
+      "petOwner": {
+        "name": "Jane Smith",
+        "contact": "jane.smith@example.com"
+      },
+      "desc": "Walk the dog",
+      "date": "2025-01-12",
+      "deadline": "2025-01-12T18:00:00Z",
+      "isExtra": false,
+      "content": {
+        "videoUrl": "http://example.com/video.mp4",
+        "timeCode": "ABC123"
+      }
+    }
+  ]
+}
+```
+
+**2. Missing Parameters**
+```json
+{
+  "error": true,
+  "message": "Missing Params"
+}
+```
+
+**3. Caregiving Document Not Found**
+```json
+{
+  "error": true,
+  "message": "CareGive Not Found"
+}
+```
+
+**4. Unauthorized Access**
+```json
+{
+  "error": true,
+  "message": "Unauthorized"
+}
+```
+
+**5. No Missions Found**
+```json
+{
+  "error": true,
+  "message": "No Mission Found In This CareGive"
+}
+```
+
+**6. Token Expired**
+```json
+{
+  "error": true,
+  "message": "Access Denied: token expired"
+}
+```
+
+**7. Internal Server Error**
+```json
+{
+  "error": true,
+  "message": "Internal Server Error"
+}
+```
+
+**Workflow:**
+
+1. The `auth` middleware checks for the presence and validity of the `x-access-token` header.
+   - If the token is missing, expired, or invalid, the middleware returns an error response.
+2. The `getMissionListByCareGiveIdController` validates the `careGiveId`, `lastItemId`, and `limit` parameters.
+   - If any parameter is missing, an appropriate error response is returned.
+3. The caregiving document is fetched using the `careGiveId`.
+   - If the document is not found, a `404 Not Found` error is returned.
+4. The user’s authorization is validated to ensure they are either the caregiver or one of the pet owners associated with the caregiving record.
+   - If unauthorized, a `401 Unauthorized` error is returned.
+5. The list of missions is retrieved and paginated based on `lastItemId` and `limit`.
+6. Detailed information about each mission, pet, and associated users is compiled.
+7. The prepared mission list is returned in the response.
+
+**Potential Data Extractions:**
+
+1. **From JWT:**
+   - `userId` (String): Extracted from the token to validate the user's identity.
+
+2. **From URL Parameters:**
+   - `careGiveId` (String): Used to locate the caregiving document.
+   - `lastItemId` (String): Used to determine the starting point for pagination.
+   - `limit` (Integer): Specifies the number of missions to retrieve.
+
+3. **Generated Data:**
+   - `totalMissionCount` (Integer): The total number of missions in the caregiving document.
+   - `missions` (Array): A list of mission details, including pet and user information.
+
+**Error Handling:**
+
+1. **Missing Parameters:** Returns a `400 Bad Request` with an appropriate message.
+2. **Authentication Failure:** Returns a `403 Forbidden` if the token is missing, expired, or invalid.
+3. **Validation Failure:** Returns a `404 Not Found` or `401 Unauthorized` if parameters or permissions are invalid.
+4. **Data Retrieval Errors:** Returns a `404 Not Found` if no caregiving document or missions are found.
+5. **Internal Errors:** Returns a `500 Internal Server Error` for unexpected issues.
+
+##### 6. Get Releated Missions By User Id
+
+**Endpoint:** `/api/careGive/mission/getMissionCalender/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of all missions associated with the authenticated user, based on their involvement as a pet owner, caregiver, or invitee.
+
+**Authentication**
+
+**Header:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+- The JWT token is validated using the `auth` middleware.
+- If the token is missing, expired, or invalid, the request is denied.
+
+**Request Parameters:**
+
+**URL Parameters:**
+- `lastItemId` (String): The ID of the last mission retrieved in the previous request. Use `'null'` for the first page.
+- `limit` (Integer): The maximum number of missions to retrieve.
+
+**Headers:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+**Response Examples:**
+
+**1. Success**
+```json
+{
+  "error": false,
+  "message": "Mission List Prepared Successfully",
+  "totalMissionCount": 50,
+  "missions": [
+    {
+      "id": "mission12345",
+      "careGiveId": "careGive123",
+      "roleId": 1,
+      "pet": {
+        "name": "Buddy",
+        "type": "Dog",
+        "age": 3
+      },
+      "careGiver": {
+        "name": "John Doe",
+        "contact": "john.doe@example.com"
+      },
+      "petOwner": {
+        "name": "Jane Smith",
+        "contact": "jane.smith@example.com"
+      },
+      "desc": "Walk the dog",
+      "date": "2025-01-12",
+      "deadline": "2025-01-12T18:00:00Z",
+      "isExtra": false,
+      "content": {
+        "videoUrl": "http://example.com/video.mp4",
+        "timeCode": "ABC123"
+      }
+    }
+  ]
+}
+```
+
+**2. Missing Parameters**
+```json
+{
+  "error": true,
+  "message": "Missing Params"
+}
+```
+
+**3. No Missions Found**
+```json
+{
+  "error": true,
+  "message": "No Mission Found For This Pet"
+}
+```
+
+**4. Token Expired**
+```json
+{
+  "error": true,
+  "message": "Access Denied: token expired"
+}
+```
+
+**5. Internal Server Error**
+```json
+{
+  "error": true,
+  "message": "Internal Server Error"
+}
+```
+
+**Workflow:**
+
+1. The `auth` middleware checks for the presence and validity of the `x-access-token` header.
+   - If the token is missing, expired, or invalid, the middleware returns an error response.
+2. The `getMissionCallenderController` retrieves the authenticated user's ID from the token.
+3. Related pets are fetched using the user's involvement as an owner.
+4. A list of caregiving records associated with the user is retrieved based on pet ownership, invitations, or caregiving roles.
+5. Missions from these caregiving records are compiled, sorted by date, and paginated based on `lastItemId` and `limit`.
+6. Detailed information about each mission, pet, and associated users is prepared and returned in the response.
+
+**Potential Data Extractions:**
+
+1. **From JWT:**
+   - `userId` (String): Extracted from the token to validate the user's identity.
+
+2. **From URL Parameters:**
+   - `lastItemId` (String): Used to determine the starting point for pagination.
+   - `limit` (Integer): Specifies the number of missions to retrieve.
+
+3. **Generated Data:**
+   - `totalMissionCount` (Integer): The total number of missions associated with the user.
+   - `missions` (Array): A list of mission details, including caregiving roles, pet details, and associated user information.
+
+**Error Handling:**
+
+1. **Missing Parameters:** Returns a `400 Bad Request` with an appropriate message.
+2. **Authentication Failure:** Returns a `403 Forbidden` if the token is missing, expired, or invalid.
+3. **Data Retrieval Errors:** Returns a `404 Not Found` if no missions or caregiving records are found.
+4. **Internal Errors:** Returns a `500 Internal Server Error` for unexpected issues.
+
+##### 7. Get Missions By Pet Id
+
+**Endpoint:** `/api/careGive/mission/getMissionCalenderByPetId/:petId/:lastItemId/:limit`
+
+**Method:** `GET`
+
+**Description:** Retrieve a paginated list of all missions associated with a specific pet. The list includes detailed information about each mission, pet, and user roles.
+
+**Authentication**
+
+**Header:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+- The JWT token is validated using the `auth` middleware.
+- If the token is missing, expired, or invalid, the request is denied.
+
+**Request Parameters:**
+
+**URL Parameters:**
+- `petId` (String): The ID of the pet.
+- `lastItemId` (String): The ID of the last mission retrieved in the previous request. Use `'null'` for the first page.
+- `limit` (Integer): The maximum number of missions to retrieve.
+
+**Headers:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+**Response Examples:**
+
+**1. Success**
+```json
+{
+  "error": false,
+  "message": "Pets Mission List Prepared Successfully",
+  "totalMissionCount": 25,
+  "missions": [
+    {
+      "id": "mission12345",
+      "careGiveId": "careGive123",
+      "roleId": 1,
+      "pet": {
+        "name": "Buddy",
+        "type": "Dog",
+        "age": 3
+      },
+      "careGiver": {
+        "name": "John Doe",
+        "contact": "john.doe@example.com"
+      },
+      "petOwner": {
+        "name": "Jane Smith",
+        "contact": "jane.smith@example.com"
+      },
+      "desc": "Walk the dog",
+      "date": "2025-01-12",
+      "deadline": "2025-01-12T18:00:00Z",
+      "isExtra": false,
+      "content": {
+        "videoUrl": "http://example.com/video.mp4",
+        "timeCode": "ABC123"
+      }
+    }
+  ]
+}
+```
+
+**2. Missing Parameters**
+```json
+{
+  "error": true,
+  "message": "Missing Params"
+}
+```
+
+**3. Pet Not Found**
+```json
+{
+  "error": true,
+  "message": "Pet Not Found"
+}
+```
+
+**4. No Missions Found**
+```json
+{
+  "error": true,
+  "message": "No Mission Found For This Pet"
+}
+```
+
+**5. Token Expired**
+```json
+{
+  "error": true,
+  "message": "Access Denied: token expired"
+}
+```
+
+**6. Internal Server Error**
+```json
+{
+  "error": true,
+  "message": "Internal Server Error"
+}
+```
+
+**Workflow:**
+
+1. The `auth` middleware checks for the presence and validity of the `x-access-token` header.
+   - If the token is missing, expired, or invalid, the middleware returns an error response.
+2. The `getMissionCallenderByPetIdController` validates the `petId`, `lastItemId`, and `limit` parameters.
+   - If any parameter is missing, an appropriate error response is returned.
+3. The pet is fetched using the `petId`.
+   - If the pet is not found, a `404 Not Found` error is returned.
+4. The system determines the user's role (e.g., pet owner, caregiver) for the specified pet.
+5. Relevant caregiving records are retrieved based on the pet ID and user role.
+6. Missions from these caregiving records are compiled, sorted by date, and paginated based on `lastItemId` and `limit`.
+7. Detailed information about each mission, pet, and associated users is prepared and returned in the response.
+
+**Potential Data Extractions:**
+
+1. **From JWT:**
+   - `userId` (String): Extracted from the token to validate the user's identity.
+
+2. **From URL Parameters:**
+   - `petId` (String): Used to locate the pet.
+   - `lastItemId` (String): Used to determine the starting point for pagination.
+   - `limit` (Integer): Specifies the number of missions to retrieve.
+
+3. **Generated Data:**
+   - `totalMissionCount` (Integer): The total number of missions associated with the pet.
+   - `missions` (Array): A list of mission details, including caregiving roles, pet details, and associated user information.
+
+**Error Handling:**
+
+1. **Missing Parameters:** Returns a `400 Bad Request` with an appropriate message.
+2. **Authentication Failure:** Returns a `403 Forbidden` if the token is missing, expired, or invalid.
+3. **Data Retrieval Errors:** Returns a `404 Not Found` if no pet or missions are found.
+4. **Internal Errors:** Returns a `500 Internal Server Error` for unexpected issues.
+
+##### Schedule Mission EndPoints
+
+###### 1. Schedule Mission
+
+**Endpoint:** `/api/careGive/mission/schedule/:careGiveId`
+
+**Method:** `PUT`
+
+**Description:** Schedule a mission for a specific caregiving record. The endpoint handles both standard and extra missions, with payment processing for extra missions.
+
+**Authentication**
+
+**Header:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+- The JWT token is validated using the `auth` middleware.
+- If the token is missing, expired, or invalid, the request is denied.
+
+**Request Parameters:**
+
+**URL Parameters:**
+- `careGiveId` (String): The ID of the caregiving document.
+
+**Headers:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+**Body:**
+```json
+{
+  "missionDesc": "Mission description",
+  "missionDate": "DD.MM.YYYY-HH:mm",
+  "cardGuid": "<optional_card_guid>",
+  "cardNo": "<card_number>",
+  "cvc": "<cvc>",
+  "cardExpiryDate": "MM/YYYY",
+  "recordCard": "true|false"
+}
+```
+
+**Response Examples:**
+
+**1. Success (Standard Mission)**
+```json
+{
+  "error": false,
+  "message": "Mission Scheduled Successfully",
+  "payData": null,
+  "careGive": "careGive123"
+}
+```
+
+**2. Success (Extra Mission - Payment Required)**
+```json
+{
+  "error": false,
+  "message": "Waiting for 3d payment approval",
+  "payData": {
+    "redirectUrl": "http://payment-provider.com/approve"
+  },
+  "careGive": "careGive123"
+}
+```
+
+**3. Missing Parameters**
+```json
+{
+  "error": true,
+  "message": "Missing param"
+}
+```
+
+**4. CareGive Not Found**
+```json
+{
+  "error": true,
+  "message": "Care give not found"
+}
+```
+
+**5. Unauthorized**
+```json
+{
+  "error": true,
+  "message": "You are not authorized to schedule mission for this pet"
+}
+```
+
+**6. Mission Already Scheduled at Same Time**
+```json
+{
+  "error": true,
+  "message": "There is already a mission scheduled at this time"
+}
+```
+
+**7. Payment Error**
+```json
+{
+  "error": true,
+  "message": "Error While Payment",
+  "payError": {}
+}
+```
+
+**8. Internal Server Error**
+```json
+{
+  "error": true,
+  "message": "Internal server error"
+}
+```
+
+**Workflow:**
+
+1. The `auth` middleware checks for the presence and validity of the `x-access-token` header.
+2. The `scheduleMissionController` validates the `careGiveId`, `missionDesc`, and `missionDate` parameters.
+   - If any parameter is missing, a `400 Bad Request` is returned.
+3. The caregiving document is fetched using the `careGiveId`.
+   - If not found, a `404 Not Found` error is returned.
+4. The system checks if the user is authorized to schedule a mission.
+   - If unauthorized, a `401 Unauthorized` error is returned.
+5. The system verifies if the mission date is valid and not already booked.
+   - If invalid, a `400 Bad Request` is returned.
+6. If scheduling an extra mission:
+   - Payment details are processed using the `mokaCreatePaymentHelper`.
+   - If successful, the user is redirected for 3D payment approval.
+7. If scheduling a standard mission:
+   - The mission is added to the caregiving record.
+8. A success response is returned.
+
+**Potential Data Extractions:**
+
+1. **From JWT:**
+   - `userId` (String): Extracted from the token to validate the user's identity.
+
+2. **From URL Parameters:**
+   - `careGiveId` (String): Used to locate the caregiving document.
+
+3. **From Body:**
+   - `missionDesc` (String): The mission description.
+   - `missionDate` (String): The scheduled date and time for the mission.
+   - `cardGuid` (String, Optional): Used for payment processing.
+   - `cardNo` (String): The credit card number.
+   - `cvc` (String): The card CVC code.
+   - `cardExpiryDate` (String): The card's expiry date.
+   - `recordCard` (Boolean): Indicates whether to save the card for future use.
+
+4. **Generated Data:**
+   - `payData` (Object): Payment details if an extra mission is scheduled.
+
+**Error Handling:**
+
+1. **Missing Parameters:** Returns a `400 Bad Request` with an appropriate message.
+2. **Authentication Failure:** Returns a `403 Forbidden` if the token is missing, expired, or invalid.
+3. **Validation Failure:** Returns a `401 Unauthorized` or `400 Bad Request` if parameters or permissions are invalid.
+4. **Payment Errors:** Returns a `500 Internal Server Error` if payment processing fails.
+5. **Internal Errors:** Returns a `500 Internal Server Error` for unexpected issues.
+
+###### 2. Delete Mission
+
+**Endpoint:** `/api/careGive/mission/schedule/delete/:careGiveId/:missionId`
+
+**Method:** `DELETE`
+
+**Description:** Delete a specific mission from a caregiving schedule. This action can only be performed by the pet owner if certain conditions are met (e.g., no video content has been uploaded for the mission).
+
+**Authentication**
+
+**Header:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+- The JWT token is validated using the `auth` middleware.
+- If the token is missing, expired, or invalid, the request is denied.
+
+**Request Parameters:**
+
+**URL Parameters:**
+- `careGiveId` (String): The ID of the caregiving record.
+- `missionId` (String): The ID of the mission to be deleted.
+
+**Headers:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+**Response Examples:**
+
+**1. Success**
+```json
+{
+  "error": false,
+  "message": "Mission deleted successfully"
+}
+```
+
+**2. Missing Parameters**
+```json
+{
+  "error": true,
+  "message": "Missing params"
+}
+```
+
+**3. CareGive Not Found**
+```json
+{
+  "error": true,
+  "message": "careGive not found"
+}
+```
+
+**4. Unauthorized**
+```json
+{
+  "error": true,
+  "message": "You are not authorized to delete this mission"
+}
+```
+
+**5. Mission Not Found**
+```json
+{
+  "error": true,
+  "message": "mission not found"
+}
+```
+
+**6. Mission Cannot Be Deleted**
+```json
+{
+  "error": true,
+  "message": "You can't delete this mission"
+}
+```
+
+**7. Internal Server Error**
+```json
+{
+  "error": true,
+  "message": "Internal server error"
+}
+```
+
+**Workflow:**
+
+1. The `auth` middleware checks for the presence and validity of the `x-access-token` header.
+   - If the token is missing, expired, or invalid, the middleware returns an error response.
+2. The `deleteMissionController` validates the `careGiveId`, `missionId`, and `userId` parameters.
+   - If any parameter is missing, a `400 Bad Request` is returned.
+3. The caregiving record is fetched using the `careGiveId`.
+   - If not found, a `404 Not Found` error is returned.
+4. The user’s authorization is verified to ensure they are the pet owner.
+   - If unauthorized, a `401 Unauthorized` error is returned.
+5. The mission is located within the caregiving record using the `missionId`.
+   - If not found, a `404 Not Found` error is returned.
+6. Conditions for deletion are checked:
+   - If video content is uploaded for the mission, deletion is denied.
+   - If it’s an extra mission, any associated payment is voided.
+7. The mission is removed from the caregiving record, and the updated record is saved.
+   - On success, a success response is returned.
+
+**Potential Data Extractions:**
+
+1. **From JWT:**
+   - `userId` (String): Extracted from the token to validate the user's identity.
+
+2. **From URL Parameters:**
+   - `careGiveId` (String): Used to locate the caregiving record.
+   - `missionId` (String): Used to locate the mission within the caregiving record.
+
+3. **Generated Data:**
+   - `cancelPayment` (Object, Optional): Details of any voided payment for extra missions.
+
+**Error Handling:**
+
+1. **Missing Parameters:** Returns a `400 Bad Request` with an appropriate message.
+2. **Authentication Failure:** Returns a `403 Forbidden` if the token is missing, expired, or invalid.
+3. **Validation Failure:** Returns a `401 Unauthorized` or `404 Not Found` for invalid parameters or unauthorized access.
+4. **Deletion Restrictions:** Returns a `400 Bad Request` if the mission cannot be deleted due to video content or other restrictions.
+5. **Payment Errors:** Returns a `500 Internal Server Error` if payment voiding fails.
+6. **Internal Errors:** Returns a `500 Internal Server Error` for unexpected issues.
+
+#### Emergency End Points
+
+##### 1. Panic Button
+
+**Endpoint:** `/api/careGive/emergency/:careGiveId`
+
+**Method:** `POST`
+
+**Description:** This endpoint allows a caregiver to send an emergency notification to the pet owner via SMS and/or email. Notifications include the caregiver's contact details and a custom emergency message.
+
+**Authentication**
+
+**Header:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+- The JWT token is validated using the `auth` middleware.
+- If the token is missing, expired, or invalid, the request is denied.
+
+**Request Parameters:**
+
+**URL Parameters:**
+- `careGiveId` (String): The ID of the caregiving record.
+
+**Headers:**
+```http
+x-access-token: <your_jwt_token>
+```
+
+**Body:**
+```json
+{
+  "emergencyMessage": "Custom emergency message"
+}
+```
+
+**Response Examples:**
+
+**1. Success**
+```json
+{
+  "error": false,
+  "message": "Emergency message successfully sent to pet owner"
+}
+```
+
+**2. Missing Parameters**
+```json
+{
+  "error": true,
+  "message": "Missing params"
+}
+```
+
+**3. CareGive Not Found**
+```json
+{
+  "error": true,
+  "message": "Care give not found"
+}
+```
+
+**4. Unauthorized**
+```json
+{
+  "error": true,
+  "message": "You are not authorized for this"
+}
+```
+
+**5. Pet Owner Contact Data Not Found**
+```json
+{
+  "error": true,
+  "message": "Pet owner's contact data not found"
+}
+```
+
+**6. Internal Server Error**
+```json
+{
+  "error": true,
+  "message": "Internal Server Error"
+}
+```
+
+**Workflow:**
+
+1. The `auth` middleware validates the JWT token in the request header.
+2. The `emergencyController` validates the `careGiveId` and `emergencyMessage` parameters.
+   - If any parameter is missing, a `400 Bad Request` is returned.
+3. The caregiving record is fetched using the `careGiveId`.
+   - If not found, a `404 Not Found` error is returned.
+4. The system checks if the user is authorized to send an emergency message.
+   - If unauthorized, a `401 Unauthorized` error is returned.
+5. The pet owner’s contact information (phone and/or email) is retrieved.
+   - If no contact information is found, a `404 Not Found` error is returned.
+6. SMS and/or email notifications are sent:
+   - SMS is sent using either `vatanSmsApiRequest` or Twilio.
+   - Email is sent using Nodemailer.
+7. A success response is returned if the notifications are successfully sent.
+
+**Potential Data Extractions:**
+
+1. **From JWT:**
+   - `userId` (String): Extracted from the token to validate the user's identity.
+
+2. **From URL Parameters:**
+   - `careGiveId` (String): Used to locate the caregiving record.
+
+3. **From Body:**
+   - `emergencyMessage` (String): The custom message to be sent.
+
+4. **Generated Data:**
+   - `petOwnerPhone` (String): The pet owner's phone number.
+   - `petOwnerEmail` (String): The pet owner's email address.
+   - `body` (String): The SMS and email content.
+
+**Error Handling:**
+
+1. **Missing Parameters:** Returns a `400 Bad Request` if required parameters are missing.
+2. **Authentication Failure:** Returns a `403 Forbidden` if the token is missing, expired, or invalid.
+3. **Data Retrieval Errors:** Returns a `404 Not Found` if caregiving record, pet owner, or pet is not found.
+4. **Contact Data Missing:** Returns a `404 Not Found` if the pet owner's contact data is missing.
+5. **Notification Errors:** Returns a `500 Internal Server Error` if SMS or email sending fails.
+6. **Internal Errors:** Returns a `500 Internal Server Error` for unexpected issues.
 
 ### Chat Routes
 _Coming soon..._
