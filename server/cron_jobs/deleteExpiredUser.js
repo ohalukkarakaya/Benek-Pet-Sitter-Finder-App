@@ -61,7 +61,7 @@ const expireUser = cron.schedule(
                 }
 
                 punishment.deleteOne();
-            };
+            }
 
             if( users ){
                 users.map( async ( user ) => {
@@ -81,7 +81,7 @@ const expireUser = cron.schedule(
 
                                 //clean followers follow event
                                 for( var i = 0; i < petFollowers.length; i ++ ){
-                                    follower = await User.findById( petFollowers[ i ] );
+                                    let follower = await User.findById( petFollowers[ i ] );
                                     follower.followingUsersOrPets = follower.followingUsersOrPets.filter( 
                                         followingObject => 
                                             followingObject.followingId.toString() !== petId 
