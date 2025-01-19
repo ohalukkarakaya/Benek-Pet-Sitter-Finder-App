@@ -27,12 +27,15 @@ dotenv.config();
 // - tested
 const expireUser = cron.schedule(
     '0 0 * * *', // hergün gece 12:00
-    // "* * * * *", // her dakika başı
+    //"* * * * *", // her dakika başı
     async () => {
         try{
+            console.log('Running cron job: expireUser');
             //pull punishment records and ban users with over punishment record
             const users = await User.find({ "deactivation.isDeactive": true, "deactivation.deactivationDate": { $lt: Date.now() - 2592000000 }, "deactivation.isAboutToDelete": true });
-            const punishmentRecords = await PunishmentRecord.find({ punishmentList: { $size: { $gte: 3 } } });
+            const punishmentRecords = await PunishmentRecord.find({
+                $expr: { $gte: [{ $size: "$punishmentList" }, 3] }
+            });
             for( const punishment of punishmentRecords ){
 
                 const punishedUser = await User.findById( punishment.userId );
