@@ -30,7 +30,6 @@ const expireUser = cron.schedule(
     //"* * * * *", // her dakika başı
     async () => {
         try{
-            console.log('Running cron job: expireUser');
             //pull punishment records and ban users with over punishment record
             const users = await User.find({ "deactivation.isDeactive": true, "deactivation.deactivationDate": { $lt: Date.now() - 2592000000 }, "deactivation.isAboutToDelete": true });
             const punishmentRecords = await PunishmentRecord.find({
@@ -468,7 +467,7 @@ const expireUser = cron.schedule(
                 });
             }
         }catch( err ){ 
-            console.log( err ); 
+            console.log( "ERROR: expireUser - ", err );
         }
     }
 );
