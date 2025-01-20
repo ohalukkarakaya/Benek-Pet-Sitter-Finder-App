@@ -30,7 +30,11 @@ const logInController = async ( req, res, next ) => {
 
       if( !verifiedPassword ){
         const tempPasswordObject = await TempPassword.findOne({ userId: user._id.toString() });
-        const verifiedTempPass = await bcrypt.compare( req.body.password, tempPasswordObject.tempPassword );
+        let verifiedTempPass;
+        if( tempPasswordObject ){
+            verifiedTempPass = await bcrypt.compare( req.body.password, tempPasswordObject.tempPassword );
+        }
+
 
         if( !tempPasswordObject || !verifiedTempPass ){
           return res.status( 401 ).json({ error: true,  message: "Invalid email or password" });

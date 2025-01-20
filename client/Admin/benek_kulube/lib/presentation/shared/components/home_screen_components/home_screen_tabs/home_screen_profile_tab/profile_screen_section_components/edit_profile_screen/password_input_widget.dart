@@ -1,5 +1,7 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/benek_toast_helper.dart';
 import 'package:benek_kulube/common/utils/styles.text.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/edit_profile_screen/single_line_edit_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -8,7 +10,11 @@ import '../../../../../../../../common/constants/app_colors.dart';
 import '../../../../../benek_process_indicator/benek_process_indicator.dart';
 
 class PasswordInputWidget extends StatefulWidget {
-  const PasswordInputWidget({super.key});
+  final Future<void> Function(String, String) onDispatch;
+  const PasswordInputWidget({
+    required this.onDispatch,
+    super.key
+  });
 
   @override
   _PasswordInputWidgetState createState() => _PasswordInputWidgetState();
@@ -38,6 +44,8 @@ class _PasswordInputWidgetState extends State<PasswordInputWidget> {
   Widget build(BuildContext context) {
     final int maxVisibleCharacters = (MediaQuery.of(context).size.width / 45).floor();
     final int characterCount = _controller.text.length;
+
+    String? oldPassword;
 
     List<Widget> icons = [];
     if (characterCount <= maxVisibleCharacters) {
@@ -132,7 +140,52 @@ class _PasswordInputWidgetState extends State<PasswordInputWidget> {
                   onPressed: () async {
                     if (_controller.text.length != characterCount) {
                       // Show error toast or handle invalid input
+                      BenekToastHelper.showErrorToast("Invalid Input", "Hatalı Giriş", context);
+                      return;
                     }
+
+                    setState(() {
+                      oldPassword = _controller.text;
+                      _controller.text = "";
+                    });
+
+                    await Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        opaque: false,
+                        barrierDismissible: false,
+                        pageBuilder: (context, _, __) => SingleLineEditTextScreen(
+                          info: BenekStringHelpers.locale('newPassword'),
+                          hint: BenekStringHelpers.locale('enterYourNewPassword'),
+                          onDispatch: (text) => widget.onDispatch(oldPassword!, text),
+                          validation: (text) {
+                            // Minimum 8 ve maksimum 30 karakter uzunluğunda
+                            final lengthRegex = RegExp(r'^.{8,30}$');
+                            // En az bir büyük harf
+                            final upperCaseRegex = RegExp(r'[A-Z]');
+                            // En az bir küçük harf
+                            final lowerCaseRegex = RegExp(r'[a-z]');
+                            // En az bir rakam
+                            final numberRegex = RegExp(r'[0-9]');
+                            // En az bir özel karakter
+                            final symbolRegex = RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+
+                            // Şifre kurallarını kontrol et
+                            if (!lengthRegex.hasMatch(text)) return false;
+                            if (!upperCaseRegex.hasMatch(text)) return false;
+                            if (!lowerCaseRegex.hasMatch(text)) return false;
+                            if (!numberRegex.hasMatch(text)) return false;
+                            if (!symbolRegex.hasMatch(text)) return false;
+
+                            // Tüm kurallar geçildi
+                            return true;
+                          },
+                          validationErrorMessage: BenekStringHelpers.locale('passwordValidationError'),
+                          shouldApprove: true,
+                          shouldHideText: true,
+                        ),
+                      ),
+                    );
                   },
                   icon: !isSendingRequest
                       ? Icon(

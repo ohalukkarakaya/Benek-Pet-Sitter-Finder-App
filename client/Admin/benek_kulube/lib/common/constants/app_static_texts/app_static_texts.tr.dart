@@ -134,6 +134,9 @@ class AppStaticTextsTr{
     'operationFailed': 'İşlem başarısız!',
     'changePassword': 'Şifreni Değiştir!',
     'enterYourCurrentPassword': 'Mevcut şifrenizi girin...',
+    'newPassword': 'Yeni Şifre',
+    'enterYourNewPassword': 'Yeni şifrenizi girin',
+    'passwordValidationError': 'Şifreniz en az 8 karakter uzunluğunda olmalı ve en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir.',
     'forgetPassword': 'Şifreni mi unuttun?',
   };
 }

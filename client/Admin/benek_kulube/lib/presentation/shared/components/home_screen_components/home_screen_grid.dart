@@ -74,7 +74,7 @@ class HomeScreenGrid extends StatelessWidget {
           // Right Tab
           // =====================================================
           store.state.selectedUserInfo == null
-            ? HomeScreenHomeRightTab( profileImg: store.state.userInfo!.profileImg! )
+            ? HomeScreenHomeRightTab( user: store.state.userInfo! )
             : const HomeScreenProfileRightTab(),
 
 

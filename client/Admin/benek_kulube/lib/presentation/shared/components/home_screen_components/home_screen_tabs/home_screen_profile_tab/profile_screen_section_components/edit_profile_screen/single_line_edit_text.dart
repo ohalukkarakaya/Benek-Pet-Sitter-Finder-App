@@ -12,21 +12,25 @@ import '../../../../../benek_process_indicator/benek_process_indicator.dart';
 
 class SingleLineEditTextScreen extends StatefulWidget {
   final String? info;
-  final String textToEdit;
+  final String? hint;
+  final String? textToEdit;
   final Future<void> Function(String) onDispatch;
   final bool Function(String) validation;
   final String? validationErrorMessage;
   final bool shouldApprove;
+  final bool shouldHideText;
   final String? approvalTitle;
 
   const SingleLineEditTextScreen({
     super.key,
     this.info,
-    required this.textToEdit,
+    this.hint,
+    this.textToEdit,
     required this.onDispatch,
     this.validation = defaultValidation,
     this.validationErrorMessage,
     this.shouldApprove = false,
+    this.shouldHideText = false,
     this.approvalTitle,
   });
 
@@ -45,6 +49,8 @@ class _SingleLineEditTextScreenState extends State<SingleLineEditTextScreen> {
 
   bool isFocused = false;
   bool isSendingRequest = false;
+  bool _isObscure = false;
+  String hintText = '';
 
   void _onFocusChanged() {
     setState(() {
@@ -59,11 +65,15 @@ class _SingleLineEditTextScreenState extends State<SingleLineEditTextScreen> {
     _textControllerEditProfileTex = TextEditingController();
 
     _textFocusNodeEditProfileTex.addListener(_onFocusChanged);
-    _textControllerEditProfileTex.text = widget.textToEdit;
+    _textControllerEditProfileTex.text = widget.textToEdit ?? "";
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).requestFocus(_textFocusNodeEditProfileTex);
     });
+
+    _isObscure = widget.shouldHideText;
+
+    hintText = widget.hint ?? BenekStringHelpers.locale('writeBio');
   }
 
   @override
@@ -102,12 +112,24 @@ class _SingleLineEditTextScreenState extends State<SingleLineEditTextScreen> {
                   textInputAction: TextInputAction.done,
                   cursorColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
                   style: lightTextStyle(textColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite),
+                  obscureText: _isObscure,
                   decoration: InputDecoration(
                     counterText: '', // Karakter sayısı göstergesini gizler
-                    hintText: BenekStringHelpers.locale('writeBio'),
+                    hintText: hintText,
                     hintStyle: lightTextStyle(textColor: AppColors.benekGrey),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+                    suffixIcon: widget.shouldHideText ? IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _isObscure = !_isObscure;
+                        });
+                      },
+                      icon: Icon(
+                        _isObscure ? Icons.visibility_off : Icons.visibility,
+                        color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                      ),
+                    ) : null,
                   ),
                   onFieldSubmitted: (value) async {
                     if(!widget.validation(_textControllerEditProfileTex.text)) {

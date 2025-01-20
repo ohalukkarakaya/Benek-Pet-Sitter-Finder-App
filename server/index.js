@@ -146,7 +146,7 @@ app.use( express.json() );
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ type: 'application/*+json' }));
 
-
+app.use("/auth", authRoutes);
 app.use("/log", logRoutes);
 app.use("/api/refreshToken", refreshTokenRoutes);
 app.use("/api/payment", paymentRoutes);

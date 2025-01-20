@@ -134,6 +134,9 @@ class AppStaticTextsEn{
     'operationFailed': 'Operation failed!',
     'changePassword': 'Change Your Password!',
     'enterYourCurrentPassword': 'Enter your current password...',
+    'newPassword': 'New Password',
+    'enterYourNewPassword': 'Enter your new password',
+    'passwordValidationError': 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
     'forgetPassword': 'Forget your password?',
   };
 }

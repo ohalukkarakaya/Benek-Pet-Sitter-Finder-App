@@ -120,56 +120,56 @@ class _EditProfileImageScreenState extends State<EditProfileImageScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      MouseRegion(
-                        cursor: isNetWorkImage ? SystemMouseCursors.click: SystemMouseCursors.basic,
-                        onHover: (_) {
+                      GestureDetector(
+                        onTap: () async {
+                          bool didApprove = false;
                           if( !isNetWorkImage ) return;
-                          setState(() {
-                            isIconHovered = true;
-                          });
-                        },
-                        onExit: (_) {
-                          setState(() {
-                            isIconHovered = false;
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 20.0),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
-                            decoration: BoxDecoration(
-                              color: !isIconHovered 
-                                  ? AppColors.benekWhite.withOpacity(0.1)
-                                  : AppColors.benekRed,
-                              borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+                          didApprove = await Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              opaque: false,
+                              barrierDismissible: false,
+                              pageBuilder: (context, _, __) => ApproveScreen(title: BenekStringHelpers.locale('approveProfilePhotoDelete')),
                             ),
-                            child: GestureDetector(
-                                onTap: () async {
-                                  if( !isNetWorkImage ) return;
-                                  bool didApprove = await Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      opaque: false,
-                                      barrierDismissible: false,
-                                      pageBuilder: (context, _, __) => ApproveScreen(title: BenekStringHelpers.locale('approveProfilePhotoDelete')),
-                                    ),
-                                  );
+                          );
 
-                                  if(didApprove != true) return;
+                          if(didApprove != true) return;
 
-                                  setState(() {
-                                    isLoading = true;
-                                  });
+                          setState(() {
+                            isLoading = true;
+                          });
 
-                                  await store.dispatch(updateProfileImageRequestAction(null));
-
-                                  Navigator.of(context).pop(store.state.userInfo!.profileImg);
-                                },
-                                child: const Icon(
-                                  Icons.delete_outline,
-                                  color: AppColors.benekWhite,
-                                  size: 20,
-                                )
+                          await store.dispatch(updateProfileImageRequestAction(null));
+                          Navigator.of(context).pop(store.state.userInfo!.profileImg);
+                        },
+                        child: MouseRegion(
+                          cursor: isNetWorkImage ? SystemMouseCursors.click: SystemMouseCursors.basic,
+                          onHover: (_) {
+                            if( !isNetWorkImage ) return;
+                            setState(() {
+                              isIconHovered = true;
+                            });
+                          },
+                          onExit: (_) {
+                            setState(() {
+                              isIconHovered = false;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 20.0),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
+                              decoration: BoxDecoration(
+                                color: !isIconHovered
+                                    ? AppColors.benekWhite.withOpacity(0.1)
+                                    : AppColors.benekRed,
+                                borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+                              ),
+                              child: const Icon(
+                                Icons.delete_outline,
+                                color: AppColors.benekWhite,
+                                size: 20,
+                              ),
                             ),
                           ),
                         ),

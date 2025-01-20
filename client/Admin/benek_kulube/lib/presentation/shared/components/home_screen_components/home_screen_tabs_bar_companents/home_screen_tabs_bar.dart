@@ -43,7 +43,10 @@ class HomeScreenTabsBar extends StatelessWidget {
               TabsButonElement(tab: AppTabsEnums.CONTACT_MESSAGES_TAB, store: store, icon: BenekIcons.dialogbox, title: BenekStringHelpers.locale('contactMessagesTab')),
             ],
           ),
-          TabsButonElement(tab: AppTabsEnums.LOGOUT_TAB, store: store, icon: Icons.logout, title: BenekStringHelpers.locale('logoutTab'), shouldShowTextWhenDeActive: true),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 11.0),
+            child: TabsButonElement(tab: AppTabsEnums.LOGOUT_TAB, store: store, icon: Icons.logout, title: BenekStringHelpers.locale('logoutTab'), shouldShowTextWhenDeActive: true),
+          ),
         ],
       ),
     );

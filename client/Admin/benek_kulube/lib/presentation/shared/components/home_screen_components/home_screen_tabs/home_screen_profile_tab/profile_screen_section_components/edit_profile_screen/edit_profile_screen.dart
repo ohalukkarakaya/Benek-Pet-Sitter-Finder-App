@@ -220,7 +220,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                               const SizedBox(width: 10.0,),
 
-                              const PasswordInputWidget()
+                              PasswordInputWidget(
+                                onDispatch: (oldPassword, newPassword) => store.dispatch(updatePasswordRequestAction(newPassword, oldPassword, oldPassword)),
+                              )
                             ],
                           ),
 
