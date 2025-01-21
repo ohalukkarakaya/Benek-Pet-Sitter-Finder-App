@@ -57,6 +57,7 @@ class _EditEmailButtonState extends State<EditEmailButton> {
               barrierDismissible: false,
               pageBuilder: (context, _, __) => SingleLineEditTextScreen(
                 info: BenekStringHelpers.locale('email'),
+                hint: BenekStringHelpers.locale('enterEmail'),
                 textToEdit: !isResend || newEmailForResend == null
                     ? userInfo.email!
                     : newEmailForResend!,

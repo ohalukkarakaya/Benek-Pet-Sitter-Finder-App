@@ -41,6 +41,7 @@ class _EditPaymenInfoButtonState extends State<EditPaymenInfoButton> {
             barrierDismissible: false,
             pageBuilder: (context, _, __) => SingleLineEditTextScreen(
               info: BenekStringHelpers.locale('iban'),
+              hint: BenekStringHelpers.locale('enterIban'),
               textToEdit: userInfo.iban!.toUpperCase(),
               onDispatch: (text) => widget.onDispatch(text.toUpperCase()),
               shouldApprove: true,
