@@ -3,6 +3,7 @@
 import 'dart:developer';
 
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/benek_toast_helper.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_location_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_profile_image_model.dart';
@@ -76,7 +77,7 @@ ThunkAction<AppState> updateAddressRequestAction(String country, String city, St
   };
 }
 
-ThunkAction<AppState> becomeCareGiverAction() {
+ThunkAction<AppState> becomeCareGiverAction(context) {
   return (Store<AppState> store) async {
     UserInfoApi api = UserInfoApi();
 
@@ -88,6 +89,11 @@ ThunkAction<AppState> becomeCareGiverAction() {
       }
 
       if(_didErrorOccured == null || _didErrorOccured == true){
+        BenekToastHelper.showErrorToast(
+            BenekStringHelpers.locale('operationFailes'),
+            response?["message"],
+            context
+        );
         log('ERROR: becomeCareGiverAction - ${response?["message"]}');
       }
 

@@ -25,18 +25,29 @@ const getPrivateUserInfoController = async (req, res) => {
         let iban = user.iban;
 
         //decrypt careGiver National IdNo
-        const recordedIv = user.identity.nationalId.iv;
-        const cryptedNationalId = user.identity.nationalId.idNumber;
+        let nationalIdNo;
+        if(
+            user.identity.nationalId !== undefined
+            && user.identity.nationalId !== null
+            && user.identity.nationalId.iv !== undefined
+            && user.identity.nationalId.iv !== null
+            && user.identity.nationalId.idNumber !== undefined
+            && user.identity.nationalId.idNumber !== null
+            && user.identity.nationalId.isTcCitizen
+        ){
+            const recordedIv = user.identity.nationalId.iv;
+            const cryptedNationalId = user.identity.nationalId.idNumber;
 
-        const iv = Buffer.from( recordedIv, 'hex' );
-        const decipher = crypto.createDecipheriv(
-            process.env.NATIONAL_ID_CRYPTO_ALGORITHM,
-            Buffer.from( process.env.NATIONAL_ID_CRYPTO_KEY ),
-            iv
-        );
+            const iv = Buffer.from(recordedIv, 'hex');
+            const decipher = crypto.createDecipheriv(
+                process.env.NATIONAL_ID_CRYPTO_ALGORITHM,
+                Buffer.from(process.env.NATIONAL_ID_CRYPTO_KEY),
+                iv
+            );
 
-        let nationalIdNo = decipher.update( cryptedNationalId, 'hex', 'utf8' );
-        nationalIdNo += decipher.final( 'utf8' );
+            nationalIdNo = decipher.update(cryptedNationalId, 'hex', 'utf8');
+            nationalIdNo += decipher.final('utf8');
+        }
 
         return res.status( 200 ).json({
             error: false,

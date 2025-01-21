@@ -30,7 +30,9 @@ class _EditPaymenInfoButtonState extends State<EditPaymenInfoButton> {
     return EditAccountInfoMenuItem(
       icon: Icons.attach_money_rounded,
       desc: BenekStringHelpers.locale('iban'),
-      text: userInfo.iban!,
+      text: userInfo.iban != null && userInfo.iban!.isNotEmpty
+          ? userInfo.iban!
+          : BenekStringHelpers.locale('enterIban'),
       onTap:() async {
         await Navigator.push(
           context,

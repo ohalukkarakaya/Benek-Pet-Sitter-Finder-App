@@ -39,7 +39,9 @@ class _EditEmailButtonState extends State<EditEmailButton> {
     return EditAccountInfoMenuItem(
       icon: Icons.email,
       desc: BenekStringHelpers.locale('email'),
-      text: userInfo.email!,
+      text: userInfo.email != null && userInfo.email!.isNotEmpty
+          ? userInfo.email!
+          : BenekStringHelpers.locale('enterEmail'),
 
       onTap: () async {
 

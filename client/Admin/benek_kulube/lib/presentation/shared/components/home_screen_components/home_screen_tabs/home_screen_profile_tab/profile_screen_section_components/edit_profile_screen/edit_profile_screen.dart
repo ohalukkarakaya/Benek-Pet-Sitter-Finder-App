@@ -82,15 +82,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          EditProfileProfileWidget(
-                            userInfo: userInfo,
-                          ),
-
-                          const DeactivateAccountButton(),
-                        ],
+                      EditProfileProfileWidget(
+                        userInfo: userInfo,
                       ),
                       const SizedBox(height: 20.0,),
 
@@ -108,7 +101,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ? BecomeCareGiverButton(
                               userInfo: userInfo,
                               onDispatch: () async {
-                                await store.dispatch(becomeCareGiverAction());
+                                await store.dispatch(becomeCareGiverAction(context));
                                 setState(() {
                                   idle = !idle;
                                 });
@@ -172,16 +165,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             EditAccountInfoMenuItem(
                               icon: Icons.phone,
                               desc: BenekStringHelpers.locale('phoneNumber'),
-                              text: userInfo.phone!,
+                              text: userInfo.phone != null && userInfo.phone!.isNotEmpty
+                                ? userInfo.phone!
+                                : BenekStringHelpers.locale('enterPhoneNumber'),
                             ),
+
                             const Divider(color: AppColors.benekGrey,),
 
-                            userInfo.identity != null && userInfo.identity!.nationalIdentityNumber != null
-                                ? EditTcNoButton(
-                                  userInfo: userInfo,
-                                  onDispatch: (text) => store.dispatch(updateTcIdNoAction(text)),
-                                )
-                                : const SizedBox(),
+                            EditTcNoButton(
+                              userInfo: userInfo,
+                              onDispatch: (text) => store.dispatch(updateTcIdNoAction(text)),
+                            ),
 
                             const Divider(color: AppColors.benekGrey,),
 

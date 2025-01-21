@@ -37,10 +37,28 @@ class _BecomeCareGiverButtonState extends State<BecomeCareGiverButton> {
           return;
         }
 
+        if( widget.userInfo.identity == null || widget.userInfo.identity!.nationalIdentityNumber == null || widget.userInfo.identity!.nationalIdentityNumber!.isEmpty ) {
+          BenekToastHelper.showErrorToast(
+              BenekStringHelpers.locale('operationFailed'),
+              BenekStringHelpers.locale('becomeCareGiverMissingNationalIdentityNumber'),
+              context
+          );
+          return;
+        }
+
         if(widget.userInfo.isPhoneVerified == false){
           BenekToastHelper.showErrorToast(
               BenekStringHelpers.locale('operationFailed'),
               BenekStringHelpers.locale('becomeCareGiverMissingPhone'),
+              context
+          );
+          return;
+        }
+
+        if(widget.userInfo.isEmailVerified == false){
+          BenekToastHelper.showErrorToast(
+              BenekStringHelpers.locale('operationFailed'),
+              BenekStringHelpers.locale('becomeCareGiverMissingEmail'),
               context
           );
           return;

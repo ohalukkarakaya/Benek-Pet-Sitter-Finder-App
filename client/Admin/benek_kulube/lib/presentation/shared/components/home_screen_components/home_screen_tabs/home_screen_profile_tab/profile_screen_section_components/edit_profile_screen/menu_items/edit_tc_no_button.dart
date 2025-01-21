@@ -32,7 +32,11 @@ class _EditTcNoButtonState extends State<EditTcNoButton> {
     return EditAccountInfoMenuItem(
       icon: Icons.verified_user,
       desc: BenekStringHelpers.locale('TCNo'),
-      text: userInfo.identity!.nationalIdentityNumber!,
+      text: userInfo.identity == null
+          ? BenekStringHelpers.locale('enterTCNo')
+          : userInfo.identity!.nationalIdentityNumber == null
+            ? BenekStringHelpers.locale('enterTCNo')
+            : userInfo.identity!.nationalIdentityNumber!,
         onTap: () async {
           await Navigator.push(
             context,
@@ -41,6 +45,7 @@ class _EditTcNoButtonState extends State<EditTcNoButton> {
               barrierDismissible: false,
               pageBuilder: (context, _, __) => SingleLineEditTextScreen(
                 info: BenekStringHelpers.locale('TCNo'),
+                hint: BenekStringHelpers.locale('enterTCNo'),
                 textToEdit: userInfo.identity!.nationalIdentityNumber!,
                 onDispatch: (text) => widget.onDispatch(text.toLowerCase()),
                 shouldApprove: true,
