@@ -17,6 +17,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 
 import '../../data/services/custom_exception.dart';
+import '../selected_user/selected_user.action.dart';
 
 ThunkAction<AppState> getUserInfoRequestAction() {
   return (Store<AppState> store) async {
@@ -239,6 +240,8 @@ ThunkAction<AppState> forgetMyPasswordRequestAction(String email) {
 
       // log out user
       AuthUtils.killUserSessionAndRestartApp(store);
+
+      await store.dispatch(setSelectedUserAction(null));
     } on ApiException catch (e) {
       log('ERROR: forgetMyPasswordRequestAction - $e');
       throw CustomException(1, BenekStringHelpers.locale('operationFailed'));

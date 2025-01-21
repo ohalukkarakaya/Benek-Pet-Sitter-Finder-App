@@ -138,5 +138,9 @@ class AppStaticTextsTr{
     'enterYourNewPassword': 'Yeni şifrenizi girin',
     'passwordValidationError': 'Şifreniz en az 8 karakter uzunluğunda olmalı ve en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir.',
     'forgetPassword': 'Şifreni mi unuttun?',
+    'forgetPasswordApproveMessage': 'Şifreni sıfırlamak için kaydır...',
+    'resetPasswordInfo': "Bu noktadan sonra uygulamadan çıkış yapacaksın ve e-postana yeni bir şifre göndereceğiz. Eğer, bahsi geçen yeni, geçici şifreyi kullanmadan, eski şifreni hatırlarsan, gönderdiğimiz geçici şifreyi kullanman gerekmez.",
+    'resetPasswordAndLogout': "Şifreyi sıfırla ve çıkış yap...",
+    'resetPassword': "Şifreni Sıfırla",
   };
 }

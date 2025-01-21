@@ -11,6 +11,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../../common/utils/benek_string_helpers.dart';
+import '../../../../../../../../common/widgets/reset_password_info_page.dart';
 import '../../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../../../../../store/actions/app_actions.dart';
 import '../../../../../loading_components/benek_blured_modal_barier.dart';
@@ -231,7 +232,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           MouseRegion(
                             cursor: SystemMouseCursors.click,
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () async {
+                                await Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    opaque: false,
+                                    barrierDismissible: false,
+                                    pageBuilder: (context, _, __) => ResetPasswordInfoPage(
+                                      onDispatch: () => store.dispatch(forgetMyPasswordRequestAction(userInfo.email!)),
+                                    ),
+                                  )
+                                );
+                              },
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 21.2),
                                 child: Text(

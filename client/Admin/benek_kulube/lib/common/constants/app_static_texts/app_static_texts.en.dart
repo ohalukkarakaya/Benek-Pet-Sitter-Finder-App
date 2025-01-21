@@ -138,5 +138,9 @@ class AppStaticTextsEn{
     'enterYourNewPassword': 'Enter your new password',
     'passwordValidationError': 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
     'forgetPassword': 'Forget your password?',
+    'forgetPasswordApproveMessage': 'Slide to reset your password...',
+    'resetPasswordInfo': "After this point, you will log out of the app and we will email you a new password. If you remember your old password before using the new temporary password, you do not need to use the temporary password we sent you.",
+    'resetPasswordAndLogout': "Reset password and logout...",
+    'resetPassword': "Reset Password",
   };
 }

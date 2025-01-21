@@ -35,7 +35,7 @@ let transporter = nodemailer.createTransport(
   next 
 ) => {
     try {
-      const htmlEmail = sendEmailHelper( "tempPassWord", otp, null, null, null, null, null );
+      const htmlEmail = sendEmailHelper( "tempPassWord", newPassword, null, null, null, null, null );
 
       //mail options
       const mailOptions = {
