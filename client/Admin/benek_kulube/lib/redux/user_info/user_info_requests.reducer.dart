@@ -21,6 +21,8 @@ UserInfo? getUserInfoRequestReducer( UserInfo? userInfo, dynamic action ){
     userInfo?.identity!.openAdress = action.newOpenAddress;
     userInfo?.location = action.newLocation;
     return userInfo;
+  } else if( action is BecomeCareGiverAction) {
+    userInfo?.isCareGiver = true;
   } else if( action is UpdateFullNameRequestAction ){
     userInfo?.identity!.firstName = action.firstName;
     userInfo?.identity!.middleName = action.middleName;

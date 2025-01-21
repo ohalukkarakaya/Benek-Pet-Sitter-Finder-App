@@ -132,6 +132,7 @@ class AppStaticTextsEn{
     'reSendEmail': 'Resend the code',
     'missingOtpCode': 'Missing verification code!',
     'operationFailed': 'Operation failed!',
+    'operationSucceeded': 'Operation succeeded!',
     'changePassword': 'Change Your Password!',
     'enterYourCurrentPassword': 'Enter your current password...',
     'newPassword': 'New Password',
@@ -142,5 +143,9 @@ class AppStaticTextsEn{
     'resetPasswordInfo': "After this point, you will log out of the app and we will email you a new password. If you remember your old password before using the new temporary password, you do not need to use the temporary password we sent you.",
     'resetPasswordAndLogout': "Reset password and logout...",
     'resetPassword': "Reset Password",
+    'becomeCareGiverMissingIban': "To become a caregiver, you must enter your IBAN number, which will receive your payment!",
+    'becomeCareGiverMissingPhone': "To become a caregiver, you must enter your phone number!",
+    'becomeCareGiverChooseYourLocationCaption': "To become a caregiver, mark your official address on the map, edit the full address and save...",
+    'youBecameACareGiver': 'You have become a caregiver!',
   };
 }

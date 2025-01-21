@@ -175,6 +175,36 @@ class UserInfoApi {
     return null;
   }
 
+  Future<Map<String, dynamic>?> putBecomeCareGiver() async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/profileSettings/becomeCareGiver';
+
+      Object? postBody;
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = ["application/json"];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 && response.statusCode != 404 ){
+        log('ERROR: putBecomeCareGiver - ${json.decode(response.body)["message"]}');
+        return {'error': true, 'message': json.decode(response.body)["message"] };
+      }else if( response.body != null ){
+        var data = json.decode(response.body);;
+        bool isCareGiver = !(data['error']);
+        return { 'error': false, 'isCareGiver': isCareGiver };
+      }
+    }
+    catch( err ){
+      log('ERROR: putBecomeCareGiver - $err');
+    }
+  }
+
   Future<Map<String, dynamic>?> putUpdateFullname(String fullname) async {
     try {
       await AuthUtils.getAccessToken();

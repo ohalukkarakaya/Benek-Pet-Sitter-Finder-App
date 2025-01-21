@@ -72,6 +72,26 @@ UserList? userSearchRequestReducer( UserList? userSearchListData, dynamic action
     }
 
     return userSearchListData;
+  } else if (action is BecomeCareGiverAction) {
+    if(userSearchListData != null && userSearchListData.recentlySeenUsers != null) {
+      bool isUserExist = userSearchListData.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        userSearchListData.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).isCareGiver = true;
+      }
+    }
+
+    if(userSearchListData != null && userSearchListData.users != null) {
+      bool isUserExist = userSearchListData.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        userSearchListData.users?.firstWhere(
+              (element) => element.userId == action.userId,
+        ).isCareGiver = true;
+      }
+    }
+
+    return userSearchListData;
   } else if( action is UpdateFullNameRequestAction ){
     if(userSearchListData != null && userSearchListData.recentlySeenUsers != null) {
       bool isUserExist = userSearchListData.recentlySeenUsers!.any((element) => element.userId == action.userId);

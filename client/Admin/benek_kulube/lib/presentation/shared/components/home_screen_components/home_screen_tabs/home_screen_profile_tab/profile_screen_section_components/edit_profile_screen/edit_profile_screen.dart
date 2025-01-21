@@ -105,22 +105,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       userInfo.isCareGiver == null
                       || userInfo.isCareGiver != null
                          && !(userInfo.isCareGiver!)
-                          ? const BecomeCareGiverButton()
+                          ? BecomeCareGiverButton(
+                              userInfo: userInfo,
+                              onDispatch: () async {
+                                await store.dispatch(becomeCareGiverAction());
+                                setState(() {
+                                  idle = !idle;
+                                });
+                              },
+                            )
                           : const SizedBox(),
 
-                      const SizedBox(height: 20.0,),
+                              const SizedBox(height: 20.0,),
 
-                      Container(
-                        padding: const EdgeInsets.all(25.0),
-                        decoration: const BoxDecoration(
-                          color: AppColors.benekBlack,
-                          borderRadius: BorderRadius.all(Radius.circular(6.0)),
-                        ),
-                        child: isLoading
-                            ? Column(
+                              Container(
+                              padding: const EdgeInsets.all(25.0),
+                              decoration: const BoxDecoration(
+                              color: AppColors.benekBlack,
+                              borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                              ),
+                              child: isLoading
+                              ? Column(
                               children: List.generate(6, (index) => Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                                child: Shimmer.fromColors(
+                              padding: const EdgeInsets.symmetric(vertical: 5.0),
+                              child: Shimmer.fromColors(
                                   baseColor: AppColors.benekWhite.withOpacity(0.4),
                                   highlightColor: AppColors.benekWhite.withOpacity(0.2),
                                   child: Container(

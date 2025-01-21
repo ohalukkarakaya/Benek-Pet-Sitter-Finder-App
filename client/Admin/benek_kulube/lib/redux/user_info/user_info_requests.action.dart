@@ -76,6 +76,29 @@ ThunkAction<AppState> updateAddressRequestAction(String country, String city, St
   };
 }
 
+ThunkAction<AppState> becomeCareGiverAction() {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      bool? _didErrorOccured = true;
+      final response =  await api.putBecomeCareGiver();
+      if(response != null){
+        _didErrorOccured = response['error'];
+      }
+
+      if(_didErrorOccured == null || _didErrorOccured == true){
+        log('ERROR: becomeCareGiverAction - ${response?["message"]}');
+      }
+
+      await store.dispatch(BecomeCareGiverAction(response!['isCareGiver'], store.state.userInfo!.userId!));
+    } on ApiException catch (e) {
+      log('ERROR: becomeCareGiverAction - $e');
+    }
+  };
+
+}
+
 ThunkAction<AppState> updateFullNameRequestAction(String fullname) {
   return (Store<AppState> store) async {
     UserInfoApi api = UserInfoApi();
@@ -285,6 +308,16 @@ class UpdateAddressRequestAction {
   String? get userId => _userId;
 
   UpdateAddressRequestAction(this._newLocation, this._newOpenAddress, this._userId);
+}
+
+class BecomeCareGiverAction {
+  final bool? _isCareGiver;
+  final String? _userId;
+
+  bool? get isCareGiver => _isCareGiver;
+  String? get userId => _userId;
+
+  BecomeCareGiverAction(this._isCareGiver, this._userId);
 }
 
 class UpdateFullNameRequestAction {

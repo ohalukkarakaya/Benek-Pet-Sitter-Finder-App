@@ -132,6 +132,7 @@ class AppStaticTextsTr{
     'reSendEmail': 'Kodu tekrar gönder',
     'missingOtpCode': 'Doğrulama kodu eksik!',
     'operationFailed': 'İşlem başarısız!',
+    'operationSucceeded': 'İşlem başarılı!',
     'changePassword': 'Şifreni Değiştir!',
     'enterYourCurrentPassword': 'Mevcut şifrenizi girin...',
     'newPassword': 'Yeni Şifre',
@@ -142,5 +143,9 @@ class AppStaticTextsTr{
     'resetPasswordInfo': "Bu noktadan sonra uygulamadan çıkış yapacaksın ve e-postana yeni bir şifre göndereceğiz. Eğer, bahsi geçen yeni, geçici şifreyi kullanmadan, eski şifreni hatırlarsan, gönderdiğimiz geçici şifreyi kullanman gerekmez.",
     'resetPasswordAndLogout': "Şifreyi sıfırla ve çıkış yap...",
     'resetPassword': "Şifreni Sıfırla",
+    'becomeCareGiverMissingIban': "Bakıcı Olabilmek için, ödeme alacağın, IBAN numaranı girmelisin!",
+    'becomeCareGiverMissingPhone': "Bakıcı Olabilmek için, telefon numaranı girmelisin!",
+    'becomeCareGiverChooseYourLocationCaption': "Bakıcı olabilmek için, resmi adresini haritada işaretle, açık adresi düzenle ve kaydet...",
+    'youBecameACareGiver': "Artık sen de bir Benek'li bakıcısın :)",
   };
 }

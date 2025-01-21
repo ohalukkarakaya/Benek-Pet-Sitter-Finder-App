@@ -68,6 +68,24 @@ UserList? userSearchRequestReducer( UserList? recomendedUsers, dynamic action ){
         ).location = action.newLocation;
       }
     }
+  } else if( action is BecomeCareGiverAction ) {
+    if(recomendedUsers != null && recomendedUsers.recentlySeenUsers != null) {
+      bool isUserExist = recomendedUsers.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).isCareGiver = true;
+      }
+    }
+
+    if(recomendedUsers != null && recomendedUsers.users != null) {
+      bool isUserExist = recomendedUsers.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        recomendedUsers.users?.firstWhere(
+              (element) => element.userId == action.userId,
+        ).isCareGiver = true;
+      }
+    }
   } else if( action is UpdateFullNameRequestAction ){
     if(recomendedUsers != null && recomendedUsers.recentlySeenUsers != null) {
       bool isUserExist = recomendedUsers.recentlySeenUsers!.any((element) => element.userId == action.userId);
