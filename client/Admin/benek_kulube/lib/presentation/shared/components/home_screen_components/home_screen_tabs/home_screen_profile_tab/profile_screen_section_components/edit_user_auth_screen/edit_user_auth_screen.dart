@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
+import 'package:benek_kulube/common/utils/benek_toast_helper.dart';
 import 'package:benek_kulube/presentation/features/user_profile_helpers/auth_role_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -140,7 +141,22 @@ class _EditUserAuthScreenState extends State<EditUserAuthScreen> {
                               width: 145,
                               child: BenekTextChip(
                                 onTap: () async {
-                                  if( !(AuthRoleHelper.checkIfRequiredRole(userInfo.authRole!, [index])) ){
+
+                                  if( userInfo.userId == store.state.userInfo!.userId ){
+                                    BenekToastHelper.showErrorToast(
+                                      BenekStringHelpers.locale('operationFailed'),
+                                      BenekStringHelpers.locale('YouCantEditYourAuth'),
+                                      context
+                                    );
+                                  }
+
+                                  if(
+                                    AuthRoleHelper.checkIfRequiredRole(userInfo.authRole!, [index])
+                                    || userInfo.userId == store.state.userInfo!.userId
+                                  ){
+                                    Navigator.of(context).pop();
+                                    return;
+                                  }
 
                                     bool? isApproved = await Navigator.push(
                                       context,
@@ -161,7 +177,6 @@ class _EditUserAuthScreenState extends State<EditUserAuthScreen> {
                                     });
 
                                     Navigator.of(context).pop();
-                                  }
                                 },
                                 enableHoverEffect: true,
                                 shouldCopyOnTap: false,

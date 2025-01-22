@@ -153,5 +153,6 @@ class AppStaticTextsTr{
     'becomeCareGiverMissingNationalIdentityNumber': "Bakıcı Olabilmek için, TC vatandaşı olmalı ve TC kimlik numaranı girmelisin! (Vergi işlemleri için...",
     'becomeCareGiverChooseYourLocationCaption': "Bakıcı olabilmek için, resmi adresini haritada işaretle, açık adresi düzenle ve kaydet...",
     'youBecameACareGiver': "Artık sen de bir Benek'li bakıcısın :)",
+    'YouCantEditYourAuth': "Kendi yetkini düzenleyemezsin!",
   };
 }

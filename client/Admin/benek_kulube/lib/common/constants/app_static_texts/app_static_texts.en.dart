@@ -153,5 +153,6 @@ class AppStaticTextsEn{
     'becomeCareGiverMissingNationalIdentityNumber': "To become a caregiver, you must be a Turkish citizen and you must enter your Turkish ID number!",
     'becomeCareGiverChooseYourLocationCaption': "To become a caregiver, mark your official address on the map, edit the full address and save...",
     'youBecameACareGiver': 'You have become a caregiver!',
+    'YouCantEditYourAuth': "You can't edit your own authorization!",
   };
 }
