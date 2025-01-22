@@ -177,6 +177,22 @@ UserList? userSearchRequestReducer( UserList? recomendedUsers, dynamic action ){
         recomendedUsers.users?.firstWhere((element) => element.userId == action.userId).iban = action.iban;
       }
     }
+  } else if ( action is SetUserAuthRoleRequestAction ){
+    if(recomendedUsers != null && recomendedUsers.recentlySeenUsers != null) {
+      bool isUserExist = recomendedUsers.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).authRole = int.parse(action.roleId);
+      }
+    }
+
+    if(recomendedUsers != null && recomendedUsers.users != null) {
+      bool isUserExist = recomendedUsers.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        recomendedUsers.users?.firstWhere((element) => element.userId == action.userId).authRole = int.parse(action.roleId);
+      }
+    }
   }
 
   return recomendedUsers;

@@ -34,3 +34,4 @@ export '../../redux/like_story_comment/like_story_comment.action.dart';
 export '../../redux/delete_story_comment_or_reply/delete_story_comment_or_reply.action.dart';
 export '../../redux/get_story_comment_replies/get_story_comment_replies.action.dart';
 export '../../redux/get_user_private_info/get_user_private_info.action.dart';
+export '../../redux/user_set_auth_role/user_set_auth_role.action.dart';

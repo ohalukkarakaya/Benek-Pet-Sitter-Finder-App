@@ -11,7 +11,7 @@ const giveUserAuthorizationRoleController = async ( req, res ) => {
         const idOfUserBeingAuthorized = req.params.userId.toString();
         const givingRoleId = parseInt( req.params.roleId );
 
-        if( !idOfUserBeingAuthorized || !givingRoleId ){
+        if( !idOfUserBeingAuthorized || !(givingRoleId.toString()) ){
             return res.status( 400 )
                       .json({ error: true, message: "Missing Params" });
         }

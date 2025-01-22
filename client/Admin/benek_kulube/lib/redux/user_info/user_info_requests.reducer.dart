@@ -38,6 +38,10 @@ UserInfo? getUserInfoRequestReducer( UserInfo? userInfo, dynamic action ){
     return userInfo;
   } else if ( action is UpdatePaymentInfoAction ){
     userInfo?.iban = action.iban;
+  } else if ( action is SetUserAuthRoleRequestAction ){
+    if( userInfo?.userId == action.userId ) {
+      userInfo?.authRole = int.parse(action.roleId);
+    }
   }
 
   return userInfo;

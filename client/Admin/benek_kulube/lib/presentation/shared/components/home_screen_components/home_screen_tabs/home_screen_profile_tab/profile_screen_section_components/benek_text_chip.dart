@@ -12,12 +12,21 @@ class BenekTextChip extends StatefulWidget {
   final bool shouldCopyOnTap;
   final Function()? onTap;
   final String? text;
+  final double opacity;
+  final bool isActive;
+  final bool isLight;
+  final Color? textColor;
+
   const BenekTextChip({
     super.key,
     this.enableHoverEffect = false,
     this.shouldCopyOnTap = true,
     this.onTap,
-    this.text
+    this.text,
+    this.opacity = 0.2,
+    this.isActive = false,
+    this.isLight = false,
+    this.textColor,
   });
 
   @override
@@ -58,7 +67,12 @@ class _BenekTextChipState extends State<BenekTextChip> {
             }
           },
           child: BenekChip(
-            text: widget.text
+            text: widget.text,
+            enableHoverEffect: widget.enableHoverEffect,
+            opacity: widget.opacity,
+            isActive: widget.isActive,
+            textColor: widget.textColor,
+            isLight: widget.isLight,
           ),
           )
         ),

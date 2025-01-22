@@ -64,6 +64,10 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
     return userInfo;
   } else if ( action is UpdatePaymentInfoAction ){
     userInfo?.iban = action.iban;
+  } else if ( action is SetUserAuthRoleRequestAction ){
+    if(action.userId == userInfo?.userId) {
+      userInfo?.authRole = int.parse(action.roleId);
+    }
   }
 
   return userInfo;

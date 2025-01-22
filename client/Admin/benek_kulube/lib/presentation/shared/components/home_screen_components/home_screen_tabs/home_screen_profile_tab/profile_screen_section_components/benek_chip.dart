@@ -6,7 +6,21 @@ import '../../../../../../../common/constants/app_colors.dart';
 
 class BenekChip extends StatefulWidget {
   final String? text;
-  const BenekChip({super.key, this.text});
+  final bool enableHoverEffect;
+  final double opacity;
+  final bool isActive;
+  final bool isLight;
+  final Color? textColor;
+
+  const BenekChip({
+    super.key,
+    this.text,
+    this.enableHoverEffect = true,
+    this.opacity = 0.2,
+    this.isActive = false,
+    this.isLight = false,
+    this.textColor,
+  });
 
   @override
   State<BenekChip> createState() => _BenekChipState();
@@ -33,7 +47,13 @@ class _BenekChipState extends State<BenekChip> {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: !isHovering ? AppColors.benekBlack.withOpacity(0.2) : AppColors.benekLightBlue,
+              color: !(widget.isActive ) && ( !isHovering || !(widget.enableHoverEffect) )
+                        ? !(widget.isLight)
+                              ? AppColors.benekBlack.withOpacity(widget.opacity)
+                              : AppColors.benekLightBlue
+                        : !(widget.isLight)
+                              ? AppColors.benekLightBlue
+                              : AppColors.benekBlack,
               borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
             ),
             padding: const EdgeInsets.all(17.0),
@@ -44,8 +64,14 @@ class _BenekChipState extends State<BenekChip> {
                   style: TextStyle(
                     fontFamily: defaultFontFamily(),
                     fontSize: 12.0,
-                    color: !isHovering ? AppColors.benekWhite : AppColors.benekBlack,
-                    fontWeight: !isHovering ? getFontWeight('regular') : getFontWeight('semiBold'),
+                    color: !(widget.isActive) && ( !isHovering || !(widget.enableHoverEffect) )
+                        ? widget.textColor != null
+                            ? widget.textColor
+                            : !(widget.isLight)
+                                  ? AppColors.benekWhite
+                                  : AppColors.benekBlack
+                            : AppColors.benekBlack,
+                    fontWeight: !(widget.isActive) && !isHovering || !(widget.enableHoverEffect) ? getFontWeight('regular') : getFontWeight('semiBold'),
                   ),
                   overflow: TextOverflow.ellipsis,
                 )

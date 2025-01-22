@@ -32,7 +32,7 @@ class _EditTcNoButtonState extends State<EditTcNoButton> {
     return EditAccountInfoMenuItem(
       icon: Icons.verified_user,
       desc: BenekStringHelpers.locale('TCNo'),
-      text: userInfo.identity != null && userInfo.identity!.nationalIdentityNumber == null && userInfo.identity!.nationalIdentityNumber!.isNotEmpty
+      text: userInfo.identity != null && userInfo.identity!.nationalIdentityNumber != null && userInfo.identity!.nationalIdentityNumber!.isNotEmpty
           ? userInfo.identity!.nationalIdentityNumber!
           : BenekStringHelpers.locale('enterTCNo'),
         onTap: () async {
