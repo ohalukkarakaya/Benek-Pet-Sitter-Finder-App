@@ -9,7 +9,7 @@ const PunishmentRecordSchema = new mongoose.Schema(
                 adminDesc: {
                     type: String,
                     maxLength: [
-                        50,
+                        100,
                         '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
                     ],
                 },

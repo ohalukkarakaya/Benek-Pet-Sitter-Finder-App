@@ -8,13 +8,17 @@ import '../../../../../../../../common/utils/styles.text.dart';
 import '../../../../../benek_process_indicator/benek_process_indicator.dart';
 
 class EditTextScreen extends StatefulWidget {
-  final String textToEdit;
-  final Future<void> Function(String) onDispatch;
+  final String? textToEdit;
+  final Future<void> Function(String)? onDispatch;
+  final String? hintText;
+  final int maxCharacter;
 
   const EditTextScreen({
     super.key,
-    required this.textToEdit,
-    required this.onDispatch,
+    this.textToEdit,
+    this.onDispatch,
+    this.hintText,
+    this.maxCharacter = 200,
   });
 
   @override
@@ -46,7 +50,7 @@ class _EditTextScreenState extends State<EditTextScreen> {
 
     _textFocusNodeEditProfileTex.addListener(_onFocusChanged);
 
-    _textControllerEditProfileTex.text = widget.textToEdit;
+    _textControllerEditProfileTex.text = widget.textToEdit ?? '';
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).requestFocus(_textFocusNodeEditProfileTex);
@@ -104,7 +108,7 @@ class _EditTextScreenState extends State<EditTextScreen> {
                                   child: TextFormField(
                                     focusNode: _textFocusNodeEditProfileTex,
                                     controller: _textControllerEditProfileTex,
-                                    maxLength: 200,
+                                    maxLength: widget.maxCharacter,
                                     onChanged: (value) {
                                       setState(() {});
                                     },
@@ -115,7 +119,7 @@ class _EditTextScreenState extends State<EditTextScreen> {
                                     textAlignVertical: TextAlignVertical.top,
                                     decoration: InputDecoration(
                                       counterText: '',
-                                      hintText: BenekStringHelpers.locale('writeBio'),
+                                      hintText: widget.hintText ?? BenekStringHelpers.locale('writeBio'),
                                       hintStyle: isFocused ? lightTextStyle(textColor: AppColors.benekGrey) : null,
                                       contentPadding: EdgeInsets.zero,
                                       border: InputBorder.none,
@@ -132,16 +136,21 @@ class _EditTextScreenState extends State<EditTextScreen> {
                               IconButton(
                                 padding: EdgeInsets.zero,
                                 onPressed: () async {
-                                  if (!isSendingRequest) {
-                                    setState(() {
-                                      isSendingRequest = true;
-                                    });
-                                    await widget.onDispatch(_textControllerEditProfileTex.text);
-                                    setState(() {
-                                      isSendingRequest = false;
-                                    });
+                                  if( widget.onDispatch != null ){ // edit bio
+                                    if (!isSendingRequest) {
+                                      setState(() {
+                                        isSendingRequest = true;
+                                      });
+                                      await widget.onDispatch!(_textControllerEditProfileTex.text);
+                                      setState(() {
+                                        isSendingRequest = false;
+                                      });
+                                      Navigator.of(context).pop(_textControllerEditProfileTex.text);
+                                    }
+                                  }else{ // punishment
                                     Navigator.of(context).pop(_textControllerEditProfileTex.text);
                                   }
+
                                 },
                                 icon: !isSendingRequest
                                     ? Icon(

@@ -37,7 +37,17 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
     userInfo?.punishmentInfo?.setPunishmentCount(action.usersPunishmentCount);
 
     return userInfo;
-  }else if( action is UpdateProfileImageRequestAction ){
+  }else if( action is PunishUserAction ){
+    if( userInfo?.punishmentInfo == null ){
+      userInfo?.punishmentInfo = PunishmentInfoModel(
+        punishmentCount: 1,
+        punishmentList: []
+      );
+    } else {
+      userInfo?.punishmentInfo?.punishmentCount = userInfo.punishmentInfo!.punishmentCount != null ? userInfo.punishmentInfo!.punishmentCount! + 1 : 1;
+    }
+    return userInfo;
+  } else if( action is UpdateProfileImageRequestAction ){
     userInfo?.profileImg = action.userProfileImage;
     return userInfo;
   }else if( action is UpdateBioRequestAction ){

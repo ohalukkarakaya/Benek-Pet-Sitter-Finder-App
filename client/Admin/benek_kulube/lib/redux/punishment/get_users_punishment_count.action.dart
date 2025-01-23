@@ -11,7 +11,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 ThunkAction<AppState> getUsersPunishmentCountRequestAction( String userId ) {
   return (Store<AppState> store) async {
-    GetUsersPunishmentInfoApi api = GetUsersPunishmentInfoApi();
+    PunishmentApi api = PunishmentApi();
 
     try {
 
@@ -21,7 +21,7 @@ ThunkAction<AppState> getUsersPunishmentCountRequestAction( String userId ) {
 
     } on ApiException catch (e) {
       log('ERROR: userSearchRequestAction - $e');
-      await AuthUtils.killUserSessionAndRestartApp(store);
+      // await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };
 }

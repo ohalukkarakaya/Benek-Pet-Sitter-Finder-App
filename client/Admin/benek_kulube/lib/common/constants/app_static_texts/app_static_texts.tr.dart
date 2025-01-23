@@ -154,5 +154,7 @@ class AppStaticTextsTr{
     'becomeCareGiverChooseYourLocationCaption': "Bakıcı olabilmek için, resmi adresini haritada işaretle, açık adresi düzenle ve kaydet...",
     'youBecameACareGiver': "Artık sen de bir Benek'li bakıcısın :)",
     'YouCantEditYourAuth': "Kendi yetkini düzenleyemezsin!",
+    'enterPunishmentDesc': "Cezalandırma sebebini gir...",
+    'youCantPunishYourself': "Kendine ceza puanı veremezsin!",
   };
 }

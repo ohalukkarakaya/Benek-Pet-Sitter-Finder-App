@@ -25,10 +25,14 @@ const punishUserController = async ( req, res ) => {
             adminId: req.user._id.toString(),
             adminDesc: punishmentDesc
         }
+
+        let punishmentObject;
         const pastPunishmentRecord = await PunishmentRecord.findOne({ userId: punishingUserId });
         if( pastPunishmentRecord ){
             //if user already have a punishment record
             pastPunishmentRecord.punishmentList.push( newPunishment );
+            pastPunishmentRecord.markModified( "punishmentList" );
+            pastPunishmentRecord.save();
         }else{
             //create new punishment
             await new PunishmentRecord({ userId: punishingUserId, punishmentList: [ newPunishment ] }).save();
@@ -37,7 +41,7 @@ const punishUserController = async ( req, res ) => {
         // send notification email to let user know
         const punishingUser = await User.findById( punishingUserId );
         if( punishingUser && !( punishingUser.deactivation.isDeactive )){
-            await sendPunishmentEmailHelper( punishmentDesc );
+            await sendPunishmentEmailHelper( punishingUser.email, punishmentDesc );
         }
 
         return res.status( 200 )

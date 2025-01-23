@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/common/utils/benek_toast_helper.dart';
+import 'package:benek_kulube/data/models/chat_models/punishment_model.dart';
 import 'package:benek_kulube/data/models/content_models/comment_model.dart';
 import 'package:benek_kulube/data/models/kulube_login_qr_code_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
@@ -47,7 +48,7 @@ part 'pet_api/pet_search_api.dart';
 part 'get_user_info_apies/get_light_weight_user_info_by_user_id_list.dart';
 part 'chat_moderating_apies/get_users_chat_as_admin/get_users_chat_as_admin_api.dart';
 part 'get_log_apies/get_logs_by_user_id_api.dart';
-part 'get_punishment_info_apies/get_users_punishment_info_api.dart';
+part 'punishment_apies/users_punishment_api.dart';
 part 'user_info_api/user_get_private_info_api.dart';
 part 'user_info_api/user_set_auth_role_api.dart';
 part 'geocoding_api.dart';
