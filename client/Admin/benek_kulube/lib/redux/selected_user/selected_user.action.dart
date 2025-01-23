@@ -20,6 +20,17 @@ ThunkAction<AppState> setSelectedUserAction( UserInfo? selectedUserInfo ){
       await store.dispatch(SetSelectedUserAction(selectedUserInfo));
     } on ApiException catch (e) {
       log('ERROR: setSelectedUserAction - $e');
+      // await AuthUtils.killUserSessionAndRestartApp(store);
+    }
+  };
+}
+
+ThunkAction<AppState> removeUserAction( String? userId ){
+  return (Store<AppState> store) async {
+    try {
+      await store.dispatch(RemoveUserAction(userId));
+    } on ApiException catch (e) {
+      log('ERROR: setSelectedUserAction - $e');
       await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };
@@ -29,4 +40,10 @@ class SetSelectedUserAction {
   final UserInfo? _selectedUserInfo;
   UserInfo? get selectedUserInfo => _selectedUserInfo;
   SetSelectedUserAction(this._selectedUserInfo);
+}
+
+class RemoveUserAction {
+  final String? _userId;
+  String? get userId => _userId;
+  RemoveUserAction(this._userId);
 }

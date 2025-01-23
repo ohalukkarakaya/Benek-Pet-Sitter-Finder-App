@@ -71,6 +71,30 @@ class UserList {
     recentlySeenUsers?.add( user );
   }
 
+  dynamic removeUser( String? userId ){
+    if( userId == null ){
+      return;
+    }
+
+    UserInfo existingUserSeenUsers = recentlySeenUsers?.firstWhere(
+      (userElement) => userElement.userId == userId,
+      orElse: () => UserInfo()
+    ) ?? UserInfo();
+
+    if( existingUserSeenUsers.userId != null ){
+      recentlySeenUsers!.remove( existingUserSeenUsers );
+    }
+
+    UserInfo existingUser = users?.firstWhere(
+      (userElement) => userElement.userId == userId,
+      orElse: () => UserInfo()
+    ) ?? UserInfo();
+
+    if( existingUser.userId != null ){
+      users!.remove( existingUser );
+    }
+  }
+
   dynamic addNewPage( UserList result ){
     users?.addAll( result.users! );
 

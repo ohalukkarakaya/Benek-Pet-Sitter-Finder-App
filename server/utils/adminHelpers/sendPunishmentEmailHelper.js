@@ -29,7 +29,7 @@ const sendPunishmentEmailHelper = async ( punishingUsersEmail, punishmentDesc ) 
 
         const htmlEmail = careGiverPunishmentEmailHtmlHelper( punishmentDesc );
 
-        const subject = `Bir Yeni Ceza Puanı Aldınız!`;
+        const subject = `💥 Bir Yeni Ceza Puanı Aldınız!`;
 
         //mail options
         const mailOptions = {

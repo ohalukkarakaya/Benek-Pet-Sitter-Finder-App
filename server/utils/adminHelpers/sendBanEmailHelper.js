@@ -29,7 +29,7 @@ const sendBanEmailHelper = async ( baningUsersEmail, banDesc ) => {
 
         const htmlEmail = careGiverBanEmailHtmlHelper( banDesc );
 
-        const subject = `Hesabınız Askıya Alındı!`;
+        const subject = `🚫 Hesabınız Askıya Alındı!`;
 
         //mail options
         const mailOptions = {

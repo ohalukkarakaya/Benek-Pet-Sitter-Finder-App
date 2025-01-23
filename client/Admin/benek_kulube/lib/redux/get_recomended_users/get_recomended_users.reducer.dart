@@ -7,6 +7,9 @@ UserList? userSearchRequestReducer( UserList? recomendedUsers, dynamic action ){
   }else if( action is SetRecentlySeenUserAction ){
     recomendedUsers?.addNewSeenUser( action.userInfo );
     return recomendedUsers;
+  }else if( action is RemoveUserAction ){
+    recomendedUsers?.removeUser( action.userId );
+    return recomendedUsers;
   }else if( action is UpdateProfileImageRequestAction ){
     if(recomendedUsers != null && recomendedUsers.recentlySeenUsers != null) {
       bool isUserExist = recomendedUsers.recentlySeenUsers!.any((element) => element.userId == action.userId);

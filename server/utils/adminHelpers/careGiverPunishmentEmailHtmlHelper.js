@@ -27,7 +27,7 @@ const careGiverPunishmentEmailHtmlHelper = ( punishmentDesc ) => {
                 <td align="left" style="padding: 13px 30px 30px; font-family: arial, helvetica, sans-serif;">
                     <div style="line-height: 140%; text-align: left; overflow-wrap: break-word;">
                     <p style="font-size: 14px; line-height: 140%; text-align: center;">
-                        <span style="font-size: 16px; line-height: 22.4px; font-family: Source Sans Pro, sans-serif;">Ceza Sebebiniz: ${ punishmentDesc }</span>
+                        <span style="font-size: 16px; line-height: 22.4px; font-family: Source Sans Pro, sans-serif;">Ceza Sebebiniz: <br> <b>${ punishmentDesc }</b></span>
                     </p>
                 </div>
             </td>
