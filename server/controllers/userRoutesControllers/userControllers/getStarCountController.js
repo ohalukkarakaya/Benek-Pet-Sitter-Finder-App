@@ -20,9 +20,12 @@ const getStarCountController = async (req, res) => {
             });
         }
 
+        let totalStarPoint = user.stars.stars.reduce((total, starObj) => total + starObj.star, 0);
+
         return res.status(200).json({
             error: false,
             starCount: user.stars.length,
+            totalStarPoint: totalStarPoint,
         });
     }catch (e) {
         console.log("Error: getStarCountController - ", e);
