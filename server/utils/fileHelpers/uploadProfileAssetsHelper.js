@@ -30,7 +30,12 @@ const uploadProfileAssetsHelper = async ( req, res, next ) => {
             async ( err ) => {
                 const userId = req.user._id.toString();
                 req.user = await User.findById( userId );
-
+                if (!req.user || req.user.deactivation.isDeactive) {
+                    return res.status(404).json({
+                        error: true,
+                        message: "user not found"
+                    });
+                }
                 const user = req.user;
 
                 const isDefaultProfileImg = user.profileImg.isDefaultImg;

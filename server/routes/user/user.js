@@ -24,6 +24,8 @@ import updateProfileImageController from "../../controllers/userRoutesController
 import userEditBioController from "../../controllers/userRoutesControllers/userControllers/userEditBioController.js";
 import userEditAdressController from "../../controllers/userRoutesControllers/userControllers/userEditAdressController.js";
 import userEditFullNameController from "../../controllers/userRoutesControllers/userControllers/userEditFullNameController.js";
+import getStarsController from "../../controllers/userRoutesControllers/userControllers/getStarsController.js";
+import getStarCountController from "../../controllers/userRoutesControllers/userControllers/getStarCountController.js";
 
 dotenv.config();
 const router = express.Router();
@@ -148,6 +150,20 @@ router.post(
   "/getLightWeightUserInfo",
   auth,
   getLightWeightUserInfoController
+);
+
+// get star count
+router.get(
+  "/getStarCount/:userId",
+  auth,
+  getStarCountController
+);
+
+//get stars of user
+router.get(
+  "/getStars/:userId",
+  auth,
+  getStarsController
 );
 
 router.use( "/profileSettings", userSetingsRoutes );
