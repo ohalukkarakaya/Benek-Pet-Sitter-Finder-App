@@ -21,23 +21,73 @@ import PhoneOtpVerificationModel from "../models/UserSettings/PhoneOTPVerificati
 import mokaVoid3dPaymentRequest from "../utils/mokaPosRequests/mokaPayRequests/mokaVoid3dPaymentRequest.js";
 import deleteFileHelper from "../utils/fileHelpers/deleteFileHelper.js";
 import getLightWeightUserInfoHelper from "../utils/getLightWeightUserInfoHelper.js";
+import canDeleteUser from "../utils/adminHelpers/canDeleteUserHelper.js";
+import BanUserASAPRecord from "../models/Report/BanUserASAPRecord.js";
 
 dotenv.config();
 
 // - tested
 const expireUser = cron.schedule(
     '0 0 * * *', // hergün gece 12:00
-    //"* * * * *", // her dakika başı
+    // "* * * * *", // her dakika başı
     async () => {
         try{
             //pull punishment records and ban users with over punishment record
             const users = await User.find({ "deactivation.isDeactive": true, "deactivation.deactivationDate": { $lt: Date.now() - 2592000000 }, "deactivation.isAboutToDelete": true });
+
+            const banUserASAPRecords = await BanUserASAPRecord.find({ "banDate": { $lt: Date.now() } });
+            for( const banRecord of banUserASAPRecords ){
+                const banRecordUser = await User.findById( banRecord.userId );
+                const isUserDeletable = await canDeleteUser( banRecord.userId );
+                if( !banRecordUser || !isUserDeletable ){
+                    continue;
+                }
+
+                const isUserInUsersArray = users.some(
+                    user =>
+                        user._id.toString() === banRecord.userId.toString()
+                );
+                if( !isUserInUsersArray ){
+                    users.push( banRecordUser );
+                }
+
+                const isUserAlreadyBanned = await BannedUsers.findOne({ userEmail: banRecordUser.email });
+                if( !isUserAlreadyBanned ){
+                    const banRecordUserInfo = getLightWeightUserInfoHelper( banRecordUser );
+                    await new BannedUsers(
+                        {
+                            adminId: banRecord.adminId,
+                            userEmail: banRecordUser.email,
+                            userPhoneNumber: banRecordUser.phone,
+                            userFullName: banRecordUserInfo.userFullName,
+                            adminDesc: "User Banned Because Of Over Punishment Record"
+                        }
+                    ).save();
+                }
+
+                banRecord.deleteOne();
+            }
+
             const punishmentRecords = await PunishmentRecord.find({
                 $expr: { $gte: [{ $size: "$punishmentList" }, 3] }
             });
             for( const punishment of punishmentRecords ){
 
                 const punishedUser = await User.findById( punishment.userId );
+                const isUserDeletable = await canDeleteUser( punishment.userId );
+
+                if( !punishedUser || !isUserDeletable ){
+                    let pastBanRequestRecord = await BanUserASAPRecord.findOne({ userId: punishment.userId });
+                    if( !pastBanRequestRecord ){
+                        await new BanUserASAPRecord({
+                            adminId: punishment.punishmentList[ punishment.punishmentList.length -1 ].adminId.toString(),
+                            userId: punishment.userId,
+                            banReason: "User Banned Because Of Over Punishment Record"
+                        }).save();
+                    }
+
+                    continue;
+                }
                 const isUserInUsersArray = users.some( 
                     user => 
                         user._id.toString() === punishedUser._id.toString() 

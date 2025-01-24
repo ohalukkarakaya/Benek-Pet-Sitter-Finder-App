@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { createRequire } from "module";
 
 import sendNotification from "../../../utils/notification/sendNotification.js";
+import BanUserASAPRecord from "../../../models/Report/BanUserASAPRecord.js";
 
 const require = createRequire(import.meta.url);
 const rawPricingDataset = require('../../../src/care_give_pricing.json');
@@ -126,6 +127,17 @@ const careGiveInvitationController = async ( req, res ) => {
 
         const careGiver = await User.findById( req.user._id.toString() );
         const owner = await User.findById( pet.primaryOwner.toString() );
+
+        const isCareGiverBanned = await BanUserASAPRecord.findOne({ userId: careGiver._id.toString() });
+        const isOwnerBanned = await BanUserASAPRecord.findOne({ userId: owner._id.toString() });
+
+        if( isCareGiverBanned || isOwnerBanned ){
+            return res.status( 403 ).json({
+                error: true,
+                message: "user is banned"
+            });
+        }
+
         if(
             !owner
             || !careGiver

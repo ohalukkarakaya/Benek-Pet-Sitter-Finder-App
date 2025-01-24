@@ -6,6 +6,8 @@ import sendPunishmentEmailHelper from "../../utils/adminHelpers/sendPunishmentEm
 import getLightWeightUserInfoHelper from "../../utils/getLightWeightUserInfoHelper.js";
 import BannedUsers from "../../models/Report/BannedUsers.js";
 import sendBanEmailHelper from "../../utils/adminHelpers/sendBanEmailHelper.js";
+import canDeleteUser from "../../utils/adminHelpers/canDeleteUserHelper.js";
+import BanUserASAPRecord from "../../models/Report/BanUserASAPRecord.js";
 
 //  *                *         .                      *            .   *           .    *
 //                                *                  *  .                .
@@ -45,8 +47,23 @@ const punishUserController = async ( req, res ) => {
 
         // send notification email to let user know
         const punishingUser = await User.findById( punishingUserId );
+        const isUserDeletable = await canDeleteUser( punishingUserId );
 
         if( totalPunishment >= 3 ){
+            if(!isUserDeletable){
+                let pastBanRequestRecord = await BanUserASAPRecord.findOne({ userId: punishingUserId });
+
+                if( !pastBanRequestRecord ) {
+                    await new BanUserASAPRecord({
+                        adminId: req.user._id.toString(),
+                        userId: punishingUserId,
+                        banReason: "User Banned Because Of Over Punishment Record"
+                    }).save();
+                }
+                return res.status(200)
+                    .json({error: false, message: "User Punished Succesfully"});
+            }
+
             punishingUser.deactivation.isDeactive = true;
             punishingUser.deactivation.isAboutToDelete = true;
             punishingUser.deactivation.deactivationDate = Date.now();
