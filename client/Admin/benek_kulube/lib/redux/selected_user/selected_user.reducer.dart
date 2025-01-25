@@ -12,6 +12,9 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
     ChatStateModel? chatData = userInfo?.chatData;
     action.userData?.chatData = chatData;
     return action.userData;
+  }else if( action is GetSelectedUserStarDataAction ){
+    userInfo?.stars = action.stars;
+    return userInfo;
   }else if( action is GetPetsByUserIdRequestAction ){
     userInfo?.addPets(action.pets!);
     return userInfo;

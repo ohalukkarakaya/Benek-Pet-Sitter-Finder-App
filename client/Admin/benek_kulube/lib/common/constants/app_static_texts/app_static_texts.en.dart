@@ -156,5 +156,7 @@ class AppStaticTextsEn{
     'YouCantEditYourAuth': "You can't edit your own authorization!",
     'enterPunishmentDesc': "Enter the reason for the punishment...",
     'youCantPunishYourself': "You can't register punishment to yourself!",
+    'averageRating': "Average rating",
+    'totalVote': "Total vote count",
   };
 }

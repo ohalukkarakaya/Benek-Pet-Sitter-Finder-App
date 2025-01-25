@@ -208,7 +208,7 @@ class _ProfileTabState extends State<ProfileTab> {
                       CareGiverBadge(isCareGiver: isCareGiver),
 
                       BenekProfileStarWidget(
-                        star: selectedUserInfo.stars ?? 0,
+                        star: selectedUserInfo.starAverage ?? 0,
                         starCount: selectedUserInfo.totalStar ?? 0,
                       ),
 

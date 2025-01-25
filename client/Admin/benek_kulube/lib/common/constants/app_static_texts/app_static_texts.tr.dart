@@ -156,5 +156,7 @@ class AppStaticTextsTr{
     'YouCantEditYourAuth': "Kendi yetkini düzenleyemezsin!",
     'enterPunishmentDesc': "Cezalandırma sebebini gir...",
     'youCantPunishYourself': "Kendine ceza puanı veremezsin!",
+    'averageRating': "Ortalama puan",
+    'totalVote': "Toplam oy sayısı",
   };
 }

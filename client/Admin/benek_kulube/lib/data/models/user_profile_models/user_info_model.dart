@@ -1,6 +1,7 @@
 import 'package:benek_kulube/data/models/chat_models/chat_state_model.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/private_info_model.dart';
+import 'package:benek_kulube/data/models/user_profile_models/star_data_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_care_giver_career_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_deactivation_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_following_users_or_pets_model.dart';
@@ -9,7 +10,6 @@ import 'package:benek_kulube/data/models/user_profile_models/user_interesting_pe
 import 'package:benek_kulube/data/models/user_profile_models/user_location_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_past_care_givers_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_profile_image_model.dart';
-import 'package:benek_kulube/data/models/user_profile_models/user_star_model.dart';
 
 import '../chat_models/punishment_info_model.dart';
 import '../log_models/log_model.dart';
@@ -36,11 +36,12 @@ class UserInfo {
   List<String>? saved;
   List<String>? dependedUsers;
   UserDeactivation? deactivation;
-  dynamic stars;
+  List<StarData>? stars;
   List<UserInterestingPetTags>? interestingPetTags;
   String? gender;
   String? defaultImage;
   int? totalStar;
+  int? starAverage;
   ChatStateModel? chatData;
   List<LogModel>? logs;
   PunishmentInfoModel? punishmentInfo;
@@ -74,6 +75,7 @@ class UserInfo {
       this.gender,
       this.defaultImage,
       this.totalStar,
+      this.starAverage,
       this.chatData,
       this.logs,
       this.punishmentInfo,
@@ -160,14 +162,15 @@ class UserInfo {
         ? UserDeactivation.fromJson(json['deactivation'])
         : null;
     if( json['stars'] == null ){
-      stars = null;
-    }else if( json['stars'].runtimeType == int ){
-      stars = json['stars'];
+      starAverage = null;
+    }else if( json['stars'].runtimeType == int || json['stars'].runtimeType == double ){
+      int incomingStarAverage = json['stars'].round();
+      starAverage = incomingStarAverage;
     }else{
-      stars = <UserStars>[];
+      stars = <StarData>[];
       json['stars'].forEach(
         ( v ){
-          stars!.add( UserStars.fromJson( v ) );
+          stars!.add( StarData.fromJson( v ) );
         }
       );
     }

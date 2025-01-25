@@ -3,7 +3,8 @@ import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../../../../common/constants/benek_icons.dart';
+
+import 'benek_profile_star_detail_widget.dart';
 
 class BenekProfileStarWidget extends StatefulWidget {
   final int star;
@@ -23,55 +24,73 @@ class _BenekProfileStarWidgetState extends State<BenekProfileStarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) {
-        setState(() {
-          isHovering = true;
-        });
+    return GestureDetector(
+      onTap: () {
+        if(widget.starCount <= 0){
+          return;
+        }
+
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            opaque: false,
+            barrierDismissible: true,
+            pageBuilder: (context, _, __) => const BenekProfileStarDetailWidget(),
+          ),
+        );
       },
-      onExit: (_) {
-        setState(() {
-          isHovering = false;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.all(10.0),
-        decoration: BoxDecoration(
-          color: isHovering ? AppColors.benekBlack.withOpacity(0.4) : AppColors.benekBlackWithOpacity,
-          borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(
-                    5,
-                    (index){
-                      return Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Icon(
-                          Icons.star,
-                          color: index < widget.star
-                              ? AppColors.benekWhite
-                              : AppColors.benekBlack,
-                          size: 20,
-                        ),
-                      );
-                    }
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Text(
-                "|  ${NumberFormat.compact().format(widget.starCount)}",
-                style: planeTextWithoutWeightStyle(
-                  textFontSize: 15,
-                  textColor: AppColors.benekWhite
+
+      child: MouseRegion(
+        cursor: widget.starCount > 0 ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        onEnter: (_) {
+          setState(() {
+            isHovering = true;
+          });
+        },
+        onExit: (_) {
+          setState(() {
+            isHovering = false;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            color: isHovering ? AppColors.benekBlack.withOpacity(0.4) : AppColors.benekBlackWithOpacity,
+            borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(
+                      5,
+                      (index){
+                        return Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Icon(
+                            Icons.star,
+                            color: index < widget.star
+                                ? AppColors.benekWhite
+                                : AppColors.benekBlack,
+                            size: 20,
+                          ),
+                        );
+                      }
                 ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Text(
+                  "|  ${NumberFormat.compact().format(widget.starCount)}",
+                  style: planeTextWithoutWeightStyle(
+                    textFontSize: 15,
+                    textColor: AppColors.benekWhite
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

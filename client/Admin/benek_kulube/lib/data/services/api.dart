@@ -9,6 +9,7 @@ import 'package:benek_kulube/common/utils/benek_toast_helper.dart';
 import 'package:benek_kulube/data/models/chat_models/punishment_model.dart';
 import 'package:benek_kulube/data/models/content_models/comment_model.dart';
 import 'package:benek_kulube/data/models/kulube_login_qr_code_model.dart';
+import 'package:benek_kulube/data/models/user_profile_models/star_data_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/widgets.dart';
@@ -52,5 +53,6 @@ part 'punishment_apies/users_punishment_api.dart';
 part 'user_info_api/user_get_private_info_api.dart';
 part 'user_info_api/user_set_auth_role_api.dart';
 part 'geocoding_api.dart';
+part 'user_star_apies/get_selected_user_star_data_api.dart';
 
 ApiClient defaultApiClient = ApiClient();

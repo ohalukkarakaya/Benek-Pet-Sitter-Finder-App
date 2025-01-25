@@ -40,7 +40,6 @@ class _EditUserAuthScreenState extends State<EditUserAuthScreen> {
         backgroundColor: Colors.transparent,
         body: Center(
           child: Padding(
-            // Masaüstü ekranı varsayılarak yanlardan boşluk
             padding: const EdgeInsets.symmetric(horizontal: 200.0),
             child: Material(
               color: Colors.transparent,

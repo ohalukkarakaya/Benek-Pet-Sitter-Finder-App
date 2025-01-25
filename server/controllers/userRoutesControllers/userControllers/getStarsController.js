@@ -1,10 +1,11 @@
 import User from "../../../models/User.js";
 import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 import getLightWeightPetInfoHelper from "../../../utils/getLightWeightPetInfoHelper.js";
+import Pet from "../../../models/Pet.js";
 
 const getStarsController = async (req, res) => {
     try{
-        const userId = req.query.userId;
+        const userId = req.params.userId;
 
         if (!userId) {
             return res.status(400).json({
@@ -28,13 +29,13 @@ const getStarsController = async (req, res) => {
             if( !owner || owner.deactivation.isDeactive ){
                 continue;
             }
-            let ownerInfo = getLightWeightUserInfoHelper(owner);
+            let ownerInfo = await getLightWeightUserInfoHelper(owner);
 
             let pet = await Pet.findById(star.petId);
             if( !pet ){
                 continue;
             }
-            let petInfo = getLightWeightPetInfoHelper(pet);
+            let petInfo = await getLightWeightPetInfoHelper(pet);
 
             starList.push({
                 owner: ownerInfo,
@@ -49,7 +50,7 @@ const getStarsController = async (req, res) => {
             stars: starList,
         });
     }catch (e) {
-        condole.log("Error: getStarsController - ", e);
+        console.log("Error: getStarsController - ", e);
         return res.status(500).json({
             error: true,
             message: "Internal Server Error"

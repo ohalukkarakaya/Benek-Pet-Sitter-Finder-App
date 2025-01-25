@@ -98,6 +98,10 @@ class ApiClient {
           return PrivateInfoModel.fromJson(value['data']);
         case 'UserProfileImg':
           return UserProfileImg.fromJson(value['data']);
+        case 'List<StarData>':
+          List<dynamic> jsonList = value['stars'];
+          List<StarData> list = jsonList.map((item) => StarData.fromJson(item)).toList();
+          return list;
 
         default:
           {
