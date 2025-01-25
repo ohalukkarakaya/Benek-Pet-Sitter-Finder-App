@@ -24,6 +24,8 @@ const punishUserController = async ( req, res ) => {
                       .json({ error: true, message: "Missing Param" });
         }
 
+        let didUserBanned = false;
+
         // insert punishment
         const newPunishment = {
             adminId: req.user._id.toString(),
@@ -61,7 +63,7 @@ const punishUserController = async ( req, res ) => {
                     }).save();
                 }
                 return res.status(200)
-                    .json({error: false, message: "User Punished Succesfully"});
+                    .json({error: false, message: "User Punished Succesfully", didUserBanned: didUserBanned});
             }
 
             punishingUser.deactivation.isDeactive = true;
@@ -79,6 +81,8 @@ const punishUserController = async ( req, res ) => {
                 }
             ).save();
 
+            didUserBanned = true;
+
             await sendBanEmailHelper( punishingUser.email, "Son 45 gün içerisinde 3'ten fazla ceza puanı aldığınız için hesabınız kalıcı olarak silinmiş ve kara listeye alınmıştır!" );
 
             punishingUser.markModified( "deactivation" );
@@ -90,7 +94,7 @@ const punishUserController = async ( req, res ) => {
         }
 
         return res.status( 200 )
-                  .json({ error: false, message: "User Punished Succesfully" })
+                  .json({ error: false, message: "User Punished Succesfully", didUserBanned: didUserBanned })
 
     }catch( err ){
         console.log( "ERROR: punishUserController - ", err );

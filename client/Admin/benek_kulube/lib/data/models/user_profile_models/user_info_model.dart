@@ -46,6 +46,7 @@ class UserInfo {
   List<LogModel>? logs;
   PunishmentInfoModel? punishmentInfo;
   String? iban;
+  bool? didUserBanned;
 
   UserInfo(
     {
@@ -79,7 +80,8 @@ class UserInfo {
       this.chatData,
       this.logs,
       this.punishmentInfo,
-      this.iban
+      this.iban,
+      this.didUserBanned = false
     }
   );
 
@@ -188,6 +190,7 @@ class UserInfo {
     chatData = json['chatData'] != null
         ? ChatStateModel.fromJson( json['chatData'] )
         : null;
+    didUserBanned = json['didUserBanned'] ?? false;
   }
 
   Map<String, dynamic> toJson() {

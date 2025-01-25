@@ -41,6 +41,7 @@ class _TabsButonElementState extends State<TabsButonElement> {
         }
 
         await widget.store.dispatch(setSelectedUserAction(null));
+        await widget.store.dispatch(setStoriesAction(null));
 
         widget.tab == AppTabsEnums.LOGOUT_TAB
           ? await AuthUtils.killUserSessionAndRestartApp( widget.store )

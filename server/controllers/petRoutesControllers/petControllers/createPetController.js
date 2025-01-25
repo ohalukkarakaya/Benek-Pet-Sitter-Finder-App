@@ -28,39 +28,18 @@ const createPetController = async (req, res) => {
         let petKind;
         let petSpecies;
   
-        for(
-          var i = 0; 
-          i < petDataset.pets
-                        .length; 
-          i ++
-        ){
-          if(
-            petDataset.pets[i]
-                      .id === req.body
-                                 .kindCode
-          ){
-            petKind = petDataset.pets[i]
-                                .name;
+        for( var i = 0; i < petDataset.pets.length; i ++ ){
+          if( petDataset.pets[i].id === req.body.kindCode  ){
+            petKind = petDataset.pets[i].name;
             for(
               var index = 0; 
-              index < petDataset.pets[i]
-                                .species
-                                .length; 
+              index < petDataset.pets[i].species.length;
               index ++
             ){
-              if(
-                petDataset.pets[i]
-                          .species[index]
-                          .id === req.body
-                                     .speciesCode
-              ){
+              if( petDataset.pets[i].species[index].id === req.body.speciesCode ){
                 petSpecies = {
-                  "tr": petDataset.pets[i]
-                                  .species[index]
-                                  .tr,
-                  "en": petDataset.pets[i]
-                                  .species[index]
-                                  .en
+                  "tr": petDataset.pets[i].species[index].tr,
+                  "en": petDataset.pets[i].species[index].en
                 };
               }
             }

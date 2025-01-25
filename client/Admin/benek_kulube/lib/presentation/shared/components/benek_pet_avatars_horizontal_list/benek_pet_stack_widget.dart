@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../../../../common/constants/app_colors.dart';
 import '../../../../common/utils/styles.text.dart';
+import '../../../../data/models/pet_models/pet_model.dart';
 import 'benek_horizontal_avatar_stack.dart';
+import 'benek_pet_list_detailed.dart';
 
 class BenekPetStackWidget extends StatefulWidget {
   final List<dynamic>? petList;
@@ -34,39 +36,59 @@ class _BenekPetStackWidgetState extends State<BenekPetStackWidget> {
             style: mediumTextStyle( textColor: AppColors.benekWhite ),
         ),
         controller: _tooltipController,
-        child: MouseRegion(
-          onHover: (event) {
-            setState(() {
-              if(
-                  _tooltipController.value != ElTooltipStatus.showing
-                  && widget.petList != null
-                  && widget.petList!.isNotEmpty
-              ){
-                _tooltipController.show();
-              }
-            });
+        child: GestureDetector(
+          onTap: () {
+
+            if(widget.petList == null || widget.petList!.isEmpty || widget.petList![0] !is! PetModel){
+              return;
+            }
+
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                opaque: false,
+                barrierDismissible: true,
+                pageBuilder: (context, _, __) => const BenekPetListDetailedScreen(),
+              ),
+            );
           },
-          onExit: (event) {
-            setState(() {
-              if( _tooltipController.value != ElTooltipStatus.hidden ){
-                _tooltipController.hide();
-              }
-            });
-          },
-          child: Container(
-            width: 200,
-            decoration: widget.petList == null || widget.petList!.isEmpty
-              ? BoxDecoration(
-                color: AppColors.benekBlackWithOpacity,
-                borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
-              )
-              : null,
-            padding: widget.petList == null || widget.petList!.isEmpty
-              ? const EdgeInsets.symmetric( horizontal: 10.0, vertical: 5.0 )
-              : null,
-            child: BenekHorizontalStackedPetAvatarWidget(
-              size: 40,
-              petList: widget.petList,
+          child: MouseRegion(
+            cursor: widget.petList != null && widget.petList!.isNotEmpty && widget.petList![0] is PetModel
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.basic,
+            onHover: (event) {
+              setState(() {
+                if(
+                    _tooltipController.value != ElTooltipStatus.showing
+                    && widget.petList != null
+                    && widget.petList!.isNotEmpty
+                ){
+                  _tooltipController.show();
+                }
+              });
+            },
+            onExit: (event) {
+              setState(() {
+                if( _tooltipController.value != ElTooltipStatus.hidden ){
+                  _tooltipController.hide();
+                }
+              });
+            },
+            child: Container(
+              width: 200,
+              decoration: widget.petList == null || widget.petList!.isEmpty
+                ? BoxDecoration(
+                  color: AppColors.benekBlackWithOpacity,
+                  borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
+                )
+                : null,
+              padding: widget.petList == null || widget.petList!.isEmpty
+                ? const EdgeInsets.symmetric( horizontal: 10.0, vertical: 5.0 )
+                : null,
+              child: BenekHorizontalStackedPetAvatarWidget(
+                size: 40,
+                petList: widget.petList,
+              ),
             ),
           ),
         ),

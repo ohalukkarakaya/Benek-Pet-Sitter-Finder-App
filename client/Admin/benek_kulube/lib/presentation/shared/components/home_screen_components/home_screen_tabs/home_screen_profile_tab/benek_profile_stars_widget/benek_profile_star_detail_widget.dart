@@ -1,5 +1,4 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
-import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_loading_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
@@ -24,25 +23,6 @@ class BenekProfileStarDetailWidget extends StatefulWidget {
 
 class _BenekProfileStarDetailWidgetState extends State<BenekProfileStarDetailWidget> {
 
-  bool didRequestSend = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Store<AppState> store = StoreProvider.of<AppState>(context);
-
-      if( !didRequestSend ){
-        await store.dispatch(IncreaseProcessCounterAction());
-        didRequestSend = true;
-
-        await store.dispatch(getSelectedUserStarDataAction( store.state.selectedUserInfo?.userId ));
-      }
-
-      await store.dispatch(DecreaseProcessCounterAction());
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final Store<AppState> store = StoreProvider.of<AppState>(context);
@@ -65,45 +45,56 @@ class _BenekProfileStarDetailWidgetState extends State<BenekProfileStarDetailWid
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
                     width: 600,
-                    padding: const EdgeInsets.all(24),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    padding: const EdgeInsets.only(right: 24, left: 24),
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 25.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              BenekProfileStarDetailInfoCard(
-                                icon: BenekIcons.star,
-                                title: BenekStringHelpers.locale('averageRating'),
-                                value: userInfo.starAverage.toString(),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  BenekProfileStarDetailInfoCard(
+                                    icon: BenekIcons.star,
+                                    title: BenekStringHelpers.locale('averageRating'),
+                                    value: userInfo.starAverage.toString(),
+                                  ),
+
+                                  BenekProfileStarDetailInfoCard(
+                                    icon: BenekIcons.mailseen,
+                                    title: BenekStringHelpers.locale('totalVote'),
+                                    value: userInfo.stars!.length.toString(),
+                                  ),
+                                ],
                               ),
 
-                              BenekProfileStarDetailInfoCard(
-                                icon: BenekIcons.mailseen,
-                                title: BenekStringHelpers.locale('totalVote'),
-                                value: userInfo.totalStar.toString(),
-                              ),
+                              const SizedBox(height: 20),
+
+                              Container(
+                                decoration: BoxDecoration(
+                                  color:  AppColors.benekBlack.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                                padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+                                child: Column(
+                                  children: List.generate(
+                                      userInfo.stars!.length,
+                                      (index) => Padding(
+                                        padding: EdgeInsets.only(bottom: 25.0),
+                                        child: BenekProfileStarDetailStarDataCard(
+                                          starData: userInfo.stars![index],
+                                        ),
+                                      )
+                                  ),
+                                ),
+                              )
                             ],
                           ),
-
-                          const SizedBox(height: 20),
-
-                          Column(
-                            children: List.generate(
-                                userInfo.totalStar!,
-                                (index) => Padding(
-                                  padding: EdgeInsets.only(bottom: 10.0),
-                                  child: userInfo.stars != null && userInfo.stars![index] != null
-                                  ? BenekProfileStarDetailStarDataCard(
-                                      starData: userInfo.stars![index],
-                                    )
-                                  : PastCareGiversLoadingWidget(),
-                                )
-                            ),
-                          )
-                        ],
+                        ),
                       ),
                     ),
                   ),

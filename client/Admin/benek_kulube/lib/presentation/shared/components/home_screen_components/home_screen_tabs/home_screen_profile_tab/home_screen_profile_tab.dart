@@ -52,6 +52,7 @@ class _ProfileTabState extends State<ProfileTab> {
 
         await store.dispatch(getUserInfoByUserIdAction( store.state.selectedUserInfo?.userId ));
         await store.dispatch(getStoriesByUserIdRequestAction( store.state.selectedUserInfo?.userId ));
+        await store.dispatch(getSelectedUserStarDataAction( store.state.selectedUserInfo?.userId ));
         await store.dispatch(getPetsByUserIdRequestAction( store.state.selectedUserInfo?.userId ));
         await store.dispatch(initPastCareGiversAction());
         await store.dispatch(initCareGiveDataAction());
@@ -210,6 +211,7 @@ class _ProfileTabState extends State<ProfileTab> {
                       BenekProfileStarWidget(
                         star: selectedUserInfo.starAverage ?? 0,
                         starCount: selectedUserInfo.totalStar ?? 0,
+                        starList: selectedUserInfo.stars,
                       ),
 
                       BenekPetStackWidget(

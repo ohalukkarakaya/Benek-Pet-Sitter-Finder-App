@@ -17,8 +17,8 @@ ThunkAction<AppState> punishUserAction( String userId, String punishmentDesc ) {
     PunishmentApi api = PunishmentApi();
     try {
 
-      await api.punishUserRequest( userId, punishmentDesc );
-      await store.dispatch(PunishUserAction());
+      bool didUserBanned = await api.punishUserRequest( userId, punishmentDesc );
+      await store.dispatch(PunishUserAction(didUserBanned));
 
     } on ApiException catch (e) {
       log('ERROR: userSearchRequestAction - $e');
@@ -28,5 +28,7 @@ ThunkAction<AppState> punishUserAction( String userId, String punishmentDesc ) {
 }
 
 class PunishUserAction {
-  PunishUserAction();
+  final bool? _didUserBanned;
+  get didUserBanned => _didUserBanned;
+  PunishUserAction(this._didUserBanned);
 }

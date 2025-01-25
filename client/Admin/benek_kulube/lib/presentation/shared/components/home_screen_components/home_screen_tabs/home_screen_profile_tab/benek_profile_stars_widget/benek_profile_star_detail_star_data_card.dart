@@ -27,13 +27,13 @@ class BenekProfileStarDetailStarDataCard extends StatelessWidget {
                       child: BenekCircleAvatar(
                         isDefaultAvatar: starData.owner!.profileImg!.isDefaultImg!,
                         imageUrl: starData.owner!.profileImg!.imgUrl!,
-                        width: 30,
-                        height: 30,
+                        width: 35,
+                        height: 35,
                         borderWidth: 2,
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 15.0, top: 10.0),
+                      padding: const EdgeInsets.only(left: 22.0, top: 10.0),
                       child: BenekCircleAvatar(
                         isDefaultAvatar: starData.pet!.petProfileImg!.isDefaultImg!,
                         imageUrl: starData.pet!.petProfileImg!.imgUrl!,
@@ -45,97 +45,62 @@ class BenekProfileStarDetailStarDataCard extends StatelessWidget {
                   ]
               ),
 
-              const SizedBox(width: 10.0),
+              const SizedBox(width: 12.0),
 
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    BenekStringHelpers.locale('startDate'),
+                    BenekStringHelpers.getUsersFullName(starData.owner!.identity!.firstName!, starData.owner!.identity!.lastName!, starData.owner!.identity!.middleName),
                     style: regularTextStyle(
                       textColor: AppColors.benekWhite,
-                      textFontSize: 8.0,
+                      textFontSize: 10.0,
                     ),
                   ),
 
-                  const SizedBox(width: 5),
-
                   Text(
-                    BenekStringHelpers.getDateAsString( starData.date! ),
+                    starData.owner!.userName!,
                     style: semiBoldTextStyle(
                       textColor: AppColors.benekWhite,
                       textFontSize: 12.0,
                     ),
-                  )
+                  ),
                 ],
               ),
-
             ]
         ),
 
-        Text(
-          starData.star.toString(),
-          style: semiBoldTextStyle( textColor: AppColors.benekWhite ),
-        )
-      ],
-    );
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        BenekCircleAvatar(
-            isDefaultAvatar: starData.owner!.profileImg!.isDefaultImg!,
-            imageUrl: starData.owner!.profileImg!.imgUrl!,
-        ),
-
-        const SizedBox(width: 16.0),
-
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
             Text(
-              BenekStringHelpers.getUsersFullName(
-                  starData.owner!.identity!.firstName!,
-                  starData.owner!.identity!.lastName!,
-                starData.owner!.identity!.middleName!,
-              ),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              BenekStringHelpers.getDateAsString(starData.date!),
+              style: regularTextStyle(
+                textColor: AppColors.benekWhite,
+                textFontSize: 12.0,
               ),
             ),
-
-            const SizedBox(height: 4.0),
-
-            Text(
-              starData.owner!.userName!,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+            const SizedBox(width: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(
+                  5,
+                      (index){
+                    return Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Icon(
+                        Icons.star,
+                        color: index < starData.star!
+                            ? AppColors.benekWhite
+                            : AppColors.benekDarkGrey,
+                        size: 20,
+                      ),
+                    );
+                  }
               ),
             ),
           ],
         ),
-
-        const SizedBox(width: 16.0),
-
-        BenekCircleAvatar(
-          isDefaultAvatar: starData.pet!.petProfileImg!.isDefaultImg!,
-          imageUrl: starData.pet!.petProfileImg!.imgUrl!,
-        ),
-
-        const SizedBox(width: 4.0),
-
-        Text(
-          starData.pet!.name!,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ]
+      ],
     );
   }
 }

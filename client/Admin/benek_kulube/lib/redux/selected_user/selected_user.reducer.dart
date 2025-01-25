@@ -47,7 +47,11 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
         punishmentList: []
       );
     } else {
-      userInfo?.punishmentInfo?.punishmentCount = userInfo.punishmentInfo!.punishmentCount != null ? userInfo.punishmentInfo!.punishmentCount! + 1 : 1;
+      userInfo?.punishmentInfo?.punishmentCount = userInfo.punishmentInfo!.punishmentCount != null
+          ? userInfo.punishmentInfo!.punishmentCount! + 1
+          : 1;
+
+      userInfo?.didUserBanned = action.didUserBanned;
     }
     return userInfo;
   } else if( action is UpdateProfileImageRequestAction ){

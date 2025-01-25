@@ -4,15 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 
+import '../../../../../../../data/models/user_profile_models/star_data_model.dart';
 import 'benek_profile_star_detail_widget.dart';
 
 class BenekProfileStarWidget extends StatefulWidget {
   final int star;
   final int starCount;
+  final List<StarData>? starList;
   const BenekProfileStarWidget({
     super.key,
     this.star = 0,
-    this.starCount = 0
+    this.starCount = 0,
+    this.starList
   });
 
   @override
@@ -26,7 +29,7 @@ class _BenekProfileStarWidgetState extends State<BenekProfileStarWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if(widget.starCount <= 0){
+        if(widget.starCount <= 0 || widget.starList == null){
           return;
         }
 

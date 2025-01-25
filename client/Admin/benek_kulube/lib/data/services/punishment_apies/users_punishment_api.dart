@@ -81,7 +81,7 @@ class  PunishmentApi {
         throw ApiException(code: response.statusCode, message: response.body);
         // ignore: unnecessary_null_comparison
       }else if( response.body != null ){
-        return true;
+        return json.decode(response.body)['didUserBanned'];
       }else{
         log('ERROR: punishUserRequest - response body is null');
         return false;

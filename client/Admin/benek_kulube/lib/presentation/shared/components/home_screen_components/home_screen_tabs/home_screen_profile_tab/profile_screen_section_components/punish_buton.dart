@@ -76,9 +76,10 @@ class _PunishUserButtonState extends State<PunishUserButton> {
 
         await store.dispatch(punishUserAction(store.state.selectedUserInfo!.userId!, punishmentDesc));
 
-        if(store.state.selectedUserInfo!.punishmentInfo?.punishmentCount != null && store.state.selectedUserInfo!.punishmentInfo!.punishmentCount! >= 3){
+        if(store.state.selectedUserInfo!.didUserBanned!){
           await store.dispatch(removeUserAction(store.state.selectedUserInfo!.userId));
           await store.dispatch(setSelectedUserAction(null));
+          await store.dispatch(setStoriesAction(null));
         }
       },
       child: MouseRegion(
