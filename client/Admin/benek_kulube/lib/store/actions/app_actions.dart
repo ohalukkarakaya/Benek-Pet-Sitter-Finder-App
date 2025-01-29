@@ -37,3 +37,4 @@ export '../../redux/get_story_comment_replies/get_story_comment_replies.action.d
 export '../../redux/get_user_private_info/get_user_private_info.action.dart';
 export '../../redux/user_set_auth_role/user_set_auth_role.action.dart';
 export '../../redux/get_selected_user_star_data/get_selected_user_star_data.action.dart';
+export '../../redux/selected_pet/selected_pet.action.dart';

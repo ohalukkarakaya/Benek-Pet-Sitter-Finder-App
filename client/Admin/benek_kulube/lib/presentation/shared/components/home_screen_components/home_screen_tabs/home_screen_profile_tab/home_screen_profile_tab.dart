@@ -3,7 +3,9 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:benek_kulube/presentation/features/image_video_helpers/image_video_helpers.dart';
+import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/care_give_career_preview_widget/care_give_preview_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_preview_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/adress_row/adress_map.dart';
@@ -131,12 +133,14 @@ class _ProfileTabState extends State<ProfileTab> {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, UserInfo?>(
-        converter: (Store<AppState> store) => store.state.selectedUserInfo,
-        builder: (BuildContext context, UserInfo? selectedUserInfo) {
+    return StoreConnector<AppState, Map<String, Object?>?>(
+        converter: (Store<AppState> store) => { "selectedUser": store.state.selectedUserInfo, "selectedPet": store.state.selectedPet },
+        builder: (BuildContext context, Map<String, Object?>? selectedDataInfo) {
+          UserInfo? selectedUserInfo = selectedDataInfo?["selectedUser"] as UserInfo?;
+          PetModel? selectedPetInfo = selectedDataInfo?["selectedPet"] as PetModel?;
+
           bool isCareGiver = selectedUserInfo!.isCareGiver != null && selectedUserInfo.isCareGiver!;
 
-          // log('selectedUserInfo-careGive-history: ${selectedUserInfo.pastCaregivers?.length}');
           Store<AppState> store = StoreProvider.of<AppState>(context);
           return Container(
             padding: const EdgeInsets.only(left: 60.0, bottom: 20.0),
@@ -148,9 +152,9 @@ class _ProfileTabState extends State<ProfileTab> {
                     BenekMessageBoxWidget(
                       size: storyBoardSize,
                       child: KulubeStoriesBoard(
-                        isUsersProfile: store.state.userInfo?.userId == selectedUserInfo.userId,
+                        isUsersProfile: selectedPetInfo == null && store.state.userInfo?.userId == selectedUserInfo.userId,
                         onTapPageBuilder: (dynamic Function() selectStoryFunction, List<StoryModel>? stories, int index) async {
-                          bool isUsersProfile = store.state.userInfo?.userId == selectedUserInfo.userId;
+                          bool isUsersProfile = selectedPetInfo == null && store.state.userInfo?.userId == selectedUserInfo.userId;
                           int indx = isUsersProfile && stories != null ? index - 1 : index;
 
                           if( stories?[indx] != null ){
@@ -181,21 +185,34 @@ class _ProfileTabState extends State<ProfileTab> {
                     authRoleId: store.state.userRoleId,
                     isUsersProfile: store.state.userInfo!.userId == selectedUserInfo.userId,
                     selectedUserInfo: selectedUserInfo,
+                    selectedPet: selectedPetInfo
                 ),
 
                 ProfileContactRowWidget(
-                  userId: selectedUserInfo.userId,
-                  email: selectedUserInfo.email,
-                  phoneNumber: selectedUserInfo.phone,
+                  userId: selectedPetInfo == null ? selectedUserInfo.userId : selectedPetInfo.id,
+                  email: selectedPetInfo == null
+                            ? selectedUserInfo.email
+                            : BenekStringHelpers.isLanguageTr()
+                                ? selectedPetInfo.kind?.tr
+                                : selectedPetInfo.kind?.en,
+                  phoneNumber: selectedPetInfo == null
+                                  ? selectedUserInfo.phone
+                                  : "${BenekStringHelpers.getAgeAsInt( selectedPetInfo!.birthDay! )} ${BenekStringHelpers.locale('yearsOld')}",
                 ),
 
-                selectedUserInfo != null
+                (
+                    selectedUserInfo != null
                 && selectedUserInfo.identity != null
                 && selectedUserInfo.identity!.bio != null
+                )
+                || (
+                    selectedPetInfo != null
+                    && selectedPetInfo.bio != null
+                   )
                     ? Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        ProfileBioWidget( text: '" ${selectedUserInfo.identity!.bio!} "' ),
+                        ProfileBioWidget( text: '" ${selectedPetInfo == null ? selectedUserInfo.identity!.bio! : selectedPetInfo.bio} "' ),
                       ],
                     )
                     : const SizedBox(),
@@ -206,40 +223,49 @@ class _ProfileTabState extends State<ProfileTab> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
 
-                      CareGiverBadge(isCareGiver: isCareGiver),
+                      selectedPetInfo == null
+                          ? CareGiverBadge(isCareGiver: isCareGiver)
+                          : const SizedBox(),
 
-                      BenekProfileStarWidget(
-                        star: selectedUserInfo.starAverage ?? 0,
-                        starCount: selectedUserInfo.totalStar ?? 0,
-                        starList: selectedUserInfo.stars,
-                      ),
+                      selectedPetInfo == null ?
+                        BenekProfileStarWidget(
+                          star: selectedUserInfo.starAverage ?? 0,
+                          starCount: selectedUserInfo.totalStar ?? 0,
+                          starList: selectedUserInfo.stars,
+                        )
+                        : const SizedBox(),
 
-                      BenekPetStackWidget(
-                        petList: selectedUserInfo.pets,
-                      ),
+                      selectedPetInfo == null
+                        ? BenekPetStackWidget(
+                          isPetList: selectedPetInfo == null,
+                          petList: selectedPetInfo == null ? selectedUserInfo.pets : selectedPetInfo.allOwners,
+                        )
+                        : const SizedBox(),
                     ],
                   ),
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      PastCareGiverPreviewWidget(
-                        title: BenekStringHelpers.locale('pastCareGiversTitle'),
-                        pastCareGiversEmptyStateTitle: BenekStringHelpers.locale('pastCareGiversEmptyMessage'),
-                        pastCareGiveList: selectedUserInfo.pastCaregivers,
-                      ),
+                selectedPetInfo == null
+                 ? Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        PastCareGiverPreviewWidget(
+                          title: BenekStringHelpers.locale('pastCareGiversTitle'),
+                          pastCareGiversEmptyStateTitle: BenekStringHelpers.locale('pastCareGiversEmptyMessage'),
+                          pastCareGiveList: selectedUserInfo.pastCaregivers,
+                        ),
 
-                      CareGivePreviewWidget(
-                        title: BenekStringHelpers.locale('givenCareGivesTitle'),
-                        emptyStateTitle: BenekStringHelpers.locale('givenCareGivesEmptyMessage'),
-                        careGiveList: selectedUserInfo.caregiverCareer,
-                      ),
-                    ],
-                  ),
-                ),
+                        CareGivePreviewWidget(
+                          title: BenekStringHelpers.locale('givenCareGivesTitle'),
+                          emptyStateTitle: BenekStringHelpers.locale('givenCareGivesEmptyMessage'),
+                          careGiveList: selectedUserInfo.caregiverCareer,
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox(),
 
                 selectedUserInfo.location != null
                     ? Padding(

@@ -48,6 +48,7 @@ class AppStaticTextsEn{
     'unauthorizedUser': 'Record Not Found',
     'pets': 'Pets',
     'usersPets': 'Pets',
+    'allOwners': 'All Owners',
     'noPetMessage': 'No Pets!',
     'notFoundMessage': 'Not Found!',
     'pastCareGiversTitle': 'Purchased Care Give Services :',
@@ -158,5 +159,6 @@ class AppStaticTextsEn{
     'youCantPunishYourself': "You can't register punishment to yourself!",
     'averageRating': "Average rating",
     'totalVote': "Total vote count",
+    'primaryOwner': "Primary Owner",
   };
 }

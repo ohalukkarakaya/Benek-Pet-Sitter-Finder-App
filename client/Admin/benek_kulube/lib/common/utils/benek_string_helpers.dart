@@ -79,6 +79,16 @@ class BenekStringHelpers {
     return "${date.day} ${getMonthAsString(date.month)} ${date.year}";
   }
 
+  static int getAgeAsInt(DateTime birthDate) {
+    DateTime now = DateTime.now();
+    int age = now.year - birthDate.year;
+    if (now.month < birthDate.month ||
+        (now.month == birthDate.month && now.day < birthDate.day)) {
+      age--;
+    }
+    return age;
+  }
+
   static String getPetGenderAsString(String sex){
     return locale(sex);
   }
@@ -130,6 +140,11 @@ class BenekStringHelpers {
        String? localizedText = AppStaticTextsEn.texts[key];
         return localizedText ?? key;
      }
+  }
+
+  static bool isLanguageTr(){
+    String language = ui.PlatformDispatcher.instance.locale.languageCode;
+    return language == 'tr' || language == 'tr_TR' || language == 'TR' || language == 'Tr';
   }
 
   static String formatPhoneNumber(String phoneNumber) {

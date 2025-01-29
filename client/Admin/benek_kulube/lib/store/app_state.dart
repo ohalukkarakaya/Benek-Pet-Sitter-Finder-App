@@ -27,7 +27,9 @@ class AppState {
   final UserList? userSearchResultList;
   final PetListModel? petSearchResultList;
   final UserInfo? selectedUserInfo;
+  final PetModel? selectedPet;
   final List<StoryModel>? storiesToDisplay;
+  final List<StoryModel>? petStroies;
   final StoryModel? selectedStory;
 
   AppState({
@@ -49,7 +51,9 @@ class AppState {
     required this.userSearchResultList,
     required this.petSearchResultList,
     required this.selectedUserInfo,
+    this.selectedPet,
     required this.storiesToDisplay,
+    required this.petStroies,
     this.selectedStory,
   });
 
@@ -73,7 +77,9 @@ class AppState {
       userSearchResultList: null,
       petSearchResultList: null,
       selectedUserInfo: null,
+      selectedPet: null,
       storiesToDisplay: null,
+      petStroies: null,
       selectedStory: null,
     );
   }
@@ -97,7 +103,9 @@ class AppState {
     UserList? userSearchResultList,
     PetListModel? petSearchResultList,
     UserInfo? selectedUserInfo,
+    PetModel? selectedPet,
     List<StoryModel>? storiesToDisplay,
+    List<StoryModel>? petStroies,
     StoryModel? selectedStory,
   }) {
     return AppState(
@@ -119,7 +127,9 @@ class AppState {
       userSearchResultList: userSearchResultList ?? this.userSearchResultList,
       petSearchResultList: petSearchResultList ?? this.petSearchResultList,
       selectedUserInfo: selectedUserInfo ?? this.selectedUserInfo,
+      selectedPet: selectedPet ?? this.selectedPet,
       storiesToDisplay: storiesToDisplay ?? this.storiesToDisplay,
+      petStroies: petStroies ?? this.petStroies,
       selectedStory: selectedStory ?? this.selectedStory,
     );
   }

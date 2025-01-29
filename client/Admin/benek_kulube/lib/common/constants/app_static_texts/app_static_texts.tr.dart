@@ -48,6 +48,7 @@ class AppStaticTextsTr{
     'unauthorizedUser': 'Kayıt Bulunamadı',
     'pets': 'Evcil Hayvanlar',
     'usersPets': 'Evcil Hayvanları',
+    'allOwners': 'Bütün Sahipleri',
     'noPetMessage': 'Evcil Hayvanı Yok!',
     'notFoundMessage': 'Bulunamadı!',
     'pastCareGiversTitle': 'Aldığı Bakım Hizmetleri :',
@@ -158,5 +159,6 @@ class AppStaticTextsTr{
     'youCantPunishYourself': "Kendine ceza puanı veremezsin!",
     'averageRating': "Ortalama puan",
     'totalVote': "Toplam oy sayısı",
+    'primaryOwner': "Ana Sahip",
   };
 }

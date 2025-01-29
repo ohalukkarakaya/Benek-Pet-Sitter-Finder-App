@@ -44,7 +44,8 @@ class PetApi {
       }else if( response.body != null ){
         return await apiClient.deserialize( response.body, 'List<PetModel>' ) as List<PetModel>;
       }else{
-        await AuthUtils.killUserSessionAndRestartApp( store );
+        log('ERROR: getPetsByUserIdRequest - response is null');
+        // await AuthUtils.killUserSessionAndRestartApp( store );
       }
     }catch( err ){
       log('ERROR: getPetsByUserIdRequest - $err');
@@ -88,7 +89,8 @@ class PetApi {
       }else if( response.body != null ){
         return await apiClient.deserialize( response.body, 'PetModel' ) as PetModel;
       }else{
-        await AuthUtils.killUserSessionAndRestartApp( store );
+        log('ERROR: getPetByIdRequest - response is null');
+        // await AuthUtils.killUserSessionAndRestartApp( store );
       }
     }catch( err ){
       log('ERROR: getPetByIdRequest - $err');

@@ -8,6 +8,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../../../common/constants/app_colors.dart';
 import '../../../../data/models/pet_models/pet_model.dart';
+import '../../../../data/models/user_profile_models/user_info_model.dart';
 
 class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
   final List<dynamic>? petList;
@@ -38,14 +39,22 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
                   width: size,
                   height: size,
                 )
-                : Container(
-                  width: size,
-                  height: size,
-                  decoration: const BoxDecoration(
-                    color: Colors.grey,
-                    shape: BoxShape.circle,
-                  ),
-                );
+                : pet is UserInfo
+                  && pet.profileImg != null
+                  ? BenekCircleAvatar(
+                    isDefaultAvatar: pet.profileImg!.isDefaultImg!,
+                    imageUrl: pet.profileImg!.imgUrl!,
+                    width: size,
+                    height: size,
+                  )
+                  : Container(
+                      width: size,
+                      height: size,
+                      decoration: const BoxDecoration(
+                        color: Colors.grey,
+                        shape: BoxShape.circle,
+                      ),
+                    );
           }).toList()
           : [],
           buildInfoWidget: ( surplus ){
@@ -81,7 +90,7 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
       height: size,
       child: petList != null
         && petList!.isNotEmpty
-        && petList![0] is! PetModel
+        && ( petList![0] is! PetModel && petList![0] is! UserInfo )
           ? Shimmer.fromColors(
               baseColor: AppColors.benekBlack.withOpacity(0.4),
               highlightColor: AppColors.benekBlack.withOpacity(0.2),
@@ -89,7 +98,7 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
           )
           : petList != null
             && petList!.isNotEmpty
-            && petList![0] is PetModel
+            && ( petList![0] is PetModel || petList![0] is UserInfo )
               ? _buildChild()
               : Center(
                 child: Text(

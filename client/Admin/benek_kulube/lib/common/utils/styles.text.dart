@@ -79,13 +79,15 @@ TextStyle regularTextStyle(
 TextStyle regularTextWithoutColorStyle(
     {
       double textFontSize = defaultFontSize,
-      FontWeight textFontWeight = regularFontWeight
+      FontWeight textFontWeight = regularFontWeight,
+      Color textColor = AppColors.benekWhite,
     }
 ){
   return TextStyle(
       fontFamily: benekFontFamily,
       fontSize: textFontSize,
-      fontWeight: textFontWeight
+      fontWeight: textFontWeight,
+      color: textColor
   );
 }
 
@@ -191,13 +193,15 @@ TextStyle mediumTextStyle(
 TextStyle mediumTextWithoutColorStyle(
     {
       double textFontSize = defaultFontSize,
-      FontWeight textFontWeight = mediumFontWeight
+      FontWeight textFontWeight = mediumFontWeight,
+      Color? textColor = AppColors.benekWhite
     }
 ){
   return TextStyle(
       fontSize: textFontSize,
       fontWeight: textFontWeight,
-      fontFamily: benekFontFamily
+      fontFamily: benekFontFamily,
+      color: textColor
   );
 }
 

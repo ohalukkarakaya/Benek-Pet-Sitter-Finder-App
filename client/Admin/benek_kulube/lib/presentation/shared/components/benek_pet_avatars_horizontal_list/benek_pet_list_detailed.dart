@@ -1,3 +1,4 @@
+import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
@@ -22,6 +23,7 @@ class _BenekPetListDetailedScreenState extends State<BenekPetListDetailedScreen>
   Widget build(BuildContext context) {
     final Store<AppState> store = StoreProvider.of<AppState>(context);
     final UserInfo selectedUserInfo = store.state.selectedUserInfo!;
+    final PetModel? selectedPet = store.state.selectedPet;
 
     return BenekBluredModalBarier(
       isDismissible: true,
@@ -59,11 +61,29 @@ class _BenekPetListDetailedScreenState extends State<BenekPetListDetailedScreen>
                                     padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
                                     child: Column(
                                       children: List.generate(
-                                          selectedUserInfo.pets!.length,
+                                          selectedPet == null ? selectedUserInfo.pets!.length : selectedPet.allOwners!.length,
                                           (index) => Padding(
                                             padding: EdgeInsets.only(bottom: 25.0),
                                             child: BenekPetListElementWidget(
+                                              onDispatchFunction: () async {
+                                                Navigator.of(context).pop();
+
+                                                if( selectedPet != null ){
+                                                  await store.dispatch( setSelectedPetAction(null) );
+                                                  await store.dispatch( setStoriesAction(null) );
+                                                  await store.dispatch( setSelectedUserAction(null) );
+
+                                                  await Future.delayed(const Duration(milliseconds: 50));
+                                                }
+
+
+                                                  store.dispatch( selectedPet == null
+                                                      ? getPetByIdRequestAction(selectedUserInfo.pets![index].id)
+                                                      : setSelectedUserAction( selectedPet.allOwners?[index] )
+                                                  );
+                                              },
                                               pet: selectedUserInfo.pets![index],
+                                              user: selectedPet == null ? null : selectedPet.allOwners![index],
                                             ),
                                             )
                                           )

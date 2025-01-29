@@ -9,11 +9,13 @@ class TextWithCharacterLimitAndToolTipWidget extends StatefulWidget {
   final String text;
   final int characterLimit;
   final double fontSize;
+  final Color textColor;
   const TextWithCharacterLimitAndToolTipWidget({
     super.key,
     required this.text,
     this.characterLimit = 14,
-    this.fontSize = 15.0
+    this.fontSize = 15.0,
+    this.textColor = AppColors.benekWhite,
   });
 
   @override
@@ -58,7 +60,7 @@ class _TextWithCharacterLimitAndToolTipWidgetState extends State<TextWithCharact
                 widget.text,
                 widget.characterLimit // Character Limit
             ),
-            style: mediumTextWithoutColorStyle( textFontSize: widget.fontSize ),
+            style: mediumTextWithoutColorStyle( textFontSize: widget.fontSize, textColor: widget.textColor ),
           ),
         ),
 
