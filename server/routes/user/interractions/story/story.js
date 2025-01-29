@@ -10,6 +10,8 @@ import deleteStoryController from "../../../../controllers/userRoutesControllers
 import likeStoryController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyControllers/likeStoryController.js";
 import getStoryByUserIdController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyControllers/getStoryByUserIdController.js";
 import getRecomendedStoryListController from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyControllers/getRecomendedStoryListController.js";
+import getStoryByPetIdController
+    from "../../../../controllers/userRoutesControllers/userInterractionsControllers/storyRoutesControllers/storyControllers/getStoryByPetIdController.js";
 
 dotenv.config();
 
@@ -46,6 +48,14 @@ router.get(
     "/getStoryByUserId/:userId",
     auth,
     getStoryByUserIdController
+);
+
+// - tested
+//get story by pet Id
+router.get(
+    "/getStoryByPetId/:petId",
+    auth,
+    getStoryByPetIdController
 );
 
 // - tested

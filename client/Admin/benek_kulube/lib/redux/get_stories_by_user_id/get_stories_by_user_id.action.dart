@@ -32,6 +32,24 @@ ThunkAction<AppState> getStoriesByUserIdRequestAction( String? userId ) {
   };
 }
 
+ThunkAction<AppState> getStoriesByPetIdRequestAction( String? petId ) {
+  return (Store<AppState> store) async {
+    StoryApi api = StoryApi();
+
+    if( petId == null ){
+      return;
+    }
+
+    try {
+      List<StoryModel>? _stories = await api.getStoriesByPetIdRequest( petId );
+
+      await store.dispatch(GetStoriesByUserIdRequestAction(_stories));
+    } on ApiException catch (e) {
+      log('ERROR: getStoriesByPetId - $e');
+    }
+  };
+}
+
 ThunkAction<AppState> setStoriesAction( List<StoryModel>? stories ) {
   return (Store<AppState> store) async {
     try {

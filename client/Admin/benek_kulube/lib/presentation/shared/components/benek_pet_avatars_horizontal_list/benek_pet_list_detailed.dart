@@ -68,21 +68,23 @@ class _BenekPetListDetailedScreenState extends State<BenekPetListDetailedScreen>
                                               onDispatchFunction: () async {
                                                 Navigator.of(context).pop();
 
-                                                if( selectedPet != null ){
-                                                  await store.dispatch( setSelectedPetAction(null) );
-                                                  await store.dispatch( setStoriesAction(null) );
-                                                  await store.dispatch( setSelectedUserAction(null) );
+                                                await store.dispatch( setStoriesAction(null) );
 
-                                                  await Future.delayed(const Duration(milliseconds: 50));
+                                                UserInfo? selectedUser = store.state.selectedUserInfo;
+                                                PetModel? selectedPetState = store.state.selectedPet;
+
+                                                await store.dispatch( setSelectedPetAction(null) );
+                                                await store.dispatch( setSelectedUserAction(null) );
+
+                                                if( selectedPetState == null ){
+                                                  await store.dispatch( getPetByIdRequestAction( selectedUserInfo.pets![index].id ) );
+                                                  await store.dispatch( setSelectedUserAction( selectedUser ) );
+                                                } else {
+                                                  await Future.delayed(const Duration(milliseconds: 60));
+                                                  await store.dispatch( setSelectedUserAction( selectedPetState.allOwners![index] ) );
                                                 }
-
-
-                                                  store.dispatch( selectedPet == null
-                                                      ? getPetByIdRequestAction(selectedUserInfo.pets![index].id)
-                                                      : setSelectedUserAction( selectedPet.allOwners?[index] )
-                                                  );
                                               },
-                                              pet: selectedUserInfo.pets![index],
+                                              pet: selectedPet == null ? selectedUserInfo.pets![index] : null,
                                               user: selectedPet == null ? null : selectedPet.allOwners![index],
                                             ),
                                             )

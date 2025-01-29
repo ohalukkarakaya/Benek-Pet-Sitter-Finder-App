@@ -43,7 +43,6 @@ AppState appReducer(AppState state, dynamic action) {
     selectedUserInfo: selected_user.setSelectedUserReducer(state.selectedUserInfo, action),
     selectedPet: selected_pet.SetSelectedPetReducer(state.selectedPet, action),
     storiesToDisplay: get_stories_by_user_id.getStoriesByUserIdRequestReducer(state.storiesToDisplay, action),
-    petStroies: null,
     selectedStory: selected_story.selectStoryReducer(state.selectedStory, action),
   );
 }

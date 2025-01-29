@@ -53,7 +53,14 @@ class _ProfileTabState extends State<ProfileTab> {
         didRequestSend = true;
 
         await store.dispatch(getUserInfoByUserIdAction( store.state.selectedUserInfo?.userId ));
-        await store.dispatch(getStoriesByUserIdRequestAction( store.state.selectedUserInfo?.userId ));
+
+        // get stories
+        if( store.state.selectedPet != null ){
+          await store.dispatch(getStoriesByPetIdRequestAction( store.state.selectedPet?.id ));
+        } else {
+          await store.dispatch(getStoriesByUserIdRequestAction( store.state.selectedUserInfo?.userId ));
+        }
+
         await store.dispatch(getSelectedUserStarDataAction( store.state.selectedUserInfo?.userId ));
         await store.dispatch(getPetsByUserIdRequestAction( store.state.selectedUserInfo?.userId ));
         await store.dispatch(initPastCareGiversAction());
