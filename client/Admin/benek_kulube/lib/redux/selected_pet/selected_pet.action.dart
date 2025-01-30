@@ -11,6 +11,7 @@ import 'package:redux/redux.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
+import '../../data/models/pet_models/pet_image_model.dart';
 import '../../data/models/pet_models/pet_model.dart';
 
 ThunkAction<AppState> getPetByIdRequestAction( String? petId ) {
@@ -27,6 +28,25 @@ ThunkAction<AppState> getPetByIdRequestAction( String? petId ) {
       await store.dispatch(GetPetByIdRequestAction(_pet));
     } on ApiException catch (e) {
       log('ERROR: GetPetByIdRequestAction - $e');
+      // await AuthUtils.killUserSessionAndRestartApp(store);
+    }
+  };
+}
+
+ThunkAction<AppState> getPetPhotosByIdRequestAction( String? petId ) {
+  return (Store<AppState> store) async {
+    PetApi api = PetApi();
+
+    if( petId == null ){
+      return;
+    }
+
+    try {
+      List<PetImageModel>? _petImages = await api.getPetPhotosByIdRequest( petId );
+
+      await store.dispatch(GetPetPhotosByIdRequestAction(_petImages));
+    } on ApiException catch (e) {
+      log('ERROR: GetPetPhotosByIdRequest - $e');
       // await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };
@@ -54,4 +74,10 @@ class SetSelectedPetAction {
   final PetModel? _pet;
   PetModel? get pet => _pet;
   SetSelectedPetAction(this._pet);
+}
+
+class GetPetPhotosByIdRequestAction {
+  final List<PetImageModel>? _petImages;
+  List<PetImageModel>? get petImages => _petImages;
+  GetPetPhotosByIdRequestAction(this._petImages);
 }

@@ -7,6 +7,9 @@ PetModel? SetSelectedPetReducer( PetModel? state, dynamic action ){
     return action.pet;
   }else if( action is SetSelectedPetAction ){
     return action.pet;
+  }else if( action is GetPetPhotosByIdRequestAction ){
+    state!.images = action.petImages;
+    return state;
   }
   return state;
 }

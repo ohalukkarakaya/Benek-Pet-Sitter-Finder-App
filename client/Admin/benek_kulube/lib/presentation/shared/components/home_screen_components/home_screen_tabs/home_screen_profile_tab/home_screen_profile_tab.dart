@@ -10,6 +10,7 @@ import 'package:benek_kulube/presentation/shared/components/home_screen_componen
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_preview_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/adress_row/adress_map.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/care_giver_badge.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/pet_images_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_contact_row.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/create_story_screen.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/kulube_stories_board.dart';
@@ -57,17 +58,17 @@ class _ProfileTabState extends State<ProfileTab> {
         // get stories
         if( store.state.selectedPet != null ){
           await store.dispatch(getStoriesByPetIdRequestAction( store.state.selectedPet?.id ));
+          await store.dispatch(getPetPhotosByIdRequestAction( store.state.selectedPet?.id ));
         } else {
           await store.dispatch(getStoriesByUserIdRequestAction( store.state.selectedUserInfo?.userId ));
+          await store.dispatch(getSelectedUserStarDataAction( store.state.selectedUserInfo?.userId ));
+          await store.dispatch(getPetsByUserIdRequestAction( store.state.selectedUserInfo?.userId ));
+          await store.dispatch(initPastCareGiversAction());
+          await store.dispatch(initCareGiveDataAction());
         }
-
-        await store.dispatch(getSelectedUserStarDataAction( store.state.selectedUserInfo?.userId ));
-        await store.dispatch(getPetsByUserIdRequestAction( store.state.selectedUserInfo?.userId ));
-        await store.dispatch(initPastCareGiversAction());
-        await store.dispatch(initCareGiveDataAction());
       }
 
-      if( store.state.userInfo?.userId != store.state.selectedUserInfo?.userId){
+      if( store.state.userInfo?.userId != store.state.selectedUserInfo?.userId || store.state.selectedPet != null){
         updateStoryBoardSize();
       }
 
@@ -223,6 +224,12 @@ class _ProfileTabState extends State<ProfileTab> {
                       ],
                     )
                     : const SizedBox(),
+
+                selectedPetInfo != null
+                  ? PetImagesWidget(
+                      images: selectedPetInfo.images,
+                    )
+                  : const SizedBox(),
 
                 Padding(
                   padding: const EdgeInsets.only(top: 20.0),

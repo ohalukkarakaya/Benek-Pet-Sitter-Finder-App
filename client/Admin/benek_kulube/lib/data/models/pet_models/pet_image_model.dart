@@ -10,7 +10,7 @@ class PetImageModel {
 
   PetImageModel.fromJson(Map<String, dynamic> json) {
     imgUrl = json['imgUrl'];
-    likes = json['likes'].cast<String>();
+    likes = json['likes']?.cast<String>();
     id = json['_id'];
     if (json['comments'] != null) {
       comments = <CommentModel>[];

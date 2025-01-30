@@ -27,6 +27,7 @@ import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dar
 
 import '../models/chat_models/chat_state_model.dart';
 import '../models/log_models/log_model.dart';
+import '../models/pet_models/pet_image_model.dart';
 import '../models/pet_models/pet_list_model.dart';
 import '../models/pet_models/pet_model.dart';
 import '../models/story_models/story_model.dart';

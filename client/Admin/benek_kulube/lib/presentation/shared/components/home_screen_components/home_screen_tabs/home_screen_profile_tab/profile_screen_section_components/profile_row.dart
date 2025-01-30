@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../../../../../common/constants/app_colors.dart';
-import '../../../../../../../common/constants/benek_icons.dart';
 import '../../../../../../../common/utils/benek_string_helpers.dart';
 import '../../../../../../../data/models/user_profile_models/auth_role_model.dart';
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
@@ -53,8 +52,8 @@ class ProfileRowWidget extends StatelessWidget {
               child: Stack(
                 children: [
                   SizedBox(
-                    width: isUsersProfile ? 75 : 70,
-                    height: isUsersProfile ? 75 : 70,
+                    width: isUsersProfile && selectedPet == null ? 75 : 70,
+                    height: isUsersProfile && selectedPet == null ? 75 : 70,
                   ),
                   Positioned(
                     right: 0,
@@ -68,6 +67,7 @@ class ProfileRowWidget extends StatelessWidget {
                     ),
                   ),
                   isUsersProfile
+                  && selectedPet == null
                     ? Positioned(
                       left: 0.0,
                       bottom: 0.0,

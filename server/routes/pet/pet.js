@@ -25,8 +25,10 @@ import getPetImageCommentsController from "../../controllers/petRoutesController
 import getPetImageCommentsRepliesController from "../../controllers/petRoutesControllers/petControllers/getPetImageCommentsRepliesController.js";
 import getPetsBySearchValueController from "../../controllers/petRoutesControllers/petControllers/getPetsBySearchValueController.js";
 import getRecommendedPetsController from "../../controllers/petRoutesControllers/petControllers/getRecommendedPetsController.js";
+import getPetPhotosByIdController from "../../controllers/petRoutesControllers/petControllers/getPetPhotosByIdController.js";
 
 import dotenv from "dotenv";
+
 
 dotenv.config();
 
@@ -120,6 +122,14 @@ router.get(
   "/getPetById/:petId",
   auth,
   getPetByIdController
+);
+
+// - tested
+// get pets photos by pet id
+router.get(
+  "/getPetPhotosById/:petId",
+  auth,
+  getPetPhotosByIdController
 );
 
 // - tested
