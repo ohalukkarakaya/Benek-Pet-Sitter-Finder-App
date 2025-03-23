@@ -14,25 +14,17 @@ const uploadPetImagesHelper = async ( req, res, next ) => {
 
         req.imageNames = [];
         const maxImageLimit = 6;
-        const howmanyImageCanUploaded = maxImageLimit - req.pet
-                                                           .images
-                                                           .length;
-        upload.array(
-                'files',
-                howmanyImageCanUploaded
-        )(
+        const howmanyImageCanUploaded = maxImageLimit - req.pet.images.length;
+        upload.array( 'files', howmanyImageCanUploaded )(
             req,
             {},
             async ( err ) => {
                 if( err ){
                     console.log( "ERROR: petImage - ", err );
-                    return res.status( 500 )
-                              .json(
-                                {
-                                    error: true,
-                                    message: "Internal Server Error"
-                                }
-                              );
+                    return res.status( 500 ).json({
+                        error: true,
+                        message: "Internal Server Error"
+                    });
                 }
 
                 for(
@@ -43,24 +35,17 @@ const uploadPetImagesHelper = async ( req, res, next ) => {
 
                     const petId = req.pet._id.toString();
 
-                    const imageId = crypto.randomBytes( 6 )
-                                          .toString( 'hex' );
+                    const imageId = crypto.randomBytes( 6 ).toString( 'hex' );
 
                     const splitedOriginalName = originalname.split(".");
 
                     const newFileName = petId + "_petsImage_"
                                               + imageId
                                               + "."
-                                              + splitedOriginalName[
-                                                    splitedOriginalName.length - 1
-                                                ];
+                                              + splitedOriginalName[ splitedOriginalName.length - 1 ];
 
-                    const fileNameWithoutExtension = petId + "_petsImage_"
-                                                           + imageId;
-
-                    const pathToSend = "pets/" + petId
-                                               + "/petsImages/"
-                                               + fileNameWithoutExtension;
+                    const fileNameWithoutExtension = petId + "_petsImage_" + imageId;
+                    const pathToSend = "pets/" + petId + "/petsImages/" + fileNameWithoutExtension;
 
                     try {
                         await fs.promises.writeFile(
@@ -82,23 +67,14 @@ const uploadPetImagesHelper = async ( req, res, next ) => {
                         res
                     );
 
-                    req.imageNames.push(
-                                      pathToSend + "."
-                                                 + splitedOriginalName[
-                                                        splitedOriginalName.length - 1
-                                                   ]
-                                   );
+                    req.imageNames.push( pathToSend + "." + splitedOriginalName[ splitedOriginalName.length - 1 ]);
 
                     fs.rmSync( newFileName );
-
                     if( uploadImage.error ){
-                        return res.status( 500 )
-                                .json(
-                                    {
-                                        error: true,
-                                        message: "Internal Server Error"
-                                    }
-                                );
+                        return res.status( 500 ).json({
+                            error: true,
+                            message: "Internal Server Error"
+                        });
                     }
                 }
 
@@ -108,13 +84,10 @@ const uploadPetImagesHelper = async ( req, res, next ) => {
 
     }catch( err ){
         console.log( "ERROR: uploadPetImagesHelper - ", err );
-        return res.status( 500 )
-                  .json(
-                    {
-                        error: true,
-                        message: "Internal server error"
-                    }
-                  );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
 }
 

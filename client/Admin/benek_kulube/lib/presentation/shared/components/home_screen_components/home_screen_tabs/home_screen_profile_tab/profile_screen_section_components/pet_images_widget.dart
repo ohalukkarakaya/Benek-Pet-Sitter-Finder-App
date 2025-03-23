@@ -32,12 +32,12 @@ class _PetImagesWidgetState extends State<PetImagesWidget> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3, // 3 sütun
-            crossAxisSpacing: 10, // Sütunlar arası boşluk
-            mainAxisSpacing: 10, // Satırlar arası boşluk
-            childAspectRatio: 1, // Kare görünümü
+            crossAxisCount: 3,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1,
           ),
-          itemCount: 6, // 3x2 = 6 kare
+          itemCount: 6,
           itemBuilder: (context, index) {
             return Container(
               decoration: BoxDecoration(

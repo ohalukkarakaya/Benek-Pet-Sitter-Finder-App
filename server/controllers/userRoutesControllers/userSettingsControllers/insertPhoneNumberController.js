@@ -7,6 +7,7 @@ import { vatanSmsSendValidationOtp } from "../../../utils/vatan_sms/vatanSmsOtpV
 import vatanSmsBalanceQueryApiRequest from "../../../utils/vatan_sms/vatanSmsBalanceQueryApiRequest.js";
 
 import dotenv from "dotenv";
+import ttMobilSmsSendValidationOtp from "../../../utils/ttmobil_sms/ttmobilSmsOtpValidation.js";
 
 dotenv.config();
 
@@ -47,90 +48,88 @@ const insertPhoneNumberController = async (req, res) => {
           isTurkishNumber = true;
         }
 
-        let areThereEnoughVatanSmsBalance = false;
         if( isTurkishNumber ){
-          const vatanSmsBalance = await vatanSmsBalanceQueryApiRequest();
-          areThereEnoughVatanSmsBalance = (
-                    vatanSmsBalance.kalanBakiye >= vatanSmsBalance.smsBirimFiyat
-                    && vatanSmsBalance.smsBirimFiyat !== -1
-                    && vatanSmsBalance.kalanBakiye !== -1
-                    && vatanSmsBalance.smsBirimFiyat > 0
-          );
+            phoneNumber = phoneNumber.replaceAll( "+", "" );
+        }else{
+            phoneNumber = phoneNumber.replaceAll( "+", "00" );
         }
 
-        if(
-          isTurkishNumber
-          && areThereEnoughVatanSmsBalance
-          && phoneNumber.includes( "05" )
-          && phoneNumber.length >= 10 
-        ){
+        //let areThereEnoughVatanSmsBalance = false;
+        //if( isTurkishNumber ){
+          //const vatanSmsBalance = await vatanSmsBalanceQueryApiRequest();
+          //areThereEnoughVatanSmsBalance = (
+                    //vatanSmsBalance.kalanBakiye >= vatanSmsBalance.smsBirimFiyat
+                    //&& vatanSmsBalance.smsBirimFiyat !== -1
+                    //&& vatanSmsBalance.kalanBakiye !== -1
+                    //&& vatanSmsBalance.smsBirimFiyat > 0
+          //);
+        //}
 
-          var startIndex = phoneNumber.indexOf( "5" );
-          phoneNumber = "0" + phoneNumber.slice( startIndex );
+        //if(
+          //isTurkishNumber
+          //&& areThereEnoughVatanSmsBalance
+          //&& phoneNumber.includes( "05" )
+          //&& phoneNumber.length >= 10
+        //){
 
-        }else if(
-          isTurkishNumber
-          && !areThereEnoughVatanSmsBalance
-          && phoneNumber.includes( "05" )
-          && phoneNumber.length >= 10 
-        ){
-          phoneNumber = phoneNumber.replaceAll( "+", "" );
-        }else if(
-          isTurkishNumber
-        ){
-          console.log( "Hata: İfade içerisinde '05' bulunamadı." );
-          return res.status( 400 )
-                    .json(
-                      {
-                        error: true,
-                        message: "Invalid Phone Number"
-                      }
-                    );
-        }
+          //var startIndex = phoneNumber.indexOf( "5" );
+          //phoneNumber = "0" + phoneNumber.slice( startIndex );
+
+        //}else if(
+          //isTurkishNumber
+          //&& !areThereEnoughVatanSmsBalance
+          //&& phoneNumber.includes( "05" )
+          //&& phoneNumber.length >= 10
+        //){
+          //phoneNumber = phoneNumber.replaceAll( "+", "" );
+        //}else if(
+          //isTurkishNumber
+        //){
+          //console.log( "Hata: İfade içerisinde '05' bulunamadı." );
+          //return res.status( 400 ).json({
+                        //error: true,
+                        //message: "Invalid Phone Number"
+                      //});
+        //}
   
         const user = await User.findById( req.user._id );
         if(
           !user 
-          || user.deactivation
-                 .isDeactive
+          || user.deactivation.isDeactive
         ){
-          return res.status( 404 )
-                    .json(
-                      {
-                        error: true,
-                        message: "User couldn't found"
-                      }
-                    );
+          return res.status( 404 ).json({
+            error: true,
+            message: "User couldn't found"
+          });
         }
   
         await PhoneOtpVerification.deleteMany({ userId: req.user._id.toString() });
         await PhoneOtpVerification.deleteMany({ phoneNumber: phoneNumber });
 
         
-        if( 
-          isTurkishNumber
-          && areThereEnoughVatanSmsBalance
-        ){
-          vatanSmsSendValidationOtp(
+        //if(
+          //isTurkishNumber
+          //&& areThereEnoughVatanSmsBalance
+        //){
+          //vatanSmsSendValidationOtp(
+            //res,
+            //phoneNumber,
+            //req.user._id.toString()
+          //);
+        //}else{
+          //sendOTPVerificationSMS({
+                //_id: req.user._id.toString(),
+                //phone: phoneNumber
+              //},
+              //res
+          //);
+        //}
+
+        await ttMobilSmsSendValidationOtp(
             res,
             phoneNumber,
-            req.user
-               ._id
-               .toString()
-          );
-        }else{
-          sendOTPVerificationSMS(
-              {
-                _id: req.user
-                        ._id
-                        .toString(),
-                        
-                phone: phoneNumber
-              },
-              res
-          );
-        }
-        
+            req.user._id.toString()
+        );
     }catch( err ){
         console.log( "Error: add phone number", err );
         return res.status( 500 )

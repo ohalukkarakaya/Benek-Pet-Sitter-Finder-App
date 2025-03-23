@@ -34,10 +34,7 @@ const vatanSmsApiRequest = async (
                 );
             }
         
-            if(
-                !smsType
-                || smsType === null
-            ){
+            if( !smsType ){
                 smsType = "Normal";
             }
         

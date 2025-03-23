@@ -5,50 +5,34 @@ import vatanSmsApiRequest from "./vatanSmsApiRequest.js";
 
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+import mokaUpdateSubsellerRequest from "../mokaPosRequests/mokaSubsellerRequests/mokaUpdateSubsellerRequest.js";
 
 dotenv.config();
 
 const vatanSmsSendValidationOtp = async ( res, phoneNumber, id ) => {
     try{
-        const otp = `${
-            Math.floor(
-                    100000 
-                    + Math.random() 
-                    * 900000
-                 )
-         }`;
+        const otp = `${ Math.floor( 100000 + Math.random() * 900000 ) }`;
 
       //hesh the otp
-      const salt = await bcrypt.genSalt(
-                                    Number(
-                                        process.env
-                                               .SALT
-                                    )
-                                );
+      const salt = await bcrypt.genSalt( Number( process.env.SALT ) );
+      const hashedOtp = await bcrypt.hash( otp, salt );
 
-      const hashedOtp = await bcrypt.hash(
-                                        otp, 
-                                        salt
-                                     );
-
-      const newOtpVerification = await new PhoneOtpVerification(
-                                              {
-                                                userId: id,
-                                                phoneNumber: phoneNumber,
-                                                otp: hashedOtp,
-                                              }
-                                           );
+      const newOtpVerification = await new PhoneOtpVerification({
+        userId: id,
+        phoneNumber: phoneNumber,
+        otp: hashedOtp,
+      });
 
       //save otp record
       await newOtpVerification.save();
 
      let smsRequest = await vatanSmsApiRequest(
-                                otp,
-                                phoneNumber,
-                                "Normal",
-                                "Tr",
-                                false
-                              );
+        otp,
+        phoneNumber,
+        "Normal",
+        "Tr",
+        false
+     );
 
     if(
         !smsRequest
@@ -95,7 +79,7 @@ const vatanSmsVerifyOtp = async (
     const OTPVerificationRecords = await PhoneOtpVerification.find(
                                                   {
                                                     userId,
-                                                    phoneNumber
+                                                    phoneNumber: `9`+ phoneNumber
                                                   }
                                               );
 
@@ -174,16 +158,16 @@ const vatanSmsVerifyOtp = async (
                                           userId
                                         }
                                      ).then(
-                                        (_) => {
+                                        async (_) => {
                                           if( user.careGiveGUID ){
-                                            const paramRequest = paramUpdateSubSellerRequest(
+                                            const paramRequest = await mokaUpdateSubsellerRequest(
                                               user.careGiveGUID,
                                               null,
                                               null,
                                               null,
                                               null,
-                                              user.phone,
                                               null,
+                                              "+9" + phoneNumber,
                                               null
                                             );
 
@@ -207,7 +191,7 @@ const vatanSmsVerifyOtp = async (
                                                         );
                                             }
                                     
-                                            if( paramRequest.sonuc !== "1" ){
+                                            if( paramRequest.data.sonuc !== "1" && paramRequest.data.sonuc !== 1 ){
                                               return res.status( 500 )
                                                         .json(
                                                           {
@@ -236,7 +220,7 @@ const vatanSmsVerifyOtp = async (
                                                       {
                                                         error: true,
                                                         message: "An error occured while deleting",
-                                                        error: error
+                                                        errorDesc: error
                                                       }
                                                     );
                                         }
@@ -250,7 +234,7 @@ const vatanSmsVerifyOtp = async (
                           {
                             error: true,
                             message: "An error occured while saving",
-                            error: e
+                              errorDesc: e
                           }
                       );
         }

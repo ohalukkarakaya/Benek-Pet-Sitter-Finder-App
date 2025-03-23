@@ -75,7 +75,7 @@ const paramUpdateSubSellerRequest = async (
     
                         if(err){
                             console.log(err);
-                            response = {
+                            let response = {
                                 error: true,
                             };
     
@@ -97,7 +97,7 @@ const paramUpdateSubSellerRequest = async (
                                                       [ 0 ]
                                                       [ "_" ];
     
-                            response = {
+                            let response = {
                                 error: false,
                                 data: {
                                     sonuc: sonuc,

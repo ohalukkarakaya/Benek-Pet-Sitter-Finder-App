@@ -24,24 +24,15 @@ const verifyPhoneNumberController = async (req, res) => {
         }
   
         let { phoneNumber, otp } = req.body;
-  
-        const user = await User.findById( 
-                                      req.user
-                                         ._id 
-                                );
 
-        let isTurkishNumber = false;
-        if( phoneNumber.includes( "+9" ) ){
-          isTurkishNumber = true;
-        }
+        const user = await User.findById( req.user._id );
 
-        const verificationObjectForServiceCheck = await PhoneOtpVerification.find(
-          {
-            userId: req.user
-                       ._id
-                       .toString()
-          }
-        );
+        let isTurkishNumber = true;
+        //if( phoneNumber.includes( "+9" ) ){
+          //isTurkishNumber = true;
+        //}
+
+        const verificationObjectForServiceCheck = await PhoneOtpVerification.find({ userId: req.user._id.toString() });
 
         const isForegnSmsService = verificationObjectForServiceCheck[ 0 ].otp === "Foreign Sms Service";
 
@@ -60,46 +51,32 @@ const verifyPhoneNumberController = async (req, res) => {
           && !isForegnSmsService
         ){
           console.log( "Hata: İfade içerisinde '05' bulunamadı." );
-          return res.status( 400 )
-                    .json(
-                      {
-                        error: true,
-                        message: "Invalid Phone Number"
-                      }
-                    );
+          return res.status( 400 ).json({
+            error: true,
+            message: "Invalid Phone Number"
+          });
         }
 
         if(
           !user 
-          || user.deactivation
-                 .isDeactive
+          || user.deactivation.isDeactive
         ){
-          return res.status( 404 )
-                    .json(
-                      {
-                        error: true,
-                        message: "User couldn't found"
-                      }
-                    );
+          return res.status( 404 ).json({
+            error: true,
+            message: "User couldn't found"
+          });
         }
   
-        const verificationObject = await PhoneOtpVerification.findOne(
-          {
-            userId: req.user
-                       ._id
-                       .toString(),
-            phoneNumber: `${ phoneNumber }`
-          }
-        );
+        const verificationObject = await PhoneOtpVerification.findOne({
+            userId: req.user._id.toString(),
+            phoneNumber: `9${ phoneNumber }`
+          });
 
         if( !verificationObject ){
-          return res.status( 404 )
-                    .json(
-                      {
-                        error: true,
-                        message: "Verification didn't request for this phone number"
-                      }
-                    );
+          return res.status( 404 ).json({
+            error: true,
+            message: "Verification didn't request for this phone number"
+          });
         }
   
         if( 

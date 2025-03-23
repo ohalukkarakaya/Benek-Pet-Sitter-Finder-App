@@ -9,10 +9,10 @@ dotenv.config();
 const env = process.env;
 
 function truncateString(str, maxLength) {
-    if (str.length <= maxLength) {
+    if (str && str.length <= maxLength) {
         return str;
     }
-    return str.substring(0, (maxLength - 3)) + "...";
+    return str ? str.substring(0, (maxLength - 3)) + "..." : null;
 }
 
 const mokaUpdateSubsellerRequest = async (
@@ -43,22 +43,14 @@ const mokaUpdateSubsellerRequest = async (
                                  .replaceAll("  ", " ");
 
             const nationalIdNoLength = 10;
-            const paddedNationalIdNo = nationalIdNo.padStart(
-                                                        nationalIdNoLength, 
-                                                        '0'
-                                                    ).replace(
-                                                        /[^\d]/g,
-                                                        '0'
-                                                    ).toUpperCase();
-                                                    
-            const ibanFinal = iban.toUpperCase()
-                                  .replaceAll( " ", "" )
-                                  .replaceAll( "TR", "" );
+            const paddedNationalIdNo = nationalIdNo ? nationalIdNo.padStart( nationalIdNoLength, '0' ).replace( /[^\d]/g,  '0' ).toUpperCase() : null;
+
+            const ibanFinal = (typeof iban === 'string') ? iban.toUpperCase().replaceAll(" ", "").replaceAll("TR", "") : null;
 
             let openAdressMaxLength = 50;
             const openAdressFinal = truncateString( openAdress, openAdressMaxLength );
 
-            const phoneNumberFinal = phoneNumber.replaceAll( "+90", "" );
+            const phoneNumberFinal = phoneNumber ? phoneNumber.replaceAll( "+90", "" ) : null;
 
             let updateDealerRequest = {};
 
