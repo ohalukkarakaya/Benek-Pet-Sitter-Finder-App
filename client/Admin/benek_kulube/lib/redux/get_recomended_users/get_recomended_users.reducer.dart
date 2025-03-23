@@ -146,6 +146,24 @@ UserList? userSearchRequestReducer( UserList? recomendedUsers, dynamic action ){
     }
 
     return recomendedUsers;
+  } else if( action is UpdatePhoneAction ){
+    if(recomendedUsers != null && recomendedUsers.recentlySeenUsers != null) {
+      bool isUserExist = recomendedUsers.recentlySeenUsers!.any((element) => element.userId == action.userId);
+
+      if(isUserExist) {
+        recomendedUsers.recentlySeenUsers?.firstWhere((element) => element.userId == action.userId).phone = action.phone;
+      }
+    }
+
+    if(recomendedUsers != null && recomendedUsers.users != null) {
+      bool isUserExist = recomendedUsers.users!.any((element) => element.userId == action.userId);
+
+      if(isUserExist){
+        recomendedUsers.users?.firstWhere((element) => element.userId == action.userId).phone = action.phone;
+      }
+    }
+
+    return recomendedUsers;
   } else if( action is UpdateTcIdNoAction ){
     if(recomendedUsers != null && recomendedUsers.recentlySeenUsers != null) {
       bool isUserExist = recomendedUsers.recentlySeenUsers!.any((element) => element.userId == action.userId);

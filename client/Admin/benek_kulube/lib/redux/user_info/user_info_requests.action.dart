@@ -195,6 +195,44 @@ ThunkAction<AppState> verifyEmailOtpRequestAction(String email, String otp) {
   };
 }
 
+ThunkAction<AppState> updatePhoneRequestAction(String phone) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      bool? _phone = await api.postResetPhoneNumber(phone);
+      if(_phone != true){
+        throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+      }
+
+      return true;
+    } on ApiException catch (e) {
+      log('ERROR: updatePhoneRequestAction - $e');
+      throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+    }
+  };
+}
+
+ThunkAction<AppState> verifyPhoneOtpRequestAction(String phone, String otp) {
+  return (Store<AppState> store) async {
+    UserInfoApi api = UserInfoApi();
+
+    try {
+      String userId = store.state.userInfo!.userId!;
+
+      bool? _phone = await api.postVerifyPhoneOtp(otp, phone);
+      if(_phone != true){
+        throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+      }
+
+      await store.dispatch(UpdatePhoneAction('+9$phone', userId));
+    } on ApiException catch (e) {
+      log('ERROR: verifyPhoneOtpRequestAction - $e');
+      throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
+    }
+  };
+}
+
 ThunkAction<AppState> updateTcIdNoAction( String TcNo ){
   return (Store<AppState> store) async {
     UserInfoApi api = UserInfoApi();
@@ -358,6 +396,16 @@ class UpdateEmailAction {
   String? get userId => _userId;
 
   UpdateEmailAction(this._email, this._userId);
+}
+
+class UpdatePhoneAction {
+  final String? _phone;
+  final String? _userId;
+
+  String? get phone => _phone;
+  String? get userId => _userId;
+
+  UpdatePhoneAction(this._phone, this._userId);
 }
 
 class UpdateTcIdNoAction {

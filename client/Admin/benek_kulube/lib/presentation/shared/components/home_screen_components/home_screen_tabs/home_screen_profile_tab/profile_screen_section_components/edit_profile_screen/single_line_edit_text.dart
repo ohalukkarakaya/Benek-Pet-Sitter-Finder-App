@@ -14,7 +14,7 @@ class SingleLineEditTextScreen extends StatefulWidget {
   final String? info;
   final String? hint;
   final String? textToEdit;
-  final Future<void> Function(String) onDispatch;
+  final Future<void> Function(String)? onDispatch;
   final bool Function(String) validation;
   final String? validationErrorMessage;
   final bool shouldApprove;
@@ -26,7 +26,7 @@ class SingleLineEditTextScreen extends StatefulWidget {
     this.info,
     this.hint,
     this.textToEdit,
-    required this.onDispatch,
+    this.onDispatch,
     this.validation = defaultValidation,
     this.validationErrorMessage,
     this.shouldApprove = false,
@@ -159,7 +159,9 @@ class _SingleLineEditTextScreenState extends State<SingleLineEditTextScreen> {
                       setState(() {
                         isSendingRequest = true;
                       });
-                      await widget.onDispatch(_textControllerEditProfileTex.text);
+                      if( widget.onDispatch != null ){
+                        await widget.onDispatch!(_textControllerEditProfileTex.text);
+                      }
                       setState(() {
                         isSendingRequest = false;
                       });
@@ -214,7 +216,10 @@ class _SingleLineEditTextScreenState extends State<SingleLineEditTextScreen> {
                             isSendingRequest = true;
                           });
                           try {
-                            await widget.onDispatch(_textControllerEditProfileTex.text);
+                            if( widget.onDispatch != null ) {
+                              await widget.onDispatch!(_textControllerEditProfileTex.text);
+                            }
+
                             setState(() {
                               isSendingRequest = false;
                             });

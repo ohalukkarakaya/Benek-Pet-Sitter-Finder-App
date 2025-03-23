@@ -33,6 +33,9 @@ UserInfo? getUserInfoRequestReducer( UserInfo? userInfo, dynamic action ){
   } else if ( action is UpdateEmailAction ){
     userInfo?.email = action.email;
     return userInfo;
+  } else if( action is UpdatePhoneAction ){
+    userInfo?.phone = action.phone;
+    return userInfo;
   } else if ( action is UpdateTcIdNoAction ){
     userInfo?.identity!.nationalIdentityNumber = action.tcIdNo;
     return userInfo;

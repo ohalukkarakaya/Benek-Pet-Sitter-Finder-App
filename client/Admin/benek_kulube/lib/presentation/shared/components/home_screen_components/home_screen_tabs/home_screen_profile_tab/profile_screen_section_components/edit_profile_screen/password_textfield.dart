@@ -17,12 +17,14 @@ class PasswordTextfield extends StatefulWidget {
   final String verifyingString;
   final Future<void> Function(String) onDispatch;
   final int passwordCharacterCount;
+  final bool isResendButtonActive;
 
   const PasswordTextfield({
     super.key,
     required this.verifyingString,
     required this.onDispatch,
     this.passwordCharacterCount = 6,
+    this.isResendButtonActive = true,
   });
 
   @override
@@ -128,20 +130,22 @@ class _PasswordTextfieldState extends State<PasswordTextfield> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: GestureDetector(
-                          onTap: (){
-                            Navigator.of(context).pop('reSend');
-                          },
-                          child: Text(
-                            BenekStringHelpers.locale('reSendEmail'),
-                            style: regularTextStyle(textColor: AppColors.benekAirForceBlue).copyWith(
-                              decoration: TextDecoration.underline,
+                      widget.isResendButtonActive
+                          ? MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: (){
+                                Navigator.of(context).pop('reSend');
+                              },
+                              child: Text(
+                                BenekStringHelpers.locale('reSendEmail'),
+                                style: regularTextStyle(textColor: AppColors.benekAirForceBlue).copyWith(
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
+                          )
+                          : SizedBox(),
                       IconButton(
                         padding: EdgeInsets.zero,
                         onPressed: () async {

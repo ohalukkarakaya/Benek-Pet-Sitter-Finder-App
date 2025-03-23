@@ -27,6 +27,7 @@ import 'edited_bio_row.dart';
 import 'menu_items/edit_email_button.dart';
 import 'menu_items/edit_full_name_button.dart';
 import 'menu_items/edit_paymen_info_button.dart';
+import 'menu_items/edit_phone_number_button.dart';
 import 'menu_items/edit_tc_no_button.dart';
 import 'menu_items/edit_user_name_button.dart';
 
@@ -159,12 +160,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             const Divider(color: AppColors.benekGrey,),
 
-                            EditAccountInfoMenuItem(
-                              icon: Icons.phone,
-                              desc: BenekStringHelpers.locale('phoneNumber'),
-                              text: userInfo.phone != null && userInfo.phone!.isNotEmpty
-                                ? userInfo.phone!
-                                : BenekStringHelpers.locale('enterPhoneNumber'),
+                            EditPhoneNumberButton(
+                              userInfo: userInfo,
+                              onDispatch: (text) => store.dispatch(updatePhoneRequestAction(text)),
+                              onVerifyDispatch: (phoneNumber, text) => store.dispatch(verifyPhoneOtpRequestAction(phoneNumber, text)),
                             ),
 
                             const Divider(color: AppColors.benekGrey,),

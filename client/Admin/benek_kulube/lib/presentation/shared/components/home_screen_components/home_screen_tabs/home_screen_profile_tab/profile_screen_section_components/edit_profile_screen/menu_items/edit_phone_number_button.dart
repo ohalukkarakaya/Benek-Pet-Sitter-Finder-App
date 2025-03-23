@@ -1,4 +1,7 @@
+
+
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../../../../../../../../common/utils/benek_string_helpers.dart';
 import '../../../../../../../../../data/models/user_profile_models/user_info_model.dart';
@@ -6,76 +9,77 @@ import '../edit_account_info_menu_item.dart';
 import '../password_textfield.dart';
 import '../single_line_edit_text.dart';
 
-class EditEmailButton extends StatefulWidget {
+class EditPhoneNumberButton extends StatefulWidget {
   final UserInfo userInfo;
   final Future<void> Function(String) onDispatch;
   final Future<void> Function(String, String) onVerifyDispatch;
-  final Future<void> Function(String) onResendDispatch;
+  final Future<void> Function(String)? onResendDispatch;
 
-  const EditEmailButton({
+  const EditPhoneNumberButton({
     super.key,
     required this.userInfo,
     required this.onDispatch,
     required this.onVerifyDispatch,
-    required this.onResendDispatch,
+    this.onResendDispatch,
   });
 
   @override
-  State<EditEmailButton> createState() => _EditEmailButtonState();
+  State<EditPhoneNumberButton> createState() => _EditPhoneNumberButtonState();
 }
 
-class _EditEmailButtonState extends State<EditEmailButton> {
+class _EditPhoneNumberButtonState extends State<EditPhoneNumberButton> {
   bool idle = false;
 
   bool isDone = true;
   bool isResend = false;
-  String? newEmailForResend;
+  String? newPhoneNumberForResend;
 
   @override
   Widget build(BuildContext context) {
     final UserInfo userInfo = widget.userInfo;
 
     return EditAccountInfoMenuItem(
-      icon: Icons.email,
-      desc: BenekStringHelpers.locale('email'),
-      text: userInfo.email != null && userInfo.email!.isNotEmpty
-          ? userInfo.email!
-          : BenekStringHelpers.locale('enterEmail'),
+      icon: Icons.phone,
+      desc: BenekStringHelpers.locale('phoneNumber'),
+      text: userInfo.phone != null && userInfo.phone!.isNotEmpty
+          ? userInfo.phone!
+          : BenekStringHelpers.locale('enterPhoneNumber'),
 
       onTap: () async {
-
         setState(() {
           isDone = false;
         });
 
         while( !isDone ){
-          String? newEmail = await Navigator.push(
+          String? newPhoneNumber = await Navigator.push(
             context,
             PageRouteBuilder(
               opaque: false,
               barrierDismissible: false,
               pageBuilder: (context, _, __) => SingleLineEditTextScreen(
-                info: BenekStringHelpers.locale('email'),
-                hint: BenekStringHelpers.locale('enterEmail'),
-                textToEdit: !isResend || newEmailForResend == null
-                    ? userInfo.email!
-                    : newEmailForResend!,
-                validation: (text) => text.contains('@') && text.toUpperCase().contains('.COM'),
-                validationErrorMessage: BenekStringHelpers.locale('invalidEmail'),
+                info: BenekStringHelpers.locale('phoneNumber'),
+                hint: BenekStringHelpers.locale('enterPhoneNumber'),
+                textToEdit: !isResend || newPhoneNumberForResend == null
+                    ? userInfo.phone!.startsWith('+9') ? userInfo.phone = userInfo.phone!.substring(2) : userInfo.phone
+                    : newPhoneNumberForResend,
+                validation: (text) => text.length == 11 && text.startsWith('05') && RegExp(r'^[0-9]+$').hasMatch(text),
+                validationErrorMessage: BenekStringHelpers.locale('invalidPhoneNumber'),
                 onDispatch: !isResend
                     ? (text) => widget.onDispatch(text.toLowerCase())
-                    : (text) => widget.onResendDispatch(text.toLowerCase()),
+                    : widget.onResendDispatch != null
+                        ? (text) => widget.onResendDispatch!(text.toLowerCase())
+                        : null,
                 shouldApprove: true,
-                approvalTitle: BenekStringHelpers.locale('approveEmailChanges'),
+                approvalTitle: BenekStringHelpers.locale('approvePhoneNumberChanges'),
               ),
             ),
           );
 
-          if(newEmail == null || newEmail.isEmpty){
+          if( newPhoneNumber == null || newPhoneNumber.isEmpty ){
             setState(() {
               isDone = true;
               isResend = false;
-              newEmailForResend = null;
+              newPhoneNumberForResend = null;
               idle = !idle;
             });
             continue;
@@ -87,8 +91,9 @@ class _EditEmailButtonState extends State<EditEmailButton> {
               opaque: false,
               barrierDismissible: false,
               pageBuilder: (context, _, __) => PasswordTextfield(
-                verifyingString: newEmail,
-                onDispatch: (text) => widget.onVerifyDispatch(newEmail.toLowerCase(), text.toLowerCase()),
+                isResendButtonActive: false,
+                verifyingString: newPhoneNumber,
+                onDispatch: (text) => widget.onVerifyDispatch(newPhoneNumber.toLowerCase(), text.toLowerCase()),
               ),
             ),
           );
@@ -96,7 +101,7 @@ class _EditEmailButtonState extends State<EditEmailButton> {
           if(resp != null && resp.isNotEmpty && resp == "reSend"){
             setState(() {
               isResend = true;
-              newEmailForResend = newEmail.toLowerCase();
+              newPhoneNumberForResend = newPhoneNumber.toLowerCase();
             });
             continue;
           }

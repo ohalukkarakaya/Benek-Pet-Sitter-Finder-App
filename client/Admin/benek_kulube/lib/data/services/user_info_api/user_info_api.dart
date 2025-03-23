@@ -279,7 +279,7 @@ class UserInfoApi {
     return false;
   }
 
-  Future<bool?> postResetEmail (String newEmail) async {
+  Future<bool?> postResetEmail(String newEmail) async {
     try{
       await AuthUtils.getAccessToken();
 
@@ -310,7 +310,7 @@ class UserInfoApi {
     }
   }
 
-  Future<bool?> postResendEmailOtp (String userId, String email) async {
+  Future<bool?> postResendEmailOtp(String userId, String email) async {
     try{
       await AuthUtils.getAccessToken();
 
@@ -342,7 +342,7 @@ class UserInfoApi {
     }
   }
 
-  Future<bool?> postVerifyEmailOtp (String otp, String email) async {
+  Future<bool?> postVerifyEmailOtp(String otp, String email) async {
     try{
       await AuthUtils.getAccessToken();
 
@@ -370,6 +370,69 @@ class UserInfoApi {
       return false;
     }catch( err ){
       log('ERROR: postVerifyEmailOtp - $err');
+      return false;
+    }
+  }
+
+  Future<bool?> postResetPhoneNumber(String newPhone) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/profileSettings/addPhoneNumber';
+
+      Object? postBody = {
+        'phoneNumber': "+9$newPhone",
+      };
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = ["application/json"];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'POST', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 && response.statusCode != 404 ){
+        log('ERROR: postResetPhoneApi - ${json.decode(response.body)["message"]}');
+        return false;
+      }else if( response.body != null ){
+        return true;
+      }
+      return false;
+    }catch( err ){
+      log('ERROR: postResetPhoneApi - $err');
+      return false;
+    }
+  }
+
+  Future<bool?> postVerifyPhoneOtp(String otp, String phone) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      const String path = '/api/user/profileSettings/verifyPhoneNumber';
+
+      Object? postBody = {
+        'otp': otp,
+        'phoneNumber': "+9$phone",
+      };
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = ["application/json"];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'POST', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 && response.statusCode != 404 ){
+        log('ERROR: postVerifyPhoneOtpApi - ${json.decode(response.body)["message"]}');
+        return false;
+      }else if( response.body != null ){
+        return true;
+      }
+      return false;
+    }catch( err ){
+      log('ERROR: postVerifyPhoneOtpApi - $err');
       return false;
     }
   }
