@@ -11,6 +11,7 @@ import twilio from "twilio";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import fs from "fs";
+import ttmobilSmsApiRequest from "../../utils/ttmobil_sms/ttmobilSmsApiRequest.js";
 
 dotenv.config();
 
@@ -116,60 +117,43 @@ const emergencyController = async (req, res) => {
         }
 
         if( petOwnerPhone ){
+
+            let isTurkishNumber = false;
+            if( petOwnerPhone.includes( "+9" ) ){
+                isTurkishNumber = true;
+            }
+
+            if( isTurkishNumber ){
+                petOwnerPhone = petOwnerPhone.replaceAll( "+", "" );
+            }else{
+                petOwnerPhone = petOwnerPhone.replaceAll( "+", "00" );
+            }
+
             const to = petOwnerPhone;
             const body = `"${emergencyMessage}". Bu mesaj, bakıcınız: ${careGiver.identity.firstName} ${careGiver.identity.lastName} tarafından, evcil hayvanınız: ${pet.name} hakkında gönderilmiş bir acil durum mesajıdır. Lütfen belirtilen iletişim bilgilerinden, derhal bakıcınızla iletişime geçiniz. TelNo: ${careGiver.phone}, Email: ${careGiver.email}`;
 
-            let areThereEnoughVatanSmsBalance;
-            const vatanSmsBalance = await vatanSmsBalanceQueryApiRequest();
-            areThereEnoughVatanSmsBalance = (
-                        vatanSmsBalance.kalanBakiye >= vatanSmsBalance.smsBirimFiyat
-                        && vatanSmsBalance.smsBirimFiyat !== -1
-                        && vatanSmsBalance.kalanBakiye !== -1
-                        && vatanSmsBalance.smsBirimFiyat > 0
+            let smsRequest = await ttmobilSmsApiRequest(
+                body,
+                to,
+                "Normal",
+                "Tr",
+                true
             );
 
-            if( areThereEnoughVatanSmsBalance ){
-                let smsRequest = await vatanSmsApiRequest(
-                    body,
-                    to,
-                    "Normal",
-                    "Tr",
-                    true
-                );
-                
-                if(
-                    !smsRequest
-                    || !( smsRequest.serverStatus )
-                    || smsRequest.serverStatus !== 1
-                    || smsRequest.error
-                ){
-                    console.log( "ERROR: vatanSmsSendValidationOtp - ", smsRequest.message );
-                    return res.status( 500 )
-                              .json(
-                                {
-                                    error: true,
-                                    message: "Internal Server Error"
-                                }
-                              );
-                }
-            }else{
-                const accountSid = process.env.TWILIO_ACCOUNT_SID;
-                const authToken = process.env.TWILIO_AUTH_TOKEN;
-                const client = new twilio( accountSid, authToken );
-
-                const from = process.env.TWILIO_PHONE_NUMBER;
-
-                await client.messages
-                      .create(
+            if(
+                !smsRequest
+                || !( smsRequest.serverStatus )
+                || smsRequest.serverStatus !== 1
+                || smsRequest.error
+            ){
+                console.log( "ERROR: vatanSmsSendValidationOtp - ", smsRequest.message );
+                return res.status( 500 )
+                          .json(
                             {
-                                body: body,
-                                from: from,
-                                to: to
+                                error: true,
+                                message: "Internal Server Error"
                             }
-                       ).then( 
-                        message => 
-                            console.log( message.sid ) 
-                       );
+                          );
             }
         }
 
