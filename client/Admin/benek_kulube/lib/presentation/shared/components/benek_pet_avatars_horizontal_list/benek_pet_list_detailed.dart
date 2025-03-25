@@ -73,6 +73,8 @@ class _BenekPetListDetailedScreenState extends State<BenekPetListDetailedScreen>
                                                 UserInfo? selectedUser = store.state.selectedUserInfo;
                                                 PetModel? selectedPetState = store.state.selectedPet;
 
+                                                await store.dispatch( IsLoadingStateAction( isLoading: true ) );
+
                                                 await store.dispatch( setSelectedPetAction(null) );
                                                 await store.dispatch( setSelectedUserAction(null) );
 
@@ -83,6 +85,8 @@ class _BenekPetListDetailedScreenState extends State<BenekPetListDetailedScreen>
                                                   await Future.delayed(const Duration(milliseconds: 60));
                                                   await store.dispatch( setSelectedUserAction( selectedPetState.allOwners![index] ) );
                                                 }
+
+                                                await store.dispatch( IsLoadingStateAction( isLoading: false ) );
                                               },
                                               pet: selectedPet == null ? selectedUserInfo.pets![index] : null,
                                               user: selectedPet == null ? null : selectedPet.allOwners![index],

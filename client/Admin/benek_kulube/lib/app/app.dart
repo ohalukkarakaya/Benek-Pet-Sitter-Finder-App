@@ -63,6 +63,7 @@ class KulubeHomePage extends StatelessWidget {
                   appBar: null,
                   body: state.activeScreen == AppScreenEnums.LOADING_SCREEN
                         && state.userRefreshToken == ''
+                        || state.isLoading
 
                             ? const Center( child: BenekLoadingComponent() )
                             : state.activeScreen == AppScreenEnums.LOGIN_SCREEN
