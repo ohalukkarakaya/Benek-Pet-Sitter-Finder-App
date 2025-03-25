@@ -33,7 +33,7 @@ const deletePetsImagesController = async (req, res) => {
 
         const petImages = req.pet.images;
         req.pet.markModified( "images" );
-        req.pet.save(
+        await req.pet.save(
           ( err ) => {
             if( err ){
               console.log( "error", err );

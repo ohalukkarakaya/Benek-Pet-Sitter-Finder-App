@@ -5,12 +5,11 @@ import 'dart:ui';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/data/models/pet_models/pet_model.dart';
 import 'package:benek_kulube/presentation/features/image_video_helpers/image_video_helpers.dart';
-import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/care_give_career_preview_widget/care_give_preview_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_preview_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/adress_row/adress_map.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/care_giver_badge.dart';
-import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/pet_images_widget.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/pet_profile_screen_components/pet_images_widget.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/profile_contact_row.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/create_story_screen.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/story_components/kulube_stories_board.dart';
@@ -225,7 +224,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     )
                     : const SizedBox(),
 
-                selectedPetInfo != null
+                selectedPetInfo != null && selectedPetInfo.images != null && selectedPetInfo.images!.isNotEmpty
                   ? PetImagesWidget(
                       images: selectedPetInfo.images,
                     )

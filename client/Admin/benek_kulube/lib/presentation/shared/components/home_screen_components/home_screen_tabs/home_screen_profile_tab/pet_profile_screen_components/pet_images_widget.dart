@@ -1,8 +1,10 @@
 
 import 'package:benek_kulube/data/models/pet_models/pet_image_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../../../../../common/constants/app_colors.dart';
+import '../../../../../../features/image_video_helpers/image_video_helpers.dart';
 
 class PetImagesWidget extends StatefulWidget {
   final List<PetImageModel>? images;
@@ -37,12 +39,19 @@ class _PetImagesWidgetState extends State<PetImagesWidget> {
             mainAxisSpacing: 10,
             childAspectRatio: 1,
           ),
-          itemCount: 6,
+          itemCount: widget.images != null ? widget.images!.length : 0,
           itemBuilder: (context, index) {
             return Container(
               decoration: BoxDecoration(
                 color: Colors.blueAccent,
                 borderRadius: BorderRadius.circular( 6.0 ),
+                  image: DecorationImage(
+                    image: NetworkImage(
+                      widget.images != null && widget.images?[index] != null ? ImageVideoHelpers.getFullUrl(widget.images![index].imgUrl!) : "",
+                      headers: { "private-key": dotenv.env['MEDIA_SERVER_API_KEY']! },
+                    ),
+                    fit: BoxFit.cover,
+                  )
               ),
             );
           },
