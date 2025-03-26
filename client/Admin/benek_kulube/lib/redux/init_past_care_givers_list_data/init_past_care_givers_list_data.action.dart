@@ -71,7 +71,7 @@ ThunkAction<AppState> initPastCareGiversAction(){
       store.dispatch(InitPastCareGiversAction(pastCareGiversList));
 
     } on ApiException catch (e) {
-      log('ERROR: getLightWeightUserInfoByUserIdListAction - $e');
+      log('ERROR: initPastCareGiversAction - $e');
       // await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };

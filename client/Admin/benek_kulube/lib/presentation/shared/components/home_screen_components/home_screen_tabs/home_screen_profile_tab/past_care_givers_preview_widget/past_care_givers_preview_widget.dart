@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../../../../data/models/user_profile_models/user_past_care_givers_model.dart';
+import 'benek_profile_past_caregivers_detail_widget.dart';
 
 class PastCareGiverPreviewWidget extends StatefulWidget {
   final String title;
@@ -28,128 +29,149 @@ class _PastCareGiverPreviewWidgetState extends State<PastCareGiverPreviewWidget>
   bool isHovering = false;
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (event) {
-        if( widget.pastCareGiveList != null && widget.pastCareGiveList!.isNotEmpty ) {
-          setState(() {
-            isHovering = true;
-          });
+    return GestureDetector(
+      onTap: () {
+        if( widget.pastCareGiveList == null || widget.pastCareGiveList!.isEmpty ){
+          return;
         }
+
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            opaque: false,
+            barrierDismissible: true,
+            pageBuilder: (context, _, __) => const PastCaregiversDetailWidget(),
+          ),
+        );
+
       },
-      onExit: (event) {
-        setState(() {
-          isHovering = false;
-        });
-      },
-      child: Stack(
-        children: [
-          Container(
-            height: 200,
-            width: 260,
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
-              color: isHovering ? AppColors.benekBlack.withOpacity(0.5) : AppColors.benekBlackWithOpacity,
-              borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.title,
-                  style: regularTextStyle( textColor: AppColors.benekWhite ),
-                ),
-                const Divider(color: AppColors.benekWhite, thickness: 0.5),
-                SizedBox(
-                  width: double.infinity,
-                  height: 145,
-                  child: widget.pastCareGiveList != null
-                    && widget.pastCareGiveList!.isNotEmpty
-                    ? ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: widget.pastCareGiveList != null && widget.pastCareGiveList!.length <= 3 ? widget.pastCareGiveList!.length : 3,
-                      itemBuilder: (context, index) {
-                        int itemCount = widget.pastCareGiveList != null && widget.pastCareGiveList!.length <= 3 ? widget.pastCareGiveList!.length : 3;
-                        return Column(
-                          children: [
-                            SizedBox(
-                              height: 38,
-                              child: widget.pastCareGiveList != null
-                                  && widget.pastCareGiveList!.isNotEmpty
-                                  && (
-                                    widget.pastCareGiveList![index].careGiver is String
-                                    || widget.pastCareGiveList![index].pet is String
-                                  )
-                                      ? const PastCareGiversLoadingWidget()
-                                      : PastCareGiversListElement(pastCareGiverInfo: widget.pastCareGiveList![index]),
-                            ),
-                            if (index < itemCount - 1 )
-                              Divider(
-                                  color: widget.pastCareGiveList != null
-                                      && widget.pastCareGiveList!.isNotEmpty
-                                      && widget.pastCareGiveList![index].careGiver is String
-                                      && widget.pastCareGiveList![index].pet is String
-                                        ? AppColors.benekBlack
-                                        : AppColors.benekWhite,
-                                  thickness: 0.5
+      child: MouseRegion(
+        cursor: widget.pastCareGiveList != null
+            && widget.pastCareGiveList!.isNotEmpty
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.basic,
+        onEnter: (event) {
+          if( widget.pastCareGiveList != null && widget.pastCareGiveList!.isNotEmpty ) {
+            setState(() {
+              isHovering = true;
+            });
+          }
+        },
+        onExit: (event) {
+          setState(() {
+            isHovering = false;
+          });
+        },
+        child: Stack(
+          children: [
+            Container(
+              height: 200,
+              width: 260,
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: isHovering ? AppColors.benekBlack.withOpacity(0.5) : AppColors.benekBlackWithOpacity,
+                borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.title,
+                    style: regularTextStyle( textColor: AppColors.benekWhite ),
+                  ),
+                  const Divider(color: AppColors.benekWhite, thickness: 0.5),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 145,
+                    child: widget.pastCareGiveList != null
+                      && widget.pastCareGiveList!.isNotEmpty
+                      ? ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: widget.pastCareGiveList != null && widget.pastCareGiveList!.length <= 3 ? widget.pastCareGiveList!.length : 3,
+                        itemBuilder: (context, index) {
+                          int itemCount = widget.pastCareGiveList != null && widget.pastCareGiveList!.length <= 3 ? widget.pastCareGiveList!.length : 3;
+                          return Column(
+                            children: [
+                              SizedBox(
+                                height: 38,
+                                child: widget.pastCareGiveList != null
+                                    && widget.pastCareGiveList!.isNotEmpty
+                                    && (
+                                      widget.pastCareGiveList![index].careGiver is String
+                                      || widget.pastCareGiveList![index].pet is String
+                                    )
+                                        ? const PastCareGiversLoadingWidget()
+                                        : PastCareGiversListElement(pastCareGiverInfo: widget.pastCareGiveList![index]),
                               ),
-                          ],
-                        );
-                      },
-                    )
-                    : Center(
+                              if (index < itemCount - 1 )
+                                Divider(
+                                    color: widget.pastCareGiveList != null
+                                        && widget.pastCareGiveList!.isNotEmpty
+                                        && widget.pastCareGiveList![index].careGiver is String
+                                        && widget.pastCareGiveList![index].pet is String
+                                          ? AppColors.benekBlack
+                                          : AppColors.benekWhite,
+                                    thickness: 0.5
+                                ),
+                            ],
+                          );
+                        },
+                      )
+                      : Center(
+                        child: Text(
+                          widget.pastCareGiversEmptyStateTitle,
+                          style: thinTextStyle(
+                            textColor: AppColors.benekWhite,
+                            textFontSize: 15,
+                          ),
+                        ),
+                      ),
+                  ),
+                ],
+              ),
+            ),
+
+            widget.pastCareGiveList != null && widget.pastCareGiveList!.isNotEmpty
+              ? Positioned(
+                bottom: 0,
+                child: Container(
+                  width: 260,
+                  height: 75,
+                  decoration: BoxDecoration(
+                    color: AppColors.benekWhite,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(6.0),
+                      bottomRight: Radius.circular(6.0),
+                    ),
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        AppColors.benekBlack.withOpacity(0.8),
+                        AppColors.benekBlack.withOpacity(0.0),
+                      ],
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 30.0),
+                    child: Center(
                       child: Text(
-                        widget.pastCareGiversEmptyStateTitle,
-                        style: thinTextStyle(
-                          textColor: AppColors.benekWhite,
-                          textFontSize: 15,
+                        BenekStringHelpers.locale('seeDetails'),
+                        style: TextStyle(
+                          color: AppColors.benekWhite,
+                          fontFamily: defaultFontFamily(),
+                          fontSize: 12,
+                          fontWeight: isHovering ? getFontWeight('semiBold') : getFontWeight('regular'),
                         ),
                       ),
                     ),
+                  )
                 ),
-              ],
-            ),
-          ),
-
-          widget.pastCareGiveList != null && widget.pastCareGiveList!.isNotEmpty
-            ? Positioned(
-              bottom: 0,
-              child: Container(
-                width: 260,
-                height: 75,
-                decoration: BoxDecoration(
-                  color: AppColors.benekWhite,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(6.0),
-                    bottomRight: Radius.circular(6.0),
-                  ),
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [
-                      AppColors.benekBlack.withOpacity(0.8),
-                      AppColors.benekBlack.withOpacity(0.0),
-                    ],
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 30.0),
-                  child: Center(
-                    child: Text(
-                      BenekStringHelpers.locale('seeDetails'),
-                      style: TextStyle(
-                        color: AppColors.benekWhite,
-                        fontFamily: defaultFontFamily(),
-                        fontSize: 12,
-                        fontWeight: isHovering ? getFontWeight('semiBold') : getFontWeight('regular'),
-                      ),
-                    ),
-                  ),
-                )
-              ),
-            )
-          : const SizedBox(),
-        ],
+              )
+            : const SizedBox(),
+          ],
+        ),
       ),
     );
   }
