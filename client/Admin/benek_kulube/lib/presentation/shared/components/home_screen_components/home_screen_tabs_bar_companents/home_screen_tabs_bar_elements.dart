@@ -79,6 +79,7 @@ class _TabsButonElementState extends State<TabsButonElement> {
             || (
               widget.store.state.activeTab == widget.tab
               && widget.store.state.selectedUserInfo == null
+              && !( widget.store.state.isLoading )
             )
               ? BoxDecoration(
                   color: AppColors.benekLightBlue,
@@ -108,6 +109,7 @@ class _TabsButonElementState extends State<TabsButonElement> {
                          || (
                               widget.store.state.activeTab == widget.tab
                               && widget.store.state.selectedUserInfo == null
+                              && !( widget.store.state.isLoading )
                           )
                       ? Colors.black
                           : null,
@@ -119,6 +121,7 @@ class _TabsButonElementState extends State<TabsButonElement> {
               || (
                   widget.store.state.activeTab == widget.tab
                   && widget.store.state.selectedUserInfo == null
+                  && !( widget.store.state.isLoading )
               )
                   ? Text(
                   widget.title,

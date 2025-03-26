@@ -17,6 +17,7 @@ import '../../../../../../../data/models/chat_models/message_seen_data_model.dar
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../benek_circle_avatar/benek_circle_avatar.dart';
 import '../../home_screen_profile_tab/message_components/chat_preview_component.dart';
+import '../../home_screen_profile_tab/profile_screen_section_components/pet_profile_turn_back_to_selected_user_button.dart';
 import '../../home_screen_profile_tab/profile_screen_section_components/punishment_count_widget.dart';
 
 class HomeScreenProfileRightTab extends StatefulWidget {
@@ -61,6 +62,7 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
           AuthRoleHelper.checkIfRequiredRole( store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
           && store.state.selectedUserInfo != null
           && store.state.selectedUserInfo!.userId != null
+          && store.state.selectedPet == null
         ){
          // Moderator Operations
 
@@ -108,6 +110,7 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
           AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('developer')])
           && store.state.selectedUserInfo != null
           && store.state.selectedUserInfo!.userId != null
+          && store.state.selectedPet == null
         ){
           // Developer Operations
 
@@ -178,12 +181,16 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
 
                       selectedUserInfo != null
                       && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
+                      && store.state.selectedPet == null
                         ? PunishmentCountWidget()
-                        : const SizedBox(),
+                          : store.state.selectedPet != null
+                            ? PetProfileTurnBackToSelectedUserButton()
+                            : const SizedBox(),
               
                       selectedUserInfo != null
                       && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
-                        ? ChatPreviewWidget(
+                      && store.state.selectedPet == null
+                          ? ChatPreviewWidget(
                           chatOwnerUserId: selectedUserInfo.userId!,
                           chatInfo: selectedUserInfo.chatData,
                           isLoading: isChatLoading,
@@ -192,7 +199,8 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
               
                       selectedUserInfo != null
                       && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('developer')])
-                        ? UserIdLogPreviewComponent(
+                      && store.state.selectedPet == null
+                          ? UserIdLogPreviewComponent(
                           isLoading: isLogsLoading,
                           logData: selectedUserInfo.logs,
                         )

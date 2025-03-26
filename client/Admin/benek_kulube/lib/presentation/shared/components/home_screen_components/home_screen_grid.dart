@@ -9,6 +9,7 @@ import 'package:benek_kulube/store/app_state.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 
+import '../loading_components/benek_loading_component.dart';
 import 'home_screen_tabs/home_screen_right_tabs/home_screen_home_right_bar/home_screen_home_right_bar.dart';
 import 'home_screen_tabs/home_screen_right_tabs/home_screen_home_right_bar/home_screen_profile_right_tab.dart';
 import 'home_screen_tabs_bar_companents/home_screen_tabs_bar.dart';
@@ -22,19 +23,35 @@ class HomeScreenGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    if (store.state.isLoading) {
+      return Row(
         children: [
+          // Sol bar
+          HomeScreenTabsBar(store: store),
 
+          // Kalan alan ortasında loading
+          Expanded(
+            child: Align(
+              alignment: Alignment.center,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: BenekLoadingComponent(),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
 
-          // Left Tab
-          // =====================================================
-          HomeScreenTabsBar( store: store,),
+    // isLoading değilse normal layout:
+    return Row(
+      children: [
+        // Sol bar
+        HomeScreenTabsBar(store: store),
 
-
-          // Center Tab
-          // =====================================================
-          Column(
+        // Orta alan
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -54,14 +71,14 @@ class HomeScreenGrid extends StatelessWidget {
                           : const BouncingScrollPhysics(),
                       children: [
                         const KulubeSearchBarButon(),
-                        const SizedBox( height: 100 ),
+                        const SizedBox(height: 100),
                         store.state.selectedUserInfo == null
-                          ? KulubeHomeTabWidget(
-                              firstName: store.state.userInfo!.identity!.firstName!,
-                              middleName: store.state.userInfo!.identity!.middleName,
-                              lastName: store.state.userInfo!.identity!.lastName!,
-                            )
-                          : const ProfileTab()
+                            ? KulubeHomeTabWidget(
+                          firstName: store.state.userInfo!.identity!.firstName!,
+                          middleName: store.state.userInfo!.identity!.middleName,
+                          lastName: store.state.userInfo!.identity!.lastName!,
+                        )
+                            : const ProfileTab()
                       ],
                     ),
                   ),
@@ -69,16 +86,13 @@ class HomeScreenGrid extends StatelessWidget {
               ),
             ],
           ),
+        ),
 
-
-          // Right Tab
-          // =====================================================
-          store.state.selectedUserInfo == null
-            ? HomeScreenHomeRightTab( user: store.state.userInfo! )
+        // Sağ bar
+        store.state.selectedUserInfo == null
+            ? HomeScreenHomeRightTab(user: store.state.userInfo!)
             : const HomeScreenProfileRightTab(),
-
-
-        ],
-      );
+      ],
+    );
   }
 }

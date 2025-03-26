@@ -162,5 +162,6 @@ class AppStaticTextsEn{
     'averageRating': "Average rating",
     'totalVote': "Total vote count",
     'primaryOwner': "Primary Owner",
+    'turnBackToSelectedUser': "Turn back to selected user...",
   };
 }

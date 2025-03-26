@@ -175,11 +175,8 @@ class ProfileRowWidget extends StatelessWidget {
                   await Future.delayed(const Duration(milliseconds: 50));
                   await store.dispatch( setSelectedUserAction( owner ) );
                 },
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: PrimaryOwnerButton(
-                    primaryOwner: selectedPet!.primaryOwner!,
-                  ),
+                child: PrimaryOwnerButton(
+                  primaryOwner: selectedPet!.primaryOwner!,
                 ),
               ),
               const SizedBox(width: 2.0,),

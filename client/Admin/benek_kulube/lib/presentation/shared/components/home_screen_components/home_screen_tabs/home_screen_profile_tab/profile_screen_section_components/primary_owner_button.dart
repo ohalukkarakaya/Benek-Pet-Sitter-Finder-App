@@ -24,6 +24,7 @@ class _PrimaryOwnerButtonState extends State<PrimaryOwnerButton> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onHover: (event) {
         setState(() {
           isHovering = true;

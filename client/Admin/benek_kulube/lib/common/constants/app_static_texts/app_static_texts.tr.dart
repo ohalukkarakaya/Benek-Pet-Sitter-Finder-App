@@ -162,5 +162,6 @@ class AppStaticTextsTr{
     'averageRating': "Ortalama puan",
     'totalVote': "Toplam oy sayısı",
     'primaryOwner': "Ana Sahip",
+    'turnBackToSelectedUser': "Seçili kullanıcıya geri dön...",
   };
 }
