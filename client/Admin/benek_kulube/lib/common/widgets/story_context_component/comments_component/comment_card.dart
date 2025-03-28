@@ -369,9 +369,9 @@ class _CommentCardWidgetState extends State<CommentCardWidget> {
                   await store.dispatch(deleteStoryCommentOrReplyRequestAction(widget.storyId, widget.commentId, widget.replyId));
                             },
                             child: const Icon(
-                  Icons.delete_outline,
-                  color: AppColors.benekWhite,
-                  size: 15,
+                              Icons.delete_outline,
+                              color: AppColors.benekWhite,
+                              size: 15,
                             ),
                           ),
                 ),

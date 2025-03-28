@@ -23,6 +23,7 @@ export '../../redux/select_story/select_story.action.dart';
 export '../../redux/set_recently_seen_user/set_recently_seen_user.action.dart';
 export '../../redux/process_counter/process_counter.action.dart';
 export '../../redux/punishment/get_users_punishment_count.action.dart';
+export '../../redux/punishment/get_users_punishment_data.action.dart';
 export '../../redux/punishment/punish_user.action.dart';
 export '../../redux/get_story_comments/get_story_comments_by_story_id.action.dart';
 export '../../redux/get_recommended_pets/get_recommended_pets.action.dart';

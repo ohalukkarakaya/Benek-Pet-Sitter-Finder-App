@@ -1,6 +1,7 @@
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/data/models/chat_models/punishment_info_model.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/profile_screen_section_components/punishment_detail_screen.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/material.dart';
@@ -57,40 +58,59 @@ class _PunishmentCountWidgetState extends State<PunishmentCountWidget> {
                         )
                     ),
                     controller: _punishWidgetTooltipController,
-                    child: MouseRegion(
-                      onEnter: (_) {
-                        setState(() {
-                          if(
-                          _punishWidgetTooltipController.value != ElTooltipStatus.showing
-                              && punishmentCount != null
-                          ){
-                            _punishWidgetTooltipController.show();
-                          }
-                        });
+                    child: GestureDetector(
+                      onTap: (){
+                        if( punishmentCount == null || punishmentCount == 0 ) return;
+
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            opaque: false,
+                            barrierDismissible: true,
+                            pageBuilder: (context, _, __) => PunishmentDetailScreen(
+                              punishmentCount: punishmentCount,
+                            ),
+                          ),
+                        );
                       },
-                      onExit: (_) {
-                        setState(() {
-                          if( _punishWidgetTooltipController.value != ElTooltipStatus.hidden ){
-                            _punishWidgetTooltipController.hide();
-                          }
-                        });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(
-                            3,
-                                (index){
-                              return Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Icon(
-                                  Icons.block,
-                                  color: index + 1 <= punishmentCount
-                                      ? PunishmentHelper.getPunishmentColor( index + 1 )
-                                      : AppColors.benekBlack,
-                                  size: 30,
-                                ),
-                              );
+                      child: MouseRegion(
+                        cursor: punishmentCount != null && punishmentCount > 0
+                            ? SystemMouseCursors.click
+                            : SystemMouseCursors.basic,
+                        onEnter: (_) {
+                          setState(() {
+                            if(
+                            _punishWidgetTooltipController.value != ElTooltipStatus.showing
+                                && punishmentCount != null
+                            ){
+                              _punishWidgetTooltipController.show();
                             }
+                          });
+                        },
+                        onExit: (_) {
+                          setState(() {
+                            if( _punishWidgetTooltipController.value != ElTooltipStatus.hidden ){
+                              _punishWidgetTooltipController.hide();
+                            }
+                          });
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List.generate(
+                              3,
+                              (index){
+                                return Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Icon(
+                                    Icons.block,
+                                    color: index + 1 <= punishmentCount
+                                        ? PunishmentHelper.getPunishmentColor( index + 1 )
+                                        : AppColors.benekBlack,
+                                    size: 30,
+                                  ),
+                                );
+                              }
+                          ),
                         ),
                       ),
                     ),

@@ -106,6 +106,10 @@ class ApiClient {
           List<dynamic> jsonList = value['photos'];
           List<PetImageModel> list = jsonList.map((item) => PetImageModel.fromJson(item)).toList();
           return list;
+        case 'List<PunishmentModel>':
+          List<dynamic> jsonList = value['punishmentRecords'];
+          List<PunishmentModel> list = jsonList.map((item) => PunishmentModel.fromJson(item)).toList();
+          return list;
 
         default:
           {

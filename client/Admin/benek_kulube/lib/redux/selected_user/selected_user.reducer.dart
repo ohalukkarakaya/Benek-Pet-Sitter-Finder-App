@@ -40,6 +40,18 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
     userInfo?.punishmentInfo?.setPunishmentCount(action.usersPunishmentCount);
 
     return userInfo;
+  }else if( action is GetUsersPunishmentDataAction ){
+    userInfo?.punishmentInfo ?? (
+        userInfo?.punishmentInfo = PunishmentInfoModel(
+          punishmentCount: 0,
+          punishmentList: []
+        )
+    );
+
+    userInfo?.punishmentInfo?.setPunishmentList(action.usersPunishmentData);
+    userInfo?.punishmentInfo?.setPunishmentCount( action.usersPunishmentData.length );
+
+    return userInfo;
   }else if( action is PunishUserAction ){
     if( userInfo?.punishmentInfo == null ){
       userInfo?.punishmentInfo = PunishmentInfoModel(

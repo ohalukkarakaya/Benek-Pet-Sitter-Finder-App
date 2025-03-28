@@ -20,7 +20,7 @@ ThunkAction<AppState> getUsersPunishmentCountRequestAction( String userId ) {
       await store.dispatch(GetUsersPunishmentCountRequestAction(_usersPunishmentCount));
 
     } on ApiException catch (e) {
-      log('ERROR: userSearchRequestAction - $e');
+      log('ERROR: getUsersPunishmentCountRequestAction - $e');
       // await AuthUtils.killUserSessionAndRestartApp(store);
     }
   };
