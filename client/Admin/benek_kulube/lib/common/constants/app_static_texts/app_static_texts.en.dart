@@ -163,5 +163,6 @@ class AppStaticTextsEn{
     'totalVote': "Total vote count",
     'primaryOwner': "Primary Owner",
     'turnBackToSelectedUser': "Turn back to selected user...",
+    'searchChat': "Search Chat...",
   };
 }

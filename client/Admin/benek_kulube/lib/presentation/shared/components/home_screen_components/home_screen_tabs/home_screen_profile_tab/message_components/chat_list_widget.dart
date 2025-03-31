@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:benek_kulube/common/constants/app_colors.dart';
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/message_components/chat_preview_element.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -135,7 +136,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                         controller: _searchController,
                         cursorColor: AppColors.benekBlack,
                         decoration: InputDecoration(
-                          hintText: 'Mesaj Ara...',
+                          hintText: BenekStringHelpers.locale('searchChat'),
                           hintStyle: thinTextStyle( textFontSize: 20.0 ),
                           suffixIcon: const Padding(
                             padding: EdgeInsets.only(right: 25.0),
@@ -162,6 +163,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                             searchText = value;
                           });
 
+                          store.dispatch(resetChatAsAdminRequest());
+
                           _searchTimer = Timer(const Duration(seconds: 1), () {
                             final trimmed = searchText.trim();
                             if (trimmed.length > 1) {
@@ -180,37 +183,44 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
                     // 💬 Chat Listesi
                     Expanded(
-                      child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                        child: ListView.builder(
-                          itemCount: chats.length,
-                          itemBuilder: (context, index) {
-                            final ChatModel chat = chats[index]!;
+                      child: (chats.isEmpty && searchText.trim().length > 1)
+                        ? Center(
+                          child: Text(
+                            BenekStringHelpers.locale('notFoundMessage'),
+                            style: TextStyle(color: Colors.white70, fontSize: 16),
+                          ),
+                        )
+                        : ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                          child: ListView.builder(
+                            itemCount: chats.length,
+                            itemBuilder: (context, index) {
+                              final ChatModel chat = chats[index]!;
 
-                            if (searchText.trim().isEmpty) {
-                              _checkIfPaginationNeeded(store, index, chatState?.totalChatCount ?? 0);
-                            }
+                              if (searchText.trim().isEmpty) {
+                                _checkIfPaginationNeeded(store, index, chatState?.totalChatCount ?? 0);
+                              }
 
-                            return GestureDetector(
-                              onTap: () => _onChatSelected(chat),
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                                decoration: BoxDecoration(
-                                  color: selectedChat?.id == chat.id
-                                      ? Colors.blueAccent.withOpacity(0.4)
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
+                              return GestureDetector(
+                                onTap: () => _onChatSelected(chat),
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                  decoration: BoxDecoration(
+                                    color: selectedChat?.id == chat.id
+                                        ? Colors.blueAccent.withOpacity(0.4)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: ChatPreviewElement(
+                                    chatOwnerUserId: store.state.selectedUserInfo!.userId!,
+                                    chatInfo: chat,
+                                  ),
                                 ),
-                                child: ChatPreviewElement(
-                                  chatOwnerUserId: store.state.selectedUserInfo!.userId!,
-                                  chatInfo: chat,
-                                ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
-                      ),
                     ),
                   ],
                 ),

@@ -62,7 +62,19 @@ ThunkAction<AppState> searchChatAsAdminRequest( String userId, String searchText
 
       await store.dispatch(SearchUsersChatAsAdminRequestAction(_searchedChatResult));
     } on ApiException catch (e) {
-      log('ERROR: seenMessageAsAdminAction - $e');
+      log('ERROR: searchChatAsAdminRequest - $e');
+    }
+  };
+}
+
+ThunkAction<AppState> resetChatAsAdminRequest() {
+  return (Store<AppState> store) async {
+    try {
+      ChatStateModel? _reset = null;
+
+      await store.dispatch(SearchUsersChatAsAdminRequestAction(_reset));
+    } on ApiException catch (e) {
+      log('ERROR: searchChatAsAdminRequest - $e');
     }
   };
 }

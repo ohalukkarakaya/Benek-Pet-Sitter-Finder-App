@@ -62,9 +62,12 @@ class GetUsersChatAsAdmin {
       String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
 
       var response = await apiClient.invokeAPI(path, 'GET', queryParams, postBody, headerParams, formParams, contentType, authNames);
-      if (response.statusCode >= 400) {
+      if (response.statusCode >= 400 && response.statusCode != 404) {
         throw ApiException(code: response.statusCode, message: response.body);
         // ignore: unnecessary_null_comparison
+      }else if( response.statusCode == 404 ){
+        ChatStateModel chatStateModel = ChatStateModel(totalChatCount: 0, chats: []);
+        return chatStateModel;
       }else if( response.body != null ){
         return apiClient.deserialize( response.body, 'ChatStateModel' ) as ChatStateModel;
       }else{

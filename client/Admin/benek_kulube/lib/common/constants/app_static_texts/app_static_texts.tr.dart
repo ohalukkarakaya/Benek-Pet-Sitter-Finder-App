@@ -163,5 +163,6 @@ class AppStaticTextsTr{
     'totalVote': "Toplam oy sayısı",
     'primaryOwner': "Ana Sahip",
     'turnBackToSelectedUser': "Seçili kullanıcıya geri dön...",
+    'searchChat': "Mesaj Ara...",
   };
 }
