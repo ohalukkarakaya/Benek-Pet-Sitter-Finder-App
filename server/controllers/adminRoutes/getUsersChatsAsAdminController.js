@@ -15,7 +15,6 @@ const getUsersChatsAsAdminController = async (req, res) => {
             {
                 $match: {
                     $and: [
-                        lastItemId !== 'null' ? { "_id": { $lt: mongoose.Types.ObjectId(lastItemId) } } : {},
                         { "members.userId": evaluatingUser },
                         { "members.leaveDate": { $exists: false } }
                     ]
@@ -53,19 +52,28 @@ const getUsersChatsAsAdminController = async (req, res) => {
                 }
             },
             { $sort: { sortDate: -1 } },
-            { $limit: limitValue }
         ];
 
         // // Chat objelerini hazırla ve filtrele ve say
-        const chatCountPipeline = [...chatMatchPipeline, { $count: "totalChatCount" }];
+        const chatCountPipeline = chatMatchPipeline.filter(stage => !stage.$limit);
+        chatCountPipeline.push({ $count: "totalChatCount" });
 
-        const [chats, chatCountResult] = await Promise.all([
+        let [chats, chatCountResult] = await Promise.all([
             Chat.aggregate( chatMatchPipeline ),
             Chat.aggregate( chatCountPipeline )
         ]);
 
         // toplam chat sayısını al
         const totalChatCount = chatCountResult[0] ? chatCountResult[0].totalChatCount : 0;
+
+        if(lastItemId !== "null" && chats.length > 0) {
+            const lastItemIndex = chats.findIndex(chat => chat._id.toString() === lastItemId);
+            chats = chats.slice(lastItemIndex + 1);
+        }
+
+        if( chats.length > limitValue ){
+            chats = chats.slice( 0, limitValue );
+        }
 
         // kullanıcıya dönülecek sohbet üyelerinin verisini hazırla
         for( let chat of chats ){

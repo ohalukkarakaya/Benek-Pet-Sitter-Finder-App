@@ -28,11 +28,7 @@ class ChatPreviewElement extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        SizedBox(
-          width: 100,
-          height: 35,
-          child: ChatStackedProfile(chatOwnerUserId: chatOwnerUserId, chatMembers: chatInfo.members),
-        ),
+        ChatStackedProfile(chatOwnerUserId: chatOwnerUserId, chatMembers: chatInfo.members),
         const SizedBox(width: 10.0),
         Expanded(
           child: Column(

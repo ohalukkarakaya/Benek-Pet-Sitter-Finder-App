@@ -1,3 +1,7 @@
+
+
+import 'dart:developer';
+
 import '../../services/api.dart';
 import 'chat_model.dart';
 import 'message_seen_data_model.dart';
@@ -27,20 +31,33 @@ class ChatStateModel {
     return data;
   }
 
-  void sortChats(){
-    if( chats != null && chats!.isNotEmpty ){
-      chats!.sort((a, b) {
-          DateTime bDate = b!.messages != null && b.messages!.isNotEmpty
-              ? b.messages!.last.sendDate!
-              : b.chatStartDate!;
+  void sortChats() {
+    if (chats == null || chats!.isEmpty) return;
 
-          DateTime aDate = a!.messages != null && a.messages!.isNotEmpty
-              ? a.messages!.last.sendDate!
-              : a.chatStartDate!;
+    chats!.sort((a, b) {
+      final aDate = _getLastActivityDate(a);
+      final bDate = _getLastActivityDate(b);
 
-          return bDate.compareTo(aDate);
-      });
+      return bDate.compareTo(aDate); // en yeni yukarıda
+    });
+  }
+
+  DateTime _getLastActivityDate(ChatModel? chat) {
+    // Eğer mesaj varsa ve geçerli tarih varsa onu kullan
+    if (chat?.messages != null && chat!.messages!.isNotEmpty) {
+      final lastMessage = chat.messages!.last;
+      if (lastMessage.sendDate != null) {
+        return lastMessage.sendDate!;
+      }
     }
+
+    // Yoksa chatStartDate kullan
+    if (chat?.chatStartDate != null) {
+      return chat!.chatStartDate!;
+    }
+
+    // En son fallback: çok eski bir tarih
+    return DateTime.fromMillisecondsSinceEpoch(0);
   }
 
   void addMessageOrChat(ChatModel newChat, String userId) {
@@ -71,6 +88,8 @@ class ChatStateModel {
       // Eğer chats listesi boşsa, yeni chat'i ekle
       chats = [newChat];
     }
+
+    sortChats();
   }
 
   void seeMessage(MessageSeenData receivingSeenData){

@@ -71,12 +71,21 @@ class ChatStackedProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final memberCount = chatMembers?.length ?? 0;
+    final double overlapOffset = 20.0;
+    final double avatarDiameter = 35.0;
+
+    final double width = memberCount > 0
+        ? avatarDiameter + (memberCount - 1) * overlapOffset
+        : 0;
+
     return SizedBox(
-      width: 150,
-      height: 50,
-      child: chatMembers != null && chatMembers!.isNotEmpty
-        ? _buildStackedProfile()
-        : const SizedBox(),
+      width: width,
+      height: avatarDiameter,
+      child: memberCount > 0
+          ? _buildStackedProfile()
+          : const SizedBox(),
     );
   }
 }

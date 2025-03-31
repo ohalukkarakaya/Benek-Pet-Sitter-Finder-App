@@ -21,6 +21,15 @@ ThunkAction<AppState> getUsersChatAsAdminRequestAction( String userId, String? l
       ChatStateModel? _chatData = await api.getUsersChatAsAdminRequest( userId, lastItemId);
       _chatData?.sortChats();
 
+      bool isPagination = lastItemId != null;
+      if( isPagination ){
+        for(var chat in _chatData!.chats!){
+          store.state.selectedUserInfo!.chatData?.addMessageOrChat(chat!, userId);
+        }
+
+        _chatData = store.state.selectedUserInfo!.chatData;
+      }
+
       await store.dispatch(GetUsersChatAsAdminRequestAction(_chatData));
     } on ApiException catch (e) {
       log('ERROR: getUsersChatAsAdminRequestAction - $e');
