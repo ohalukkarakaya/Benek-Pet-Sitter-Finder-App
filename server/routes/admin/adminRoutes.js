@@ -74,6 +74,7 @@ router.get(
     getUsersChatsAsAdminController
 );
 
+// - tested
 // search users chat as admin
 router.get(
     "/searchUsersChat/:userId/:searchText",

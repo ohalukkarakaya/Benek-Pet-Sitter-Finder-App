@@ -1,8 +1,3 @@
-
-
-import 'dart:developer';
-
-import '../../services/api.dart';
 import 'chat_model.dart';
 import 'message_seen_data_model.dart';
 
@@ -13,7 +8,9 @@ class ChatStateModel {
   ChatStateModel({this.totalChatCount, this.chats});
 
   ChatStateModel.fromJson(Map<String, dynamic> json) {
-    totalChatCount = json['totalChatCount'];
+    json['totalChatCount'] != null
+        ? totalChatCount = json['totalChatCount']
+        : json['chats'].length;
     if (json['chats'] != null) {
       chats = <ChatModel>[];
       json['chats'].forEach((v) {
@@ -38,12 +35,11 @@ class ChatStateModel {
       final aDate = _getLastActivityDate(a);
       final bDate = _getLastActivityDate(b);
 
-      return bDate.compareTo(aDate); // en yeni yukarıda
+      return bDate.compareTo(aDate);
     });
   }
 
   DateTime _getLastActivityDate(ChatModel? chat) {
-    // Eğer mesaj varsa ve geçerli tarih varsa onu kullan
     if (chat?.messages != null && chat!.messages!.isNotEmpty) {
       final lastMessage = chat.messages!.last;
       if (lastMessage.sendDate != null) {

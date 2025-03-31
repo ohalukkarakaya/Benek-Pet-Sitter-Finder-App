@@ -20,10 +20,7 @@ const searchChatAsAdminController = async (req, res) => {
         }).lean();
 
         let matchingChats = [];
-        for(
-            let chat
-            of chats
-            ){
+        for( let chat of chats ){
             const chatData = chat;
 
             const members = chatData.members.filter(
@@ -38,10 +35,7 @@ const searchChatAsAdminController = async (req, res) => {
             );
 
             let didUserMatched
-            for(
-                let memberId
-                of userIdies
-                ){
+            for( let memberId of userIdies ){
                 const member = await User.findById( memberId );
                 if( !memberId ){ break; }
 
@@ -77,10 +71,7 @@ const searchChatAsAdminController = async (req, res) => {
                 break;
             }
 
-            for(
-                let message
-                of chat.messages
-                ){
+            for( let message of chat.messages ){
                 if(
                     message.message
                     && message.message.toLowerCase().includes( searchValue.toLowerCase() )
@@ -101,16 +92,10 @@ const searchChatAsAdminController = async (req, res) => {
                 );
         }
 
-        for(
-            let chat
-            of matchingChats
-            ){
+        for( let chat of matchingChats ){
             // prepare profile info of chat members
             let membersList = [];
-            for(
-                let member
-                of chat.members
-                ){
+            for( let member of chat.members ){
                 let userObject = await User.findById( member.userId.toString() );
                 if( !userObject ){
                     console.log( "user not found" );
@@ -118,6 +103,7 @@ const searchChatAsAdminController = async (req, res) => {
                 }
 
                 let userInfo = getLightWeightUserInfoHelper( userObject );
+                userInfo.joinDate = member.joinDate;
                 membersList.push( userInfo );
             }
 

@@ -27,6 +27,9 @@ UserInfo? setSelectedUserReducer( UserInfo? userInfo, dynamic action ){
   }else if( action is GetUsersChatAsAdminRequestAction ){
     userInfo?.chatData = action.chatData;
     return userInfo;
+  }else if( action is SearchUsersChatAsAdminRequestAction ){
+    userInfo?.searchedChatData = action.searchedChatResult;
+    return userInfo;
   }else if( action is GetLogsByUserIdRequestAction ){
     userInfo?.logs = action.dataList;
     return userInfo;

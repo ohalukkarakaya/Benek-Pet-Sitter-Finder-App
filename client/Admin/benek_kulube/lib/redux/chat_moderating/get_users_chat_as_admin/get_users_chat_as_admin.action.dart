@@ -53,6 +53,20 @@ ThunkAction<AppState> getUsersChatAsAdminRequestActionFromSocket( ChatModel rece
   };
 }
 
+ThunkAction<AppState> searchChatAsAdminRequest( String userId, String searchText ) {
+  return (Store<AppState> store) async {
+    try {
+      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+      ChatStateModel? _searchedChatResult = await api.getSearchChatAsAdminRequest( userId, searchText );
+      _searchedChatResult?.sortChats();
+
+      await store.dispatch(SearchUsersChatAsAdminRequestAction(_searchedChatResult));
+    } on ApiException catch (e) {
+      log('ERROR: seenMessageAsAdminAction - $e');
+    }
+  };
+}
+
 ThunkAction<AppState> seenMessageAsAdminBySocketAction( MessageSeenData receivingSeenData ) {
   return (Store<AppState> store) async {
     try {
@@ -70,4 +84,10 @@ class GetUsersChatAsAdminRequestAction {
   final ChatStateModel? _chatData;
   ChatStateModel? get chatData => _chatData;
   GetUsersChatAsAdminRequestAction(this._chatData);
+}
+
+class SearchUsersChatAsAdminRequestAction {
+  final ChatStateModel? _searchedChatResult;
+  ChatStateModel? get searchedChatResult => _searchedChatResult;
+  SearchUsersChatAsAdminRequestAction(this._searchedChatResult);
 }

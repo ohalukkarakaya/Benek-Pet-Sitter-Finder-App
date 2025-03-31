@@ -43,6 +43,7 @@ class UserInfo {
   int? totalStar;
   int? starAverage;
   ChatStateModel? chatData;
+  ChatStateModel? searchedChatData;
   List<LogModel>? logs;
   PunishmentInfoModel? punishmentInfo;
   String? iban;
@@ -78,6 +79,7 @@ class UserInfo {
       this.totalStar,
       this.starAverage,
       this.chatData,
+      this.searchedChatData,
       this.logs,
       this.punishmentInfo,
       this.iban,
@@ -190,6 +192,9 @@ class UserInfo {
     chatData = json['chatData'] != null
         ? ChatStateModel.fromJson( json['chatData'] )
         : null;
+    searchedChatData = json['searchedChatData'] != null
+        ? ChatStateModel.fromJson( json['searchedChatData'] )
+        : null;
     didUserBanned = json['didUserBanned'] ?? false;
   }
 
@@ -255,6 +260,9 @@ class UserInfo {
     if( chatData != null ){
       data['chatData'] = chatData!.toJson();
     }
+    if( searchedChatData != null ){
+      data['searchedChatData'] = searchedChatData!.toJson();
+    }
     return data;
   }
 
@@ -272,6 +280,10 @@ class UserInfo {
 
   dynamic addChatData( ChatStateModel inComingChatData ){
     chatData = inComingChatData;
+  }
+
+  dynamic addSearchedChatData( ChatStateModel inComingSearchedChatData ){
+    searchedChatData = inComingSearchedChatData;
   }
 
   dynamic addLogData( List<LogModel> inComingLogListData ){
