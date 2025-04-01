@@ -1,5 +1,14 @@
+import 'package:benek_kulube/data/models/chat_models/message_model.dart';
+
 import 'chat_model.dart';
 import 'message_seen_data_model.dart';
+
+import 'package:flutter_redux/flutter_redux.dart';
+// ignore: depend_on_referenced_packages
+import 'package:redux/redux.dart';
+import 'package:benek_kulube/store/actions/app_actions.dart';
+import 'package:benek_kulube/store/app_redux_store.dart';
+import 'package:benek_kulube/store/app_state.dart';
 
 class ChatStateModel {
   int? totalChatCount;
@@ -57,6 +66,24 @@ class ChatStateModel {
   }
 
   void addMessageOrChat(ChatModel newChat, String userId) {
+    Store<AppState> store = AppReduxStore.currentStore!;
+    if( userId == store.state.selectedUserInfo!.userId ){
+      List<String> messagesIdsList = [];
+      for( MessageModel message in newChat.messages! ){
+        if(message.seenBy != null && message.seenBy!.contains(userId)){
+          continue;
+        }
+        messagesIdsList.add(message.id!);
+        message.seenBy != null
+          ? message.seenBy!.add(userId)
+          : message.seenBy = [userId];
+      }
+
+      if( messagesIdsList.isNotEmpty ){
+        store.dispatch(seeMessagesAction(newChat.id!, messagesIdsList));
+      }
+    }
+
     if( chats != null && chats!.isNotEmpty ){
       ChatModel? chatOfTheMessage = chats?.firstWhere(
           (element) => element!.id.toString() == newChat.id.toString(),

@@ -37,7 +37,8 @@ const getUsersChatsAsAdminController = async (req, res) => {
                                 cond: { $not: { $in: [evaluatingUser, "$$message.seenBy"] } }
                             }
                         }
-                    }
+                    },
+                    totalMessageCount: { $size: "$messages" }
                 }
             },
             {

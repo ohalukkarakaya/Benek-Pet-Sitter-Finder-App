@@ -59,7 +59,10 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
 
         // Moderator Operations Auth Check
         if(
-          AuthRoleHelper.checkIfRequiredRole( store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
+          (
+            AuthRoleHelper.checkIfRequiredRole( store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
+            || store.state.userInfo!.userId == store.state.selectedUserInfo!.userId
+          )
           && store.state.selectedUserInfo != null
           && store.state.selectedUserInfo!.userId != null
           && store.state.selectedPet == null
@@ -77,7 +80,9 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
          ){
            Future.delayed(Duration.zero, () async {
              socket.emit(
-                 'addEvaluatorToChat',
+                 store.state.userInfo!.userId != store.state.selectedUserInfo!.userId
+                  ? 'addEvaluatorToChat'
+                  : 'addUser',
                  [
                    store.state.userInfo!.userId,
                    store.state.selectedUserInfo!.userId!
@@ -188,7 +193,10 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
                             : const SizedBox(),
               
                       selectedUserInfo != null
-                      && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
+                      && (
+                          AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')])
+                          || store.state.userInfo!.userId == store.state.selectedUserInfo!.userId
+                      )
                       && store.state.selectedPet == null
                           ? ChatPreviewWidget(
                           chatOwnerUserId: selectedUserInfo.userId!,

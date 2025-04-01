@@ -104,6 +104,7 @@ const searchChatAsAdminController = async (req, res) => {
 
                 let userInfo = getLightWeightUserInfoHelper( userObject );
                 userInfo.joinDate = member.joinDate;
+                userInfo.leaveDate = member.leaveDate;
                 membersList.push( userInfo );
             }
 
@@ -112,9 +113,11 @@ const searchChatAsAdminController = async (req, res) => {
 
             // prepare last message
             let lastMessage = chat.messages[ chat.messages.length - 1 ];
+            let totalMessageCount = chat.messages.length;
 
             delete chat.messages;
             chat.lastMessage = lastMessage;
+            chat.totalMessageCount = totalMessageCount;
 
             // prepare message seenBy
             let seenUsersList = [];

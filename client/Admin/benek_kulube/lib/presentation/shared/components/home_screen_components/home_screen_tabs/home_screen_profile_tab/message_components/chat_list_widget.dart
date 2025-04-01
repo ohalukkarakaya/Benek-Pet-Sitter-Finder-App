@@ -114,6 +114,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           });
         }
 
+        bool isUsersOwnChat = store.state.selectedUserInfo!.userId == store.state.userInfo!.userId;
+
         return Row(
           children: [
             // Sol Panel - Chat Listesi
@@ -130,55 +132,89 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                 child: Column(
                   children: [
                     // 🔍 Arama Barı
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: TextField(
-                        controller: _searchController,
-                        cursorColor: AppColors.benekBlack,
-                        decoration: InputDecoration(
-                          hintText: BenekStringHelpers.locale('searchChat'),
-                          hintStyle: thinTextStyle( textFontSize: 20.0 ),
-                          suffixIcon: const Padding(
-                            padding: EdgeInsets.only(right: 25.0),
-                            child: Icon(
-                                BenekIcons.searchcircle,
-                                color: AppColors.benekBlack,
+                    Row(
+                      children: [
+                        // + butonu
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12.0),
+                          child: SizedBox(
+                            width: 48,
+                            height: 48,
+                            child: ElevatedButton(
+
+                              onPressed: isUsersOwnChat
+                                ? () {
+                                    // buton aksiyonu
+                                  }
+                                : null,
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                padding: EdgeInsets.zero,
+                                backgroundColor: isUsersOwnChat ? AppColors.benekLightBlue : AppColors.benekLightBlue.withOpacity(0.5),
+                                iconColor: isUsersOwnChat ? AppColors.benekBlack : AppColors.benekBlack.withOpacity(0.3),
+                                overlayColor: AppColors.benekBlack.withOpacity(0.1),
+                                splashFactory: isUsersOwnChat ? InkRipple.splashFactory : NoSplash.splashFactory,
+                              ),
+                              child: Icon(Icons.add),
                             ),
                           ),
-                          filled: true,
-                          fillColor: AppColors.benekLightBlue,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all( Radius.circular( 6.0 ) ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6.0),
+                        ),
+
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: TextField(
+                              controller: _searchController,
+                              cursorColor: AppColors.benekBlack,
+                              decoration: InputDecoration(
+                                hintText: BenekStringHelpers.locale('searchChat'),
+                                hintStyle: thinTextStyle( textFontSize: 20.0 ),
+                                suffixIcon: const Padding(
+                                  padding: EdgeInsets.only(right: 25.0),
+                                  child: Icon(
+                                      BenekIcons.searchcircle,
+                                      color: AppColors.benekBlack,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: AppColors.benekLightBlue,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+                                border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all( Radius.circular( 6.0 ) ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                              ),
+                              style: regularTextStyle( textFontSize: 20.0 ),
+                              onChanged: (value) {
+                                _searchTimer?.cancel();
+                          
+                                setState(() {
+                                  searchText = value;
+                                });
+                          
+                                store.dispatch(resetChatAsAdminRequest());
+                          
+                                _searchTimer = Timer(const Duration(seconds: 1), () {
+                                  final trimmed = searchText.trim();
+                                  if (trimmed.length > 1) {
+                                    store.dispatch(searchChatAsAdminRequest(
+                                      store.state.selectedUserInfo!.userId!,
+                                      trimmed,
+                                    ));
+                                    log('Searching chat: $trimmed');
+                                  } else {
+                                    store.dispatch(resetChatAsAdminRequest());
+                                  }
+                                });
+                              },
+                            ),
                           ),
                         ),
-                        style: regularTextStyle( textFontSize: 20.0 ),
-                        onChanged: (value) {
-                          _searchTimer?.cancel();
-
-                          setState(() {
-                            searchText = value;
-                          });
-
-                          store.dispatch(resetChatAsAdminRequest());
-
-                          _searchTimer = Timer(const Duration(seconds: 1), () {
-                            final trimmed = searchText.trim();
-                            if (trimmed.length > 1) {
-                              store.dispatch(searchChatAsAdminRequest(
-                                store.state.selectedUserInfo!.userId!,
-                                trimmed,
-                              ));
-                              log('Searching chat: $trimmed');
-                            } else {
-                              store.dispatch(resetUserSearchDataAction());
-                            }
-                          });
-                        },
-                      ),
+                      ],
                     ),
 
                     // 💬 Chat Listesi

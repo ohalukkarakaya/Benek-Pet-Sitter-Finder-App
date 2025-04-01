@@ -92,6 +92,21 @@ ThunkAction<AppState> seenMessageAsAdminBySocketAction( MessageSeenData receivin
   };
 }
 
+ThunkAction<AppState> seeMessagesAction( String chatId, List<String> messageIds ) {
+  return (Store<AppState> store) async {
+    try {
+      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+      bool response = await api.seeMessages( chatId, messageIds );
+
+      if( !response ){
+        log('ERROR: seeMessagesAction - response is false');
+      }
+    } on ApiException catch (e) {
+      log('ERROR: seeMessagesAction - $e');
+    }
+  };
+}
+
 class GetUsersChatAsAdminRequestAction {
   final ChatStateModel? _chatData;
   ChatStateModel? get chatData => _chatData;

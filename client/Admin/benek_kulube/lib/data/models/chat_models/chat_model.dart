@@ -15,6 +15,7 @@ class ChatModel {
   String? chatImageUrl;
   String? chatName;
   int? unreadMessageCount;
+  int? totalMessageCount;
 
   ChatModel(
       {
@@ -25,7 +26,8 @@ class ChatModel {
         this.messages,
         this.chatImageUrl,
         this.chatName,
-        this.unreadMessageCount
+        this.unreadMessageCount,
+        this.totalMessageCount
       }
   );
 
@@ -54,6 +56,7 @@ class ChatModel {
     chatImageUrl = json['chatImageUrl'];
     chatName = json['chatName'];
     unreadMessageCount = json['unreadMessageCount'] ?? 0;
+    totalMessageCount = json['totalMessageCount'] ?? 0;
   }
 
   Map<String, dynamic> toJson(){
@@ -70,6 +73,7 @@ class ChatModel {
     data['chatImageUrl'] = chatImageUrl;
     data['chatName'] = chatName;
     data['unreadMessageCount'] = unreadMessageCount;
+    data['totalMessageCount'] = totalMessageCount;
     return data;
   }
 
