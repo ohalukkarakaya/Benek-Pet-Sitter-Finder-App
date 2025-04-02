@@ -92,7 +92,15 @@ io.on(
                 let rawEvaluatorsList = [];
                 for (let receiverUserId of [...new Set(receiverIdList)]) {
                     let user = getUser(receiverUserId);
-                    if (user && receiverUserId !== chatObject.message.sendedUserId.toString()) {
+                    if (
+                        user
+                        && (
+                            chatObject != null
+                            && chatObject.message != null
+                            && chatObject.message.sendedUserId.toString() !== null
+                            && receiverUserId !== chatObject.message.sendedUserId.toString()
+                        )
+                    ) {
                         io.to(user.socketId).emit("getMessage", chatObject)
                     }
 
