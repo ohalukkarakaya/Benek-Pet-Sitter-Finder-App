@@ -11,6 +11,7 @@ class BenekSmallButton extends StatefulWidget {
   final Function()? onTap;
   final double iconSize;
   final bool isLight;
+  final bool isPassive;
   final String? tooltipMessage;
   final double size;
 
@@ -20,6 +21,7 @@ class BenekSmallButton extends StatefulWidget {
     this.onTap,
     this.iconSize = 20,
     this.isLight = false,
+    this.isPassive = false,
     this.tooltipMessage,
     this.size = 50,
   });
@@ -35,14 +37,17 @@ class _BenekSmallButtonState extends State<BenekSmallButton> {
   Widget _buildChildWidget(){
     return GestureDetector(
       onTap: widget.tooltipMessage == null
+          && !widget.isPassive
           ? widget.onTap
           : null,
       child: MouseRegion(
-        cursor: SystemMouseCursors.click,
+        cursor: !widget.isPassive ? SystemMouseCursors.click : SystemMouseCursors.basic,
         onHover: (event) {
-          setState(() {
-            isHovering = true;
-          });
+          if( !widget.isPassive ) {
+            setState(() {
+              isHovering = true;
+            });
+          }
         },
         onExit: (event) {
           setState(() {
@@ -54,6 +59,7 @@ class _BenekSmallButtonState extends State<BenekSmallButton> {
           height: widget.size,
           decoration: BoxDecoration(
             color: isHovering
+              && !widget.isPassive
                 ? AppColors.benekLightBlue
                 : !widget.isLight
                     ? AppColors.benekBlackWithOpacity
@@ -64,7 +70,11 @@ class _BenekSmallButtonState extends State<BenekSmallButton> {
             child: Icon(
               widget.iconData,
               size: widget.iconSize,
-              color: isHovering ? AppColors.benekBlack : AppColors.benekWhite,
+              color: widget.isPassive
+                ? AppColors.benekGrey
+                : isHovering
+                  ? AppColors.benekBlack
+                  : AppColors.benekWhite,
             )
           ),
         ),

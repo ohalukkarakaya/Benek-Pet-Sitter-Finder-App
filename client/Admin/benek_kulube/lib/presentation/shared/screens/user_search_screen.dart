@@ -15,7 +15,11 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 class KulubeUserSearchScreen extends StatefulWidget {
-  const KulubeUserSearchScreen({super.key});
+  final bool isForUserProfile;
+  const KulubeUserSearchScreen({
+    super.key,
+    this.isForUserProfile = true
+  });
 
   @override
   State<KulubeUserSearchScreen> createState() => _KulubeUserSearchScreenState();
@@ -92,7 +96,11 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
       });
 
       if( hoveringUser != null ){
-        _updateSelectedUser(hoveringUser!);
+        if( widget.isForUserProfile ){
+          _updateSelectedUser(hoveringUser!);
+        }else{
+          Navigator.of(context).pop(hoveringUser);
+        }
       }else{
         Navigator.pop(context);
       }

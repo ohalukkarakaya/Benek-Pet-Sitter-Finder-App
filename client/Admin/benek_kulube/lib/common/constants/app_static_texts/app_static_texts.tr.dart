@@ -164,5 +164,6 @@ class AppStaticTextsTr{
     'primaryOwner': "Ana Sahip",
     'turnBackToSelectedUser': "Seçili kullanıcıya geri dön...",
     'searchChat': "Mesaj Ara...",
+    'enterChatDesc': "Sohbet Açıklaması Girin...",
   };
 }

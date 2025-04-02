@@ -164,5 +164,6 @@ class AppStaticTextsEn{
     'primaryOwner': "Primary Owner",
     'turnBackToSelectedUser': "Turn back to selected user...",
     'searchChat': "Search Chat...",
+    'enterChatDesc': "Enter Chat Description...",
   };
 }

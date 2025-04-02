@@ -89,8 +89,8 @@ class _ChatBoxScreenState extends State<ChatBoxScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height - 100,
-                  width: MediaQuery.of(context).size.width - 100,
+                  height: MediaQuery.of(context).size.height - 150,
+                  width: MediaQuery.of(context).size.width - 150,
                   child: ChatListWidget(),
                 ),
               ],

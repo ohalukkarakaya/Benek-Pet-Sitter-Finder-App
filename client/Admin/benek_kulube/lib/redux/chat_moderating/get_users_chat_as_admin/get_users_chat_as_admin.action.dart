@@ -107,6 +107,19 @@ ThunkAction<AppState> seeMessagesAction( String chatId, List<String> messageIds 
   };
 }
 
+ThunkAction<AppState> createChat( String desc, List<String> memberIds ) {
+  return (Store<AppState> store) async {
+    try {
+      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+      String? newChatId = await api.postCreateChatRequest( desc, memberIds );
+
+      return newChatId;
+    } on ApiException catch (e) {
+      log('ERROR: createChat - $e');
+    }
+  };
+}
+
 class GetUsersChatAsAdminRequestAction {
   final ChatStateModel? _chatData;
   ChatStateModel? get chatData => _chatData;

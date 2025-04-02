@@ -8,6 +8,7 @@ class BenekHorizontalButton extends StatefulWidget {
   final double width;
   final double height;
   final bool isLight;
+  final bool isPassive;
   final Function()? onTap;
   const BenekHorizontalButton({
     super.key,
@@ -15,6 +16,7 @@ class BenekHorizontalButton extends StatefulWidget {
     this.width = 230,
     this.height = 50,
     this.isLight = false,
+    this.isPassive = false,
     this.onTap
   });
 
@@ -28,13 +30,15 @@ class _BenekHorizontalButtonState extends State<BenekHorizontalButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: !widget.isPassive ? widget.onTap : null,
       child: MouseRegion(
-        cursor: SystemMouseCursors.click,
+        cursor: !widget.isPassive ? SystemMouseCursors.click : SystemMouseCursors.basic,
         onHover: (event) {
-          setState(() {
-            isHovering = true;
-          });
+          if(!widget.isPassive) {
+            setState(() {
+              isHovering = true;
+            });
+          }
         },
         onExit: (event) {
           setState(() {
@@ -61,7 +65,11 @@ class _BenekHorizontalButtonState extends State<BenekHorizontalButton> {
                 style: TextStyle(
                   fontFamily: defaultFontFamily(),
                   fontSize: 12.0,
-                  color: !isHovering ? AppColors.benekWhite : AppColors.benekBlack,
+                  color: widget.isPassive
+                  ? AppColors.benekGrey
+                  : !isHovering
+                      ? AppColors.benekWhite
+                      : AppColors.benekBlack,
                   fontWeight: getFontWeight('regular'),
                 ),
                 textAlign: TextAlign.center,
@@ -69,7 +77,11 @@ class _BenekHorizontalButtonState extends State<BenekHorizontalButton> {
               ),
               Icon(
                 BenekIcons.right,
-                color: !isHovering ? AppColors.benekWhite : AppColors.benekBlack,
+                color: widget.isPassive
+                    ? AppColors.benekGrey
+                    : !isHovering
+                        ? AppColors.benekWhite
+                        : AppColors.benekBlack,
                 size: 12.0
               )
             ],

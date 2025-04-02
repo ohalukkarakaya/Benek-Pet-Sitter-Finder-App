@@ -3,7 +3,9 @@ import 'dart:developer';
 
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/data/models/chat_models/chat_member_model.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/message_components/chat_preview_element.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/message_components/select_members_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -15,6 +17,9 @@ import 'package:benek_kulube/store/actions/app_actions.dart';
 
 import '../../../../../../../common/constants/benek_icons.dart';
 import '../../../../../../../common/utils/styles.text.dart';
+import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
+import '../../../../../screens/user_search_screen.dart';
+import '../profile_screen_section_components/edit_profile_screen/edit_text_screen.dart';
 
 class ChatListWidget extends StatefulWidget {
   const ChatListWidget({super.key});
@@ -143,8 +148,60 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                             child: ElevatedButton(
 
                               onPressed: isUsersOwnChat
-                                ? () {
-                                    // buton aksiyonu
+                                ? () async {
+                                   String? chatDesc = await Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        opaque: false,
+                                        barrierDismissible: false,
+                                        pageBuilder: (context, _, __) => EditTextScreen(
+                                          hintText: BenekStringHelpers.locale("enterChatDesc"),
+                                        ),
+                                      ),
+                                    );
+
+                                   if(chatDesc == null) return;
+
+                                   List<UserInfo>? members = await Navigator.push(
+                                     context,
+                                     PageRouteBuilder(
+                                       opaque: false,
+                                       barrierDismissible: false,
+                                       pageBuilder: (context, _, __) => SelectMembersScreen( desc: chatDesc, ),
+                                     ),
+                                   );
+
+                                   if(members == null) return;
+
+                                   List<String>? memberIds = members.map((e) => e.userId!).toList();
+
+                                   String? newChatId = await store.dispatch(createChat(
+                                     chatDesc,
+                                     memberIds,
+                                   ));
+
+
+                                   if( newChatId != null ) {
+                                     List<ChatMemberModel> chatMembers = [];
+                                     for( UserInfo member in members ) {
+                                       ChatMemberModel newChatMember = ChatMemberModel(
+                                         userData: member,
+                                         joinDate: DateTime.now(),
+                                       );
+
+                                        chatMembers.add(newChatMember);
+                                     }
+                                     ChatModel newChat = ChatModel(
+                                       id: newChatId,
+                                       chatDesc: chatDesc,
+                                       members: chatMembers,
+                                       messages: [],
+                                       chatStartDate: DateTime.now(),
+                                       unreadMessageCount: 0,
+                                     );
+
+                                     store.dispatch(getUsersChatAsAdminRequestActionFromSocket(newChat, store.state.selectedUserInfo!.userId!));
+                                   }
                                   }
                                 : null,
                               style: ElevatedButton.styleFrom(
