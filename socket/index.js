@@ -91,20 +91,20 @@ io.on(
             ( chatObject, receiverIdList ) => {
                 let rawEvaluatorsList = [];
                 for (let receiverUserId of [...new Set(receiverIdList)]) {
-                    let user = getUser(receiverUserId);
+                    let user = getUser(receiverUserId.userId);
                     if (
                         user
                         && (
                             chatObject != null
                             && chatObject.message != null
                             && chatObject.message.sendedUserId.toString() !== null
-                            && receiverUserId !== chatObject.message.sendedUserId.toString()
+                            && receiverUserId.userId !== chatObject.message.sendedUserId.toString()
                         )
                     ) {
                         io.to(user.socketId).emit("getMessage", chatObject)
                     }
 
-                    let evaluators = [...new Set(getEvaluatorsOnChat(receiverUserId))];
+                    let evaluators = [...new Set(getEvaluatorsOnChat(receiverUserId.userId))];
                     rawEvaluatorsList = rawEvaluatorsList.concat(evaluators);
                 }
 

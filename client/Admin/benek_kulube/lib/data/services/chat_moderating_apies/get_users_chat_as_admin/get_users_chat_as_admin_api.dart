@@ -184,4 +184,33 @@ class GetUsersChatAsAdmin {
       log('ERROR: postCreateChatRequest - $errr');
     }
   }
+
+  Future<dynamic> postAddMemberToChatRequest(String chatId, List<String> memberList) async {
+    Store<AppState> store = AppReduxStore.currentStore!;
+    try{
+      await AuthUtils.getAccessToken();
+
+      String path = '/api/chat/addMember/$chatId';
+      memberList  = memberList.where((memberId) => memberId != store.state.userInfo!.userId).toList();
+
+      Object? postBody = { 'memberList': memberList };
+
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = [];
+      List<String> authNames = [];
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'POST', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 ) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      }else if( response.body != null ) {
+        return jsonDecode(response.body)['chatId'];
+      }
+
+    }catch( errr ){
+      log('ERROR: postAddMemberToChatRequest - $errr');
+    }
+  }
 }

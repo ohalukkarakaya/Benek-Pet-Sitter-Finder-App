@@ -1,3 +1,4 @@
+import 'package:benek_kulube/data/models/chat_models/chat_member_model.dart';
 import 'package:benek_kulube/data/models/chat_models/message_model.dart';
 
 import 'chat_model.dart';
@@ -119,6 +120,14 @@ class ChatStateModel {
     for( var chat in chats??[] ){
       if( chat.id == receivingSeenData.chatId ){
         chat.seeMessage(receivingSeenData);
+      }
+    }
+  }
+
+  void addMembersToChat( String chatId, List<ChatMemberModel> newMembers ){
+    for( var chat in chats??[] ){
+      if( chat.id == chatId ){
+        chat.members.addAll(newMembers);
       }
     }
   }

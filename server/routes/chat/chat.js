@@ -6,7 +6,7 @@ import serverHandleChatImageHelper from "../../utils/fileHelpers/serverHandleCha
 
 //controllers
 import createChatController from "../../controllers/chatRoutesControllers/chatControllers/createChatController.js";
-import addMemberToChatController from "../../controllers/chatRoutesControllers/chatControllers/addMemberToChatController.js";
+import addMembersToChatController from "../../controllers/chatRoutesControllers/chatControllers/addMemberToChatController.js";
 import leaveChatController from "../../controllers/chatRoutesControllers/chatControllers/leaveChatController.js";
 import updateChatNameController from "../../controllers/chatRoutesControllers/chatControllers/updateChatNameController.js";
 import updateChatDescController from "../../controllers/chatRoutesControllers/chatControllers/updateChatDescController.js";
@@ -31,9 +31,9 @@ router.post(
 // - tested
 //Add Member to Chat
 router.post(
-    "/addMember/:chatId/:userId",
+    "/addMember/:chatId",
     auth,
-    addMemberToChatController
+    addMembersToChatController
 );
 
 // - tested

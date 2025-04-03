@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:benek_kulube/data/models/chat_models/chat_member_model.dart';
 import 'package:benek_kulube/data/models/chat_models/chat_state_model.dart';
 import 'package:benek_kulube/data/services/api.dart';
 import 'package:benek_kulube/data/services/api_exception.dart';
@@ -12,6 +13,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 import '../../../data/models/chat_models/chat_model.dart';
 import '../../../data/models/chat_models/message_seen_data_model.dart';
+import '../../../data/models/user_profile_models/user_info_model.dart';
 
 ThunkAction<AppState> getUsersChatAsAdminRequestAction( String userId, String? lastItemId ) {
   return (Store<AppState> store) async {
@@ -116,6 +118,26 @@ ThunkAction<AppState> createChat( String desc, List<String> memberIds ) {
       return newChatId;
     } on ApiException catch (e) {
       log('ERROR: createChat - $e');
+    }
+  };
+}
+
+ThunkAction<AppState> addMembersToChat( String chatId, List<UserInfo> memberList ) {
+  return (Store<AppState> store) async {
+    try {
+      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+
+      List<String> memberIds = memberList.map((e) => e.userId!).toList();
+      String? newChatId = await api.postAddMemberToChatRequest( chatId, memberIds );
+
+      List<ChatMemberModel> newMembers = memberList.map((e) => ChatMemberModel.fromUserInfo(e)).toList();
+
+      ChatStateModel? chat = store.state.selectedUserInfo!.chatData;
+      chat?.addMembersToChat(chatId, newMembers);
+
+      await store.dispatch(GetUsersChatAsAdminRequestAction(chat));
+    } on ApiException catch (e) {
+      log('ERROR: addMembersToChat - $e');
     }
   };
 }

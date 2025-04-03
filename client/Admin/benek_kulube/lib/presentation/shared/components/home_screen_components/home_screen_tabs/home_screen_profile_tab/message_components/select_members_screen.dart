@@ -16,9 +16,11 @@ import 'package:benek_kulube/store/app_state.dart';
 
 class SelectMembersScreen extends StatefulWidget {
   final String? desc;
+  final List<UserInfo>? existingMembers;
   const SelectMembersScreen({
     super.key,
-    this.desc
+    this.desc,
+    this.existingMembers,
   });
 
   @override
@@ -32,7 +34,25 @@ class _SelectMembersScreenState extends State<SelectMembersScreen> {
   void initState() {
     super.initState();
     final store = StoreProvider.of<AppState>(context, listen: false);
-    members = [store.state.userInfo!];
+    members = widget.existingMembers == null
+      || widget.existingMembers!.isEmpty
+          ? []
+          : List<UserInfo>.from(widget.existingMembers!);
+
+    members.insert(0, store.state.userInfo!);
+  }
+
+  bool isRemovable(int index) {
+    if (index == 0 || index >= members.length) return false;
+
+    final member = members[index];
+
+    // Eğer existingMembers null ya da boşsa => herkes silinebilir
+    if (widget.existingMembers == null || widget.existingMembers!.isEmpty) return true;
+
+    // Eğer existingMembers içinde bu kullanıcı varsa => silinemez
+    final exists = widget.existingMembers!.any((e) => e.userId == member.userId);
+    return !exists;
   }
 
   @override
@@ -172,9 +192,7 @@ class _SelectMembersScreenState extends State<SelectMembersScreen> {
                                   ),
                                 ),
 
-                                members.isNotEmpty
-                                && index <= members.length - 1
-                                && index > 0
+                                isRemovable(index)
                                   ? Positioned(
                                     left: 0.0,
                                     top: 0.0,
@@ -256,7 +274,16 @@ class _SelectMembersScreenState extends State<SelectMembersScreen> {
                       BenekSmallButton(
                           iconData: BenekIcons.checksquare,
                           isLight: true,
-                          isPassive: members.isEmpty || members.length < 2,
+                          isPassive:
+                            members.isEmpty
+                            || (
+                              widget.existingMembers != null
+                              && members.length - widget.existingMembers!.length < 2
+                            )
+                            || (
+                              widget.existingMembers == null
+                              && members.length < 2
+                            ),
                           onTap: () {
                             Navigator.of(context).pop(members);
                           }

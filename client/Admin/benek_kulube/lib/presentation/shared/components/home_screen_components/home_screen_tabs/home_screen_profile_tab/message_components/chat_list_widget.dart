@@ -20,6 +20,7 @@ import '../../../../../../../common/utils/styles.text.dart';
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../../screens/user_search_screen.dart';
 import '../profile_screen_section_components/edit_profile_screen/edit_text_screen.dart';
+import 'chat_info_bar.dart';
 
 class ChatListWidget extends StatefulWidget {
   const ChatListWidget({super.key});
@@ -129,10 +130,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColors.benekBlack,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                  ),
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
                 ),
                 child: Column(
                   children: [
@@ -248,13 +246,13 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                               style: regularTextStyle( textFontSize: 20.0 ),
                               onChanged: (value) {
                                 _searchTimer?.cancel();
-                          
+
                                 setState(() {
                                   searchText = value;
                                 });
-                          
+
                                 store.dispatch(resetChatAsAdminRequest());
-                          
+
                                 _searchTimer = Timer(const Duration(seconds: 1), () {
                                   final trimmed = searchText.trim();
                                   if (trimmed.length > 1) {
@@ -320,18 +318,28 @@ class _ChatListWidgetState extends State<ChatListWidget> {
               ),
             ),
 
+            const SizedBox(width: 15),
+
             // Sağ Panel - Mesaj Alanı
             Expanded(
               flex: 6,
               child: Container(
                 height: double.infinity,
-                color: Colors.blue[600],
-                child: Center(
-                  child: Text(
-                    selectedChat != null ? selectedChat!.chatDesc! : 'Seçili Chat Yok',
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
-                  ),
+                decoration: BoxDecoration(
+                  color: AppColors.benekBlack.withOpacity(0.7),
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
                 ),
+                child: Column(
+                  children: [
+                    selectedChat != null
+                      ? ChatInfoBar(
+                        memberList: selectedChat!.members!,
+                        chatDesc: selectedChat!.chatDesc!,
+                        chat: selectedChat!,
+                      )
+                      : const SizedBox()
+                  ],
+                )
               ),
             ),
           ],

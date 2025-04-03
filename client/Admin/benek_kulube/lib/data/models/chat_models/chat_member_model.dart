@@ -26,4 +26,9 @@ class ChatMemberModel {
     data['joinDate'] = joinDate;
     return data;
   }
+
+  ChatMemberModel.fromUserInfo(UserInfo userInfo) {
+    userData = userInfo;
+    joinDate = DateTime.now();
+  }
 }
