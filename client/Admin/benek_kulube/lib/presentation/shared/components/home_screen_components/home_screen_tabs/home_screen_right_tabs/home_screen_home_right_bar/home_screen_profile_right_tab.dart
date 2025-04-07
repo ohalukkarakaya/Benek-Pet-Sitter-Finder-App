@@ -98,6 +98,11 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
            await store.dispatch(getUsersChatAsAdminRequestActionFromSocket(receivingChatData, store.state.selectedUserInfo!.userId!));
          });
 
+         // Listen for incoming leaves
+         socket.on('chatMemberLeaved', (data) async {
+           await store.dispatch(userLeftActionFromSocket( data ));
+         });
+
          // Listen for incoming message reads
          socket.on('seenMessage', (data) async {
            MessageSeenData receivingSeenData = MessageSeenData.fromJson(data);

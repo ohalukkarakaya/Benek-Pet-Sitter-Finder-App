@@ -27,6 +27,10 @@ class _ChatBoxScreenState extends State<ChatBoxScreen> {
   bool didRequestSend = false;
   bool isChatLoading = true;
 
+  // fill it if a chat moves
+  String? oldChatId;
+  String? movedChatId;
+
   @override
   void initState() {
     super.initState();
@@ -62,6 +66,10 @@ class _ChatBoxScreenState extends State<ChatBoxScreen> {
       socket.on('getMessage', (data) async {
         ChatModel receivingChatData = ChatModel.fromJson(data);
         await store.dispatch(getUsersChatAsAdminRequestActionFromSocket(receivingChatData, store.state.selectedUserInfo!.userId!));
+      });
+
+      socket.on('chatMemberLeaved', (data) async {
+        await store.dispatch(userLeftActionFromSocket( data ));
       });
 
       // Listen for incoming message reads

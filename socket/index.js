@@ -119,6 +119,30 @@ io.on(
             }
         );
 
+        socket.on(
+            "chatMemberLeaved",
+            ({ chatId, leavedUserId, remainingActiveMembers }) => {
+                let rawEvaluatorsList = [];
+                for (let member of remainingActiveMembers) {
+                    let user = getUser(member.userId);
+                    if (user) {
+                        io.to(user.socketId).emit("chatMemberLeaved", { chatId, leavedUserId });
+                    }
+
+                    let evaluators = [...new Set(getEvaluatorsOnChat(member.userId))];
+                    rawEvaluatorsList = rawEvaluatorsList.concat(evaluators);
+                }
+
+                //send message to evaluators
+                let evaluators = [...new Set(rawEvaluatorsList)];
+                if( evaluators.length > 0 ){
+                    for (let evaluator of evaluators) {
+                        io.to(evaluator.socketId).emit("chatMemberLeaved", { chatId, leavedUserId });
+                    }
+                }
+            }
+        );
+
         //see message
         socket.on(
             "seeMessage",

@@ -127,7 +127,6 @@ const addMembersToChatController = async (req, res) => {
             chatToSend.members[i] = userInfo; // artık safe
         }
 
-// Emit et
         socket.emit(
             "sendMessage",
             chatToSend,

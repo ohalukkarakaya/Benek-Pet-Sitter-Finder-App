@@ -14,10 +14,12 @@ const getUsersChatsAsAdminController = async (req, res) => {
         const chatMatchPipeline = [
             {
                 $match: {
-                    $and: [
-                        { "members.userId": evaluatingUser },
-                        { "members.leaveDate": { $exists: false } }
-                    ]
+                    members: {
+                        $elemMatch: {
+                            userId: evaluatingUser,
+                            leaveDate: { $exists: false }
+                        }
+                    }
                 }
             },
             {

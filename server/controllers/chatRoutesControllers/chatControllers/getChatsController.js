@@ -12,10 +12,12 @@ const getChatsController = async (req, res) => {
         const chatMatchPipeline = [
           {
             $match: {
-              $and: [
-                { "members.userId": userId },
-                { "members.leaveDate": { $exists: false } }
-              ]
+                members: {
+                    $elemMatch: {
+                        userId: userId,
+                        leaveDate: { $exists: false }
+                    }
+                }
             }
           },
           {

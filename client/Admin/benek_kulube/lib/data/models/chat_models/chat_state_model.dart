@@ -131,4 +131,8 @@ class ChatStateModel {
       }
     }
   }
+
+  void leaveChat( String chatId ){
+    chats = chats?.where((chat) => chat!.id != chatId).toList();
+  }
 }

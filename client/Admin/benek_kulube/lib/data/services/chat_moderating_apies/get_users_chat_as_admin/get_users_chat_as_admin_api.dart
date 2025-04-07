@@ -213,4 +213,31 @@ class GetUsersChatAsAdmin {
       log('ERROR: postAddMemberToChatRequest - $errr');
     }
   }
+
+  Future<dynamic> deleteLeaveChatRequest( String chatId ) async {
+    Store<AppState> store = AppReduxStore.currentStore!;
+    try{
+      await AuthUtils.getAccessToken();
+
+      String path = '/api/chat/leave/$chatId';
+
+      Object? postBody = {};
+
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = [];
+      List<String> authNames = [];
+      String contentType = "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'DELETE', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 ) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      }else if( response.body != null ) {
+        return jsonDecode(response.body)['chatId'];
+      }
+    }catch( errr ){
+      log('ERROR: deleteLeaveChatRequest - $errr');
+    }
+  }
 }

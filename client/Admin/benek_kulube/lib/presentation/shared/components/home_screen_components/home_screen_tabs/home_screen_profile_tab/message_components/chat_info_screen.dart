@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/constants/benek_icons.dart';
+import 'package:benek_kulube/common/widgets/approve_screen.dart';
 import 'package:benek_kulube/data/models/chat_models/chat_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/message_components/select_members_screen.dart';
@@ -6,6 +7,7 @@ import 'package:benek_kulube/redux/chat_moderating/get_users_chat_as_admin/get_u
 import 'package:flutter/material.dart';
 
 import '../../../../../../../common/constants/app_colors.dart';
+import '../../../../../../../common/utils/benek_string_helpers.dart';
 import '../../../../../../../common/utils/styles.text.dart';
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../benek_circle_avatar/benek_circle_avatar.dart';
@@ -19,11 +21,13 @@ import 'chat_detail_button_widget.dart';
 class ChatInfoScreen extends StatefulWidget {
   final String userId;
   final ChatModel chatInfo;
+  final Future<void> Function() onChatLeave;
 
   const ChatInfoScreen({
     super.key,
     required this.userId,
     required this.chatInfo,
+    required this.onChatLeave,
   });
 
   @override
@@ -37,10 +41,13 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
   Widget build(BuildContext context) {
     Store<AppState> store = StoreProvider.of<AppState>(context);
 
-    widget.chatInfo.members!.removeWhere((element) => element.userData!.userId == widget.userId);
+    widget.chatInfo.members!.removeWhere((element) => element.leaveDate != null);
+    if(widget.chatInfo.members != null && widget.chatInfo.members!.isNotEmpty && widget.chatInfo.members!.length > 1 ){
+      widget.chatInfo.members!.removeWhere((element) => element.userData!.userId == widget.userId );
+    }
     bool isUsersOwnChat = store.state.selectedUserInfo!.userId == widget.userId;
 
-    List<UserInfo> existingUsers = widget.chatInfo.members!.map((e) => e.userData!).toList();
+    List<UserInfo> existingUsers = widget.chatInfo.members!.where((element) => element.userData!.userId != widget.userId ).map((e) => e.userData!).toList();
 
     return BenekBluredModalBarier(
       isDismissible: true,
@@ -182,6 +189,26 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
                     const SizedBox(width: 10.0),
 
                     ChatDetailButtonWidget(
+                      onTap: () async {
+
+                        bool didApprove = await Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            opaque: false,
+                            barrierDismissible: false,
+                            pageBuilder: (context, _, __) => ApproveScreen(title: BenekStringHelpers.locale('leaveChat')),
+                          ),
+                        );
+
+                        if( !didApprove ){ return; }
+
+                        await widget.onChatLeave!();
+
+                        setState(() {
+                          idle = !idle;
+                        });
+                        Navigator.of(context).pop();
+                      },
                       chat: widget.chatInfo,
                       icon: Icons.logout,
                       iconSize: 25.0,

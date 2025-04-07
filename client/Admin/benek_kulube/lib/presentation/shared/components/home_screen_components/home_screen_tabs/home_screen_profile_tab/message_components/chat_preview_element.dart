@@ -53,7 +53,16 @@ class ChatPreviewElement extends StatelessWidget {
                           userData: UserInfo(userName: ""),
                           joinDate: null,
                         ),
-                  ).userData!.userName!,
+                  ).leaveDate == null
+                      ? chatInfo.members!.firstWhere(
+                        (user) =>
+                    user.userData!.userId == chatInfo.messages![0].sendedUserId!,
+                    orElse: () => ChatMemberModel(
+                      userData: UserInfo(userName: ""),
+                      joinDate: null,
+                    ),
+                  ).userData!.userName!
+                  : BenekStringHelpers.locale('missingUser'),
                   message: chatInfo.messages![0].messageType != MessageTypeEnum.UNDEFINED
                       ? chatInfo.messages![0].message != null
                         ? chatInfo.messages![0].message!

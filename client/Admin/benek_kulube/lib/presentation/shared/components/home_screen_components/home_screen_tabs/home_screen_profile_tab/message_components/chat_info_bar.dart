@@ -16,12 +16,14 @@ class ChatInfoBar extends StatelessWidget {
   final List<ChatMemberModel> memberList;
   final String chatDesc;
   final ChatModel chat;
+  final Future<void> Function() onChatLeave;
 
   const ChatInfoBar({
     super.key,
     required this.memberList,
     required this.chatDesc,
     required this.chat,
+    required this.onChatLeave,
   });
 
   @override
@@ -73,6 +75,7 @@ class ChatInfoBar extends StatelessWidget {
                     pageBuilder: (context, _, __) => ChatInfoScreen(
                       userId: store.state.userInfo!.userId!,
                       chatInfo: chat,
+                      onChatLeave: onChatLeave,
                     ),
                   ),
                 );

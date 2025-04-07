@@ -165,5 +165,7 @@ class AppStaticTextsTr{
     'turnBackToSelectedUser': "Seçili kullanıcıya geri dön...",
     'searchChat': "Mesaj Ara...",
     'enterChatDesc': "Sohbet Açıklaması Girin...",
+    'leaveChat': "Sohbetten ayrılmak için kaydır...",
+    'missingUser': "Bulunmayan Kullanıcı",
   };
 }

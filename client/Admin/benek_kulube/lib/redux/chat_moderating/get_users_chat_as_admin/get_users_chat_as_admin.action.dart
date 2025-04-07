@@ -55,6 +55,36 @@ ThunkAction<AppState> getUsersChatAsAdminRequestActionFromSocket( ChatModel rece
   };
 }
 
+ThunkAction<AppState> userLeftActionFromSocket( Map<String, dynamic> data ) {
+  return (Store<AppState> store) async {
+    try {
+      ChatStateModel? chatState = store.state.selectedUserInfo!.chatData;
+      if( chatState == null ||chatState.chats == null || chatState.chats!.isEmpty ) return;
+
+      if( data['leavedUserId'] == store.state.selectedUserInfo!.userId ){
+        // if the user left the chat, remove the chat from the list
+        chatState.chats!.removeWhere((chat) => chat!.id == data['chatId']);
+        await store.dispatch(GetUsersChatAsAdminRequestAction(chatState));
+        return;
+      }
+
+      final chat = chatState.chats!.firstWhere(
+            (chat) => chat!.id == data['chatId'],
+        orElse: () => ChatModel(),
+      );
+
+      if( chat == null || chat.members == null || chat.members!.isEmpty ) return;
+
+      chat.members!.removeWhere((member) => member.userData?.userId == data['leavedUserId']);
+
+      await store.dispatch(GetUsersChatAsAdminRequestAction(chatState));
+    } on ApiException catch (e) {
+      log('ERROR: userLeftActionFromSocket - $e');
+    }
+  };
+
+}
+
 ThunkAction<AppState> searchChatAsAdminRequest( String userId, String searchText ) {
   return (Store<AppState> store) async {
     try {
@@ -138,6 +168,23 @@ ThunkAction<AppState> addMembersToChat( String chatId, List<UserInfo> memberList
       await store.dispatch(GetUsersChatAsAdminRequestAction(chat));
     } on ApiException catch (e) {
       log('ERROR: addMembersToChat - $e');
+    }
+  };
+}
+
+ThunkAction<AppState> leaveChatAction( String chatId ) {
+  return (Store<AppState> store) async {
+    try {
+      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+
+      String? newChatId = await api.deleteLeaveChatRequest( chatId );
+
+      ChatStateModel? chat = store.state.selectedUserInfo!.chatData;
+      chat?.leaveChat(chatId);
+
+      await store.dispatch(GetUsersChatAsAdminRequestAction(chat));
+    } on ApiException catch (e) {
+      log('ERROR: leaveChatAction - $e');
     }
   };
 }

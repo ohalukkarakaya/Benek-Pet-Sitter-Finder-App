@@ -7,17 +7,20 @@ class ChatMemberModel {
 
   UserInfo? userData;
   DateTime? joinDate;
+  DateTime? leaveDate;
 
   ChatMemberModel(
       {
         this.userData,
         this.joinDate,
+        this.leaveDate,
       }
       );
 
   ChatMemberModel.fromJson(Map<String, dynamic> json) {
     userData = UserInfo.fromJson(json);
     joinDate = format.parse(json['joinDate']);
+    leaveDate = json['leaveDate'] != null ? format.parse(json['leaveDate']) : null;
   }
 
   Map<String, dynamic> toJson() {

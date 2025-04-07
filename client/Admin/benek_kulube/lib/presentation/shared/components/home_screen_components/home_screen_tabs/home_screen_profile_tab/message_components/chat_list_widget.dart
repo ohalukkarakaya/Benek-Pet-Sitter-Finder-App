@@ -336,6 +336,15 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                         memberList: selectedChat!.members!,
                         chatDesc: selectedChat!.chatDesc!,
                         chat: selectedChat!,
+                        onChatLeave: () async {
+                          if( selectedChat == null ){ return; }
+                          await store.dispatch(leaveChatAction( selectedChat!.id! ));
+                          setState(() {
+                            selectedChat = chats.length > 2
+                                ? chats[ chats.indexWhere((chat) => chat!.id == selectedChat!.id) + 1 ]
+                                : null;
+                          });
+                        },
                       )
                       : const SizedBox()
                   ],

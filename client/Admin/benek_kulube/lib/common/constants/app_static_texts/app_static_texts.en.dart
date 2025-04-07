@@ -165,5 +165,7 @@ class AppStaticTextsEn{
     'turnBackToSelectedUser': "Turn back to selected user...",
     'searchChat': "Search Chat...",
     'enterChatDesc': "Enter Chat Description...",
+    'leaveChat': "Slide to leave the chat...",
+    'missingUser': "Missing User",
   };
 }
