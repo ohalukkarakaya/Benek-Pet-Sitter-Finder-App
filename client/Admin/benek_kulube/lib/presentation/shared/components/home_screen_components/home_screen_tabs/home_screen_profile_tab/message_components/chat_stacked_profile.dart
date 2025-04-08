@@ -23,21 +23,22 @@ class ChatStackedProfile extends StatelessWidget {
     List<ChatMemberModel>? memberList = chatMembers != null && chatMembers!.isNotEmpty
       ? chatMembers!.where(
             (member) =>
-                member.userData != null ?
-                    member.userData!.userId != chatOwnerUserId
-                    && member.leaveDate == null
-                    : false ).toList()
+                member.userData != null
+                    ? member.userData!.userId != chatOwnerUserId
+                      && member.leaveDate == null
+                    : false
+       ).toList()
       : [];
 
-    ChatMemberModel owner = chatMembers != null && chatMembers!.isNotEmpty
-      ? chatMembers!.firstWhere(
-            (member) =>
-                member.userData != null ?
-                    member.userData!.userId == chatOwnerUserId
-                    : false )
-      : ChatMemberModel();
+    // TO DO: Burada Hata Alıyoeruz !!!!!!!!!!!!!!!!!!!!!!!
+    ChatMemberModel? owner =  chatMembers != null && chatMembers!.isNotEmpty
+    ? chatMembers?.where(
+              (member) =>
+                  member.userData?.userId == chatOwnerUserId
+      ).first
+    : null;
 
-    if (memberList.length <= 0  ){
+    if ( memberList.isEmpty && owner != null ){
       memberList.add(owner);
     }
 

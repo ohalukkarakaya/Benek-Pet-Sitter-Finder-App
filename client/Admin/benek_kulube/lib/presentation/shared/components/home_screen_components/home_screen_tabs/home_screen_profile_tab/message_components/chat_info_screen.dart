@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../common/utils/benek_string_helpers.dart';
 import '../../../../../../../common/utils/styles.text.dart';
+import '../../../../../../../data/models/chat_models/chat_member_model.dart';
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../benek_circle_avatar/benek_circle_avatar.dart';
 import '../../../../loading_components/benek_blured_modal_barier.dart';
@@ -41,10 +42,13 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
   Widget build(BuildContext context) {
     Store<AppState> store = StoreProvider.of<AppState>(context);
 
-    widget.chatInfo.members!.removeWhere((element) => element.leaveDate != null);
-    if(widget.chatInfo.members != null && widget.chatInfo.members!.isNotEmpty && widget.chatInfo.members!.length > 1 ){
-      widget.chatInfo.members!.removeWhere((element) => element.userData!.userId == widget.userId );
+    List<ChatMemberModel>? filteredMembers = List.from(widget.chatInfo.members!)
+      ..removeWhere((element) => element.leaveDate != null);
+
+    if (filteredMembers.length > 1) {
+      filteredMembers.removeWhere((element) => element.userData!.userId == widget.userId);
     }
+
     bool isUsersOwnChat = store.state.selectedUserInfo!.userId == widget.userId;
 
     List<UserInfo> existingUsers = widget.chatInfo.members!.where((element) => element.userData!.userId != widget.userId ).map((e) => e.userData!).toList();
@@ -92,11 +96,11 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
                           padding: const EdgeInsets.only(left: 10.0, bottom: 15.0),
                           child: Row(
                               children: List.generate(
-                                  widget.chatInfo.members != null
-                                      ? widget.chatInfo.members!.length
+                                  filteredMembers != null
+                                      ? filteredMembers!.length
                                       : 0,
                                   (index){
-                                    UserInfo userData = widget.chatInfo.members![index].userData!;
+                                    UserInfo userData = filteredMembers![index].userData!;
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 5.0),
                                       child: Container(

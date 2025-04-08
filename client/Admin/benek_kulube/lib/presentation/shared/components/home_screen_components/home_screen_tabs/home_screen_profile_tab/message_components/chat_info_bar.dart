@@ -42,7 +42,10 @@ class ChatInfoBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            ChatStackedProfile(chatOwnerUserId: store.state.selectedUserInfo!.userId!, chatMembers: memberList),
+            ChatStackedProfile(
+                chatOwnerUserId: store.state.selectedUserInfo!.userId!,
+                chatMembers: memberList
+            ),
             const SizedBox(width: 10.0),
             Expanded(
               child: Column(
