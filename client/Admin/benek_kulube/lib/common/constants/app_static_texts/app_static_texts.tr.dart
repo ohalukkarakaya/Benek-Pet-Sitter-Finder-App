@@ -167,5 +167,7 @@ class AppStaticTextsTr{
     'enterChatDesc': "Sohbet Açıklaması Girin...",
     'leaveChat': "Sohbetten ayrılmak için kaydır...",
     'missingUser': "Bulunmayan Kullanıcı",
+    'addMembers': "Üye ekle...",
+    'selectAMember': "Bir üye seç",
   };
 }

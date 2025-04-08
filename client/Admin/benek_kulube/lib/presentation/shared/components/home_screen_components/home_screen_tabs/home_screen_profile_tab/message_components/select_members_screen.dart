@@ -1,4 +1,5 @@
 import 'package:benek_kulube/common/constants/benek_icons.dart';
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/common/widgets/benek_small_button.dart';
 import 'package:benek_kulube/presentation/shared/components/loading_components/benek_blured_modal_barier.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +79,7 @@ class _SelectMembersScreenState extends State<SelectMembersScreen> {
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Text(
-                      'Select Members',
+                      BenekStringHelpers.locale('addMembers'),
                       style: mediumTextStyle( textColor: AppColors.benekWhite ),
                   ),
                 ),
@@ -245,7 +246,7 @@ class _SelectMembersScreenState extends State<SelectMembersScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       BenekHorizontalButton(
-                        text: 'Select a member',
+                        text: BenekStringHelpers.locale('selectAMember'),
                         isLight: true,
                         isPassive: members.length >= 5,
                         onTap: () async {

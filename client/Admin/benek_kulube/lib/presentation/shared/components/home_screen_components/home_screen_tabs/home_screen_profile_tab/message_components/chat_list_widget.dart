@@ -21,6 +21,7 @@ import '../../../../../../../data/models/user_profile_models/user_info_model.dar
 import '../../../../../screens/user_search_screen.dart';
 import '../profile_screen_section_components/edit_profile_screen/edit_text_screen.dart';
 import 'chat_info_bar.dart';
+import 'chat_loading_list.dart';
 
 class ChatListWidget extends StatefulWidget {
   const ChatListWidget({super.key});
@@ -346,7 +347,34 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                           });
                         },
                       )
-                      : const SizedBox()
+                      : const SizedBox(),
+
+                      selectedChat != null
+                        ? (selectedChat!.totalMessageCount ?? 0) < 1
+                          ?  Expanded(
+                            child: Center(
+                              child: Text(
+                                "${BenekStringHelpers.getDateAsString(selectedChat!.chatStartDate!)} ${BenekStringHelpers.locale('createdAt')}",
+                                style: regularTextStyle(textColor: AppColors.benekLightBlue, textFontSize: 12.0),
+                              ),
+                            ),
+                          )
+                          : (
+                            (selectedChat!.totalMessageCount ?? 0) > 15
+                            && (selectedChat!.messages?.length ?? 0) < 15
+                          )
+                          || (
+                            (selectedChat!.totalMessageCount ?? 0) < 15
+                            && (selectedChat!.messages?.length ?? 0) < (selectedChat!.totalMessageCount ?? 0)
+
+                          )
+                          ?  Expanded(
+                              child: ChatLoadingList(
+                                  chat: selectedChat!,
+                                ),
+                            )
+                          : const SizedBox()
+                        : const SizedBox(),
                   ],
                 )
               ),

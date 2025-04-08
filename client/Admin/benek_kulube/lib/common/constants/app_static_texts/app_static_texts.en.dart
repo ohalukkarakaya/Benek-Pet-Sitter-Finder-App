@@ -167,5 +167,7 @@ class AppStaticTextsEn{
     'enterChatDesc': "Enter Chat Description...",
     'leaveChat': "Slide to leave the chat...",
     'missingUser': "Missing User",
+    'addMembers': "Add Members...",
+    'selectAMember': "Select a member",
   };
 }
