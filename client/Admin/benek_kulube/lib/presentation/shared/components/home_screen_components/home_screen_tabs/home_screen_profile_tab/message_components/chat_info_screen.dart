@@ -49,7 +49,7 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
       filteredMembers.removeWhere((element) => element.userData!.userId == widget.userId);
     }
 
-    bool isUsersOwnChat = store.state.selectedUserInfo!.userId == widget.userId;
+    bool isUsersOwnChat = store.state.selectedUserInfo!.userId == store.state.userInfo!.userId;
 
     List<UserInfo> existingUsers = widget.chatInfo.members!.where((element) => element.userData!.userId != widget.userId ).map((e) => e.userData!).toList();
 

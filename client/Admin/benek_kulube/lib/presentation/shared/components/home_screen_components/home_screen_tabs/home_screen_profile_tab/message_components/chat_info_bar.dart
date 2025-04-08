@@ -76,7 +76,7 @@ class ChatInfoBar extends StatelessWidget {
                     opaque: false,
                     barrierDismissible: false,
                     pageBuilder: (context, _, __) => ChatInfoScreen(
-                      userId: store.state.userInfo!.userId!,
+                      userId: store.state.selectedUserInfo!.userId!,
                       chatInfo: chat,
                       onChatLeave: onChatLeave,
                     ),
