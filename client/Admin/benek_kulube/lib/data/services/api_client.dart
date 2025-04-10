@@ -61,6 +61,10 @@ class ApiClient {
           return list;
         case 'ChatStateModel':
           return ChatStateModel.fromJson(value);
+        case 'List<MessageModel>':
+          List<dynamic> jsonList = value['messages'];
+          List<MessageModel> list = jsonList.map((item) => MessageModel.fromJson(item)).toList();
+          return ChatModel( messages: list, totalMessageCount: value['totalMessageCount'] );
         case 'List<LogModel>':
           List<dynamic> jsonList = value['logs'];
           List<LogModel> list = jsonList.map((item) => LogModel.fromJson(item)).toList();

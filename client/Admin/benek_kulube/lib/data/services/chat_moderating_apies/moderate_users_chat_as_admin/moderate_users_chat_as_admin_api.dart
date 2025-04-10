@@ -1,12 +1,12 @@
 part of benek.api;
 
-class GetUsersChatAsAdmin {
+class ModerateUsersChatAsAdmin {
 
   final ApiClient apiClient;
 
-  GetUsersChatAsAdmin([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
+  ModerateUsersChatAsAdmin([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
 
-  // Get Logged In User Info
+  // Get chat
   Future<dynamic> getUsersChatAsAdminRequest(String? userId, String? lastItemId) async {
     Store<AppState> store = AppReduxStore.currentStore!;
     try{

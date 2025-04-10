@@ -17,7 +17,7 @@ import '../../../data/models/user_profile_models/user_info_model.dart';
 
 ThunkAction<AppState> getUsersChatAsAdminRequestAction( String userId, String? lastItemId ) {
   return (Store<AppState> store) async {
-    GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+    ModerateUsersChatAsAdmin api = ModerateUsersChatAsAdmin();
 
     try {
       ChatStateModel? _chatData = await api.getUsersChatAsAdminRequest( userId, lastItemId);
@@ -42,7 +42,7 @@ ThunkAction<AppState> getUsersChatAsAdminRequestAction( String userId, String? l
 ThunkAction<AppState> getUsersChatAsAdminRequestActionFromSocket( ChatModel receivingChatData, String userId ) {
   return (Store<AppState> store) async {
     try {
-      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+      ModerateUsersChatAsAdmin api = ModerateUsersChatAsAdmin();
       int unReadMessageCountRes = await api.getUnreadMessagesFromChatId( receivingChatData.id!, userId );
       receivingChatData.unreadMessageCount = unReadMessageCountRes;
 
@@ -88,7 +88,7 @@ ThunkAction<AppState> userLeftActionFromSocket( Map<String, dynamic> data ) {
 ThunkAction<AppState> searchChatAsAdminRequest( String userId, String searchText ) {
   return (Store<AppState> store) async {
     try {
-      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+      ModerateUsersChatAsAdmin api = ModerateUsersChatAsAdmin();
       ChatStateModel? _searchedChatResult = await api.getSearchChatAsAdminRequest( userId, searchText );
       _searchedChatResult?.sortChats();
 
@@ -127,7 +127,7 @@ ThunkAction<AppState> seenMessageAsAdminBySocketAction( MessageSeenData receivin
 ThunkAction<AppState> seeMessagesAction( String chatId, List<String> messageIds ) {
   return (Store<AppState> store) async {
     try {
-      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+      ModerateUsersChatAsAdmin api = ModerateUsersChatAsAdmin();
       bool response = await api.seeMessages( chatId, messageIds );
 
       if( !response ){
@@ -142,7 +142,7 @@ ThunkAction<AppState> seeMessagesAction( String chatId, List<String> messageIds 
 ThunkAction<AppState> createChat( String desc, List<String> memberIds ) {
   return (Store<AppState> store) async {
     try {
-      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+      ModerateUsersChatAsAdmin api = ModerateUsersChatAsAdmin();
       String? newChatId = await api.postCreateChatRequest( desc, memberIds );
 
       return newChatId;
@@ -155,7 +155,7 @@ ThunkAction<AppState> createChat( String desc, List<String> memberIds ) {
 ThunkAction<AppState> addMembersToChat( String chatId, List<UserInfo> memberList ) {
   return (Store<AppState> store) async {
     try {
-      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+      ModerateUsersChatAsAdmin api = ModerateUsersChatAsAdmin();
 
       List<String> memberIds = memberList.map((e) => e.userId!).toList();
       String? newChatId = await api.postAddMemberToChatRequest( chatId, memberIds );
@@ -175,7 +175,7 @@ ThunkAction<AppState> addMembersToChat( String chatId, List<UserInfo> memberList
 ThunkAction<AppState> leaveChatAction( String chatId ) {
   return (Store<AppState> store) async {
     try {
-      GetUsersChatAsAdmin api = GetUsersChatAsAdmin();
+      ModerateUsersChatAsAdmin api = ModerateUsersChatAsAdmin();
 
       String? newChatId = await api.deleteLeaveChatRequest( chatId );
 

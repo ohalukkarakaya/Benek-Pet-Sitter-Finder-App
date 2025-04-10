@@ -25,7 +25,9 @@ import 'package:http_parser/http_parser.dart';
 
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 
+import '../models/chat_models/chat_model.dart';
 import '../models/chat_models/chat_state_model.dart';
+import '../models/chat_models/message_model.dart';
 import '../models/log_models/log_model.dart';
 import '../models/pet_models/pet_image_model.dart';
 import '../models/pet_models/pet_list_model.dart';
@@ -48,7 +50,8 @@ part 'pet_api/pet_api.dart';
 part 'pet_api/get_recommended_pets_api.dart';
 part 'pet_api/pet_search_api.dart';
 part 'get_user_info_apies/get_light_weight_user_info_by_user_id_list.dart';
-part 'chat_moderating_apies/get_users_chat_as_admin/get_users_chat_as_admin_api.dart';
+part 'chat_moderating_apies/moderate_users_chat_as_admin/moderate_users_chat_as_admin_api.dart';
+part 'chat_moderating_apies/moderate_users_messages_as_admin/moderate_users_messages_as_admin_api.dart';
 part 'get_log_apies/get_logs_by_user_id_api.dart';
 part 'punishment_apies/users_punishment_api.dart';
 part 'user_info_api/user_get_private_info_api.dart';

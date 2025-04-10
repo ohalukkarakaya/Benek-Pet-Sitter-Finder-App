@@ -77,10 +77,27 @@ class ChatModel {
     return data;
   }
 
-  void addMessage(MessageModel newMessage, String userId){
+  void addMessage( MessageModel newMessage ){
     messages ??= <MessageModel>[];
 
-    messages!.add(newMessage);
+    if (!messages!.any((m) => m.id == newMessage.id)) {
+      messages!.add(newMessage);
+    }
+  }
+
+  void addMessagesList(List<MessageModel> newMessages ){
+    messages ??= <MessageModel>[];
+
+    for (var message in newMessages) {
+      if (!messages!.any((m) => m.id == message.id)) {
+        messages!.add(message);
+      }
+    }
+
+    // make all messages unique
+    messages = messages!.toSet().toList();
+
+    sortMessages();
   }
 
   void seeMessage(MessageSeenData messageSeenData){

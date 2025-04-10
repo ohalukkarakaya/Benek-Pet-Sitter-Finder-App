@@ -94,9 +94,16 @@ class ChatStateModel {
         // Yeni mesajları ekle ve üyeleri güncelle
         chatOfTheMessage.unreadMessageCount = newChat.unreadMessageCount;
         for (var message in newChat.messages!) {
-          chatOfTheMessage.addMessage(message, userId);
+          chatOfTheMessage.addMessage(message);
         }
-        chatOfTheMessage.members = newChat.members;
+        if(
+            newChat.members != null
+            && newChat.members!.isNotEmpty
+        ){
+          chatOfTheMessage.members = newChat.members;
+        }
+
+        chatOfTheMessage.totalMessageCount = newChat.totalMessageCount;
 
         // Mesajları sırala
         chatOfTheMessage.sortMessages();

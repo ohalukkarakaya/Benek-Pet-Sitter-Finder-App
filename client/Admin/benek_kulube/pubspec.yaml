@@ -69,6 +69,7 @@ dependencies:
   slide_to_act: ^2.0.2
   font_awesome_flutter: ^10.7.0
   point_in_polygon: ^1.0.0
+  flutter_sticky_header: ^0.7.0
 
 dev_dependencies:
   flutter_test:

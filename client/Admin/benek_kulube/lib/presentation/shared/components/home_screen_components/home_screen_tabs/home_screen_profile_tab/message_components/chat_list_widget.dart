@@ -22,6 +22,7 @@ import '../../../../../screens/user_search_screen.dart';
 import '../profile_screen_section_components/edit_profile_screen/edit_text_screen.dart';
 import 'chat_info_bar.dart';
 import 'chat_loading_list.dart';
+import 'message_element_components/chat_messages_list.dart';
 
 class ChatListWidget extends StatefulWidget {
   const ChatListWidget({super.key});
@@ -34,6 +35,9 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   ChatModel? selectedChat;
   bool isWaitingForPagination = false;
   bool shouldPaginate = false;
+
+  Widget? _cachedChatLoadingList;
+  String? _cachedChatId;
 
   final TextEditingController _searchController = TextEditingController();
   Timer? _searchTimer;
@@ -54,9 +58,16 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     });
   }
 
-  void _onChatSelected(ChatModel chat) {
+  void _onChatSelected(ChatModel chat) async {
+    final store = StoreProvider.of<AppState>(context, listen: false);
     setState(() {
       selectedChat = chat;
+      _cachedChatId = null;
+      _cachedChatLoadingList = null;
+    });
+    await store.dispatch(getMessagesAction( store.state.selectedUserInfo!.userId!, chat.id!, null ));
+    setState(() {
+      selectedChat = store.state.selectedUserInfo?.chatData?.chats?.firstWhere((element) => element!.id == chat.id);
     });
   }
 
@@ -112,6 +123,18 @@ class _ChatListWidgetState extends State<ChatListWidget> {
       builder: (context, chatState) {
         final List<ChatModel?> chats = chatState?.chats ?? [];
         Store<AppState> store = StoreProvider.of<AppState>(context);
+
+        if (selectedChat != null) {
+          final total = selectedChat!.totalMessageCount ?? 0;
+          final loaded = selectedChat!.messages?.length ?? 0;
+
+          final bool shouldShowLoading = (total > 15 && loaded < 15) || (total < 15 && loaded < total);
+
+          if (shouldShowLoading && _cachedChatId != selectedChat!.id) {
+            _cachedChatId = selectedChat!.id;
+            _cachedChatLoadingList = ChatLoadingList(chat: selectedChat!);
+          }
+        }
 
         if (shouldPaginate && searchText.trim().isEmpty) {
           Future.microtask(() {
@@ -368,12 +391,15 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                             && (selectedChat!.messages?.length ?? 0) < (selectedChat!.totalMessageCount ?? 0)
 
                           )
-                          ?  Expanded(
-                              child: ChatLoadingList(
-                                  chat: selectedChat!,
-                                ),
+                          ? Expanded(
+                              child: _cachedChatLoadingList ?? const SizedBox(),
                             )
-                          : const SizedBox()
+                          : Expanded(
+                            child: ChatMessagesList(
+                              chatBoxOwnerId: store.state.selectedUserInfo!.userId!,
+                              selectedChat: selectedChat!,
+                            ),
+                          ) // Chat List
                         : const SizedBox(),
                   ],
                 )

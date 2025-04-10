@@ -63,8 +63,10 @@ const getUsersMessagesAsAdminController = async (req, res) => {
         // kullanıcının sohbete katılma tarihinden sonra gönderilen mesajları bul
         const joinDate = usersChatInfo[0].joinDate;
         const filteredMessages = chat.messages.filter(
-            ( message ) =>
-                Date( message.sendDate ) >= joinDate
+            ( message ) => {
+                const sendDate = new Date(message.sendDate);
+                return sendDate >= joinDate;
+            }
         );
 
         // kullanıcı sohbete katıldıktan sonra gönderilmiş bir mesaj yoksa
@@ -109,6 +111,7 @@ const getUsersMessagesAsAdminController = async (req, res) => {
         const seenByListUpdatedMessageList = sortedMessages.map(
             ( message ) => {
                 const seenBy = message.seenBy.map(( userId ) => {
+                    message.senderUser = userDataList.find( ( usr ) =>  usr.userId === message.sendedUserId );
                     const user = userDataList.find( ( usr ) =>  usr.userId === userId );
                     return user ? user : null;
                 });
