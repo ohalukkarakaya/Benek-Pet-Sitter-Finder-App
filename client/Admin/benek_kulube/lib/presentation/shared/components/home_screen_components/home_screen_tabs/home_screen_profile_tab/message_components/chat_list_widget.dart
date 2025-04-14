@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:socket_io_client/socket_io_client.dart' as io;
+
 import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
 import 'package:benek_kulube/data/models/chat_models/chat_member_model.dart';
@@ -15,8 +17,10 @@ import 'package:benek_kulube/data/models/chat_models/chat_model.dart';
 import 'package:benek_kulube/data/models/chat_models/chat_state_model.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
 
+import '../../../../../../../common/constants/app_config.dart';
 import '../../../../../../../common/constants/benek_icons.dart';
 import '../../../../../../../common/utils/styles.text.dart';
+import '../../../../../../../data/models/chat_models/message_seen_data_model.dart';
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../../../screens/user_search_screen.dart';
 import '../profile_screen_section_components/edit_profile_screen/edit_text_screen.dart';
@@ -33,6 +37,7 @@ class ChatListWidget extends StatefulWidget {
 }
 
 class _ChatListWidgetState extends State<ChatListWidget> {
+  io.Socket? socket;
   ChatModel? selectedChat;
   bool isWaitingForPagination = false;
   bool shouldPaginate = false;
@@ -48,6 +53,17 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   void initState() {
     super.initState();
 
+    var socket = io.io(
+        AppConfig.socketServerBaseUrl,
+        <String, dynamic>{
+          'transports': ['websocket'],
+          'autoConnect': false,
+        }
+    );
+
+    // Connect to web socket
+    socket.connect();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final store = StoreProvider.of<AppState>(context, listen: false);
       final chats = store.state.selectedUserInfo?.chatData?.chats ?? [];
@@ -55,6 +71,37 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         await store.dispatch(getMessagesAction( store.state.selectedUserInfo!.userId!, chats.first!.id!, null ));
         _onChatSelected(chats.first!);
       }
+
+      if( store.state.userInfo != null && store.state.selectedUserInfo != null ){
+        Future.delayed(Duration.zero, () async {
+          socket.emit(
+              'addEvaluatorToChat',
+              [
+                store.state.userInfo!.userId,
+                store.state.selectedUserInfo!.userId!
+              ]
+          );
+        });
+      }
+
+
+      // Listen for incoming messages
+      socket.on('getMessage', (data) async {
+        ChatModel receivingChatData = ChatModel.fromJson(data);
+        await store.dispatch(getUsersChatAsAdminRequestActionFromSocket(receivingChatData, store.state.selectedUserInfo!.userId!));
+      });
+
+      socket.on('chatMemberLeaved', (data) async {
+        await store.dispatch(userLeftActionFromSocket( data ));
+      });
+
+      // Listen for incoming message reads
+      socket.on('seenMessage', (data) async {
+        MessageSeenData receivingSeenData = MessageSeenData.fromJson(data);
+        receivingSeenData.chatOwnerId = store.state.selectedUserInfo!.userId;
+
+        await store.dispatch(seenMessageAsAdminBySocketAction(receivingSeenData));
+      });
     });
   }
 

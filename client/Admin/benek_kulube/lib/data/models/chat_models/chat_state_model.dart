@@ -102,7 +102,9 @@ class ChatStateModel {
       if (existingIndex != -1) {
         ChatModel chatOfTheMessage = chats![existingIndex]!;
 
-        chatOfTheMessage.unreadMessageCount = newChat.unreadMessageCount;
+        if (store.state.userInfo!.userId == store.state.selectedUserInfo!.userId) {
+          chatOfTheMessage.unreadMessageCount = newChat.unreadMessageCount;
+        }
 
         for (var message in newChat.messages!) {
           chatOfTheMessage.addMessage(message);

@@ -214,6 +214,7 @@ const sendMessageController = async ( req, res ) => {
             chatName: chat.chatName,
             chatDesc: chat.chatDesc,
             chatImageUrl: chat.chatImageUrl,
+            totalMessageCount: chat.messages.length,
             message: messageToSend
         }
         
