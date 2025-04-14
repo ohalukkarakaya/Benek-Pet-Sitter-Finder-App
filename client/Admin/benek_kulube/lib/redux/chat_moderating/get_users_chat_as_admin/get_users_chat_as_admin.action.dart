@@ -15,21 +15,26 @@ import '../../../data/models/chat_models/chat_model.dart';
 import '../../../data/models/chat_models/message_seen_data_model.dart';
 import '../../../data/models/user_profile_models/user_info_model.dart';
 
-ThunkAction<AppState> getUsersChatAsAdminRequestAction( String userId, String? lastItemId ) {
+ThunkAction<AppState> getUsersChatAsAdminRequestAction(String userId, String? lastItemId) {
   return (Store<AppState> store) async {
     ModerateUsersChatAsAdmin api = ModerateUsersChatAsAdmin();
 
     try {
-      ChatStateModel? _chatData = await api.getUsersChatAsAdminRequest( userId, lastItemId);
-      _chatData?.sortChats();
+      ChatStateModel? _chatData = await api.getUsersChatAsAdminRequest(userId, lastItemId);
 
       bool isPagination = lastItemId != null;
-      if( isPagination ){
-        for(var chat in _chatData!.chats!){
+      if (isPagination) {
+        for (var chat in _chatData!.chats!) {
           store.state.selectedUserInfo!.chatData?.addMessageOrChat(chat!, userId);
         }
 
+        // ✅ Mevcut chatData'yı yeniden sırala
+        store.state.selectedUserInfo!.chatData?.sortChats();
+
         _chatData = store.state.selectedUserInfo!.chatData;
+      } else {
+        // İlk çağrıysa sıralama zaten yapılmıştı
+        _chatData?.sortChats();
       }
 
       await store.dispatch(GetUsersChatAsAdminRequestAction(_chatData));

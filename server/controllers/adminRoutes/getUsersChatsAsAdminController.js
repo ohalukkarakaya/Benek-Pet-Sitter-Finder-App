@@ -54,7 +54,14 @@ const getUsersChatsAsAdminController = async (req, res) => {
                     }
                 }
             },
-            { $sort: { sortDate: -1 } },
+            {
+                $addFields: {
+                    lastMessageDate: {
+                        $ifNull: ["$lastMessage.sendDate", "$chatStartDate"]
+                    }
+                }
+            },
+            { $sort: { lastMessageDate: -1 } }
         ];
 
         // // Chat objelerini hazırla ve filtrele ve say

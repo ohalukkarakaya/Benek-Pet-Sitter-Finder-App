@@ -51,18 +51,22 @@ class ChatStateModel {
 
   DateTime _getLastActivityDate(ChatModel? chat) {
     if (chat?.messages != null && chat!.messages!.isNotEmpty) {
-      final lastMessage = chat.messages!.last;
-      if (lastMessage.sendDate != null) {
-        return lastMessage.sendDate!;
+      // Mesajların hepsine bak, en son tarihli olanı al
+      final validDates = chat.messages!
+          .where((m) => m.sendDate != null)
+          .map((m) => m.sendDate!)
+          .toList();
+
+      if (validDates.isNotEmpty) {
+        validDates.sort((a, b) => b.compareTo(a)); // Desc
+        return validDates.first;
       }
     }
 
-    // Yoksa chatStartDate kullan
     if (chat?.chatStartDate != null) {
       return chat!.chatStartDate!;
     }
 
-    // En son fallback: çok eski bir tarih
     return DateTime.fromMillisecondsSinceEpoch(0);
   }
 
@@ -75,55 +79,47 @@ class ChatStateModel {
 
   void addMessageOrChat(ChatModel newChat, String userId) {
     Store<AppState> store = AppReduxStore.currentStore!;
-    if( store.state.userInfo!.userId == store.state.selectedUserInfo!.userId ){
+    if (store.state.userInfo!.userId == store.state.selectedUserInfo!.userId) {
       List<String> messagesIdsList = [];
-      for( MessageModel message in newChat.messages! ){
-        if(message.seenBy != null && message.seenBy!.contains(userId)){
+      for (MessageModel message in newChat.messages!) {
+        if (message.seenBy != null && message.seenBy!.contains(userId)) {
           continue;
         }
         messagesIdsList.add(message.id!);
         message.seenBy != null
-          ? message.seenBy!.add(userId)
-          : message.seenBy = [userId];
+            ? message.seenBy!.add(userId)
+            : message.seenBy = [userId];
       }
 
-      if( messagesIdsList.isNotEmpty ){
+      if (messagesIdsList.isNotEmpty) {
         store.dispatch(seeMessagesAction(newChat.id!, messagesIdsList));
       }
     }
 
-    if( chats != null && chats!.isNotEmpty ){
-      ChatModel? chatOfTheMessage = chats?.firstWhere(
-          (element) => element!.id.toString() == newChat.id.toString(),
-          orElse: () => ChatModel());
+    if (chats != null && chats!.isNotEmpty) {
+      int existingIndex = chats!.indexWhere((element) => element!.id.toString() == newChat.id.toString());
 
-      if( chatOfTheMessage != null && chatOfTheMessage.id != null ) {
-        // Yeni mesajları ekle ve üyeleri güncelle
+      if (existingIndex != -1) {
+        ChatModel chatOfTheMessage = chats![existingIndex]!;
+
         chatOfTheMessage.unreadMessageCount = newChat.unreadMessageCount;
+
         for (var message in newChat.messages!) {
           chatOfTheMessage.addMessage(message);
         }
-        if(
-            newChat.members != null
-            && newChat.members!.isNotEmpty
-        ){
+
+        if (newChat.members != null && newChat.members!.isNotEmpty) {
           chatOfTheMessage.members = newChat.members;
         }
 
         chatOfTheMessage.totalMessageCount = newChat.totalMessageCount;
-
-        // Mesajları sırala
         chatOfTheMessage.sortMessages();
 
-        // Var olan chat'i listeden çıkart ve en üste ekle
-        chats!.removeWhere((element) => element!.id.toString() == newChat.id.toString());
-        chats!.insert(0, chatOfTheMessage);
-      }else{
-        // Yeni chat ekle
-        chats!.insert(0, newChat);
+        chats![existingIndex] = chatOfTheMessage;
+      } else {
+        chats!.add(newChat);
       }
-    }else{
-      // Eğer chats listesi boşsa, yeni chat'i ekle
+    } else {
       chats = [newChat];
     }
 

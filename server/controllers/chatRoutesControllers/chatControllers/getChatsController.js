@@ -41,7 +41,14 @@ const getChatsController = async (req, res) => {
               totalMessageCount: { $size: "$messages" }
             }
           },
-          { $sort: { "lastMessage.sendDate": -1 } }
+          {
+              $addFields: {
+                  lastMessageDate: {
+                      $ifNull: ["$lastMessage.sendDate", "$chatStartDate"]
+                   }
+              }
+          },
+          { $sort: { lastMessageDate: -1 } }
         ];
 
         // // Chat objelerini hazırla ve filtrele ve say

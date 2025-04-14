@@ -39,6 +39,7 @@ ThunkAction<AppState> sendMessageAction( String chatId, String message ) {
       selectedChat.addMessage(sendedMessage);
 
       ChatStateModel? _chatData = store.state.selectedUserInfo!.chatData;
+      _chatData?.sortChats();
 
       await store.dispatch(GetUsersChatAsAdminRequestAction(_chatData));
     } on ApiException catch (e) {

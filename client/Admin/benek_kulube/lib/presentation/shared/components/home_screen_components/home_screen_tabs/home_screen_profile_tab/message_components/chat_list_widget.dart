@@ -53,9 +53,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
       final chats = store.state.selectedUserInfo?.chatData?.chats ?? [];
       if (chats.isNotEmpty && selectedChat == null) {
         await store.dispatch(getMessagesAction( store.state.selectedUserInfo!.userId!, chats.first!.id!, null ));
-        setState(() {
-          selectedChat = chats.first;
-        });
+        _onChatSelected(chats.first!);
       }
     });
   }
@@ -404,8 +402,9 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                           ) // Chat List
                         : const SizedBox(),
 
-                    selectedChat != null
+                        selectedChat != null
                         && selectedChat!.id != null
+                        && store.state.selectedUserInfo!.userId == store.state.userInfo!.userId
                         ? LeaveMessageComponent(
                             chatId: selectedChat!.id!
                         )
