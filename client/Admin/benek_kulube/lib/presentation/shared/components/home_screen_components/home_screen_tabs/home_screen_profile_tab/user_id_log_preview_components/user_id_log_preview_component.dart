@@ -43,15 +43,17 @@ class UserIdLogPreviewComponent extends StatelessWidget {
                 width: width
               ),
 
-        SizedBox(
-            height: !isLoading && logData != null && logData!.isNotEmpty
-                  ? 20.0
-                  : 0.0
-        ),
+         const SizedBox(height: 30.0),
 
-        !isLoading && logData != null && logData!.isNotEmpty
-          ? const SeeUserLogsDetailedButton()
-          : const SizedBox()
+        // SizedBox(
+        //     height: !isLoading && logData != null && logData!.isNotEmpty
+        //           ? 20.0
+        //           : 0.0
+        // ),
+        //
+        // !isLoading && logData != null && logData!.isNotEmpty
+        //   ? const SeeUserLogsDetailedButton()
+        //   : const SizedBox()
       ],
     );
   }
