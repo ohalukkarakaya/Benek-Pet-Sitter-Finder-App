@@ -3,145 +3,120 @@ import User from "../../../models/User.js";
 import getLightWeightUserInfoHelper from "../../../utils/getLightWeightUserInfoHelper.js";
 
 const getMessagesController = async (req, res) => {
-    try{
-        // gelen veriyi karşıla
+    try {
         const userId = req.user._id.toString();
-        const LastItemId = req.params.lastItemId.toString() || 'null';
-        const limit = parseInt( req.params.limit.toString() ) || 15;
+        const LastItemId = req.params.lastItemId?.toString() || "null";
+        const limit = parseInt(req.params.limit?.toString()) || 15;
+        const chatId = req.params.chatId?.toString();
 
-        const chatId = req.params.chatId.toString();
-        if( !chatId ){
+        if (!chatId) {
             return res.status(400).json({
                 error: true,
-                message: "missing param"
+                message: "missing param",
             });
         }
 
-        // chat objesini bul, yoksa hata dön
-        const chat = await Chat.findById( chatId ).lean();
-        if( !chat ){
+        const chat = await Chat.findById(chatId).lean();
+        if (!chat) {
             return res.status(404).json({
                 error: true,
-                message: "chat not found"
+                message: "chat not found",
             });
         }
 
-        // sohbet üyesi kullanıcıların verilerini hazırla
+        // Kullanıcı bilgilerini topla
         const userDataList = [];
-        for( let member of chat.members ){
-            // sohbet üyesi kullanıcıyı bul
-            if( !( member.leaveDate ) ){
-                let memberObject = await User.findById( member.userId.toString() );
-                if( !memberObject ){
-                    return res.status( 404 ).json({
+        for (let member of chat.members) {
+            if (!member.leaveDate) {
+                const memberObject = await User.findById(member.userId.toString());
+                if (!memberObject) {
+                    return res.status(404).json({
                         error: true,
-                        message: `user with the id: "${member.userId.toString()}" not found`
+                        message: `user with the id: "${member.userId.toString()}" not found`,
                     });
                 }
-                //kullanıcının verilerini filtrele
-                let memberData = getLightWeightUserInfoHelper( memberObject );
-                if( memberData ){
-                    //veriyi listeye ekle
-                    userDataList.push( memberData );
+                const memberData = getLightWeightUserInfoHelper(memberObject);
+                if (memberData) {
+                    userDataList.push(memberData);
                 }
             }
         }
 
-        // istek atan kullanıcının sohbet üyesi olup olmadığını kontrol et
+        // Kullanıcının bu sohbette olup olmadığını kontrol et
         const usersChatInfo = chat.members.filter(
-            member =>
-                member.userId.toString() === userId
-                && !( member.leaveDate )
+            (member) => member.userId.toString() === userId && !member.leaveDate
         );
-        if( usersChatInfo.length <= 0 ){
-            return res.status( 401 ).json({
+
+        if (usersChatInfo.length <= 0) {
+            return res.status(401).json({
                 error: true,
-                message: "UnAuthorized"
+                message: "UnAuthorized",
             });
         }
 
-        // kullanıcının sohbete katılma tarihinden sonra gönderilen mesajları bul
         const joinDate = usersChatInfo[0].joinDate;
-        const filteredMessages = chat.messages.filter(message => {
+
+        // Sohbetteki mesajlardan sadece kullanıcının katıldığı tarihten sonrakileri al
+        const filteredMessages = chat.messages.filter((message) => {
             const sendDate = new Date(message.sendDate);
             return sendDate >= joinDate;
         });
 
-        // kullanıcı sohbete katıldıktan sonra gönderilmiş bir mesaj yoksa
-        // chat boş mesajı dön
-        if( filteredMessages.length < 1 ){
-            return res.status( 200 ).json({
+        if (filteredMessages.length < 1) {
+            return res.status(200).json({
                 error: false,
                 message: "chat is empty",
-                totalMessageCount: filteredMessages.length,
-                messages: []
+                totalMessageCount: 0,
+                messages: [],
             });
         }
 
-        let skip = 0;
-        if (LastItemId && LastItemId !== 'null') {
-            const lastIndex = filteredMessages.findIndex(
+        // 1. Mesajları yeniye göre sırala
+        const sortedMessages = filteredMessages.sort(
+            (a, b) => b.sendDate.getTime() - a.sendDate.getTime()
+        );
+
+        // 2. LastItemId varsa index bul
+        let startIndex = 0;
+        if (LastItemId && LastItemId !== "null") {
+            const lastIndex = sortedMessages.findIndex(
                 (msg) => msg._id.toString() === LastItemId
             );
-            skip = lastIndex >= 0 ? lastIndex + 1 : 0;
+            startIndex = lastIndex >= 0 ? lastIndex + 1 : 0;
         }
 
-        // mesajları skip, limit değerine göre sayfalandırma sistemi için böl
-        let slicedMessage = filteredMessages.reverse();
-        slicedMessage = slicedMessage.slice( skip, skip + limit );
-        slicedMessage = slicedMessage.reverse();
+        // 3. slice işlemi yap
+        const paginatedMessages = sortedMessages.slice(startIndex, startIndex + limit);
 
-        if( slicedMessage.length < 1 ){
-            return res.status( 200 ).json({
-                error: false,
-                message: "chat is empty",
-                totalMessageCount: filteredMessages.length,
-                messages: []
+        // 4. frontend düzgün görsün diye eskiye göre sırala
+        const finalMessages = paginatedMessages.reverse();
+
+        // seenBy kullanıcı bilgilerini ekle
+        const seenByListUpdatedMessageList = finalMessages.map((message) => {
+            message.senderUser = userDataList.find(
+                (usr) => usr.userId === message.sendedUserId
+            );
+
+            const seenBy = message.seenBy.map((seenUserId) => {
+                return userDataList.find((usr) => usr.userId === seenUserId) || null;
             });
-        }
 
-        // mesajları gönderilme tarihine göre sırala
-        const sortedMessages = slicedMessage.sort(
-            ( a, b ) =>
-                a.sendDate.getTime() - b.sendDate.getTime()
-        );
-        // bir sebepten sıralanmış mesaj listesi boş ise liste boş mesajı dön
-        if( sortedMessages.length < 1 ){
-            return res.status( 200 ).json({
-                error: false,
-                message: "chat is empty",
-                totalMessageCount: filteredMessages.length,
-                messages: []
-            });
-        }
+            return { ...message, seenBy };
+        });
 
-        // seenby listesini hazırla
-        const seenByListUpdatedMessageList = sortedMessages.map(
-            ( message ) => {
-                const seenBy = message.seenBy.map(( userId ) => {
-                    message.senderUser = userDataList.find( ( usr ) =>  usr.userId === message.sendedUserId );
-                    const user = userDataList.find( ( usr ) =>  usr.userId === userId );
-                    return user ? user : null;
-                });
-            
-                return { ...message, seenBy };
-            }
-        );
-
-        return res.status( 200 ).json({
+        return res.status(200).json({
             error: false,
             message: "Messages listed succesfully",
             totalMessageCount: filteredMessages.length,
-            messages: seenByListUpdatedMessageList
+            messages: seenByListUpdatedMessageList,
         });
-
-    }catch( err ){
-        console.log( "ERROR: getMessagesController - ", err );
-        return res.status( 500 ).json({
+    } catch (err) {
+        console.log("ERROR: getMessagesController - ", err);
+        return res.status(500).json({
             error: true,
-            message: "Internal Server Error"
+            message: "Internal Server Error",
         });
     }
-}
+};
 
 export default getMessagesController;
