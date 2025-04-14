@@ -89,6 +89,7 @@ class AppStaticTextsEn{
     'writeACaption': 'Write a caption...',
     'writeAComment': 'Write a comment...',
     'writeAReply': 'Write a reply...',
+    'writeAMessage': 'Write a message...',
     'commentEmptyState': 'No Comment Yet!',
     'replyEmptyState': 'No Reply Yet!',
     'tagPetInfoCaption': 'Stories has to be about A pet! Please tag a pet!',

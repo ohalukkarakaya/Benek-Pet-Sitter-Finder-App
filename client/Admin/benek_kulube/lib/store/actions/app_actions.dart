@@ -40,3 +40,4 @@ export '../../redux/user_set_auth_role/user_set_auth_role.action.dart';
 export '../../redux/get_selected_user_star_data/get_selected_user_star_data.action.dart';
 export '../../redux/selected_pet/selected_pet.action.dart';
 export '../../redux/chat_moderating/get_users_messages_as_admin/get_users_messages_as_admin.action.dart';
+export '../../redux/chat_moderating/get_users_messages_as_admin/send_message.action.dart';

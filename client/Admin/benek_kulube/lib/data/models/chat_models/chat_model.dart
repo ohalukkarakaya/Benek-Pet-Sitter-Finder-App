@@ -82,6 +82,8 @@ class ChatModel {
 
     if (!messages!.any((m) => m.id == newMessage.id)) {
       messages!.add(newMessage);
+
+      sortMessages();
     }
   }
 

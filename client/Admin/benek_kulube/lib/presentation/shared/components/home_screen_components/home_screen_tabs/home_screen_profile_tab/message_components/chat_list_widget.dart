@@ -22,6 +22,7 @@ import '../../../../../screens/user_search_screen.dart';
 import '../profile_screen_section_components/edit_profile_screen/edit_text_screen.dart';
 import 'chat_info_bar.dart';
 import 'chat_loading_list.dart';
+import 'leave_message_component.dart';
 import 'message_element_components/chat_messages_list.dart';
 
 class ChatListWidget extends StatefulWidget {
@@ -401,6 +402,13 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                               selectedChat: selectedChat!,
                             ),
                           ) // Chat List
+                        : const SizedBox(),
+
+                    selectedChat != null
+                        && selectedChat!.id != null
+                        ? LeaveMessageComponent(
+                            chatId: selectedChat!.id!
+                        )
                         : const SizedBox(),
                   ],
                 )

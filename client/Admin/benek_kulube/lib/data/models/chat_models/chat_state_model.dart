@@ -66,9 +66,16 @@ class ChatStateModel {
     return DateTime.fromMillisecondsSinceEpoch(0);
   }
 
+  ChatModel? getChatById(String chatId) {
+    return chats!.firstWhere(
+          (element) => element!.id.toString() == chatId,
+      orElse: () => null as ChatModel,
+    );
+  }
+
   void addMessageOrChat(ChatModel newChat, String userId) {
     Store<AppState> store = AppReduxStore.currentStore!;
-    if( userId == store.state.selectedUserInfo!.userId ){
+    if( store.state.userInfo!.userId == store.state.selectedUserInfo!.userId ){
       List<String> messagesIdsList = [];
       for( MessageModel message in newChat.messages! ){
         if(message.seenBy != null && message.seenBy!.contains(userId)){
