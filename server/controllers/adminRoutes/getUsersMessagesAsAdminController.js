@@ -80,9 +80,18 @@ const getUsersMessagesAsAdminController = async (req, res) => {
             });
         }
 
-        const skip = LastItemId !== 'null' ? filteredMessages.findIndex( ( message ) => message._id.toString() === lastItemIs ) + 1 : 0;
+        let skip = 0;
+        if (LastItemId && LastItemId !== 'null') {
+            const lastIndex = filteredMessages.findIndex(
+                (msg) => msg._id.toString() === LastItemId
+            );
+            skip = lastIndex >= 0 ? lastIndex + 1 : 0;
+        }
+
         // mesajları skip, limit değerine göre sayfalandırma sistemi için böl
-        const slicedMessage = filteredMessages.slice( skip, skip + limit );
+        let slicedMessage = filteredMessages.reverse();
+        slicedMessage = slicedMessage.slice( skip, skip + limit );
+        slicedMessage = slicedMessage.reverse();
         if( slicedMessage.length < 1 ){
             return res.status( 200 ).json({
                 error: false,

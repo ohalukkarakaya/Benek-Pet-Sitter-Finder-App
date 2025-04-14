@@ -26,14 +26,59 @@ class ChatMessagesList extends StatefulWidget {
 }
 
 class _ChatMessagesListState extends State<ChatMessagesList> {
+  final ScrollController _scrollController = ScrollController();
+  bool isPaginating = false;
 
   @override
   void initState() {
     super.initState();
 
+    _scrollController.addListener(_onScroll);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Liste açıldığında en alta kaydır
+      // kullanıldığında normal scrollu engellediği için yorum satırına alındı
       //_scrollToBottom();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 100) {
+      _triggerPagination();
+    }
+  }
+
+  void _triggerPagination() async {
+    final store = StoreProvider.of<AppState>(context, listen: false);
+
+    final totalCount = widget.selectedChat.totalMessageCount ?? 0;
+    final loadedCount = widget.selectedChat.messages?.length ?? 0;
+
+    // Zaten yükleniyor veya yüklenmişse çık
+    if (isPaginating || loadedCount >= totalCount) return;
+
+    setState(() {
+      isPaginating = true;
+    });
+
+    final lastMessageId = widget.selectedChat.messages?.last.id;
+
+    await store.dispatch(
+      getMessagesAction(
+        store.state.selectedUserInfo!.userId!,
+        widget.selectedChat.id!,
+        lastMessageId,
+      ),
+    );
+
+    setState(() {
+      isPaginating = false;
     });
   }
 
@@ -97,6 +142,7 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: CustomScrollView(
+        controller: _scrollController,
         reverse: true,
         slivers: sliverMessages,
       ),

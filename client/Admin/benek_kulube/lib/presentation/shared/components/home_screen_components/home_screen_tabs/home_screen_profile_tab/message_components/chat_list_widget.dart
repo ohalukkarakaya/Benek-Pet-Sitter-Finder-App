@@ -47,10 +47,11 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final store = StoreProvider.of<AppState>(context, listen: false);
       final chats = store.state.selectedUserInfo?.chatData?.chats ?? [];
       if (chats.isNotEmpty && selectedChat == null) {
+        await store.dispatch(getMessagesAction( store.state.selectedUserInfo!.userId!, chats.first!.id!, null ));
         setState(() {
           selectedChat = chats.first;
         });
