@@ -11,6 +11,7 @@ class MessageDialogBox extends StatelessWidget {
   final String? message;
   final String? fileUrl;
   final PaymentOfferModel? paymentOffer;
+  final DateTime? sendDate;
 
   const MessageDialogBox({
     super.key,
@@ -19,13 +20,14 @@ class MessageDialogBox extends StatelessWidget {
     this.message,
     this.fileUrl,
     this.paymentOffer,
+    this.sendDate,
   });
 
   @override
   Widget build(BuildContext context) {
     switch(messageType) {
       case MessageTypeEnum.TEXT:
-        return TextMessageDialog(message: message!, shouldDisplayAtLeft: shouldDisplayAtLeft);
+        return TextMessageDialog(message: message!, shouldDisplayAtLeft: shouldDisplayAtLeft, sendDate: sendDate);
       case MessageTypeEnum.FILE:
         return FileMassageDialog(filePath: fileUrl!, shouldDisplayAtLeft: shouldDisplayAtLeft);
       // case MessageTypeEnum.USERPROFILE:

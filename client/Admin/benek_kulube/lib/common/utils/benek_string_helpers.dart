@@ -79,6 +79,30 @@ class BenekStringHelpers {
     return "${date.day} ${getMonthAsString(date.month)} ${date.year}";
   }
 
+  static String getSmartFormattedDate(DateTime inputDate) {
+    final now = DateTime.now();
+
+    bool isSameDay(DateTime a, DateTime b) =>
+        a.year == b.year && a.month == b.month && a.day == b.day;
+
+    bool isSameWeek(DateTime a, DateTime b) {
+      final startOfWeekA = a.subtract(Duration(days: a.weekday - 1));
+      final startOfWeekB = b.subtract(Duration(days: b.weekday - 1));
+      return isSameDay(startOfWeekA, startOfWeekB);
+    }
+
+    if (isSameDay(inputDate, now)) {
+      return locale("today");
+    } else if (isSameWeek(inputDate, now)) {
+      return getDayOfWeekAsString(inputDate.weekday);
+    } else if (inputDate.year == now.year) {
+      return "${inputDate.day} ${getMonthAsString(inputDate.month)}";
+    } else {
+      return "${inputDate.day} ${getMonthAsString(inputDate.month)} ${inputDate.year}";
+    }
+  }
+
+
   static int getAgeAsInt(DateTime birthDate) {
     DateTime now = DateTime.now();
     int age = now.year - birthDate.year;

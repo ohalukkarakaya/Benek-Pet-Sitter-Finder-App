@@ -42,6 +42,9 @@ class MessageElement extends StatelessWidget {
                   message: messageList[index].message,
                   fileUrl: messageList[index].fileUrl,
                   paymentOffer: messageList[index].paymentOffer,
+                  sendDate: index == 0
+                      ? messageList[index].sendDate!
+                      : null,
                 ),
             childCount: messageList.length,
           ),

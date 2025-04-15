@@ -40,6 +40,7 @@ ThunkAction<AppState> sendMessageAction( String chatId, String message ) {
 
       ChatStateModel? _chatData = store.state.selectedUserInfo!.chatData;
       _chatData?.sortChats();
+      _chatData?.totalChatCount = (_chatData?.totalChatCount ?? 0) + 1;
 
       await store.dispatch(GetUsersChatAsAdminRequestAction(_chatData));
     } on ApiException catch (e) {

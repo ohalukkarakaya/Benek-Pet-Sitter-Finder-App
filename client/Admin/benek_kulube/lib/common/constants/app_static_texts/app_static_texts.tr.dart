@@ -18,6 +18,7 @@ class AppStaticTextsTr{
     'contactMessagesTab': 'Talepler',
     'logoutTab': 'Çıkış Yap',
     'welcome': 'Hoş Geldin',
+    'today': 'Bugün',
     'monday': 'Pazartesi',
     'tuesday': 'Salı',
     'wednesday': 'Çarşamba',

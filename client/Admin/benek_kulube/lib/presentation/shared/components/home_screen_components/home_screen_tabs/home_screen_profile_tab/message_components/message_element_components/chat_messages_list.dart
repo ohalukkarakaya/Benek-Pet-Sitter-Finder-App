@@ -1,3 +1,4 @@
+import 'package:benek_kulube/common/constants/app_colors.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -6,6 +7,8 @@ import 'package:redux/redux.dart';
 
 import 'package:benek_kulube/store/actions/app_actions.dart';
 
+import '../../../../../../../../common/utils/benek_string_helpers.dart';
+import '../../../../../../../../common/utils/styles.text.dart';
 import '../../../../../../../../data/models/chat_models/chat_member_model.dart';
 import '../../../../../../../../data/models/chat_models/chat_model.dart';
 import '../../../../../../../../data/models/chat_models/message_model.dart';
@@ -95,57 +98,118 @@ class _ChatMessagesListState extends State<ChatMessagesList> {
       return const Center(child: Text('No messages'));
     }
 
-    // 🔁 Sıralama: Eski mesaj üstte, yeni mesaj altta
-    final messages = [...originalMessages]..sort((a, b) => b.sendDate!.compareTo(a.sendDate!));
+    // 🔁 Sıralama: Eski → Yeni
+    final messages = [...originalMessages]
+      ..sort((a, b) => a.sendDate!.compareTo(b.sendDate!));
 
-    // Mesajları ardışık olarak gruplandır
-    List<List<MessageModel>> groupedMessages = [];
-    for (var message in messages) {
-      if (groupedMessages.isEmpty ||
-          groupedMessages.last.last.sendedUserId != message.sendedUserId) {
-        groupedMessages.add([message]);
-      } else {
-        groupedMessages.last.add(message);
-      }
+    // 🗓 Mesajları önce tarihe göre grupla
+    final Map<String, List<MessageModel>> dateGroupedMessages = {};
+
+    for (final message in messages) {
+      final sendDate = message.sendDate!;
+      final dateKey = "${sendDate.year}-${sendDate.month}-${sendDate.day}";
+
+      dateGroupedMessages.putIfAbsent(dateKey, () => []).add(message);
     }
 
-    // Widget listesi oluştur
+    // 📅 Tarih sıralı anahtarlar
+    final sortedDateKeys = dateGroupedMessages.keys.toList()
+      ..sort((a, b) {
+        final aDate = dateGroupedMessages[a]!.first.sendDate!;
+        final bDate = dateGroupedMessages[b]!.first.sendDate!;
+        return aDate.compareTo(bDate);
+      });
+
     List<Widget> sliverMessages = [];
 
     ChatMemberModel? findMember(String sendedUserId) {
       try {
         return widget.selectedChat.members!
             .firstWhere((e) => e.userData?.userId == sendedUserId);
-      } catch (e) {
+      } catch (_) {
         return null;
       }
     }
 
-    for (var group in groupedMessages) {
-      final sendedUserId = group[0].sendedUserId;
-      final member = findMember(sendedUserId!);
+    for (final dateKey in sortedDateKeys) {
+      final dateMessages = dateGroupedMessages[dateKey]!;
 
-      if (member == null) {
-        debugPrint('❌ Member not found for sendedUserId: $sendedUserId');
-        continue;
-      }
+      // 🔽 Saat sırasına göre sırala (en eski saat en önce)
+      dateMessages.sort((a, b) => a.sendDate!.compareTo(b.sendDate!));
 
+      final formattedDate = BenekStringHelpers.getSmartFormattedDate(dateMessages.first.sendDate!);
+
+      // 📅 Tarih etiketi
       sliverMessages.add(
-        MessageElement(
-          chatBoxOwnerId: widget.chatBoxOwnerId,
-          sendedUserProfileImage: member.userData!.profileImg!,
-          messageList: group,
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.benekWhite.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  formattedDate,
+                  style: TextStyle(
+                    fontFamily: defaultFontFamily(),
+                    fontSize: 12.0,
+                    color: AppColors.benekWhite,
+                    fontWeight: getFontWeight('medium'),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       );
+
+      // 👤 Kullanıcıya göre ardışık gruplama
+      List<List<MessageModel>> groupedBySender = [];
+
+      for (var message in dateMessages) {
+        if (groupedBySender.isEmpty ||
+            groupedBySender.last.last.sendedUserId != message.sendedUserId) {
+          groupedBySender.add([message]);
+        } else {
+          groupedBySender.last.add(message);
+        }
+      }
+
+      for (var group in groupedBySender) {
+        group.sort((a, b) => b.sendDate!.compareTo(a.sendDate!));
+      }
+
+      for (var group in groupedBySender) {
+        final sendedUserId = group[0].sendedUserId;
+        final member = findMember(sendedUserId!);
+
+        if (member == null) continue;
+
+        sliverMessages.add(
+          MessageElement(
+            chatBoxOwnerId: widget.chatBoxOwnerId,
+            sendedUserProfileImage: member.userData!.profileImg!,
+            messageList: group,
+          ),
+        );
+      }
     }
+
+
+    // ✅ Listeyi ters çevir (reverse: true ile çalışmak için)
+    final reversedSliverMessages = sliverMessages.reversed.toList();
 
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: CustomScrollView(
         controller: _scrollController,
         reverse: true,
-        slivers: sliverMessages,
+        slivers: reversedSliverMessages,
       ),
     );
   }
+
 }

@@ -18,6 +18,7 @@ class AppStaticTextsEn{
     'contactMessagesTab': 'Requests',
     'logoutTab': 'Log out',
     'welcome': 'Welcome',
+    'today': 'Today',
     'monday': 'Monday',
     'tuesday': 'Tuesday',
     'wednesday': 'Wednesday',
