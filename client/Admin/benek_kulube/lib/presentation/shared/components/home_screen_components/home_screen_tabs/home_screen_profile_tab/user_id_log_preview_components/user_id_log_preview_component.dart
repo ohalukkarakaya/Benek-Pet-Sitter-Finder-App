@@ -11,13 +11,15 @@ class UserIdLogPreviewComponent extends StatelessWidget {
   final double width;
   final bool isLoading;
   final List<LogModel>? logData;
+  final bool shouldGivePaddingToBottom;
 
   const UserIdLogPreviewComponent({
     super.key,
     this.height = 350,
     this.width = 350,
     this.isLoading = true,
-    required this.logData
+    required this.logData,
+    this.shouldGivePaddingToBottom = true
   });
 
   @override
@@ -29,7 +31,11 @@ class UserIdLogPreviewComponent extends StatelessWidget {
           logData == null
           || ( logData != null && logData!.isEmpty )
         )
-          ? const UserIdLogPreviewLoadingWidget()
+          ? UserIdLogPreviewLoadingWidget(
+           height: height,
+            width: width,
+            shouldGivePaddingToBottom: shouldGivePaddingToBottom
+          )
           : !isLoading
             && logData != null
             && logData!.isNotEmpty
@@ -40,7 +46,8 @@ class UserIdLogPreviewComponent extends StatelessWidget {
               )
               : UserIdLogPreviewEmptyStateWidget(
                 height: height,
-                width: width
+                width: width,
+                shouldGivePaddingToBottom: shouldGivePaddingToBottom
               ),
 
          const SizedBox(height: 30.0),

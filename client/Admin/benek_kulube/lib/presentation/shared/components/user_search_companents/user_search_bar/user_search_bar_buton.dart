@@ -6,7 +6,12 @@ import 'package:benek_kulube/presentation/shared/screens/user_search_screen.dart
 import 'package:flutter/material.dart';
 
 class KulubeSearchBarButon extends StatelessWidget {
-  const KulubeSearchBarButon({super.key});
+  final bool shouldGivePaddingToTop;
+
+  const KulubeSearchBarButon({
+    super.key,
+    this.shouldGivePaddingToTop = true,
+  });
 
   void _onTap(BuildContext context) async { 
     await Navigator.push(
@@ -24,7 +29,7 @@ class KulubeSearchBarButon extends StatelessWidget {
   Widget build(BuildContext context) {
     
     return Padding(
-      padding: const EdgeInsets.only(top: 45.0, left: 150.0),
+      padding: EdgeInsets.only(top: shouldGivePaddingToTop ? 45.0 : 0, left: 150.0),
       child: GestureDetector(
           onTap: () => _onTap(context),
           child: Hero(

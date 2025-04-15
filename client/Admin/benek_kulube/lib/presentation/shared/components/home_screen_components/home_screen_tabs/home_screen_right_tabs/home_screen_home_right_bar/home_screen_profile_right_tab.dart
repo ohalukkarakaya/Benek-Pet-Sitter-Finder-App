@@ -214,10 +214,10 @@ class _HomeScreenProfileRightTabState extends State<HomeScreenProfileRightTab> {
                       && AuthRoleHelper.checkIfRequiredRole(store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('developer')])
                       && store.state.selectedPet == null
                           ? UserIdLogPreviewComponent(
-                          isLoading: isLogsLoading,
-                          logData: selectedUserInfo.logs,
-                        )
-                        : const SizedBox(),
+                            isLoading: isLogsLoading,
+                            logData: selectedUserInfo.logs,
+                          )
+                          : const SizedBox(),
                     ],
                   ),
                 ),

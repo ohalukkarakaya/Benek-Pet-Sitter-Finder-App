@@ -13,6 +13,7 @@ import 'package:benek_kulube/data/models/user_profile_models/star_data_model.dar
 import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:benek_kulube/store/app_state.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import 'package:benek_kulube/common/constants/app_config.dart';

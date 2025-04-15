@@ -4,6 +4,7 @@ import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dar
 import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:geolocator/geolocator.dart';
 import '../data/models/kulube_login_qr_code_model.dart';
+import '../data/models/log_models/log_model.dart';
 import '../data/models/pet_models/pet_list_model.dart';
 import '../data/models/pet_models/pet_model.dart';
 import '../data/models/story_models/story_model.dart';
@@ -30,6 +31,7 @@ class AppState {
   final PetModel? selectedPet;
   final List<StoryModel>? storiesToDisplay;
   final StoryModel? selectedStory;
+  final List<LogModel>? logs;
 
   AppState({
     required this.counter,
@@ -53,6 +55,7 @@ class AppState {
     this.selectedPet,
     required this.storiesToDisplay,
     this.selectedStory,
+    this.logs,
   });
 
   factory AppState.initial() {
@@ -78,6 +81,7 @@ class AppState {
       selectedPet: null,
       storiesToDisplay: null,
       selectedStory: null,
+      logs: null,
     );
   }
 
@@ -103,6 +107,7 @@ class AppState {
     PetModel? selectedPet,
     List<StoryModel>? storiesToDisplay,
     StoryModel? selectedStory,
+    List<LogModel>? logs,
   }) {
     return AppState(
       counter: counter ?? this.counter,
@@ -126,6 +131,7 @@ class AppState {
       selectedPet: selectedPet ?? this.selectedPet,
       storiesToDisplay: storiesToDisplay ?? this.storiesToDisplay,
       selectedStory: selectedStory ?? this.selectedStory,
+      logs: logs ?? this.logs,
     );
   }
 }

@@ -20,6 +20,7 @@ import '../../redux/select_story/select_story.reducer.dart' as selected_story;
 import '../../redux/process_counter/process_counter.reducer.dart' as processCounter;
 import '../../redux/pet_search/pet_search_request.reducer.dart' as pet_search;
 import '../../redux/selected_pet/selected_pet.reducer.dart' as selected_pet;
+import '../../redux/logs/get_logs_by_user_id/get_last_30_days_logs.reducer.dart' as get_last_30_days_logs;
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
@@ -44,5 +45,6 @@ AppState appReducer(AppState state, dynamic action) {
     selectedPet: selected_pet.SetSelectedPetReducer(state.selectedPet, action),
     storiesToDisplay: get_stories_by_user_id.getStoriesByUserIdRequestReducer(state.storiesToDisplay, action),
     selectedStory: selected_story.selectStoryReducer(state.selectedStory, action),
+    logs: get_last_30_days_logs.getLast30DaysLogsReducer(state.logs, action),
   );
 }

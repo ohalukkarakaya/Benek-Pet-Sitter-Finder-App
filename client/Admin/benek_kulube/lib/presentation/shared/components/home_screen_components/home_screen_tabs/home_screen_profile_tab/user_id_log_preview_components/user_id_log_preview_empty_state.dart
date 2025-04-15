@@ -7,17 +7,19 @@ import '../../../../../../../common/utils/benek_string_helpers.dart';
 class UserIdLogPreviewEmptyStateWidget extends StatelessWidget {
   final double height;
   final double width;
+  final bool shouldGivePaddingToBottom;
 
   const UserIdLogPreviewEmptyStateWidget({
     super.key,
     this.height = 350,
     this.width = 350,
+    this.shouldGivePaddingToBottom = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: 40.0, bottom: 30.0),
+      padding: EdgeInsets.only(right: 40.0, bottom: shouldGivePaddingToBottom ? 30.0 : 0),
       child: Container(
         width: width,
         height: height,

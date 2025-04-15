@@ -6,11 +6,13 @@ import '../../../../../../../common/constants/app_colors.dart';
 class UserIdLogPreviewLoadingWidget extends StatelessWidget {
   final double height;
   final double width;
+  final bool shouldGivePaddingToBottom;
 
   const UserIdLogPreviewLoadingWidget({
     super.key,
     this.height = 350,
     this.width = 350,
+    this.shouldGivePaddingToBottom = true,
   });
 
   @override
@@ -19,7 +21,7 @@ class UserIdLogPreviewLoadingWidget extends StatelessWidget {
       baseColor: AppColors.benekBlack.withOpacity(0.5),
       highlightColor: AppColors.benekBlack.withOpacity(0.2),
       child: Padding(
-        padding: const EdgeInsets.only(right: 40.0, bottom: 30.0),
+        padding: EdgeInsets.only(right: 40.0, bottom: shouldGivePaddingToBottom ? 30.0 : 0),
         child: Container(
           width: width,
           height: height,
