@@ -21,6 +21,7 @@ import '../../redux/process_counter/process_counter.reducer.dart' as processCoun
 import '../../redux/pet_search/pet_search_request.reducer.dart' as pet_search;
 import '../../redux/selected_pet/selected_pet.reducer.dart' as selected_pet;
 import '../../redux/logs/get_logs_by_user_id/get_last_30_days_logs.reducer.dart' as get_last_30_days_logs;
+import '../../redux/care_give_moderating/report.reducer.dart' as get_reports;
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
@@ -46,5 +47,6 @@ AppState appReducer(AppState state, dynamic action) {
     storiesToDisplay: get_stories_by_user_id.getStoriesByUserIdRequestReducer(state.storiesToDisplay, action),
     selectedStory: selected_story.selectStoryReducer(state.selectedStory, action),
     logs: get_last_30_days_logs.getLast30DaysLogsReducer(state.logs, action),
+    reports: get_reports.reportReducer(state.reports, action),
   );
 }

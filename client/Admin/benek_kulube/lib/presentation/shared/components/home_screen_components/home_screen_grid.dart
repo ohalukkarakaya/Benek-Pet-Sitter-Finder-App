@@ -13,6 +13,7 @@ import 'package:redux/redux.dart';
 import '../../../../common/constants/tabs_enum.dart';
 import '../loading_components/benek_loading_component.dart';
 import 'home_screen_tabs/home_screen_logs_tab/home_screen_logs_tab.dart';
+import 'home_screen_tabs/home_screen_report_tab/home_screen_report_tab.dart';
 import 'home_screen_tabs/home_screen_right_tabs/home_screen_home_right_bar/home_screen_home_right_bar.dart';
 import 'home_screen_tabs/home_screen_right_tabs/home_screen_home_right_bar/home_screen_profile_right_tab.dart';
 import 'home_screen_tabs_bar_companents/home_screen_tabs_bar.dart';
@@ -43,6 +44,7 @@ class HomeScreenGrid extends StatelessWidget {
     }
 
     final isLogsTab = store.state.activeTab == AppTabsEnums.LOGS_TAB;
+
     final noUserSelected = store.state.selectedUserInfo == null;
 
     return Row(
@@ -50,7 +52,7 @@ class HomeScreenGrid extends StatelessWidget {
         // Sol bar
         HomeScreenTabsBar(store: store),
 
-        // Eğer Logs tab ise → sağ + orta birleşsin, tek widget göstersin
+        // Eğer Logs tab ise → sağ + orta, tek widget olacak
         if (isLogsTab && noUserSelected)
           Expanded(
             child: KulubeLogsTabWidget(), // bu hem ortayı hem sağ tarafı kaplayacak
@@ -77,15 +79,21 @@ class HomeScreenGrid extends StatelessWidget {
                               : const BouncingScrollPhysics(),
                           children: [
                             const KulubeSearchBarButon(),
-                            const SizedBox(height: 100),
+                            SizedBox(
+                                height: store.state.activeTab == AppTabsEnums.REPORTED_TAB
+                                          ? 0
+                                          : 100
+                            ),
                             store.state.selectedUserInfo == null
                                 ? store.state.activeTab == AppTabsEnums.HOME_TAB
-                                ? KulubeHomeTabWidget(
-                              firstName: store.state.userInfo!.identity!.firstName!,
-                              middleName: store.state.userInfo!.identity!.middleName,
-                              lastName: store.state.userInfo!.identity!.lastName!,
-                            )
-                                : const SizedBox()
+                                    ? KulubeHomeTabWidget(
+                                      firstName: store.state.userInfo!.identity!.firstName!,
+                                      middleName: store.state.userInfo!.identity!.middleName,
+                                      lastName: store.state.userInfo!.identity!.lastName!,
+                                    )
+                                    : store.state.activeTab == AppTabsEnums.REPORTED_TAB
+                                        ? KulubeReportTabWidget()
+                                        : const SizedBox()
                                 : const ProfileTab()
                           ],
                         ),
@@ -99,8 +107,9 @@ class HomeScreenGrid extends StatelessWidget {
             // Sağ bar
             store.state.selectedUserInfo == null
                 ? store.state.activeTab == AppTabsEnums.HOME_TAB
-                ? HomeScreenHomeRightTab(user: store.state.userInfo!)
-                : const SizedBox()
+                  || store.state.activeTab == AppTabsEnums.REPORTED_TAB
+                    ? HomeScreenHomeRightTab(user: store.state.userInfo!)
+                    : const SizedBox()
                 : const HomeScreenProfileRightTab(),
           ]
       ],

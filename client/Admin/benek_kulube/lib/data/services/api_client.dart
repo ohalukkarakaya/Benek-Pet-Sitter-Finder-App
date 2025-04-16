@@ -114,6 +114,8 @@ class ApiClient {
           List<dynamic> jsonList = value['punishmentRecords'];
           List<PunishmentModel> list = jsonList.map((item) => PunishmentModel.fromJson(item)).toList();
           return list;
+        case 'ReportStateModel':
+          return ReportStateModel.fromJson(value);
 
         default:
           {

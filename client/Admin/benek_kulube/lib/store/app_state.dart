@@ -1,5 +1,6 @@
 import 'package:benek_kulube/common/constants/app_screens_enum.dart';
 import 'package:benek_kulube/common/constants/tabs_enum.dart';
+import 'package:benek_kulube/data/models/care_give_models/report_state_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 import 'package:benek_kulube/data/models/user_profile_models/user_list_model.dart';
 import 'package:geolocator/geolocator.dart';
@@ -32,6 +33,7 @@ class AppState {
   final List<StoryModel>? storiesToDisplay;
   final StoryModel? selectedStory;
   final List<LogModel>? logs;
+  final ReportStateModel? reports;
 
   AppState({
     required this.counter,
@@ -56,6 +58,7 @@ class AppState {
     required this.storiesToDisplay,
     this.selectedStory,
     this.logs,
+    this.reports,
   });
 
   factory AppState.initial() {
@@ -82,6 +85,7 @@ class AppState {
       storiesToDisplay: null,
       selectedStory: null,
       logs: null,
+      reports: null,
     );
   }
 
@@ -108,6 +112,7 @@ class AppState {
     List<StoryModel>? storiesToDisplay,
     StoryModel? selectedStory,
     List<LogModel>? logs,
+    ReportStateModel? reports,
   }) {
     return AppState(
       counter: counter ?? this.counter,
@@ -132,6 +137,7 @@ class AppState {
       storiesToDisplay: storiesToDisplay ?? this.storiesToDisplay,
       selectedStory: selectedStory ?? this.selectedStory,
       logs: logs ?? this.logs,
+      reports: reports ?? this.reports,
     );
   }
 }

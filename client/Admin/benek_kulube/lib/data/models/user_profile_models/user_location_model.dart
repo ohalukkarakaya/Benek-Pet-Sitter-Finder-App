@@ -17,7 +17,7 @@ class UserLocation {
     country = json['country'];
     city = json['city'];
     lat = json['lat'];
-    lng = json['lng'];
+    lng = json['lng'] ?? json['long'];
   }
 
   Map<String, dynamic> toJson(){

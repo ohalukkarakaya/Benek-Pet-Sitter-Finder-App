@@ -11,14 +11,14 @@ import prepareReportedMissionHelper from "../../utils/adminHelpers/prepareReport
 
 const getReportedMissionListController = async ( req, res ) => {
     try{
-        const lasItemId = req.params.lastItemId || 'null';
+        const lastItemId = req.params.lastItemId || 'null';
         const limit = parseInt( req.params.limit ) || 15;
 
         const reportedMissionFilter = {};
-        if( lasItemId !== 'null' ){
-            const lastItem = await ReportMission.findById(lasItemId);
+        if( lastItemId !== 'null' ){
+            const lastItem = await ReportMission.findById(lastItemId);
             if(lastItem){
-                reportedMissionFilter.createdAt = { $gt: lasItem.createdAt };
+                reportedMissionFilter.createdAt = { $gt: lastItem.createdAt };
             }
             
         }

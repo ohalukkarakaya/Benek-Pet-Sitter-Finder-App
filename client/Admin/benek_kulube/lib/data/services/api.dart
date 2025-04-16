@@ -26,6 +26,8 @@ import 'package:http_parser/http_parser.dart';
 
 import 'package:benek_kulube/data/models/user_profile_models/user_info_model.dart';
 
+import '../models/care_give_models/report_model.dart';
+import '../models/care_give_models/report_state_model.dart';
 import '../models/chat_models/chat_model.dart';
 import '../models/chat_models/chat_state_model.dart';
 import '../models/chat_models/message_model.dart';
@@ -59,5 +61,6 @@ part 'user_info_api/user_get_private_info_api.dart';
 part 'user_info_api/user_set_auth_role_api.dart';
 part 'geocoding_api.dart';
 part 'user_star_apies/get_selected_user_star_data_api.dart';
+part 'care_give_apies/report_api.dart';
 
 ApiClient defaultApiClient = ApiClient();

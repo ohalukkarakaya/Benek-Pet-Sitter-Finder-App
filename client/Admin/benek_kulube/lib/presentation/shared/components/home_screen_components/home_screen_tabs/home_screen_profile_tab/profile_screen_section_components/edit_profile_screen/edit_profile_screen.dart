@@ -18,11 +18,8 @@ import 'package:redux/redux.dart';
 import 'package:benek_kulube/store/app_state.dart';
 
 import 'become_care_giver_button.dart';
-import 'deactivate_account_button.dart';
-import 'edit_account_info_menu_item.dart';
 import 'edit_adress_widget.dart';
 import 'edit_profile_profile_widget.dart';
-import 'edit_text_screen.dart';
 import 'edited_bio_row.dart';
 import 'menu_items/edit_email_button.dart';
 import 'menu_items/edit_full_name_button.dart';

@@ -54,8 +54,8 @@ class _VerticalContentComponentState extends State<VerticalContentComponent> {
     bool isMp4 = ImageVideoHelpers.isVideo(widget.src);
     String? path = !widget.isCreatingStory
         ? isMp4
-        ? await ImageVideoHelpers.getVideo(widget.src)
-        : ImageVideoHelpers.getFullUrl(widget.src)
+          ? await ImageVideoHelpers.getVideo(widget.src)
+          : ImageVideoHelpers.getFullUrl(widget.src)
         : widget.src;
 
     setState(() {
@@ -170,12 +170,12 @@ class _VerticalContentComponentState extends State<VerticalContentComponent> {
         ],
       )
           : Container(
-        color: Colors.white,
-        child: VideoLoadingWidget(
-          width: widget.width,
-          height: widget.height,
-        ),
-      ),
+            color: Colors.white,
+            child: VideoLoadingWidget(
+              width: widget.width,
+              height: widget.height,
+            ),
+          ),
     );
   }
 }
