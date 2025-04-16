@@ -48,9 +48,16 @@ const CareGiveSchema = new mongoose.Schema(
       },
       startDate: { type: Date, default: Date.now() },
       endDate: {
-        type: Date,
-        default: Date.now() + 7*24*60*60*1000,
-        validate: [( value ) => { const startDate = Date.parse( this.startDate ); return startDate < Date.parse( value ); }]
+          type: Date,
+          default: () => Date.now() + 7*24*60*60*1000,
+          validate: [
+              function (value) {
+                  if (!this.startDate) return true;
+                  const startDate = Date.parse(this.startDate);
+                  return startDate < Date.parse(value);
+              },
+              "endDate must be after startDate"
+          ]
       },
       adress: {
         adressDesc: { type: String, maxLength: [ 100, '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır' ], },
@@ -65,14 +72,12 @@ const CareGiveSchema = new mongoose.Schema(
                 type: Date,
                 required: true,
                 validate: [
-                    ( value ) => {
-                        const startDate = new Date( this.missionDate );
-                        const endDate = new Date( value );
-
-                        if( isNaN( startDate ) || isNaN( endDate ) ) { return false; }
-                        if( startDate >= endDate ){ return false; }
-
-                        return true;
+                    function (value) {
+                        if (!this.missionDate || !value) return false;
+                        const startDate = new Date(this.missionDate);
+                        const endDate = new Date(value);
+                        if (isNaN(startDate) || isNaN(endDate)) return false;
+                        return startDate < endDate;
                     },
                     "Invalid missionDeadline"
                 ]

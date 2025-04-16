@@ -37,75 +37,60 @@ const scheduleMissionController = async ( req, res) => {
             || !missionDesc 
             || !missionDate
         ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Missing param"
-                            }    
-                       );
+            return res.status( 400 ).json({
+                error: true,
+                message: "Missing param"
+            });
         }
         
         const careGive = await CareGive.findById( careGiveId );
         if( !careGive ){
-            return res.status( 404 )
-                      .json(
-                            {
-                                error: true,
-                                message: "Care give not found"
-                            }
-                       );
+            return res.status( 404 ).json({
+                error: true,
+                message: "Care give not found"
+            });
         }
         const isVolunteer = careGive.prices.priceType === "Free";
         if( isVolunteer ){
-            return res.status( 401 )
-                      .json(
-                            {
-                                error: true,
-                                message: "You can't schedule mission for Free careGive"
-                            }
-                       );
+            return res.status( 401 ).json({
+                error: true,
+                message: "You can't schedule mission for Free careGive"
+            });
         }
 
-        if( careGive.endDate < missionDateToUse ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "You can't insert mission on this date"
-                            }
-                       );
+        if(
+            careGive.endDate < missionDateToUse
+            || careGive.startDate > missionDateToUse
+        ){
+            return res.status( 400 ).json({
+                error: true,
+                message: "You can't insert mission on this date"
+            });
         }
 
         const areThereMissionAtSameTime = careGive.missionCallender.find(
-                                                                        missionObject => 
-                                                                            missionObject.missionDate === missionDateToUse
-                                                                    );
+            missionObject =>
+                missionObject.missionDate === missionDateToUse
+        );
         if( areThereMissionAtSameTime ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "there is allready mission scheduled at this time"
-                            }
-                       );
+            return res.status( 400 ).json({
+                error: true,
+                message: "there is allready mission scheduled at this time"
+            });
         }
 
         if( careGive.petOwner.petOwnerId.toString() !== req.user._id.toString() ){
-            return res.status( 400 )
-                      .json(
-                            {
-                                error: true,
-                                message: "You are not authorized to schedule mission for this pet"
-                            }
-                       );
+            return res.status( 400 ).json({
+                error: true,
+                message: "You are not authorized to schedule mission for this pet"
+            });
         }
         const isExtraMission = careGive.missionCallender.length >= careGive.prices.maxMissionCount;
 
         if( isExtraMission ){
             const cardGuid = req.body.cardGuid 
-                                ? req.body.cardGuid.toString() 
-                                : null;
+                ? req.body.cardGuid.toString()
+                : null;
 
             const cardNo = req.body.cardNo.toString();
             const cvv = req.body.cvc.toString();
@@ -135,14 +120,11 @@ const scheduleMissionController = async ( req, res) => {
             );
 
             if( paymentData.message === 'Daily Limit Exceeded' ){
-                return res.status( 500 )
-                            .json(
-                            {
-                                error: true,
-                                message: "CareGiver Daily Limit Exceeded",
-                                payError: paymentData
-                            }
-                            );
+                return res.status( 500 ).json({
+                    error: true,
+                    message: "CareGiver Daily Limit Exceeded",
+                    payError: paymentData
+                });
             }
 
             if(
@@ -153,25 +135,19 @@ const scheduleMissionController = async ( req, res) => {
                 || paymentData.payData === null 
                 || paymentData.payData === undefined
             ){
-                return res.status( 500 )
-                            .json(
-                            {
-                                error: true,
-                                message: "Error While Payment",
-                                payError: paymentData
-                            }
-                            );
+                return res.status( 500 ).json({
+                    error: true,
+                    message: "Error While Payment",
+                    payError: paymentData
+                });
             }
 
-            return res.status( 200 )
-                        .json(
-                            {
-                                error: false,
-                                message: "Waiting for 3d payment approve",
-                                payData: paymentData.payData,
-                                careGive: careGiveId
-                            }
-                        );
+            return res.status( 200 ).json({
+                error: false,
+                message: "Waiting for 3d payment approve",
+                payData: paymentData.payData,
+                careGive: careGiveId
+            });
         }
 
         const scheduleExtraMission = await prepareExtraMissionHelper(
@@ -190,33 +166,24 @@ const scheduleMissionController = async ( req, res) => {
             !scheduleExtraMission
             || scheduleExtraMission.error
         ){
-            return res.status( 500 )
-                      .json(
-                        {
-                            error: true,
-                            message: "Internal Server Error"
-                        }
-                      )
+            return res.status( 500 ).json({
+                error: true,
+                message: "Internal Server Error"
+            })
         }
 
-        return res.status( 200 )
-                  .json(
-                        {
-                            error: false,
-                            message: "Mission Scheduled Succesfully",
-                            payData: null,
-                            careGive: careGiveId
-                        }
-                  );
+        return res.status( 200 ).json({
+            error: false,
+            message: "Mission Scheduled Succesfully",
+            payData: null,
+            careGive: careGiveId
+        });
     }catch( err ){
         console.log( "Error: schedule care give mission - ", err );
-        return res.status( 500 )
-                  .json(
-                        {
-                            error: true,
-                            message: "Internal server error"
-                        }
-                   );
+        return res.status( 500 ).json({
+            error: true,
+            message: "Internal server error"
+        });
     }
 }
 

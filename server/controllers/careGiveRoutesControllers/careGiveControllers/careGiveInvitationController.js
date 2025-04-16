@@ -180,6 +180,13 @@ const careGiveInvitationController = async ( req, res ) => {
             );
             const jsStartDate = new Date( jsTarih );
 
+            if (jsStartDate < new Date()) {
+                return res.status(400).json({
+                    error: true,
+                    message: "start date cannot be in the past"
+                });
+            }
+
             let endDateToSave;
             if( miliSecToCountEndDate ){
                 endDateToSave = new Date( jsStartDate.getTime() + miliSecToCountEndDate );

@@ -38,7 +38,7 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
             !( pet.allOwners.includes( userId ) )
             && careGive.careGiver.careGiverId !== userId
         ){
-            return res.statu( 401 ).json({
+            return res.status( 401 ).json({
                 error: true,
                 message: "UnAuthorized"
             });
@@ -55,7 +55,7 @@ const getMissionListByCareGiveIdController = async ( req, res ) => {
         const startIndex = lastItemId === 'null' ? 0 : missionCallender.findIndex( mission => mission._id.toString() === lastItemId ) + 1;
         const endIndex = startIndex + limit;
 
-        const petInfo = getLightWeightPetInfoHelper( pet );
+        const petInfo = await getLightWeightPetInfoHelper( pet );
 
         const petOwner = await User.findById( careGive.petOwner.petOwnerId.toString());
         const careGiver = await User.findById( careGive.careGiver.careGiverId.toString() );

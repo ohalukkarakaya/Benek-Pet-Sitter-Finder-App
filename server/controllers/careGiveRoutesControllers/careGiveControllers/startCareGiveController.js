@@ -94,7 +94,7 @@ const startCareGiveController = async (req, res) => {
             processedStartDate > nowDate
             || processedStartDate < nowDate
         ){
-            return res.status( 400 ).json({ error: true, message: "care give was past" });
+            return res.status( 400 ).json({ error: true, message: "care give can't start now" });
         }
 
         const verifiedPassword = await bcrypt.compare( actionCodePassword, careGive.invitation.actionCode.codePassword );

@@ -30,7 +30,7 @@ class _KulubeLogsTabWidgetState extends State<KulubeLogsTabWidget> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      
+
       Store<AppState> store = StoreProvider.of<AppState>(context);
       final hasAccess = AuthRoleHelper.checkIfRequiredRole(
         store.state.userRoleId,

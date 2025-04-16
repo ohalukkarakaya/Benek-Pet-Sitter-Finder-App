@@ -1,4 +1,5 @@
 const fs = require('fs');
+const cleanTempFilesHelper = require("../cleanTempFilesHelper");
 
 const writeVideoFileAfterProcessHelper = async (
     newPath,

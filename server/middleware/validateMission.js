@@ -82,7 +82,7 @@ const validateMission = async (req, res, next) => {
 
         if ( mission.missionContent.videoUrl ){
           const deleteMission = await deleteFileHelper( mission.missionContent.videoUrl );
-          if( deleteCertificate.error ){
+          if( mission.missionContent.error ){
             return res.status( 500 )
                       .json(
                         {
