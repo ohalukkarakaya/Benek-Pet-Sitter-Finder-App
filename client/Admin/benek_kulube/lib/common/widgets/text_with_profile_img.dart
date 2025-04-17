@@ -33,7 +33,7 @@ class TextWithProfileImg extends StatelessWidget {
             child: Text(
               text,
               style: lightTextStyle( textColor: AppColors.benekWhite ),
-              maxLines: 3,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ),

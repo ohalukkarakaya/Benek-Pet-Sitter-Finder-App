@@ -171,5 +171,7 @@ class AppStaticTextsTr{
     'missingUser': "Bulunmayan Kullanıcı",
     'addMembers': "Üye ekle...",
     'selectAMember': "Bir üye seç",
+    'enterExcuse': "Mazeret girin...",
+    'sendExcuse': "Şikayeti haklı bul ve mazereti gönder!",
   };
 }

@@ -171,5 +171,7 @@ class AppStaticTextsEn{
     'missingUser': "Missing User",
     'addMembers': "Add Members...",
     'selectAMember': "Select a member",
+    'enterExcuse': "Enter excuse...",
+    'sendExcuse': "Justify the report and send the excuse!",
   };
 }

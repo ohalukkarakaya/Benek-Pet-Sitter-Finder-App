@@ -12,6 +12,8 @@ import '../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../presentation/features/image_video_helpers/image_video_helpers.dart';
 import 'package:benek_kulube/common/widgets/vertical_video_companent/video_loading_widget.dart';
 
+import '../../constants/app_colors.dart';
+
 class VerticalContentComponent extends StatefulWidget {
   final bool isLocalAsset;
   final String src;
@@ -161,12 +163,32 @@ class _VerticalContentComponentState extends State<VerticalContentComponent> {
           Positioned(
             bottom: 20,
             left: 20,
-            child: BenekCircleAvatar(
-              borderWidth: 2,
-              isDefaultAvatar: widget.user.profileImg!.isDefaultImg!,
-              imageUrl: widget.user.profileImg!.imgUrl!,
+            child: Row(
+              children: [
+                BenekCircleAvatar(
+                  borderWidth: 2,
+                  isDefaultAvatar: widget.user.profileImg!.isDefaultImg!,
+                  imageUrl: widget.user.profileImg!.imgUrl!,
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    widget.user.userName ?? '',
+                    style: TextStyle(
+                      color: AppColors.benekWhite,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+
         ],
       )
           : Container(
