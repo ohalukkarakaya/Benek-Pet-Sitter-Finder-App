@@ -74,7 +74,7 @@ class _ReportContextVerticalScrollWidgetState extends State<ReportContextVertica
               return Padding(
                 padding: EdgeInsets.only(bottom: index != vm.reports.length - 1 ? 15.0 : 0.0),
                 child: ReportContextWidget(
-                  report: report,
+                  report: report
                 )
               );
             },

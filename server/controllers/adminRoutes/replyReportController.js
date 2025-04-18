@@ -1,6 +1,7 @@
 import PaymentData from "../../models/PaymentData/PaymentData.js";
 import ReportMission from "../../models/Report/ReportMission.js";
 import AdminPaymentCancellation from "../../models/Report/AdminPaymentCancellation.js";
+import deleteFileHelper from "../../utils/fileHelpers/deleteFileHelper.js";
 
 //  *                *         .                      *            .   *           .    *
 //                                *                  *  .                .
@@ -12,7 +13,7 @@ const replyReportController = async ( req, res ) => {
     try{
         const reportId = req.params.reportId.toString();
         let adminsResponseToReport = req.params.response.toString();
-        const responseDesc = req.body.responseDesc.toString();
+        const responseDesc = req.body.responseDesc;
 
         if( !reportId || !adminsResponseToReport ){
             return res.status( 400 )

@@ -21,7 +21,7 @@ const AdminPaymentCancellationSchema = new mongoose.Schema(
             type: String,
             required: true,
             maxLength: [
-                50,
+                100,
                 '`{PATH}` Alanı (`{VALUE}`), `{MAXLENGTH}` Karakterden Az Olmalıdır'
             ],
         }

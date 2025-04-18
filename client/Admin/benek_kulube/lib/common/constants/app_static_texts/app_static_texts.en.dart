@@ -173,5 +173,7 @@ class AppStaticTextsEn{
     'selectAMember': "Select a member",
     'enterExcuse': "Enter excuse...",
     'sendExcuse': "Justify the report and send the excuse!",
+    'approveAcceptingReport': "Slide to accept the report...",
+    'cancelReport': "Cancel the report",
   };
 }

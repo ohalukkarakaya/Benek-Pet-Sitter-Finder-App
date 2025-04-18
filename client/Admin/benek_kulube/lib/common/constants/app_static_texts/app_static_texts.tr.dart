@@ -173,5 +173,7 @@ class AppStaticTextsTr{
     'selectAMember': "Bir üye seç",
     'enterExcuse': "Mazeret girin...",
     'sendExcuse': "Şikayeti haklı bul ve mazereti gönder!",
+    'approveAcceptingReport': "Şikayeti kabul etmek için kaydır...",
+    'cancelReport': "Şikayeti iptal et",
   };
 }

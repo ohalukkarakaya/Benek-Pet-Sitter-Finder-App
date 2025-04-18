@@ -53,6 +53,39 @@ ThunkAction<AppState> resetReportsAction() {
   };
 }
 
+ThunkAction<AppState> sendReportResponseAction( String reportId, bool adminresponse, String? responseDesc ) {
+  return (Store<AppState> store) async {
+    ReportApi api = ReportApi();
+
+    try {
+      bool result = await api.postGiveResponseToReportRequest(reportId, adminresponse, responseDesc);
+
+      if (result) {
+        // If the response is successful, fetch the updated report list
+        ReportStateModel? _reports = store.state.reports;
+        _reports?.totalReportCount = _reports.totalReportCount != null && _reports!.totalReportCount! > 0
+            ? _reports.totalReportCount! - 1
+            : 0;
+
+        final newReportsList = List<ReportModel>.from(_reports?.reports ?? []);
+        newReportsList.removeWhere((report) => report.reportId == reportId);
+
+        await store.dispatch(GetReportedMissionListAction(
+            ReportStateModel(
+              reports: newReportsList,
+              totalReportCount: (_reports?.totalReportCount ?? 1) - 1,
+              selectedReportIndex: (_reports?.selectedReportIndex ?? 0),
+            )
+        ));
+      } else {
+        log('ERROR: sendReportResponseAction - Failed to send report response');
+      }
+    } on ApiException catch (e) {
+      log('ERROR: sendReportResponseAction - $e');
+    }
+  };
+}
+
 ThunkAction<AppState> setSelectedReportIndex(int index){
   return (Store<AppState> store) async {
     try {
