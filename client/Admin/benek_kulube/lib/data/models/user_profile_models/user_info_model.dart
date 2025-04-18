@@ -93,12 +93,22 @@ class UserInfo {
     authRole = json['authRole'] ?? 0;
     identity = json['identity'] != null
         ? UserIdentity.fromJson( json['identity'] )
-        : json[ 'userFullName' ] != null
-          ? UserIdentity(
-              firstName: json['userFullName'].toString().split(" ")[0],
-              middleName: json['userFullName'].toString().split(" ").length > 2 ? json['userFullName'].toString().split(" ")[1] : null,
-              lastName: json['userFullName'].toString().split(" ").length > 2 ? json['userFullName'].toString().split(" ")[2] : json['userFullName'].toString().split(" ")[1],
-            )
+        : (json['userFullName'] != null || json["nationalIdentityNumber"] != null)
+        ? UserIdentity(
+            firstName: json['userFullName'] != null
+                ? json['userFullName'].toString().split(" ")[0]
+                : null,
+            middleName: json['userFullName'] != null &&
+                json['userFullName'].toString().split(" ").length > 2
+                ? json['userFullName'].toString().split(" ")[1]
+                : null,
+            lastName: json['userFullName'] != null
+                ? (json['userFullName'].toString().split(" ").length > 2
+                ? json['userFullName'].toString().split(" ")[2]
+                : json['userFullName'].toString().split(" ")[1])
+                : null,
+            nationalIdentityNumber: json['nationalIdentityNumber'],
+          )
           : null;
     email = json['email'];
     phone = json['phone'];

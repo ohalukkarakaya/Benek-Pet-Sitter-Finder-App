@@ -28,6 +28,7 @@ import { adminAuthAny, adminAuthSuperAdmin, adminAuthEvaluator, adminAuthAccount
 
 import dotenv from "dotenv";
 import searchChatController from "../../controllers/chatRoutesControllers/chatControllers/searchChatController.js";
+import getPaymentsFromDateController from "../../controllers/adminRoutes/getPaymentsFromDateController.js";
 
 
 
@@ -128,6 +129,13 @@ router.get(
     adminAuthAccounting,
     getExpensePaperListController
 );
+
+// get all payment data from a date
+router.get(
+    "/getPaymentsFromDate/:date",
+    adminAuthAccounting,
+    getPaymentsFromDateController
+)
 
 // - tested
 // punish user

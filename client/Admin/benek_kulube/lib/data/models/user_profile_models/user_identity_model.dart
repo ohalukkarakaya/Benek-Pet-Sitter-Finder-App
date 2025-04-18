@@ -28,6 +28,7 @@ class UserIdentity {
     middleName = json['middleName'];
     lastName = json['lastName'];
     openAdress = json['openAdress'];
+    nationalIdentityNumber = json['nationalIdentityNumber'];
     job = json['job'];
     bio = json['bio'];
     if( json['certificates'] != null ){

@@ -259,7 +259,8 @@ const expenseDocumentGenerationHelper = async ( paymentData, res ) => {
           }
         );
 
-        await paymentData.deleteOne();
+        // yeni geliştirme sonucu payment datayı kullanıyoruz silmemeliyiz...
+        //await paymentData.deleteOne();
         return {
             error: false,
             statusCode: 200,
