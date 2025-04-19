@@ -183,5 +183,18 @@ class AppStaticTextsTr{
     'careGiverAdress': "Bakıcı Adresi :",
     'careGiver': "Bakıcı :",
     'customer': "Müşteri :",
+    'noPaymentData': 'Hiç Ödeme Yok!',
+    'careGiverFullName': 'Bakıcı Adı Soyadı',
+    'careGiverTc': 'Bakıcı TC',
+    'careGiverEmail': 'Bakıcı E-posta',
+    'careGiverPhone': 'Bakıcı Telefon',
+    'careGiverOpenAddress': 'Bakıcı Adresi',
+    'petOwnerFullName': 'Müşteri Adı Soyadı',
+    'petOwnerEmail': 'Müşteri E-posta',
+    'petOwnerPhone': 'Müşteri Telefon',
+    'paymentAmount': 'Ödeme Tutarı',
+    'paymentDate': 'Ödeme Tarihi',
+    'excelDocumentCreated': "Excel Dosyası Oluşturuldu!",
+    'exportAsExcel': "Excel'e Aktar",
   };
 }

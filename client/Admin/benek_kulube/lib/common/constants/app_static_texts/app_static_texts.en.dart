@@ -183,5 +183,18 @@ class AppStaticTextsEn{
     'careGiverAdress': "Caregiver Address :",
     'careGiver': "Caregiver :",
     'customer': "Customer :",
+    'noPaymentData': 'No Payment Data!',
+    'careGiverFullName': 'Caregiver Full Name',
+    'careGiverTc': 'Caregiver TC',
+    'careGiverEmail': 'Caregiver E-mail',
+    'careGiverPhone': 'Caregiver Phone',
+    'careGiverOpenAddress': 'Caregiver Address',
+    'petOwnerFullName': 'Customer Full Name',
+    'petOwnerEmail': 'Customer E-mail',
+    'petOwnerPhone': 'Customer Phone',
+    'paymentAmount': 'Payment Amount',
+    'paymentDate': 'Payment Date',
+    'excelDocumentCreated': "Excel Document Created!",
+    'exportAsExcel': "Export as Excel",
   };
 }
