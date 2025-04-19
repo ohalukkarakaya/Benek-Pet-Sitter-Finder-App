@@ -91,25 +91,36 @@ class UserInfo {
     userId = json['userId'] ?? json ['_id'];
     userName = json['userName'] ?? json['username'];
     authRole = json['authRole'] ?? 0;
-    identity = json['identity'] != null
-        ? UserIdentity.fromJson( json['identity'] )
-        : (json['userFullName'] != null || json["nationalIdentityNumber"] != null)
-        ? UserIdentity(
-            firstName: json['userFullName'] != null
-                ? json['userFullName'].toString().split(" ")[0]
-                : null,
-            middleName: json['userFullName'] != null &&
-                json['userFullName'].toString().split(" ").length > 2
-                ? json['userFullName'].toString().split(" ")[1]
-                : null,
-            lastName: json['userFullName'] != null
-                ? (json['userFullName'].toString().split(" ").length > 2
-                ? json['userFullName'].toString().split(" ")[2]
-                : json['userFullName'].toString().split(" ")[1])
-                : null,
-            nationalIdentityNumber: json['nationalIdentityNumber'],
-          )
-          : null;
+    if (json['identity'] != null) {
+      identity = UserIdentity.fromJson(json['identity']);
+
+      // Eğer fullname varsa, eksik bilgileri güncelle
+      if (json['userFullName'] != null) {
+        List<String> parts = json['userFullName'].toString().split(" ");
+        if (parts.isNotEmpty && (identity?.firstName == null || identity!.firstName!.isEmpty)) {
+          identity?.firstName = parts[0];
+        }
+        if (parts.length > 2 && (identity?.middleName == null || identity!.middleName!.isEmpty)) {
+          identity?.middleName = parts[1];
+        }
+        if ((identity?.lastName == null || identity!.lastName!.isEmpty)) {
+          identity?.lastName = parts.length > 2 ? parts[2] : parts[1];
+        }
+      }
+
+      if (json['nationalIdentityNumber'] != null &&
+          (identity?.nationalIdentityNumber == null || identity!.nationalIdentityNumber!.isEmpty)) {
+        identity?.nationalIdentityNumber = json['nationalIdentityNumber'];
+      }
+    } else if (json['userFullName'] != null || json["nationalIdentityNumber"] != null) {
+      List<String> parts = json['userFullName']?.toString().split(" ") ?? [];
+      identity = UserIdentity(
+        firstName: parts.isNotEmpty ? parts[0] : null,
+        middleName: parts.length > 2 ? parts[1] : null,
+        lastName: parts.length > 2 ? parts[2] : (parts.length > 1 ? parts[1] : null),
+        nationalIdentityNumber: json['nationalIdentityNumber'],
+      );
+    }
     email = json['email'];
     phone = json['phone'];
     isEmailVerified = json['isEmailVerified'];

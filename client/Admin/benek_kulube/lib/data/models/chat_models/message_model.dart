@@ -29,7 +29,7 @@ class MessageModel {
         this.sendDate,
         this.id
       }
-      );
+  );
 
   MessageModel.fromJson(Map<String, dynamic> json) {
     sendedUserId = json['sendedUserId'];

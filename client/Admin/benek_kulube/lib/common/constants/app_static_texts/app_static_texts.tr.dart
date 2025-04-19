@@ -59,6 +59,7 @@ class AppStaticTextsTr{
     'seeAll': 'Tümünü Gör',
     'startDate': 'Başlangıç Tarihi :',
     'endDate': 'Bitiş Tarihi :',
+    'date': "Tarih :",
     'volunteer': 'Gönüllü',
     'giveAuthRoleButonText': 'Yetki Ver',
     'copied': 'Kopyalandı!',
@@ -175,5 +176,12 @@ class AppStaticTextsTr{
     'sendExcuse': "Şikayeti haklı bul ve mazereti gönder!",
     'approveAcceptingReport': "Şikayeti kabul etmek için kaydır...",
     'cancelReport': "Şikayeti iptal et",
+    'totalMoneyOnPool': "Havuzdaki toplam para",
+    'profit': "Kar",
+    'customersShare': "Müşteri Payı",
+    'customersTax': "Müşteri Vergisi",
+    'careGiverAdress': "Bakıcı Adresi :",
+    'careGiver': "Bakıcı :",
+    'customer': "Müşteri :",
   };
 }

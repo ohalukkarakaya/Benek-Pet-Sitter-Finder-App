@@ -59,6 +59,7 @@ class AppStaticTextsEn{
     'seeAll': 'See All',
     'startDate': 'Start Date :',
     'endDate': 'End Date :',
+    'date': 'Date :',
     'volunteer': 'Volunteer',
     'giveAuthRoleButonText': 'Give Auth Role',
     'copied': 'Copied!',
@@ -175,5 +176,12 @@ class AppStaticTextsEn{
     'sendExcuse': "Justify the report and send the excuse!",
     'approveAcceptingReport': "Slide to accept the report...",
     'cancelReport': "Cancel the report",
+    'totalMoneyOnPool': "Total Money on Pool",
+    'profit': "Profit",
+    'customersShare': "Customer Share",
+    'customersTax': "Customer Tax",
+    'careGiverAdress': "Caregiver Address :",
+    'careGiver': "Caregiver :",
+    'customer': "Customer :",
   };
 }

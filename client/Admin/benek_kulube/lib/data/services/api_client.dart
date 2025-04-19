@@ -116,6 +116,10 @@ class ApiClient {
           return list;
         case 'ReportStateModel':
           return ReportStateModel.fromJson(value);
+        case 'List<PaymentDataModel>':
+          List<dynamic> jsonList = value['paymentDataInfoList'];
+          List<PaymentDataModel> list = jsonList.map((item) => PaymentDataModel.fromJson(item)).toList();
+          return list;
 
         default:
           {

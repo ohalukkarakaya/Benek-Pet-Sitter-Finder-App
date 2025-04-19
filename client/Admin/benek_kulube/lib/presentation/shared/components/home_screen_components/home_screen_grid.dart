@@ -13,6 +13,7 @@ import 'package:redux/redux.dart';
 import '../../../../common/constants/tabs_enum.dart';
 import '../loading_components/benek_loading_component.dart';
 import 'home_screen_tabs/home_screen_logs_tab/home_screen_logs_tab.dart';
+import 'home_screen_tabs/home_screen_payment_data_tab/home_screen_payment_data_tab.dart';
 import 'home_screen_tabs/home_screen_report_tab/home_screen_report_right_tab.dart';
 import 'home_screen_tabs/home_screen_report_tab/home_screen_report_tab.dart';
 import 'home_screen_tabs/home_screen_right_tabs/home_screen_home_right_bar/home_screen_home_right_bar.dart';
@@ -66,7 +67,9 @@ class HomeScreenGrid extends StatelessWidget {
                 children: [
                   Expanded(
                     child: SizedBox(
-                      width: 600,
+                      width: store.state.activeTab == AppTabsEnums.FILES_TAB
+                        ? 600
+                        : 600,
                       child: ScrollConfiguration(
                         behavior: ScrollConfiguration.of(context).copyWith(
                           scrollbars: false,
@@ -76,6 +79,7 @@ class HomeScreenGrid extends StatelessWidget {
                         child: ListView(
                           shrinkWrap: true,
                           physics: store.state.selectedUserInfo == null
+                          && store.state.activeTab != AppTabsEnums.FILES_TAB
                               ? const NeverScrollableScrollPhysics()
                               : const BouncingScrollPhysics(),
                           children: [
@@ -94,7 +98,9 @@ class HomeScreenGrid extends StatelessWidget {
                                     )
                                     : store.state.activeTab == AppTabsEnums.REPORTED_TAB
                                         ? KulubeReportTabWidget()
-                                        : const SizedBox()
+                                        : store.state.activeTab == AppTabsEnums.FILES_TAB
+                                            ? HomeScreenPaymentDataTab()
+                                            : const SizedBox()
                                 : const ProfileTab()
                           ],
                         ),
@@ -108,6 +114,7 @@ class HomeScreenGrid extends StatelessWidget {
             // Sağ bar
             store.state.selectedUserInfo == null
                 ? store.state.activeTab == AppTabsEnums.HOME_TAB
+                  || store.state.activeTab == AppTabsEnums.FILES_TAB
                     ? HomeScreenHomeRightTab(user: store.state.userInfo!)
                     : store.state.activeTab == AppTabsEnums.REPORTED_TAB
                         ? HomeScreenReportRightTab(user: store.state.userInfo!)

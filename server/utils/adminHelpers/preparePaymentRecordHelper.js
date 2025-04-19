@@ -37,11 +37,19 @@ const preparePaymentRecordHelper = async (paymentDataList) => {
             let petOwnerNationalIdNo = await getNationalIdNoHelper(petOwner)
 
 
-            careGiverInfo.nationalIdentityNumber = careGiverNationalIdNo;
+            if (!careGiverInfo.identity) careGiverInfo.identity = {};
+            careGiverInfo.identity.nationalIdentityNumber = careGiverNationalIdNo;
             careGiverInfo.location = careGiver.location;
+            careGiverInfo.identity.openAdress = careGiver.identity.openAdress;
+            careGiverInfo.phone = careGiver.phone;
+            careGiverInfo.email = careGiver.email;
 
-            petOwnerInfo.nationalIdentityNumber = petOwnerNationalIdNo;
+            if (!petOwnerInfo.identity) petOwnerInfo.identity = {};
+            petOwnerInfo.identity.nationalIdentityNumber = petOwnerNationalIdNo;
             petOwnerInfo.location = careGiver.location;
+            petOwnerInfo.identity.openAdress = petOwner.identity.openAdress;
+            petOwnerInfo.phone = petOwner.phone;
+            petOwnerInfo.email = petOwner.email;
 
             let paymentInfo = {
                 paymentId: paymentData._id,

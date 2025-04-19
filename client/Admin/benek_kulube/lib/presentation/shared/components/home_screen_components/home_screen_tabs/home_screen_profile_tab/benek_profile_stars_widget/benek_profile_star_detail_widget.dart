@@ -5,8 +5,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:benek_kulube/store/app_state.dart';
 
-import '../../../../../../../store/actions/app_actions.dart';
-
 import '../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../common/constants/benek_icons.dart';
 import '../../../../../../../data/models/user_profile_models/user_info_model.dart';

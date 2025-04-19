@@ -32,6 +32,7 @@ import '../models/chat_models/chat_model.dart';
 import '../models/chat_models/chat_state_model.dart';
 import '../models/chat_models/message_model.dart';
 import '../models/log_models/log_model.dart';
+import '../models/payment_data_models/payment_data_model.dart';
 import '../models/pet_models/pet_image_model.dart';
 import '../models/pet_models/pet_list_model.dart';
 import '../models/pet_models/pet_model.dart';
@@ -62,5 +63,6 @@ part 'user_info_api/user_set_auth_role_api.dart';
 part 'geocoding_api.dart';
 part 'user_star_apies/get_selected_user_star_data_api.dart';
 part 'care_give_apies/report_api.dart';
+part 'payment_data_apies/payment_data_api.dart';
 
 ApiClient defaultApiClient = ApiClient();
