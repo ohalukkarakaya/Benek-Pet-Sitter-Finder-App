@@ -47,8 +47,11 @@ class _HomeScreenPaymentDataTabState extends State<HomeScreenPaymentDataTab> {
     return StoreConnector<AppState, PaymentStateModel?>(
       converter: (Store<AppState> store) => store.state.paymentData,
       builder: (context, paymentData) {
-        final isLoading = paymentData == null || paymentData.payments == null;
-        final isEmpty = paymentData?.payments?.isEmpty ?? true;
+        final isLoading = paymentData == null
+            || paymentData.payments == null
+            || (paymentData.payments!.isEmpty && paymentData.totalMoneyOnPool != 0);
+
+        final isEmpty = paymentData?.payments?.isEmpty ?? false;
 
         return ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
@@ -92,37 +95,37 @@ class _HomeScreenPaymentDataTabState extends State<HomeScreenPaymentDataTab> {
                     child: Column(
                       children: isLoading
                           ? List.generate(
-                        4,
+                            4,
                             (index) => const Padding(
-                          padding: EdgeInsets.only(bottom: 10.0),
-                          child: PaymentDataCardLoadingComponent(),
-                        ),
-                      )
-                          : isEmpty
-                          ? [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 40.0),
-                          child: Center(
-                            child: Text(
-                              'Ödeme verisi yok!',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              padding: EdgeInsets.only(bottom: 10.0),
+                              child: PaymentDataCardLoadingComponent(),
                             ),
-                          ),
-                        ),
-                      ]
-                          : List.generate(
-                        paymentData!.payments!.length,
-                            (index) => Padding(
-                          padding: const EdgeInsets.only(bottom: 10.0),
-                          child: PaymentDataCardWidget(
-                            payment: paymentData.payments![index],
-                          ),
-                        ),
-                      ),
+                          )
+                          : isEmpty
+                            ? [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 40.0),
+                                child: Center(
+                                  child: Text(
+                                    'Ödeme verisi yok!',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ]
+                            : List.generate(
+                                paymentData.payments!.length,
+                                (index) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 10.0),
+                                  child: PaymentDataCardWidget(
+                                    payment: paymentData.payments![index],
+                                  ),
+                                ),
+                            ),
                     ),
                   ),
                 ],
