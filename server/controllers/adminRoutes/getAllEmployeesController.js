@@ -22,6 +22,7 @@ const getAllEmployeesController = async ( req, res ) => {
 
         for( let employee of employeeRawData ){
             const employeeInfo = getLightWeightUserInfoHelper( employee );
+            employeeInfo.authRole = employee.authRole;
             employeeList.push( employeeInfo );
         }
 
