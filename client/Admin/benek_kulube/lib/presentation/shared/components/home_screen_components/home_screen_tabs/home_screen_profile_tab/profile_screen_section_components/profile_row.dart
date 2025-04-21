@@ -62,7 +62,7 @@ class ProfileRowWidget extends StatelessWidget {
                       width: 70,
                       height: 70,
                       radius: 100,
-                      isDefaultAvatar: selectedPet == null ? selectedUserInfo.profileImg!.isDefaultImg! : selectedPet!.petProfileImg!.isDefaultImg!,
+                      isDefaultAvatar: selectedPet == null ? selectedUserInfo.profileImg?.isDefaultImg ?? true : selectedPet!.petProfileImg!.isDefaultImg!,
                       imageUrl: selectedPet == null ?  selectedUserInfo.profileImg!.imgUrl! : selectedPet!.petProfileImg!.imgUrl!,
                     ),
                   ),

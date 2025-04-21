@@ -196,5 +196,7 @@ class AppStaticTextsTr{
     'paymentDate': 'Ödeme Tarihi',
     'excelDocumentCreated': "Excel Dosyası Oluşturuldu!",
     'exportAsExcel': "Excel'e Aktar",
+    'contactFormInfo': "Uygulama üzerinden iletilen teknik mesajlara benek-gizli-geri-bildirm reposundan, web sitesi üzerinden gönderilen mesajlara ise benek-geri-bildirim reposundan ulaşabilirsiniz.",
+    'priorityMessageWarning': "Gizli olmayan benek-geri-bildirim reposundaki issue’lara yanıt vermek önceliklidir.",
   };
 }

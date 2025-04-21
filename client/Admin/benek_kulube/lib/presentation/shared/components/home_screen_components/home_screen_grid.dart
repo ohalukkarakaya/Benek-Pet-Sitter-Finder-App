@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:benek_kulube/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
+import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_contact_messages_tab/home_screen_contact_messages_tab.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_home_tab/home_screen_home_tab.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_profile_tab/home_screen_profile_tab.dart';
 import 'package:benek_kulube/presentation/shared/components/home_screen_components/home_screen_tabs/home_screen_right_tabs/home_screen_home_right_bar/home_screen_logs_right_bar.dart';
@@ -103,7 +104,9 @@ class HomeScreenGrid extends StatelessWidget {
                                             ? HomeScreenPaymentDataTab()
                                             : store.state.activeTab == AppTabsEnums.EMPLOYEES_TAB
                                                 ? HomeScreenEmployeesTab()
-                                                : const SizedBox()
+                                                : store.state.activeTab == AppTabsEnums.CONTACT_MESSAGES_TAB
+                                                    ? ContactMessagesTabWidget()
+                                                    : const SizedBox()
                                 : const ProfileTab()
                           ],
                         ),
@@ -118,7 +121,8 @@ class HomeScreenGrid extends StatelessWidget {
             store.state.selectedUserInfo == null
                 ? store.state.activeTab == AppTabsEnums.HOME_TAB
                   || store.state.activeTab == AppTabsEnums.PAYMENT_TAB
-                    || store.state.activeTab == AppTabsEnums.EMPLOYEES_TAB
+                  || store.state.activeTab == AppTabsEnums.EMPLOYEES_TAB
+                  || store.state.activeTab == AppTabsEnums.CONTACT_MESSAGES_TAB
                     ? HomeScreenHomeRightTab(user: store.state.userInfo!)
                     : store.state.activeTab == AppTabsEnums.REPORTED_TAB
                         ? HomeScreenReportRightTab(user: store.state.userInfo!)

@@ -196,5 +196,7 @@ class AppStaticTextsEn{
     'paymentDate': 'Payment Date',
     'excelDocumentCreated': "Excel Document Created!",
     'exportAsExcel': "Export as Excel",
+    'contactFormInfo': "Technical messages submitted through the application can be accessed from the benek-gizli-geri-bildirm repository, while those submitted via the website are available in the benek-geri-bildirim repository.",
+    'priorityMessageWarning': "Responding to issues in the public benek-geri-bildirim repository takes priority.",
   };
 }
