@@ -19,10 +19,17 @@ class UserList {
 
   UserList.fromJson( Map<String, dynamic> json ){
     try{
-      totalDataInServer = json['totalDataCount'];
+      totalDataInServer = json['totalDataCount'] ?? json['totalEmployeecount'];
       if( json['dataList'] != null ){
         users = <UserInfo>[];
         json['dataList'].forEach(
+          ( v ){
+            users!.add( UserInfo.fromJson( v ) );
+          }
+        );
+      }else if( json['employeeData'] != null ){
+        users = <UserInfo>[];
+        json['employeeData'].forEach(
           ( v ){
             users!.add( UserInfo.fromJson( v ) );
           }

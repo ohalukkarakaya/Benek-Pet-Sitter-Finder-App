@@ -17,7 +17,7 @@ class TabsButonElementHelper {
         return null;
       case AppTabsEnums.REPORTED_TAB:
         return null;
-      case AppTabsEnums.FILES_TAB:
+      case AppTabsEnums.PAYMENT_TAB:
         return null;
       case AppTabsEnums.EMPLOYEES_TAB:
         return null;

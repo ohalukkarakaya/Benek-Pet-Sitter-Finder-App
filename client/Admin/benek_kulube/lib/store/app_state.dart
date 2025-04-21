@@ -36,6 +36,7 @@ class AppState {
   final List<LogModel>? logs;
   final ReportStateModel? reports;
   final PaymentStateModel? paymentData;
+  final UserList? employees;
 
   AppState({
     required this.counter,
@@ -62,6 +63,7 @@ class AppState {
     this.logs,
     this.reports,
     this.paymentData,
+    this.employees,
   });
 
   factory AppState.initial() {
@@ -90,6 +92,7 @@ class AppState {
       logs: null,
       reports: null,
       paymentData: null,
+      employees: null,
     );
   }
 
@@ -118,6 +121,7 @@ class AppState {
     List<LogModel>? logs,
     ReportStateModel? reports,
     PaymentStateModel? paymentData,
+    UserList? employees,
   }) {
     return AppState(
       counter: counter ?? this.counter,
@@ -144,6 +148,7 @@ class AppState {
       logs: logs ?? this.logs,
       reports: reports ?? this.reports,
       paymentData: paymentData ?? this.paymentData,
+      employees: employees ?? this.employees,
     );
   }
 }

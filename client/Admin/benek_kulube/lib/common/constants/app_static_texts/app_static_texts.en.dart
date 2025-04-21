@@ -13,7 +13,7 @@ class AppStaticTextsEn{
     'homeTab': 'Main menu',
     'logsTab': 'Logs',
     'reportedTab': 'Reported',
-    'filesTab': 'Folders',
+    'paymentTab': 'Folders',
     'employeesTab': 'Employees',
     'contactMessagesTab': 'Requests',
     'logoutTab': 'Log out',

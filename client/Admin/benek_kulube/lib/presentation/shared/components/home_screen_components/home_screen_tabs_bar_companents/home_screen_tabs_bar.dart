@@ -36,7 +36,7 @@ class HomeScreenTabsBar extends StatelessWidget {
               const SizedBox( height: 10.0, ),
               TabsButonElement(tab: AppTabsEnums.REPORTED_TAB, store: store, icon: BenekIcons.flag, title: BenekStringHelpers.locale('reportedTab')),
               const SizedBox( height: 10.0, ),
-              TabsButonElement(tab: AppTabsEnums.FILES_TAB, store: store, icon: BenekIcons.file, title: BenekStringHelpers.locale('filesTab')),
+              TabsButonElement(tab: AppTabsEnums.PAYMENT_TAB, store: store, icon: BenekIcons.file, title: BenekStringHelpers.locale('paymentTab')),
               const SizedBox( height: 10.0, ),
               TabsButonElement(tab: AppTabsEnums.EMPLOYEES_TAB, store: store, icon: BenekIcons.person, title: BenekStringHelpers.locale('employeesTab')),
               const SizedBox( height: 50.0, ),

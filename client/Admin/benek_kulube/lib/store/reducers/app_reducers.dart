@@ -23,6 +23,7 @@ import '../../redux/selected_pet/selected_pet.reducer.dart' as selected_pet;
 import '../../redux/logs/get_logs_by_user_id/get_last_30_days_logs.reducer.dart' as get_last_30_days_logs;
 import '../../redux/care_give_moderating/report.reducer.dart' as get_reports;
 import '../../redux/payment_data/payment_data.reducer.dart' as payment_data;
+import '../../redux/get_employees/get_employees.reducer.dart' as get_employees;
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
@@ -50,5 +51,6 @@ AppState appReducer(AppState state, dynamic action) {
     logs: get_last_30_days_logs.getLast30DaysLogsReducer(state.logs, action),
     reports: get_reports.reportReducer(state.reports, action),
     paymentData: payment_data.paymentDataReducer(state.paymentData, action),
+    employees: get_employees.getEmployeesRequestReducer(state.employees, action),
   );
 }

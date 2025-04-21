@@ -13,7 +13,7 @@ class AppStaticTextsTr{
     'homeTab': 'Ana Menü',
     'logsTab': 'Loglar',
     'reportedTab': 'Bildirilenler',
-    'filesTab': 'Dosyalar',
+    'paymentTab': 'Ödemeler',
     'employeesTab': 'Çalışanlar',
     'contactMessagesTab': 'Talepler',
     'logoutTab': 'Çıkış Yap',

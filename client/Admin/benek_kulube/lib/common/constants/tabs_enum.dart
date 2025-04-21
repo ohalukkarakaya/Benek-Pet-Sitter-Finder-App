@@ -4,7 +4,7 @@ enum AppTabsEnums {
   HOME_TAB,
   LOGS_TAB,
   REPORTED_TAB,
-  FILES_TAB,
+  PAYMENT_TAB,
   EMPLOYEES_TAB,
   CONTACT_MESSAGES_TAB,
   LOGOUT_TAB,
@@ -20,7 +20,7 @@ AppTabsEnums getTabEnum( int activeTab ){
     case 2:
       return AppTabsEnums.REPORTED_TAB;
     case 3:
-      return AppTabsEnums.FILES_TAB;
+      return AppTabsEnums.PAYMENT_TAB;
     case 4:
       return AppTabsEnums.EMPLOYEES_TAB;
     case 5:
@@ -40,7 +40,7 @@ int getTabId( AppTabsEnums activeTab ){
       return 1;
     case AppTabsEnums.REPORTED_TAB:
       return 2;
-    case AppTabsEnums.FILES_TAB:
+    case AppTabsEnums.PAYMENT_TAB:
       return 3;
     case AppTabsEnums.EMPLOYEES_TAB:
       return 4;
