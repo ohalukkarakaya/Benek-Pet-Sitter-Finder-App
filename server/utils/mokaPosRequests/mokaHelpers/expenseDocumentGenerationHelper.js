@@ -260,7 +260,21 @@ const expenseDocumentGenerationHelper = async ( paymentData, res ) => {
         );
 
         // yeni geliştirme sonucu payment datayı kullanıyoruz silmemeliyiz...
+        // onun yerine silinsin verisini true yapacağız ve cronla sileceğiz
         //await paymentData.deleteOne();
+        paymentData.shouldBeDeleted = true;
+        paymentData.whenShouldBeDeleted = new Date(now.getTime() + 45 * 24 * 60 * 60 * 1000);
+
+        paymentData.markModified( "shouldBeDeleted" );
+        paymentData.markModified( "whenShouldBeDeleted" );
+        await paymentData.save(
+            ( err ) => {
+                if( err ) {
+                    console.error('ERROR: While Update!', err);
+                }
+              }
+        );
+
         return {
             error: false,
             statusCode: 200,

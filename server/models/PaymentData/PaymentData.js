@@ -55,7 +55,14 @@ const PaymentDataSchema = new mongoose.Schema(
         type: Boolean,
         default: false
       },
-      virtualPosOrderId: { type: String }
+      virtualPosOrderId: { type: String },
+      shouldBeDeleted: {
+        type: Boolean,
+        default: false
+      },
+      whenShouldBeDeleted: {
+        type: Date
+      },
   },
   {
       timestamps: true

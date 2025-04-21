@@ -48,6 +48,7 @@ import expireEvents from './cron_jobs/deleteExpiredEvents.js';
 import expireCareGive from './cron_jobs/deleteExpiredCareGive.js';
 import expireUser from './cron_jobs/deleteExpiredUser.js';
 import expirePunishments from './cron_jobs/deleteExpiredPunishments.js';
+import expirePaymentData from './cron_jobs/deleteExpiredPaymentDatas.js';
 import deleteOverTimedLogs from './cron_jobs/deleteOverTimedLogs.js';
 
 import http from 'http';
@@ -73,6 +74,9 @@ expireUser;
 
 // - 
 expirePunishments;
+
+// - tested
+expirePaymentData;
 
 // - tested
 deleteOverTimedLogs;
