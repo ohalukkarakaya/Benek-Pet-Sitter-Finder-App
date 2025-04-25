@@ -42,11 +42,11 @@ class UserInfoApi {
       }else if( response.body != null ){
         return apiClient.deserialize( response.body, 'UserInfoModel' ) as UserInfo;
       }else{
-        await AuthUtils.killUserSessionAndRestartApp( store );
+        await store.dispatch(const ChangeScreenAction( AppScreenEnums.ERROR_SCREEN ));
       }
     }catch( err ){
       log('ERROR: getUserInfoRequest - $err');
-      await AuthUtils.killUserSessionAndRestartApp( store );
+      await store.dispatch(const ChangeScreenAction( AppScreenEnums.ERROR_SCREEN ));
     }
   }
 

@@ -238,6 +238,7 @@ class ApiClient {
               || resp.statusCode >= 500
             ){
               log('API Error: ${resp.statusCode} ${resp.body}');
+              store.dispatch(const ChangeScreenAction( AppScreenEnums.ERROR_SCREEN ));
             }
             //   AuthUtils.killUserSessionAndRestartApp( store ).then(
             //     ( value ) => log("User Session Killed!!")
@@ -248,6 +249,7 @@ class ApiClient {
           ( exception ){
             var errorMessage = getApiExceptionMessage(path, method, exception);
             log(errorMessage);
+            store.dispatch(const ChangeScreenAction( AppScreenEnums.ERROR_SCREEN ));
             // AuthUtils.killUserSessionAndRestartApp( store );
           }
         );

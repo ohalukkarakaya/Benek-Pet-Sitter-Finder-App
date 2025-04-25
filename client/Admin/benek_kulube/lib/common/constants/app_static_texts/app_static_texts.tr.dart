@@ -200,5 +200,6 @@ class AppStaticTextsTr{
     'priorityMessageWarning': "Gizli olmayan benek-geri-bildirim reposundaki issue’lara yanıt vermek önceliklidir.",
     'unAthorizedAccess': "Yetkisiz Erişim",
     'youCantEnterHere': "Buraya giremezsin!",
+    'errorCapital': "HATA",
   };
 }

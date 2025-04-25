@@ -200,5 +200,6 @@ class AppStaticTextsEn{
     'priorityMessageWarning': "Responding to issues in the public benek-geri-bildirim repository takes priority.",
     'unAthorizedAccess': "Unauthorized Access",
     'youCantEnterHere': "You can't enter here!",
+    'errorCapital': "ERROR",
   };
 }
