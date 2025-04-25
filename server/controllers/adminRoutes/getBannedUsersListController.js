@@ -15,7 +15,7 @@ const getBannedUsersListController = async ( req, res ) => {
         let lastItemId = req.params.lastItemId || 'null';
         let limit = parseInt( req.params.limit ) || 15;
 
-        bannedUserFilter = {};
+        let bannedUserFilter = {};
         if( lastItemId !== 'null' ){
             const lastItem = await BannedUsers.findById(lastItemId);
             if(lastItem){

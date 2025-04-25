@@ -53,8 +53,6 @@ class KulubeHomeTabWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const HomeScreenButon(),
-                const SizedBox( width: 20 ),
                 HomeScreenButon(
                   icon: FontAwesomeIcons.dollarSign,
                   onTap: () => Navigator.push(
@@ -83,6 +81,7 @@ class KulubeHomeTabWidget extends StatelessWidget {
                   icon: FontAwesomeIcons.file,
                   onTap: () => _launchUrl(notionDocumentationUrl),
                 ),
+                const SizedBox( width: 150 ),
               ],
             ),
           ),

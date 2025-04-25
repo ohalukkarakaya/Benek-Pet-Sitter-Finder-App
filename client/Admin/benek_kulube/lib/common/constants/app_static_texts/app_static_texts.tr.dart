@@ -198,5 +198,7 @@ class AppStaticTextsTr{
     'exportAsExcel': "Excel'e Aktar",
     'contactFormInfo': "Uygulama üzerinden iletilen teknik mesajlara benek-gizli-geri-bildirm reposundan, web sitesi üzerinden gönderilen mesajlara ise benek-geri-bildirim reposundan ulaşabilirsiniz.",
     'priorityMessageWarning': "Gizli olmayan benek-geri-bildirim reposundaki issue’lara yanıt vermek önceliklidir.",
+    'unAthorizedAccess': "Yetkisiz Erişim",
+    'youCantEnterHere': "Buraya giremezsin!",
   };
 }

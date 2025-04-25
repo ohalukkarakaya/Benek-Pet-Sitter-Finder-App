@@ -7,6 +7,7 @@ import 'package:benek_kulube/store/app_state.dart';
 import 'package:redux/redux.dart';
 
 import '../../../../../common/constants/benek_icons.dart';
+import '../../../../features/user_profile_helpers/auth_role_helper.dart';
 import 'home_screen_tabs_bar_elements.dart';
 
 class HomeScreenTabsBar extends StatelessWidget {
@@ -32,13 +33,13 @@ class HomeScreenTabsBar extends StatelessWidget {
             children: [
               TabsButonElement(tab: AppTabsEnums.HOME_TAB, store: store, icon: BenekIcons.homebasic, title: BenekStringHelpers.locale('homeTab')),
               const SizedBox( height: 50.0, ),
-              TabsButonElement(tab: AppTabsEnums.LOGS_TAB, store: store, icon: BenekIcons.chart, title: BenekStringHelpers.locale('logsTab')),
+              TabsButonElement(tab: AppTabsEnums.LOGS_TAB, store: store, icon: BenekIcons.chart, title: BenekStringHelpers.locale('logsTab'), authCheck: AuthRoleHelper.checkIfRequiredRole( store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('developer')]),),
               const SizedBox( height: 10.0, ),
-              TabsButonElement(tab: AppTabsEnums.REPORTED_TAB, store: store, icon: BenekIcons.flag, title: BenekStringHelpers.locale('reportedTab')),
+              TabsButonElement(tab: AppTabsEnums.REPORTED_TAB, store: store, icon: BenekIcons.flag, title: BenekStringHelpers.locale('reportedTab'), authCheck: AuthRoleHelper.checkIfRequiredRole( store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('moderator')]),),
               const SizedBox( height: 10.0, ),
-              TabsButonElement(tab: AppTabsEnums.PAYMENT_TAB, store: store, icon: BenekIcons.file, title: BenekStringHelpers.locale('paymentTab')),
+              TabsButonElement(tab: AppTabsEnums.PAYMENT_TAB, store: store, icon: BenekIcons.file, title: BenekStringHelpers.locale('paymentTab'), authCheck: AuthRoleHelper.checkIfRequiredRole( store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin'), AuthRoleHelper.getAuthRoleIdFromRoleName('accountant')]),),
               const SizedBox( height: 10.0, ),
-              TabsButonElement(tab: AppTabsEnums.EMPLOYEES_TAB, store: store, icon: BenekIcons.person, title: BenekStringHelpers.locale('employeesTab')),
+              TabsButonElement(tab: AppTabsEnums.EMPLOYEES_TAB, store: store, icon: BenekIcons.person, title: BenekStringHelpers.locale('employeesTab'), authCheck: AuthRoleHelper.checkIfRequiredRole( store.state.userRoleId, [ AuthRoleHelper.getAuthRoleIdFromRoleName('superAdmin') ]),),
               const SizedBox( height: 50.0, ),
               TabsButonElement(tab: AppTabsEnums.CONTACT_MESSAGES_TAB, store: store, icon: BenekIcons.dialogbox, title: BenekStringHelpers.locale('contactMessagesTab')),
             ],

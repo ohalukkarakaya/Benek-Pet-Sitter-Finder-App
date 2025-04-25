@@ -1,4 +1,6 @@
 import 'package:benek_kulube/common/constants/app_colors.dart';
+import 'package:benek_kulube/common/utils/benek_string_helpers.dart';
+import 'package:benek_kulube/common/utils/benek_toast_helper.dart';
 import 'package:benek_kulube/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek_kulube/common/utils/styles.text.dart';
 import 'package:benek_kulube/store/actions/app_actions.dart';
@@ -15,6 +17,8 @@ class TabsButonElement extends StatefulWidget {
   final IconData icon;
   final String title;
   final bool shouldShowTextWhenDeActive;
+
+  final bool authCheck;
   
   const TabsButonElement({
     Key? key,
@@ -23,6 +27,8 @@ class TabsButonElement extends StatefulWidget {
     required this.icon,
     required this.title,
     this.shouldShowTextWhenDeActive = false,
+
+    this.authCheck = true,
   }) : super(key: key);
 
   @override
@@ -37,6 +43,15 @@ class _TabsButonElementState extends State<TabsButonElement> {
     return GestureDetector(
       onTap: () async {
         if( widget.store.state.processCounter != 0 ){
+          return;
+        }
+
+        if( !widget.authCheck ){
+          BenekToastHelper.showErrorToast(
+            BenekStringHelpers.locale('unAthorizedAccess'),
+            BenekStringHelpers.locale("youCantEnterHere"),
+            context
+          );
           return;
         }
 
