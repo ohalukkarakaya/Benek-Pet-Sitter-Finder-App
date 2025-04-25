@@ -71,6 +71,7 @@ dependencies:
   point_in_polygon: ^1.0.0
   flutter_sticky_header: ^0.7.0
   excel: ^2.0.0
+  flutter_markdown: ^0.7.7
 
 dev_dependencies:
   flutter_test:
@@ -102,6 +103,10 @@ flutter:
     - assets/images/avatar_assets/male/
     - assets/images/avatar_assets/female/
     - assets/images/avatar_assets/pet/
+    - assets/benek_hizmet_sozlesmesi.md
+    - assets/kisisel_verilerin_korunması_acik_riza_metni_ve_beyani.md
+    - assets/kisisel_verilerin_korunması_ kullanici_aydinlatma.md
+    - assets/pricing.md
     - .env
   #   - images/a_dot_ham.jpeg
 
