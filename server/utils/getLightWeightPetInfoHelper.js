@@ -1,4 +1,4 @@
-import User from "../models/user.js";
+import User from "../models/User.js";
 
 import getPetKindHelper from "./getPetKindHelper.js";
 import getLightWeightUserInfoHelper from "./getLightWeightUserInfoHelper.js";
