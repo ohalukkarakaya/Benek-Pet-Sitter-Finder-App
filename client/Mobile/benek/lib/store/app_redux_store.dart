@@ -1,0 +1,17 @@
+import 'package:benek/store/app_state.dart';
+import 'package:benek/store/reducers/app_reducers.dart';
+// ignore: depend_on_referenced_packages
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+
+class AppReduxStore {
+  static Store<AppState>? currentStore;
+
+  static Store<AppState> getInitialStore() {
+    return Store<AppState>(
+      appReducer,
+      initialState: AppState.initial(),
+      middleware: [ thunkMiddleware ],
+    );
+  }
+}
