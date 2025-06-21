@@ -1,4 +1,5 @@
 import 'package:benek/common/widgets/login_screen_widgets/login_widget.dart';
+import 'package:benek/common/widgets/login_screen_widgets/sign_up_widget.dart';
 import 'package:benek/common/widgets/onboarding_slider_widget/onboarding_slider_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -43,11 +44,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     });
                   },
                   signupOnTap: () {
-                    currentAction = LoginAction.SIGNUP;
+                    setState(() {
+                      currentAction = LoginAction.SIGNUP;
+                    });
                   },
                 )
               : currentAction == LoginAction.SIGNUP
-                  ? const SizedBox()
+                  ? SignupWidget(
+                    defaultOnTap: () {
+                    setState(() {
+                      currentAction = LoginAction.DEFAULT;
+                    });
+                  },
+                  loginOnTap: () {
+                    setState(() {
+                      currentAction = LoginAction.LOGIN;;
+                    });
+                  },
+                  )
                   : OnBoardingSliderWidget(
                       loginOnTap: () {
                         setState(() {
