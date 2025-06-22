@@ -73,7 +73,6 @@ dependencies:
   excel: ^2.0.0
   flutter_markdown: ^0.7.7
   connectivity_plus: ^6.1.4
-  syncfusion_flutter_pdfviewer: ^29.2.11
 
 dev_dependencies:
   flutter_test:

@@ -224,7 +224,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                             onTap: () async {
                               String clientId = await getClientId();
                               //login isteği atabiliriz artık
-                              print('email: $_email, password: $_password, clientId: $clientId');
+                              print('email: ${ _email}, password: ${ _password}, clientId: ${clientId}');
                             },
                           )
                         ],

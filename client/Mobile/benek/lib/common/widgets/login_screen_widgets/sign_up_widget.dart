@@ -1,5 +1,5 @@
 import 'package:benek/common/constants/benek_icons.dart';
-import 'package:benek/common/utils/show_pdf_modal_sheet.dart';
+import 'package:benek/common/utils/show_md_modal_sheet.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:benek/common/constants/app_colors.dart';
@@ -7,6 +7,7 @@ import 'package:benek/common/utils/styles.text.dart';
 import 'package:benek/common/widgets/benek_small_button.dart';
 import 'package:benek/common/widgets/benek_textfield.dart';
 import 'package:benek/common/widgets/login_screen_widgets/gender_selector_widget.dart';
+import 'package:benek/presentation/shared/components/benek_custom_modal_sheet/custom_modal_bottom_sheet.dart';
 
 class SignupWidget extends StatefulWidget {
   final dynamic Function()? defaultOnTap;
@@ -203,7 +204,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                                   textFontSize: 12),
                                               recognizer: TapGestureRecognizer()
                                                 ..onTap = () {
-                                                  showPdfModalSheet(context, 'assets/sozlesmeler/Benek Hizmet Sozlesmesi.pdf');
+                                                  showMarkdownModalSheet(context, 'assets/sozlesmeler/benek_hizmet_sozlesmesi.md');
                                                 },
                                             ),
                                             const TextSpan(text: ", "),
@@ -216,7 +217,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                                   textFontSize: 12),
                                               recognizer: TapGestureRecognizer()
                                                 ..onTap = () {
-                                                  showPdfModalSheet(context, 'assets/sozlesmeler/Kişisel Verilerin Korunması  “Açık Rıza Beyanı”.pdf');
+                                                  showMarkdownModalSheet(context, 'assets/sozlesmeler/kisisel_verilerin_korunmasi_acik_riza_beyani.md');
                                                 },
                                             ),
                                             const TextSpan(text: ", "),
@@ -229,7 +230,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                                   textFontSize: 12),
                                               recognizer: TapGestureRecognizer()
                                                 ..onTap = () {
-                                                  showPdfModalSheet(context, 'assets/sozlesmeler/Kişisel Verilerin Korunması-  Kullanıcı Aydınlatma Metni .pdf');
+                                                  showMarkdownModalSheet(context, 'assets/sozlesmeler/kisisel_verilerin_korunmasi_kullanici_aydinlatma_metni.md');
                                                 },
                                             ),
                                             const TextSpan(text: ", "),
@@ -241,7 +242,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                                   textFontSize: 12),
                                               recognizer: TapGestureRecognizer()
                                                 ..onTap = () {
-                                                  showPdfModalSheet(context, 'assets/sozlesmeler/Kişisel Verilerin Korunması ve Gizlilik Politikası.pdf');
+                                                  showMarkdownModalSheet(context, 'assets/sozlesmeler/kisisel_verilerin_korunmasi_ve_gizlilik_politikasi.md');
                                                 },
                                             ),
                                             const TextSpan(text: "."),
@@ -258,6 +259,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                           const BenekSmallButton(
                             iconData: Icons.arrow_forward_ios,
                             isLight: true,
+                            isPassive: true,
                           ),
                         ],
                       ),
