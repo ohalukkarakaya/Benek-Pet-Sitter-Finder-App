@@ -1,11 +1,12 @@
 import 'package:benek/common/constants/benek_icons.dart';
+import 'package:benek/common/utils/show_pdf_modal_sheet.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:benek/common/constants/app_colors.dart';
 import 'package:benek/common/utils/styles.text.dart';
 import 'package:benek/common/widgets/benek_small_button.dart';
 import 'package:benek/common/widgets/benek_textfield.dart';
 import 'package:benek/common/widgets/login_screen_widgets/gender_selector_widget.dart';
-import 'package:benek/presentation/shared/components/benek_custom_modal_sheet/custom_modal_bottom_sheet.dart';
 
 class SignupWidget extends StatefulWidget {
   final dynamic Function()? defaultOnTap;
@@ -23,6 +24,7 @@ class SignupWidget extends StatefulWidget {
 
 class _SignupWidgetState extends State<SignupWidget> {
   Gender _selectedGender = Gender.male;
+  bool _isConsentGiven = false;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +91,10 @@ class _SignupWidgetState extends State<SignupWidget> {
                                     width: 140,
                                     decoration: const BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: [AppColors.benekBlue, AppColors.benekWhite],
+                                        colors: [
+                                          AppColors.benekBlue,
+                                          AppColors.benekWhite
+                                        ],
                                         begin: Alignment.bottomLeft,
                                         end: Alignment.topRight,
                                       ),
@@ -112,10 +117,14 @@ class _SignupWidgetState extends State<SignupWidget> {
                           fontWeight: FontWeight.bold,
                           foreground: Paint()
                             ..shader = const LinearGradient(
-                              colors: [AppColors.benekBlue, AppColors.benekWhite],
+                              colors: [
+                                AppColors.benekBlue,
+                                AppColors.benekWhite
+                              ],
                               begin: Alignment.bottomLeft,
                               end: Alignment.topRight,
-                            ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 0.0)),
+                            ).createShader(
+                                const Rect.fromLTWH(0.0, 0.0, 200.0, 0.0)),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -144,62 +153,115 @@ class _SignupWidgetState extends State<SignupWidget> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      const BenekTextField(hintText: "Password", obscureText: true),
+                      const BenekTextField(
+                          hintText: "Password", obscureText: true),
                       const SizedBox(height: 20),
 
                       /// Alt kısım
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          GestureDetector(
-                            onTap: () => showCustomBlurBottomSheet(
-                              context,
-                              true,
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Böyle şeyler herkesin başına gelebilir. Sana yardımcı olacağız. "
-                                    "Lütfen e-posta adresini gir, sana geçici bir şifre göndereceğiz.",
-                                    style: mediumTextStyle(
-                                      textColor: AppColors.benekGrey,
-                                      textFontSize: 10,
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment
+                                  .centerLeft, // ✅ Yatayda sola yapıştır
+                              child: IntrinsicWidth(
+                                // ✅ Taşmadan sar
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Checkbox(
+                                      value: _isConsentGiven,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _isConsentGiven = value ?? false;
+                                        });
+                                      },
+                                      activeColor: AppColors.benekBlue,
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      visualDensity: const VisualDensity(
+                                          horizontal: -4, vertical: -4),
                                     ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  const BenekTextField(
-                                    hintText: "Email adresi",
-                                    keyboardType: TextInputType.emailAddress,
-                                  ),
-                                  const SizedBox(height: 20),
-                                  const Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      BenekSmallButton(
-                                        iconData: Icons.arrow_forward_ios,
-                                        isLight: true,
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: lightTextStyle(
+                                            textColor: AppColors.benekGrey,
+                                            textFontSize: 12,
+                                          ),
+                                          children: [
+                                            const TextSpan(
+                                              text: "Aşağıdaki belgeleri okudum ve kabul ediyorum: ",
+                                            ),
+                                            TextSpan(
+                                              text: "Hizmet Sözleşmesi",
+                                              style: regularTextStyleUnderLine(
+                                                  textColor:AppColors.benekBlue,
+                                                  textFontSize: 12),
+                                              recognizer: TapGestureRecognizer()
+                                                ..onTap = () {
+                                                  showPdfModalSheet(context, 'assets/sozlesmeler/Benek Hizmet Sozlesmesi.pdf');
+                                                },
+                                            ),
+                                            const TextSpan(text: ", "),
+                                            TextSpan(
+                                              text:
+                                                  "Kişisel Verilerin Korunması Açık Rıza Metni ve Beyanı",
+                                              style: regularTextStyleUnderLine(
+                                                  textColor:
+                                                      AppColors.benekBlue,
+                                                  textFontSize: 12),
+                                              recognizer: TapGestureRecognizer()
+                                                ..onTap = () {
+                                                  showPdfModalSheet(context, 'assets/sozlesmeler/Kişisel Verilerin Korunması  “Açık Rıza Beyanı”.pdf');
+                                                },
+                                            ),
+                                            const TextSpan(text: ", "),
+                                            TextSpan(
+                                              text:
+                                                  "Kullanıcı Aydınlatma Metni",
+                                              style: regularTextStyleUnderLine(
+                                                  textColor:
+                                                      AppColors.benekBlue,
+                                                  textFontSize: 12),
+                                              recognizer: TapGestureRecognizer()
+                                                ..onTap = () {
+                                                  showPdfModalSheet(context, 'assets/sozlesmeler/Kişisel Verilerin Korunması-  Kullanıcı Aydınlatma Metni .pdf');
+                                                },
+                                            ),
+                                            const TextSpan(text: ", "),
+                                            TextSpan(
+                                              text: "Gizlilik Politikamız",
+                                              style: regularTextStyleUnderLine(
+                                                  textColor:
+                                                      AppColors.benekBlue,
+                                                  textFontSize: 12),
+                                              recognizer: TapGestureRecognizer()
+                                                ..onTap = () {
+                                                  showPdfModalSheet(context, 'assets/sozlesmeler/Kişisel Verilerin Korunması ve Gizlilik Politikası.pdf');
+                                                },
+                                            ),
+                                            const TextSpan(text: "."),
+                                          ],
+                                        ),
                                       ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            child: Text(
-                              "Şifreni mi unuttun?",
-                              style: lightTextStyle(
-                                textColor: AppColors.benekGrey,
-                                textFontSize: 12,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
+                          const SizedBox(width: 10),
                           const BenekSmallButton(
                             iconData: Icons.arrow_forward_ios,
                             isLight: true,
                           ),
                         ],
                       ),
+
                       const SizedBox(height: 20),
                     ],
                   ),

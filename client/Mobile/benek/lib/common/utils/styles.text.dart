@@ -76,6 +76,22 @@ TextStyle regularTextStyle(
   );
 }
 
+TextStyle regularTextStyleUnderLine(
+    {
+      Color textColor = AppColors.benekBlack,
+      double textFontSize = defaultFontSize,
+      FontWeight textFontWeight = regularFontWeight
+    }
+){
+  return TextStyle(
+      fontFamily: benekFontFamily,
+      fontSize: textFontSize,
+      fontWeight: textFontWeight,
+      color: textColor,
+      decoration: TextDecoration.underline,
+  );
+}
+
 TextStyle regularTextWithoutColorStyle(
     {
       double textFontSize = defaultFontSize,

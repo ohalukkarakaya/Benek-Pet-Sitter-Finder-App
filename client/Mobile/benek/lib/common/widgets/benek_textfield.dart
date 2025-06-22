@@ -6,6 +6,7 @@ class BenekTextField extends StatelessWidget {
   final String hintText;
   final bool obscureText;
   final TextEditingController? controller;
+  final void Function(String)? onChanged;
   final TextInputType keyboardType;
 
   const BenekTextField({
@@ -13,6 +14,7 @@ class BenekTextField extends StatelessWidget {
     required this.hintText,
     this.obscureText = false,
     this.controller,
+    this.onChanged,
     this.keyboardType = TextInputType.text,
   });
 
@@ -20,6 +22,7 @@ class BenekTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      onChanged: onChanged,
       obscureText: obscureText,
       keyboardType: keyboardType,
       style: TextStyle(

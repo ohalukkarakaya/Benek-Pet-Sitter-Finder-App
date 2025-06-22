@@ -1,3 +1,4 @@
+import 'package:benek/common/utils/client_id.dart';
 import 'package:flutter/material.dart';
 import 'package:benek/common/constants/app_colors.dart';
 import 'package:benek/common/constants/benek_icons.dart';
@@ -21,6 +22,15 @@ class LoginWidget extends StatefulWidget {
 }
 
 class _LoginWidgetState extends State<LoginWidget> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _forgetPasswordEmailController = TextEditingController();
+
+  String _email = '';
+  String _password = '';
+
+  String _forgetPasswordEmail = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,14 +138,26 @@ class _LoginWidgetState extends State<LoginWidget> {
                       const SizedBox(height: 20),
 
                       /// TextField'lar
-                      const BenekTextField(
+                      BenekTextField(
                         hintText: "Email address",
                         keyboardType: TextInputType.emailAddress,
+                        controller: _emailController,
+                        onChanged: (value) {
+                          setState(() {
+                            _email = value;
+                          });
+                        },
                       ),
                       const SizedBox(height: 16),
-                      const BenekTextField(
+                      BenekTextField(
                         hintText: "Password",
                         obscureText: true,
+                        controller: _passwordController,
+                        onChanged: (value) {
+                          setState(() {
+                            _password = value;
+                          });
+                        },
                       ),
                       const SizedBox(height: 20),
 
@@ -160,17 +182,27 @@ class _LoginWidgetState extends State<LoginWidget> {
                                     ),
                                   ),
                                   const SizedBox(height: 20),
-                                  const BenekTextField(
+                                  BenekTextField(
                                     hintText: "Email adresi",
                                     keyboardType: TextInputType.emailAddress,
+                                    controller: _forgetPasswordEmailController,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _forgetPasswordEmail = value;
+                                      });
+                                    },
                                   ),
                                   const SizedBox(height: 20),
-                                  const Row(
+                                  Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       BenekSmallButton(
                                         iconData: Icons.arrow_forward_ios,
                                         isLight: true,
+                                        isPassive: !(_forgetPasswordEmail.contains("@") && _forgetPasswordEmail.contains(".com") && _forgetPasswordEmail.isNotEmpty),
+                                        onTap: () async {
+                                          // şifremi unuttum isteği atılabilir
+                                        },
                                       ),
                                     ],
                                   ),
@@ -185,9 +217,15 @@ class _LoginWidgetState extends State<LoginWidget> {
                               ),
                             ),
                           ),
-                          const BenekSmallButton(
+                          BenekSmallButton(
                             iconData: Icons.arrow_forward_ios,
                             isLight: true,
+                            isPassive: !(_email.contains("@") && _email.contains(".com") && _email.isNotEmpty && _password.isNotEmpty),
+                            onTap: () async {
+                              String clientId = await getClientId();
+                              //login isteği atabiliriz artık
+                              print('email: $_email, password: $_password, clientId: $clientId');
+                            },
                           )
                         ],
                       ),

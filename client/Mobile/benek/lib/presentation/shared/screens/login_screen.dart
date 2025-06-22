@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   loginOnTap: () {
                     setState(() {
-                      currentAction = LoginAction.LOGIN;;
+                      currentAction = LoginAction.LOGIN;
                     });
                   },
                   )
