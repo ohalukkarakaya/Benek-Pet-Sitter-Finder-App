@@ -310,14 +310,13 @@ class UserInfoApi {
     }
   }
 
-  Future<bool?> postResendEmailOtp(String userId, String email) async {
+  Future<bool?> postResendEmailOtp(String email) async {
     try{
       await AuthUtils.getAccessToken();
 
       const String path = '/auth/resendOtp';
 
       Object? postBody = {
-        'userId': userId,
         'email': email,
       };
       List<QueryParam> queryParams = [];

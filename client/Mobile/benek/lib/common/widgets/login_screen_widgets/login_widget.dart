@@ -1,7 +1,11 @@
+import 'dart:ui';
+
 import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/benek_toast_helper.dart';
 import 'package:benek/common/utils/client_id.dart';
 import 'package:benek/common/utils/state_utils/auth_utils/auth_utils.dart';
+import 'package:benek/common/widgets/login_screen_widgets/password_text_field.dart';
+import 'package:benek/data/services/api.dart';
 import 'package:benek/redux/login_and_signup/login.action.dart';
 import 'package:flutter/material.dart';
 import 'package:benek/common/constants/app_colors.dart';
@@ -28,7 +32,8 @@ class LoginWidget extends StatefulWidget {
 class _LoginWidgetState extends State<LoginWidget> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _forgetPasswordEmailController = TextEditingController();
+  final TextEditingController _forgetPasswordEmailController =
+      TextEditingController();
 
   String _email = '';
   String _password = '';
@@ -123,7 +128,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                           fontWeight: FontWeight.bold,
                           foreground: Paint()
                             ..shader = const LinearGradient(
-                              colors: [AppColors.benekBlue, AppColors.benekWhite],
+                              colors: [
+                                AppColors.benekBlue,
+                                AppColors.benekWhite
+                              ],
                               begin: Alignment.bottomLeft,
                               end: Alignment.topRight,
                             ).createShader(
@@ -203,7 +211,11 @@ class _LoginWidgetState extends State<LoginWidget> {
                                       BenekSmallButton(
                                         iconData: Icons.arrow_forward_ios,
                                         isLight: true,
-                                        isPassive: !(_forgetPasswordEmail.contains("@") && _forgetPasswordEmail.contains(".com") && _forgetPasswordEmail.isNotEmpty),
+                                        isPassive: !(_forgetPasswordEmail
+                                                .contains("@") &&
+                                            _forgetPasswordEmail
+                                                .contains(".com") &&
+                                            _forgetPasswordEmail.isNotEmpty),
                                         onTap: () async {
                                           // şifremi unuttum isteği atılabilir
                                         },
@@ -222,33 +234,125 @@ class _LoginWidgetState extends State<LoginWidget> {
                             ),
                           ),
                           BenekSmallButton(
-                            iconData: Icons.arrow_forward_ios,
-                            isLight: true,
-                            isPassive: !(_email.contains("@") && _email.contains(".com") && _email.isNotEmpty && _password.isNotEmpty),
-                            onTap: () async {
-                              String clientId = await getClientId();
-                              print('email: $_email, password: $_password, clientId: $clientId');
+                              iconData: Icons.arrow_forward_ios,
+                              isLight: true,
+                              isPassive: !(_email.contains("@") &&
+                                  _email.contains(".com") &&
+                                  _email.isNotEmpty &&
+                                  _password.isNotEmpty),
+                              onTap: () async {
+                                String clientId = await getClientId();
+                                print(
+                                    'email: $_email, password: $_password, clientId: $clientId');
 
-                              final result = await loginAction(_email, _password, clientId);
+                                var result = await loginAction( _email, _password, clientId);
 
-                              if (result['shouldVerifyEmail'] == true) {
-                                print( "verify email" );
-                                return;
-                              }
+                                if (result['shouldVerifyEmail'] == true) {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    barrierColor: Colors.transparent,
+                                    builder: (context) {
+                                      return GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () =>
+                                            FocusScope.of(context).unfocus(),
+                                        child: LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            return Stack(
+                                              children: [
+                                                // 🔹 BLUR
+                                                Positioned.fill(
+                                                  child: BackdropFilter(
+                                                    filter: ImageFilter.blur(
+                                                        sigmaX: 10, sigmaY: 10),
+                                                    child: Container(
+                                                      color: Colors.black
+                                                          .withOpacity(0.3),
+                                                    ),
+                                                  ),
+                                                ),
 
-                              if (result['success'] == false) {
-                                BenekToastHelper.showErrorToast(
-                                  BenekStringHelpers.locale('Error'),
-                                  "Email yada şifre hatalı!",
-                                  context
-                                );
-                                return;
-                              }
+                                                // 🔹 KONTROLLÜ YÜKSEKLİK (yalnızca içerik kadar)
+                                                Align(
+                                                  alignment: Alignment.bottomCenter,
+                                                  child: AnimatedPadding(
+                                                    duration: const Duration(milliseconds: 150),
+                                                    curve: Curves.easeOut,
+                                                    padding: EdgeInsets.only(
+                                                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                                                    ),
+                                                    child: IntrinsicHeight(
+                                                      child: Container(
+                                                        decoration: const BoxDecoration(
+                                                          color: Colors.black,
+                                                          borderRadius: BorderRadius.vertical(
+                                                            top: Radius.circular(20),
+                                                          ),
+                                                        ),
+                                                        padding: const EdgeInsets.all(24.0),
+                                                        child: PasswordTextfield(
+                                                          verifyingString: _email,
+                                                          onDispatch: (String code) async {
+                                                            print("Kullanıcı kod girdi: $code");
 
-                              // Başarılı giriş
-                              AuthUtils.setCredentials();
-                            }
-                          )
+                                                            bool isSuccesful = await UserInfoApi()
+                                                                .postVerifyEmailOtpTrustedId(code, _email, clientId) ?? false;
+
+                                                            if (!isSuccesful) {
+                                                              BenekToastHelper.showErrorToast(
+                                                                BenekStringHelpers.locale('Error'),
+                                                                "Hata oluştu!",
+                                                                context,
+                                                              );
+                                                              return;
+                                                            }
+
+                                                            // Modal'ı kapat
+                                                            Navigator.of(context).pop();
+
+                                                            // Biraz bekle, sonra tekrar login olmaya çalış
+                                                            await Future.delayed(const Duration(milliseconds: 300));
+
+                                                            var result = await loginAction(_email, _password, clientId);
+
+                                                            if (result['success'] == true) {
+                                                              AuthUtils.setCredentials();
+                                                            } else {
+                                                              BenekToastHelper.showErrorToast(
+                                                                BenekStringHelpers.locale('Error'),
+                                                                "Email veya şifre hatalı!",
+                                                                context,
+                                                              );
+                                                            }
+                                                          }
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  );
+                                  return;
+                                }
+
+                                if (result['success'] == false) {
+                                  BenekToastHelper.showErrorToast(
+                                      BenekStringHelpers.locale('Error'),
+                                      "Email yada şifre hatalı!",
+                                      context);
+                                  return;
+                                }
+
+                                // Başarılı giriş
+                                AuthUtils.setCredentials();
+                              })
                         ],
                       ),
 

@@ -310,14 +310,13 @@ class UserInfoApi {
     }
   }
 
-  Future<bool?> postResendEmailOtp(String userId, String email) async {
+  Future<bool?> postResendEmailOtp(String email) async {
     try{
       await AuthUtils.getAccessToken();
 
       const String path = '/auth/resendOtp';
 
       Object? postBody = {
-        'userId': userId,
         'email': email,
       };
       List<QueryParam> queryParams = [];
@@ -370,6 +369,39 @@ class UserInfoApi {
       return false;
     }catch( err ){
       log('ERROR: postVerifyEmailOtp - $err');
+      return false;
+    }
+  }
+
+  Future<bool?> postVerifyEmailOtpTrustedId(String otp, String email, String clientId) async {
+    try{
+      await AuthUtils.getAccessToken();
+
+      const String path = '/auth/verifyOTP';
+
+      Object? postBody = {
+        'otp': otp,
+        'email': email,
+        'ip': clientId
+      };
+      List<QueryParam> queryParams = [];
+      Map<String, String> headerParams = {};
+      Map<String, String> formParams = {};
+      List<String> contentTypes = ["application/json"];
+      List<String> authNames = [];
+
+      String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
+
+      var response = await apiClient.invokeAPI(path, 'POST', queryParams, postBody, headerParams, formParams, contentType, authNames);
+      if( response.statusCode >= 400 && response.statusCode != 404 ){
+        log('ERROR: postVerifyEmailOtpTrustedId - ${json.decode(response.body)["message"]}');
+        return false;
+      }else if( response.body != null ){
+        return true;
+      }
+      return false;
+    }catch( err ){
+      log('ERROR: postVerifyEmailOtpTrustedId - $err');
       return false;
     }
   }

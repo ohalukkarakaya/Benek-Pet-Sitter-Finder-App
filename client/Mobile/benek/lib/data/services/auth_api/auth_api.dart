@@ -37,7 +37,6 @@ class AuthApi {
   }
 
   Future<dynamic> postLoginRequest(String email, String password, String clientId) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try {
       const String path = '/auth/login';
 
@@ -52,7 +51,7 @@ class AuthApi {
       final data = jsonDecode(response.body);
       if (response.statusCode >= 400 && response.statusCode != 401) {
         throw ApiException(code: response.statusCode, message: response.body);
-      } else if (response.statusCode == 401 && data['isEmailVerified'] != null && !(data['isEmailVerified'])) {
+      } else if (response.statusCode == 401 && ((data['isEmailVerified'] != null && !(data['isEmailVerified']) || data['isLoggedInIpTrusted'] != null && !(data['isLoggedInIpTrusted']) ) )) {
         String? refreshtoken;
         String? accessToken;
         int? userRole;

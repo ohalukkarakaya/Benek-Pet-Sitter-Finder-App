@@ -8,19 +8,19 @@ dotenv.config();
 
 const verifyOtpController = async (req, res) => {
     try{
-      let { userId, otp, ip } = req.body;
-      
-      if(
-        !userId 
-        || !otp 
-        || !ip
-      ){
-        return res.status( 400 )
-                  .json({
-                      error: true,
-                      message: "Empty otp details are not allowed"
-                    });
-      }
+        let { userId, email, otp, ip } = req.body;
+
+        // Email varsa, userId'yi bul
+        if (!userId && email) {
+            const user = await User.findOne({ email });
+            if (!user) {
+                return res.status(404).json({
+                    error: true,
+                    message: "Email adresine ait kullanıcı bulunamadı",
+                });
+            }
+            userId = user._id;
+        }
 
       const UserOTPVerificationRecords = await UserOTPVerification.find({ userId });
 

@@ -10,8 +10,8 @@ Future<Map<String, dynamic>> loginAction(String email, String password, String c
 
   try {
     dynamic _data = await api.postLoginRequest(email, password, clientId);
-
-    if (_data['error'] == true) {
+    
+    if (_data['error'] == true || (_data['isVerifiyingEmail'] != null && _data['isVerifiyingEmail']) ) {
       return {
         'success': false,
         'shouldVerifyEmail': _data['isVerifiyingEmail'] ?? false,
@@ -26,13 +26,6 @@ Future<Map<String, dynamic>> loginAction(String email, String password, String c
 
     return {
       'success': true,
-      'shouldVerifyEmail': false
-    };
-  } on ApiException catch (e) {
-    log('ERROR: loginAction - $e');
-    return {
-      'success': false,
-      'message': 'Sunucu hatası: ${e.message}',
       'shouldVerifyEmail': false
     };
   } catch (e) {
