@@ -1,4 +1,8 @@
+import 'package:benek/common/utils/benek_string_helpers.dart';
+import 'package:benek/common/utils/benek_toast_helper.dart';
 import 'package:benek/common/utils/client_id.dart';
+import 'package:benek/common/utils/state_utils/auth_utils/auth_utils.dart';
+import 'package:benek/redux/login_and_signup/login.action.dart';
 import 'package:flutter/material.dart';
 import 'package:benek/common/constants/app_colors.dart';
 import 'package:benek/common/constants/benek_icons.dart';
@@ -223,9 +227,27 @@ class _LoginWidgetState extends State<LoginWidget> {
                             isPassive: !(_email.contains("@") && _email.contains(".com") && _email.isNotEmpty && _password.isNotEmpty),
                             onTap: () async {
                               String clientId = await getClientId();
-                              //login isteği atabiliriz artık
-                              print('email: ${ _email}, password: ${ _password}, clientId: ${clientId}');
-                            },
+                              print('email: $_email, password: $_password, clientId: $clientId');
+
+                              final result = await loginAction(_email, _password, clientId);
+
+                              if (result['shouldVerifyEmail'] == true) {
+                                print( "verify email" );
+                                return;
+                              }
+
+                              if (result['success'] == false) {
+                                BenekToastHelper.showErrorToast(
+                                  BenekStringHelpers.locale('Error'),
+                                  "Email yada şifre hatalı!",
+                                  context
+                                );
+                                return;
+                              }
+
+                              // Başarılı giriş
+                              AuthUtils.setCredentials();
+                            }
                           )
                         ],
                       ),

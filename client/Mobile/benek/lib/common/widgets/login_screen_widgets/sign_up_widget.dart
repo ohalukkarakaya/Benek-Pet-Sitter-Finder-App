@@ -1,4 +1,5 @@
 import 'package:benek/common/constants/benek_icons.dart';
+import 'package:benek/common/utils/client_id.dart';
 import 'package:benek/common/utils/show_md_modal_sheet.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,6 @@ import 'package:benek/common/utils/styles.text.dart';
 import 'package:benek/common/widgets/benek_small_button.dart';
 import 'package:benek/common/widgets/benek_textfield.dart';
 import 'package:benek/common/widgets/login_screen_widgets/gender_selector_widget.dart';
-import 'package:benek/presentation/shared/components/benek_custom_modal_sheet/custom_modal_bottom_sheet.dart';
-
 class SignupWidget extends StatefulWidget {
   final dynamic Function()? defaultOnTap;
   final dynamic Function()? loginOnTap;
@@ -24,8 +23,20 @@ class SignupWidget extends StatefulWidget {
 }
 
 class _SignupWidgetState extends State<SignupWidget> {
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _fullnameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  String _username = "";
+  String _email = "";
+  String _fullname = "";
+  String _password = "";
+
   Gender _selectedGender = Gender.male;
   bool _isConsentGiven = false;
+
+  List<String>? _isimler;
 
   @override
   Widget build(BuildContext context) {
@@ -139,11 +150,36 @@ class _SignupWidgetState extends State<SignupWidget> {
                       const SizedBox(height: 20),
 
                       /// TextField'lar
-                      const BenekTextField(hintText: "Kullanıcı adı"),
+                      BenekTextField(
+                        hintText: "Kullanıcı adı",
+                        controller: _userNameController,
+                        onChanged: (value) {
+                          setState(() {
+                            _username = value;
+                          });
+                        },
+                      ),
                       const SizedBox(height: 16),
-                      const BenekTextField(hintText: "Email address"),
+                      BenekTextField(
+                        hintText: "Email address",
+                        controller: _emailController,
+                        onChanged: (value) {
+                          setState(() {
+                            _email = value;
+                          });
+                        },
+                      ),
                       const SizedBox(height: 16),
-                      const BenekTextField(hintText: "Kimlikte yazan tam isim"),
+                      BenekTextField(
+                        hintText: "Kimlikte yazan tam isim",
+                        controller: _fullnameController,
+                        onChanged: (value){
+                          setState(() {
+                            _fullname = value;
+                            _isimler = _fullname.split(" ");
+                          });
+                        },
+                      ),
                       const SizedBox(height: 16),
                       GenderSelector(
                         selectedGender: _selectedGender,
@@ -154,8 +190,16 @@ class _SignupWidgetState extends State<SignupWidget> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      const BenekTextField(
-                          hintText: "Password", obscureText: true),
+                      BenekTextField(
+                          hintText: "Password", 
+                          obscureText: true,
+                          controller: _passwordController,
+                          onChanged: (value) {
+                            setState(() {
+                              _password = value;
+                            });
+                          },
+                      ),
                       const SizedBox(height: 20),
 
                       /// Alt kısım
@@ -256,10 +300,29 @@ class _SignupWidgetState extends State<SignupWidget> {
                             ),
                           ),
                           const SizedBox(width: 10),
-                          const BenekSmallButton(
+                          BenekSmallButton(
                             iconData: Icons.arrow_forward_ios,
                             isLight: true,
-                            isPassive: true,
+                            isPassive: !(
+                              _username.isNotEmpty
+                              && _email.contains("@") 
+                              && _email.contains(".com") 
+                              && _email.isNotEmpty 
+                              && _isimler != null
+                              && _isimler!.isNotEmpty
+                              && _isimler!.length > 1
+                              && _password.isNotEmpty
+                              && _isConsentGiven
+                            ),
+                            onTap: () async {
+                              String clientId = await getClientId();
+
+                              String? firstname = _isimler![0];
+                              String? middlename = _isimler!.length > 2 ? _isimler![1] : null;
+                              String? lastname = _isimler!.length > 2 ? _isimler![2] : _isimler![1];
+
+                              print( "clientId: ${clientId}, username: ${_username}, email: ${_email}, firstname: ${firstname}, middlename: ${middlename}, lastname: ${lastname}, password: ${_password}, isConsentGiven: ${_isConsentGiven}");
+                            },
                           ),
                         ],
                       ),

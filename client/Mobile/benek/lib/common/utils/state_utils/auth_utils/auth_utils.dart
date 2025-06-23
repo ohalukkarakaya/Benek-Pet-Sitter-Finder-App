@@ -62,7 +62,7 @@ class AuthUtils {
   static Future<void> removeCredentials( Store<AppState> store ) async {
     // Remove Refresh Token
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('refreshToken');
+    await prefs.remove('refresh_token');
 
     // Remove Access Token
     if( store.state.userAccessToken != '') {
