@@ -9,65 +9,57 @@ class LocationWarningWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 30.0, left: 20),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(6.0),
-        child: Container(
-          width: 500,
-          height: 80,
-          color: AppColors.benekBlack.withOpacity(0.8), // Açık turuncu arkaplan rengi
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                width: 5.0, // Sol taraf ince koyu turuncu dikdörtgen
-                height: 80.0,
-                color: AppColors.benekWarningOrange, // Koyu turuncu renk
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: SizedBox(
-                  width: 450.0,
-                  height: 80,
-                  child: Row(
+    final screenWidth = MediaQuery.of(context).size.width;
+    final boxWidth = screenWidth > 380 ? 360.0 : screenWidth - 40.0;
+
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: Container(
+            width: boxWidth,
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+            color: AppColors.benekBlack.withOpacity(0.85),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 4.0,
+                  height: 40.0,
+                  color: AppColors.benekWarningOrange,
+                ),
+                const SizedBox(width: 10.0),
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.warning_rounded, // Uyarı ikonu
-                        color: AppColors.benekWarningOrange, // Koyu turuncu renk
+                      Text(
+                        BenekStringHelpers.locale('chooseYourLocationCaption'),
+                        style: boldTextStyle(
+                          textColor: AppColors.benekWarningOrange,
+                          textFontSize: 14.0,
+                        ),
                       ),
-                      const SizedBox(width: 10.0), // Boşluk
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                BenekStringHelpers.locale('chooseYourLocationCaption'), // Başlık
-                                style: boldTextStyle(
-                                  textColor: AppColors.benekWarningOrange, // Koyu turuncu renk
-                                  textFontSize: 14.0,
-                                )
-                            ),
-                            SizedBox(height: 5.0), // Başlık ile açıklama arası boşluk
-                            Text(
-                                BenekStringHelpers.locale('chooseYourLocationDesc'), // Açıklama
-                                style: regularTextStyle(
-                                  textColor: AppColors.benekWhite,
-                                )
-                            ),
-                          ],
+                      const SizedBox(height: 4.0),
+                      Text(
+                        BenekStringHelpers.locale('chooseYourLocationDesc'),
+                        style: regularTextStyle(
+                          textColor: AppColors.benekWhite,
+                          textFontSize: 12.0,
                         ),
                       ),
                     ],
                   ),
                 ),
-              )
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
+

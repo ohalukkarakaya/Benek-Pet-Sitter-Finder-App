@@ -6,9 +6,11 @@ import '../../../../../../../../../common/widgets/approve_screen.dart';
 
 class MapBackAndCancelButton extends StatefulWidget {
   final bool didEdit;
+  final bool shouldTakeAprovvement;
   const MapBackAndCancelButton({
     super.key,
     required this.didEdit,
+    this.shouldTakeAprovvement = true
   });
 
   @override
@@ -27,6 +29,7 @@ class _MapBackAndCancelButtonState extends State<MapBackAndCancelButton> {
       child: GestureDetector(
         onTap: () async {
           bool didApprove = widget.didEdit
+            && widget.shouldTakeAprovvement
               ? await Navigator.push(
                   context,
                   PageRouteBuilder(

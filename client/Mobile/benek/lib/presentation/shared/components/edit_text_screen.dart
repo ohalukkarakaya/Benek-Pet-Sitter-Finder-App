@@ -3,7 +3,6 @@ import 'package:benek/presentation/shared/components/loading_components/benek_bl
 import 'package:flutter/material.dart';
 import 'package:benek/common/constants/app_colors.dart';
 import 'package:benek/common/utils/benek_string_helpers.dart';
-import 'package:benek/common/utils/styles.text.dart';
 
 class EditTextScreen extends StatefulWidget {
   final String? textToEdit;
@@ -35,12 +34,15 @@ class _EditTextScreenState extends State<EditTextScreen> {
     super.initState();
     _textFocusNode = FocusNode();
     _controller = TextEditingController(text: widget.textToEdit ?? '');
+
     _textFocusNode.addListener(() {
       setState(() => isFocused = _textFocusNode.hasFocus);
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      FocusScope.of(context).requestFocus(_textFocusNode);
+      if (mounted) {
+        FocusScope.of(context).requestFocus(_textFocusNode);
+      }
     });
   }
 
@@ -63,7 +65,10 @@ class _EditTextScreenState extends State<EditTextScreen> {
         body: Center(
           child: Container(
             width: maxWidth,
-            constraints: const BoxConstraints(maxHeight: 220),
+            constraints: const BoxConstraints(
+              maxHeight: 220,
+              minHeight: 160,
+            ),
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               color: isFocused ? AppColors.benekLightBlue : AppColors.benekBlack,
@@ -76,15 +81,24 @@ class _EditTextScreenState extends State<EditTextScreen> {
                     focusNode: _textFocusNode,
                     controller: _controller,
                     maxLength: widget.maxCharacter,
-                    maxLines: null,
+                    maxLines: 4,
+                    minLines: 1,
                     keyboardType: TextInputType.multiline,
                     cursorColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                    style: lightTextStyle(
-                      textColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                      fontSize: 14,
+                      height: 1.4,
+                      letterSpacing: 0.3,
                     ),
                     decoration: InputDecoration(
                       hintText: widget.hintText ?? BenekStringHelpers.locale('writeBio'),
-                      hintStyle: lightTextStyle(textColor: AppColors.benekGrey),
+                      hintStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: AppColors.benekGrey,
+                        fontSize: 14,
+                        height: 1.4,
+                        letterSpacing: 0.3,
+                      ),
                       border: InputBorder.none,
                       counterText: '',
                       contentPadding: EdgeInsets.zero,

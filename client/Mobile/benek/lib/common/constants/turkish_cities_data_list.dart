@@ -86,6 +86,58 @@ final List<City> turkishCities = [
   City(code: 81, name: 'Düzce', coordinates: [40.84384900, 31.15654000, 40.89176200, 31.19580700, 40.82471700, 31.10666200]),
 ];
 
+String? findClosestCity(double lat, double lng) {
+  double minDistance = double.infinity;
+  String? closestCity;
+
+  for (final city in turkishCities) {
+    final double cityLat = city.coordinates[0];
+    final double cityLng = city.coordinates[1];
+
+    final double distance = (lat - cityLat) * (lat - cityLat) +
+                            (lng - cityLng) * (lng - cityLng); // Euclidean
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestCity = city.name;
+    }
+  }
+
+  return closestCity;
+}
+
+String? findCityForCoordinatesOrClosest(double latitude, double longitude) {
+  final point = Point(x: latitude, y: longitude);
+
+  // 🔹 Önce nokta şehir poligonlarının içinde mi kontrol et
+  for (var city in turkishCities) {
+    if (Poly.isPointInPolygon(point, city.getFormattedCoordinates())) {
+      return city.name;
+    }
+  }
+
+  // 🔸 Eğer hiçbir şehir poligonunda bulunamadıysa, en yakın şehir merkezini bul
+  double minDistance = double.infinity;
+  String? closestCity;
+
+  for (var city in turkishCities) {
+    if (city.coordinates.length >= 2) {
+      final double centerLat = city.coordinates[0];
+      final double centerLng = city.coordinates[1];
+
+      final double distanceSquared = (latitude - centerLat) * (latitude - centerLat) +
+                                     (longitude - centerLng) * (longitude - centerLng);
+
+      if (distanceSquared < minDistance) {
+        minDistance = distanceSquared;
+        closestCity = city.name;
+      }
+    }
+  }
+
+  return closestCity;
+}
+
 String? findCityForCoordinates(double latitude, double longitude) {
   Point point = Point(x: latitude, y: longitude);
 

@@ -6,12 +6,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:benek/store/app_state.dart';
-import 'package:benek/store/actions/app_actions.dart';
 import '../edit_text_screen.dart';
 import '../../../../../../../../../common/constants/app_colors.dart';
 
 class AddressSaveButton extends StatefulWidget {
   final bool didEdit;
+  final void Function(Map<String, dynamic>)? onSave;
   final String? address;
   final String? city;
   final double? lat;
@@ -19,6 +19,7 @@ class AddressSaveButton extends StatefulWidget {
 
   const AddressSaveButton({
     super.key,
+    this.onSave,
     required this.didEdit,
     required this.address,
     required this.city,
@@ -38,35 +39,35 @@ class _AddressSaveButtonState extends State<AddressSaveButton> {
     final store = StoreProvider.of<AppState>(context);
 
     return MouseRegion(
-      cursor: widget.didEdit ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      cursor:
+          widget.didEdit ? SystemMouseCursors.click : SystemMouseCursors.basic,
       onEnter: (_) => setState(() => didHovered = true),
       onExit: (_) => setState(() => didHovered = false),
       child: GestureDetector(
         onTap: () async {
           if (!widget.didEdit) return;
 
-          String? changes = await Navigator.push(
+          final text = await Navigator.push(
             context,
             PageRouteBuilder(
               opaque: false,
               barrierDismissible: false,
               pageBuilder: (context, _, __) => EditTextScreen(
                 textToEdit: widget.address ?? '',
-                onDispatch: (text) async {
-                  await store.dispatch(updateAddressRequestAction(
-                    'TUR',
-                    widget.city!,
-                    text,
-                    widget.lat!,
-                    widget.lng!,
-                  ));
-                },
               ),
             ),
           );
 
-          if (changes != null) {
-            Navigator.pop(context);
+          if (text != null && context.mounted) {
+            final resultAddressObj = {
+              'address': text,
+              'city': widget.city,
+              'lat': widget.lat,
+              'lng': widget.lng,
+            };
+
+            widget.onSave
+                ?.call(resultAddressObj); // sadece callback çağır, pop yapma!
           }
         },
         child: Container(

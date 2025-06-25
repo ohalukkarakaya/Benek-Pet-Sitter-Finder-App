@@ -28,6 +28,12 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Uygulama konumunuza ihtiyaç duyuyor.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Uygulama arka planda konumunuzu kullanabilir.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Bu uygulama konum bilgisine ihtiyaç duyar.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

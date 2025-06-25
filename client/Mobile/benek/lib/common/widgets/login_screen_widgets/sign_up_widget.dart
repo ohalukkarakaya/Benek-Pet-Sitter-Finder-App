@@ -1,6 +1,10 @@
 import 'package:benek/common/constants/benek_icons.dart';
 import 'package:benek/common/utils/client_id.dart';
+import 'package:benek/common/utils/get_current_location_helper.dart';
 import 'package:benek/common/utils/show_md_modal_sheet.dart';
+import 'package:benek/presentation/shared/components/choose_location_from_map/choose_location_from_map_screen.dart';
+import 'package:benek/store/app_redux_store.dart';
+import 'package:benek/store/app_state.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:benek/common/constants/app_colors.dart';
@@ -8,6 +12,9 @@ import 'package:benek/common/utils/styles.text.dart';
 import 'package:benek/common/widgets/benek_small_button.dart';
 import 'package:benek/common/widgets/benek_textfield.dart';
 import 'package:benek/common/widgets/login_screen_widgets/gender_selector_widget.dart';
+// ignore: depend_on_referenced_packages
+import 'package:redux/redux.dart';
+
 class SignupWidget extends StatefulWidget {
   final dynamic Function()? defaultOnTap;
   final dynamic Function()? loginOnTap;
@@ -32,6 +39,10 @@ class _SignupWidgetState extends State<SignupWidget> {
   String _email = "";
   String _fullname = "";
   String _password = "";
+  String _lat = "";
+  String _lng = "";
+  String _city= "";
+  String _country = "TUR";
 
   Gender _selectedGender = Gender.male;
   bool _isConsentGiven = false;
@@ -320,6 +331,22 @@ class _SignupWidgetState extends State<SignupWidget> {
                               String? firstname = _isimler![0];
                               String? middlename = _isimler!.length > 2 ? _isimler![1] : null;
                               String? lastname = _isimler!.length > 2 ? _isimler![2] : _isimler![1];
+
+                              Store<AppState> store = AppReduxStore.currentStore!;
+                              await LocationHelper.getCurrentLocation(store);
+
+                              final adress = await Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  opaque: false,
+                                  barrierDismissible: false,
+                                  pageBuilder: (context, _, __) => const ChooseLocationFromMapScreen(),
+                                ),
+                              );
+
+                              if (adress != null && adress is Map<String, dynamic>) {
+                                print("Adres seçildi: $adress");
+                              }
 
                               print( "clientId: ${clientId}, username: ${_username}, email: ${_email}, firstname: ${firstname}, middlename: ${middlename}, lastname: ${lastname}, password: ${_password}, isConsentGiven: ${_isConsentGiven}");
                             },
