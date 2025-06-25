@@ -33,9 +33,11 @@ const forgetPasswordController = async ( req, res, next ) => {
         const salt = await bcrypt.genSalt(Number( process.env.SALT ));
         const hashedOneTimePassword = await bcrypt.hash( oneTimePassword, salt );
 
-        sendOneTimePassword({ newPassword: oneTimePassword, email }, null, next );
+        await sendOneTimePassword({ newPassword: oneTimePassword, email }, null, next );
 
         await UserToken.deleteMany({ userId: user._id.toString() });
+        await TempPassword.deleteMany({ userId: user._id.toString() });
+
         await new TempPassword(
             {
                 userId: user._id.toString(),
@@ -54,6 +56,7 @@ const forgetPasswordController = async ( req, res, next ) => {
          ).catch(
             ( error ) => {
                 if( error ){
+                    console.log( "ERROR: forgetPasswordController - ", error);
                     return res.status( 500 ).json({
                         error: true,
                         message: "Internal Server Error"

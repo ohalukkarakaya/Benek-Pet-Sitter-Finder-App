@@ -1,5 +1,11 @@
 import 'dart:ui';
 
+// ignore: depend_on_referenced_packages
+import 'package:benek/store/actions/app_actions.dart';
+import 'package:benek/store/app_redux_store.dart';
+import 'package:benek/store/app_state.dart';
+import 'package:redux/redux.dart';
+
 import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/benek_toast_helper.dart';
 import 'package:benek/common/utils/client_id.dart';
@@ -179,52 +185,79 @@ class _LoginWidgetState extends State<LoginWidget> {
                         children: [
                           GestureDetector(
                             onTap: () => showCustomBlurBottomSheet(
-                              context,
-                              true,
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Böyle şeyler herkesin başına gelebilir. Sana yardımcı olacağız. "
-                                    "Lütfen e-posta adresini gir, sana geçici bir şifre göndereceğiz.",
-                                    style: mediumTextStyle(
-                                      textColor: AppColors.benekGrey,
-                                      textFontSize: 10,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  BenekTextField(
-                                    hintText: "Email adresi",
-                                    keyboardType: TextInputType.emailAddress,
-                                    controller: _forgetPasswordEmailController,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _forgetPasswordEmail = value;
-                                      });
-                                    },
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      BenekSmallButton(
-                                        iconData: Icons.arrow_forward_ios,
-                                        isLight: true,
-                                        isPassive: !(_forgetPasswordEmail
-                                                .contains("@") &&
-                                            _forgetPasswordEmail
-                                                .contains(".com") &&
-                                            _forgetPasswordEmail.isNotEmpty),
-                                        onTap: () async {
-                                          // şifremi unuttum isteği atılabilir
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
+  context,
+  true,
+  StatefulBuilder( // ✨ Eklenen kısım
+    builder: (BuildContext context, StateSetter localSetState) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Böyle şeyler herkesin başına gelebilir. Sana yardımcı olacağız. "
+            "Lütfen e-posta adresini gir, sana geçici bir şifre göndereceğiz.",
+            style: mediumTextStyle(
+              textColor: AppColors.benekGrey,
+              textFontSize: 10,
+            ),
+          ),
+          const SizedBox(height: 20),
+          BenekTextField(
+            hintText: "Email adresi",
+            keyboardType: TextInputType.emailAddress,
+            controller: _forgetPasswordEmailController,
+            onChanged: (value) {
+              _forgetPasswordEmail = value;
+              localSetState(() {}); // ✨ Local state tetikleniyor
+            },
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              BenekSmallButton(
+                iconData: Icons.arrow_forward_ios,
+                isLight: true,
+                isPassive: !(
+                  _forgetPasswordEmail.contains("@") &&
+                  _forgetPasswordEmail.contains(".com") &&
+                  _forgetPasswordEmail.isNotEmpty
+                ),
+                onTap: () async {
+                  Store<AppState> store = AppReduxStore.currentStore!;
+                  bool isSuccess = await store.dispatch(
+                      forgetMyPasswordRequestAction(_forgetPasswordEmail)
+                  ) ?? true;
+
+                  if (!isSuccess) {
+                    BenekToastHelper.showErrorToast(
+                      BenekStringHelpers.locale('operationFailed'),
+                      "Bir Hata oluştu!",
+                      context,
+                    );
+                    return;
+                  }
+
+                  BenekToastHelper.showSuccessToast(
+                    BenekStringHelpers.locale('operationSucceeded'),
+                    "Epostanıza yeni şifre gönderildi",
+                    context,
+                  );
+
+                  _forgetPasswordEmailController.clear();
+                  _forgetPasswordEmail = "";
+
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        ],
+      );
+    },
+  ),
+),
+
                             child: Text(
                               "Şifreni mi unuttun?",
                               style: lightTextStyle(
@@ -293,6 +326,8 @@ class _LoginWidgetState extends State<LoginWidget> {
                                                         ),
                                                         padding: const EdgeInsets.all(24.0),
                                                         child: PasswordTextfield(
+                                                          message: "Görünüşe göre farklı bir cihazdan giriş yapıyorsun. Güvenliğin için epostana bir kod gönderdik. "
+                                                            "Lütfen e-postanı kontrol et ve kodu gir.",
                                                           verifyingString: _email,
                                                           onDispatch: (String code) async {
                                                             print("Kullanıcı kod girdi: $code");

@@ -26,39 +26,22 @@ let transporter = nodemailer.createTransport(
   );
 
  //send OTP verification
- const sendOneTimePassword = async ( 
-  {
-    newPassword, 
-    email
-  }, 
-  res, 
-  next 
-) => {
+const sendOneTimePassword = async ({ newPassword, email }) => {
     try {
-      const htmlEmail = sendEmailHelper( "tempPassWord", newPassword, null, null, null, null, null );
+        const htmlEmail = sendEmailHelper("tempPassWord", newPassword);
 
-      //mail options
-      const mailOptions = {
-        from: process.env.AUTH_EMAIL,
-        to: email,
-        subject: "Benek Geçici Şifreniz",
-        html: htmlEmail,
-      };
-      await transporter.sendMail( mailOptions );
-      
-      next();
-    }catch( e ){
-      console.log( "ERROR: sendOneTimePassword - ", e );
-      if( res ){
-        return res.status( 500 )
-                  .json(
-                    {
-                      error: true,
-                      message: e.message,
-                    }
-                  );
-      }
+        const mailOptions = {
+            from: process.env.AUTH_EMAIL,
+            to: email,
+            subject: "Benek Geçici Şifreniz",
+            html: htmlEmail,
+        };
+
+        await transporter.sendMail(mailOptions);
+    } catch (e) {
+        console.log("ERROR: sendOneTimePassword - ", e);
+        throw new Error("Email could not be sent: " + e.message);
     }
-  }
+};
 
-  export default sendOneTimePassword;
+export default sendOneTimePassword;
