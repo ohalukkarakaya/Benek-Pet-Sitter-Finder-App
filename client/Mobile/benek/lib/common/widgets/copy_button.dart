@@ -50,34 +50,22 @@ class _BenekCopyButtonState extends State<BenekCopyButton> {
               _tooltipController.hide();
             });
           },
-          child: MouseRegion(
-            onHover: (event) {
-              setState(() {
-                isHovering = true;
-              });
-            },
-            onExit: (event) {
-              setState(() {
-                isHovering = false;
-              });
-            },
-            child: Container(
-              width: widget.widthAndHeight,
-              height: widget.widthAndHeight,
-              decoration: BoxDecoration(
-                color: !isHovering
-                    ? !widget.isLight
-                      ? AppColors.benekBlackWithOpacity
-                      : AppColors.benekWhite.withAlpha(26)
-                    : AppColors.benekLightBlue,
-                borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-              ),
-              child: Center(
-                child: Icon(
-                  BenekIcons.copy,
-                  color: !isHovering ? AppColors.benekWhite : AppColors.benekBlack,
-                  size: 15,
-                ),
+          child: Container(
+            width: widget.widthAndHeight,
+            height: widget.widthAndHeight,
+            decoration: BoxDecoration(
+              color: !isHovering
+                  ? !widget.isLight
+                    ? AppColors.benekBlackWithOpacity
+                    : AppColors.benekWhite.withAlpha(26)
+                  : AppColors.benekLightBlue,
+              borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+            ),
+            child: Center(
+              child: Icon(
+                BenekIcons.copy,
+                color: !isHovering ? AppColors.benekWhite : AppColors.benekBlack,
+                size: 15,
               ),
             ),
           ),

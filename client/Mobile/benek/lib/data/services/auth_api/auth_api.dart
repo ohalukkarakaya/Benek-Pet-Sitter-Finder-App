@@ -89,4 +89,89 @@ class AuthApi {
       log('ERROR: postLoginRequest - $e');
     }
   }
+
+  Future<dynamic> postSignupRequest(
+      String username, 
+      String email, 
+      Gender gender, 
+      String firstname, 
+      String? lastname,
+      String city,
+      String lat,
+      String lng,
+      String password, 
+      String clientId,
+      String? middlename
+  ) async {
+    try {
+      const String path = '/auth/signUp';
+
+      Object postBody =
+          jsonEncode({
+            'userName': username,
+            'email': email, 
+            'gender': gender == Gender.male ? "Male" : "Female",
+            'identity': {
+              "firstName": firstname,
+              "middleName": middlename,
+              "lastName": lastname
+            },
+            'location': {
+              'country': 'TUR',
+              'city': city,
+              'lat': lat,
+              'lng': lng,
+            },
+            'password': password, 
+            'ip': clientId
+          });
+
+      final response = await http.post(
+        Uri.parse("${AppConfig.baseUrl}$path"),
+        body: postBody,
+        headers: {'Content-Type': 'application/json'},
+      );
+      final data = jsonDecode(response.body);
+
+      // TO DO: buraya bak yarın haluk
+      if (response.statusCode >= 400 && response.statusCode != 401) {
+        throw ApiException(code: response.statusCode, message: response.body);
+      } else if (response.statusCode == 401 && ((data['isEmailVerified'] != null && !(data['isEmailVerified']) || data['isLoggedInIpTrusted'] != null && !(data['isLoggedInIpTrusted']) ) )) {
+        String? refreshtoken;
+        String? accessToken;
+        int? userRole;
+
+        return {
+          'error': false,
+          "isVerifiyingEmail": true,
+          'refreshToken': refreshtoken,
+          'accessToken': accessToken,
+          'userRole': userRole
+        };
+      } else if (data['error'] == false) {
+        String? refreshtoken = data['refreshToken'];
+        String? accessToken = data['accessToken'];
+        int? userRole = data['roleId'];
+
+        print( refreshtoken );
+
+        return {
+          'error': false,
+          "isVerifiyingEmail": false,
+          'refreshToken': refreshtoken,
+          'accessToken': accessToken,
+          'userRole': userRole
+        };
+
+      } else {
+        return {
+          'error': true,
+          'message': data['message'],
+          'isVerifiyingEmail': data['isVerifiyingEmail'] ?? false
+        };
+      }
+    } catch (e) {
+      log('ERROR: postLoginRequest - $e');
+    }
+  }
 }

@@ -24,89 +24,74 @@ class BenekPetListElementWidget extends StatefulWidget {
 }
 
 class _BenekPetListElementWidgetState extends State<BenekPetListElementWidget> {
-  bool isHovering = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.onDispatchFunction,
-      child: MouseRegion(
-        onHover: (event) {
-          setState(() {
-            isHovering = true;
-          });
-        },
-        onExit: (event) {
-          setState(() {
-            isHovering = false;
-          });
-        },
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(6.0),
-          child: Container(
-              width: 500.0,
-              height: 60.0,
-              decoration: BoxDecoration(
-                color: isHovering
-                    ? AppColors.benekBlue
-                    : AppColors.benekLightBlue,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only( left: 12, bottom: 5.0),
-                        child: BenekCircleAvatar(
-                          isDefaultAvatar: widget.user == null ? widget.pet!.petProfileImg!.isDefaultImg! : widget.user!.profileImg!.isDefaultImg!,
-                          imageUrl: widget.user == null ? widget.pet!.petProfileImg!.imgUrl! : widget.user!.profileImg!.imgUrl!,
-                          bgColor: AppColors.benekBlack,
-                          width: 30,
-                          height: 30,
-                          borderWidth: 2,
-                        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(6.0),
+        child: Container(
+            width: 500.0,
+            height: 60.0,
+            decoration: const BoxDecoration(
+              color:  AppColors.benekLightBlue,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only( left: 12, bottom: 5.0),
+                      child: BenekCircleAvatar(
+                        isDefaultAvatar: widget.user == null ? widget.pet!.petProfileImg!.isDefaultImg! : widget.user!.profileImg!.isDefaultImg!,
+                        imageUrl: widget.user == null ? widget.pet!.petProfileImg!.imgUrl! : widget.user!.profileImg!.imgUrl!,
+                        bgColor: AppColors.benekBlack,
+                        width: 30,
+                        height: 30,
+                        borderWidth: 2,
                       ),
-                      const SizedBox(width: 12.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                              widget.user == null
-                                ? widget.pet!.name!
-                                : BenekStringHelpers.getUsersFullName(
-                                    widget.user!.identity!.firstName!,
-                                    widget.user!.identity!.lastName!,
-                                    widget.user!.identity!.middleName
-                                ),
-                                style: mediumTextStyle()
-                          ),
-
-                          Text(
-                              widget.user == null
-                                  ? "${BenekStringHelpers.calculateYearsDifference(widget.pet!.birthDay!)} ${BenekStringHelpers.locale('yearsOld')}, ${BenekStringHelpers.getPetKindAsString(widget.pet!.kind!)}, ${BenekStringHelpers.getPetGenderAsString(widget.pet!.sex!)}"
-                                  : "@${widget.user!.userName}",
-                              style: lightTextStyle()
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-
-                  const Padding(
-                    padding: EdgeInsets.only(right: 20.0),
-                    child: Icon(
-                      BenekIcons.right,
-                      color: AppColors.benekBlack,
-                      size: 12,
                     ),
+                    const SizedBox(width: 12.0),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                            widget.user == null
+                              ? widget.pet!.name!
+                              : BenekStringHelpers.getUsersFullName(
+                                  widget.user!.identity!.firstName!,
+                                  widget.user!.identity!.lastName!,
+                                  widget.user!.identity!.middleName
+                              ),
+                              style: mediumTextStyle()
+                        ),
+      
+                        Text(
+                            widget.user == null
+                                ? "${BenekStringHelpers.calculateYearsDifference(widget.pet!.birthDay!)} ${BenekStringHelpers.locale('yearsOld')}, ${BenekStringHelpers.getPetKindAsString(widget.pet!.kind!)}, ${BenekStringHelpers.getPetGenderAsString(widget.pet!.sex!)}"
+                                : "@${widget.user!.userName}",
+                            style: lightTextStyle()
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+      
+                const Padding(
+                  padding: EdgeInsets.only(right: 20.0),
+                  child: Icon(
+                    BenekIcons.right,
+                    color: AppColors.benekBlack,
+                    size: 12,
                   ),
-                ],
-              )
-          ),
+                ),
+              ],
+            )
         ),
       ),
     );

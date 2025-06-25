@@ -4,6 +4,7 @@ import 'package:benek/common/utils/benek_toast_helper.dart';
 import 'package:benek/common/utils/client_id.dart';
 import 'package:benek/common/utils/get_current_location_helper.dart';
 import 'package:benek/common/utils/show_md_modal_sheet.dart';
+import 'package:benek/common/widgets/login_screen_widgets/tc_no_popup.dart';
 import 'package:benek/presentation/shared/components/choose_location_from_map/choose_location_from_map_screen.dart';
 import 'package:benek/store/app_redux_store.dart';
 import 'package:benek/store/app_state.dart';
@@ -348,7 +349,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                 if (!isInsideTurkey) {
                                   BenekToastHelper.showErrorToast(
                                     BenekStringHelpers.locale('operationFailed'),
-                                    "Türkiyenin dışındasınız, uygulamamız şimdilik yalnızca Türkiye içerisinde işlemektedir.",
+                                    "Türkiyenin dışındasınız, üye olabilmek için Türkiye'de olmalısınız.",
                                     context,
                                   );
 
@@ -367,6 +368,17 @@ class _SignupWidgetState extends State<SignupWidget> {
 
                               if (adress != null && adress is Map<String, dynamic>) {
                                 print("Adres seçildi: $adress");
+
+                                // final tc = await showTcKimlikPopup(context);
+                                // if (tc != null) {
+                                //   print("Girilen TC: $tc");
+                                //   // 🔐 Burada server'a gönderilebilir vs.
+                                // } else {
+                                //   BenekToastHelper.showErrorToast(
+                                //     "İptal Edildi", "TC Kimlik numarası girilmeden işlem devam edemez.", context,
+                                //   );
+                                //   return;
+                                // }
                               }
 
                               print( "clientId: $clientId, username: $_username, email: $_email, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $_password, isConsentGiven: $_isConsentGiven");

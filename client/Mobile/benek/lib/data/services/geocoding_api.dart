@@ -9,6 +9,8 @@ class GeocodingApi {
       String path = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng';
 
       var request = http.Request('GET', Uri.parse(path));
+      request.headers['User-Agent'] = 'benek-app/1.0 (iletisim@benekapp.com)';
+
       http.StreamedResponse response = await request.send();
 
       if(response.statusCode == 200){

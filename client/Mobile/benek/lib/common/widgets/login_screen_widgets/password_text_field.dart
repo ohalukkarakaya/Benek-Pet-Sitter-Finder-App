@@ -94,14 +94,14 @@ class _PasswordTextfieldState extends State<PasswordTextfield> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     widget.message != null
-                    ? Text(
-                      widget.message!,
-                      style: mediumTextStyle(
-                        textColor: AppColors.benekGrey,
-                        textFontSize: 10,
-                      ),
-                    )
-                    : const SizedBox(),
+                        ? Text(
+                            widget.message!,
+                            style: mediumTextStyle(
+                              textColor: AppColors.benekGrey,
+                              textFontSize: 10,
+                            ),
+                          )
+                        : const SizedBox(),
                     SizedBox(
                       height: widget.message != null ? 10.0 : 0.0,
                     ),
@@ -116,7 +116,7 @@ class _PasswordTextfieldState extends State<PasswordTextfield> {
                             (index) {
                               bool isFilled = _controller.text.length > index;
                               return Padding(
-                                padding: const EdgeInsets.only(right: 25.0),
+                                padding: const EdgeInsets.only(right: 10.0),
                                 child: Icon(
                                   FontAwesomeIcons.asterisk,
                                   color: isFilled

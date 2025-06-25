@@ -18,51 +18,43 @@ class MapBackAndCancelButton extends StatefulWidget {
 }
 
 class _MapBackAndCancelButtonState extends State<MapBackAndCancelButton> {
-  bool didHovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => didHovered = true),
-      onExit: (_) => setState(() => didHovered = false),
-      child: GestureDetector(
-        onTap: () async {
-          bool didApprove = widget.didEdit
-            && widget.shouldTakeAprovvement
-              ? await Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    opaque: false,
-                    barrierDismissible: false,
-                    pageBuilder: (context, _, __) => ApproveScreen(
-                      isNegative: true,
-                      title: BenekStringHelpers.locale('approveCancelChanges'),
-                    ),
+    return GestureDetector(
+      onTap: () async {
+        bool didApprove = widget.didEdit
+          && widget.shouldTakeAprovvement
+            ? await Navigator.push(
+                context,
+                PageRouteBuilder(
+                  opaque: false,
+                  barrierDismissible: false,
+                  pageBuilder: (context, _, __) => ApproveScreen(
+                    isNegative: true,
+                    title: BenekStringHelpers.locale('approveCancelChanges'),
                   ),
-                )
-              : true;
-
-          if (didApprove) {
-            Navigator.pop(context);
-          }
-        },
-        child: Container(
-          width: 48.0,
-          height: 48.0,
-          padding: const EdgeInsets.all(12.0),
-          decoration: BoxDecoration(
-            color: !didHovered
-                ? AppColors.benekBlack.withAlpha(204)
-                : AppColors.benekLightRed,
-            borderRadius: BorderRadius.circular(6.0),
-          ),
-          child: Center(
-            child: Icon(
-              BenekIcons.left,
-              color: !didHovered ? AppColors.benekWhite : AppColors.benekRed,
-              size: 16.0,
-            ),
+                ),
+              )
+            : true;
+    
+        if (didApprove) {
+          Navigator.pop(context);
+        }
+      },
+      child: Container(
+        width: 48.0,
+        height: 48.0,
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          color: AppColors.benekBlack.withAlpha(204),
+          borderRadius: BorderRadius.circular(6.0),
+        ),
+        child: const Center(
+          child: Icon(
+            BenekIcons.left,
+            color: AppColors.benekWhite,
+            size: 16.0,
           ),
         ),
       ),
