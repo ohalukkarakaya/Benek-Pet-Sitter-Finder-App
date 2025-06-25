@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../api.dart';
 
 class UserSetAuthRoleApi {
 
@@ -19,7 +19,6 @@ class UserSetAuthRoleApi {
       List<QueryParam> queryParams = [];
       Map<String, String> headerParams = {};
       Map<String, String> formParams = {};
-      List<String> contentTypes = [];
       List<String> authNames = [];
 
       String contentType = "application/json";
@@ -27,7 +26,6 @@ class UserSetAuthRoleApi {
       var response = await apiClient.invokeAPI(path, 'PUT', queryParams, postBody, headerParams, formParams, contentType, authNames);
       if (response.statusCode >= 400 && response.statusCode  != 404) {
         throw ApiException(code: response.statusCode, message: response.body);
-        return false;
         // ignore: unnecessary_null_comparison
       }else if( response.body != null ){
         return true;

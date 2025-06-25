@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:benek/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek/data/services/api.dart';
 import 'package:benek/data/services/api_exception.dart';
 // ignore: depend_on_referenced_packages

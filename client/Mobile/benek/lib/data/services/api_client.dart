@@ -1,6 +1,6 @@
 // ignore_for_file: unnecessary_null_comparison
 
-part of benek.api;
+part of 'api.dart';
 
 class QueryParam {
   String name;

@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../api.dart';
 
 class StoryApi {
 
@@ -8,7 +8,6 @@ class StoryApi {
 
   // Get Logged In User Info
   Future<List<StoryModel>?> getStoriesByUserIdRequest( String userId ) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 
@@ -51,7 +50,6 @@ class StoryApi {
   }
 
   Future<List<StoryModel>?> getStoriesByPetIdRequest( String petId ) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 

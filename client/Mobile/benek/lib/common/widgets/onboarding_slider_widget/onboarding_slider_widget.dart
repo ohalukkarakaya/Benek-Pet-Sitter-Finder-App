@@ -84,7 +84,7 @@ Widget build(BuildContext context) {
       Expanded(
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.85),
+            color: AppColors.benekBlack.withAlpha(217)
           ),
           child: Column(
             children: [

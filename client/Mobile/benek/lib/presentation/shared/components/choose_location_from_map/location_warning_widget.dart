@@ -21,7 +21,7 @@ class LocationWarningWidget extends StatelessWidget {
           child: Container(
             width: boxWidth,
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-            color: AppColors.benekBlack.withOpacity(0.85),
+            color: AppColors.benekBlack.withAlpha(217),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

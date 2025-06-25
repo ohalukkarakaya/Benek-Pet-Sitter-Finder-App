@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../api.dart';
 
 class UserPrivateInfoApi {
 
@@ -8,7 +8,6 @@ class UserPrivateInfoApi {
 
   // Get Logged In User Info
   Future<dynamic> getUsersPrivateInfoRequest() async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 
@@ -20,7 +19,6 @@ class UserPrivateInfoApi {
       List<QueryParam> queryParams = [];
       Map<String, String> headerParams = {};
       Map<String, String> formParams = {};
-      List<String> contentTypes = [];
       List<String> authNames = [];
 
       String contentType = "application/json";

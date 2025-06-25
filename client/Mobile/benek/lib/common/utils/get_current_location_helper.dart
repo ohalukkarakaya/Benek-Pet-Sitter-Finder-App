@@ -38,10 +38,13 @@ class LocationHelper {
 
       if (position == null) {
         try {
+          const settings = LocationSettings(
+            accuracy: LocationAccuracy.lowest,
+            timeLimit: Duration(seconds: 5),
+          );
+
           position = await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.lowest,
-            forceAndroidLocationManager: true,
-            timeLimit: const Duration(seconds: 5),
+            locationSettings: settings,
           );
         } on TimeoutException catch (e) {
           log("TimeoutException: ${e.message}");

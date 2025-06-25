@@ -13,11 +13,11 @@ class BenekProcessIndicator extends StatefulWidget {
   final double? height;
 
   const BenekProcessIndicator({
-    Key? key,
+    super.key,
     this.color = AppColors.benekWhite,
     this.width = 30,
     this.height = 30,
-  }) : super(key: key);
+  });
 
   @override
   State<BenekProcessIndicator> createState() => _BenekProcessIndicatorState();

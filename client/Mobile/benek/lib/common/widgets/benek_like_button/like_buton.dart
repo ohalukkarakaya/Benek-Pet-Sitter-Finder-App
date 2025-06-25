@@ -7,7 +7,7 @@ import './utils/like_button_util.dart';
 
 class LikeButton extends StatefulWidget {
   const LikeButton({
-    Key? key,
+    super.key,
     this.size = 30.0,
     this.likeBuilder,
     this.countBuilder,
@@ -35,8 +35,7 @@ class LikeButton extends StatefulWidget {
     this.countDecoration,
     this.postFrameCallback,
   })  : bubblesSize = bubblesSize ?? size * 2.0,
-        circleSize = circleSize ?? size * 0.8,
-        super(key: key);
+        circleSize = circleSize ?? size * 0.8;
 
   /// size of like widget
   final double size;
@@ -246,9 +245,9 @@ class LikeButtonState extends State<LikeButton> with TickerProviderStateMixin {
                       ? _scaleAnimation.value
                       : 1.0,
                   child: SizedBox(
-                    child: likeWidget,
                     height: widget.size,
                     width: widget.size,
+                    child: likeWidget,
                   ),
                 ),
               ),
@@ -343,12 +342,12 @@ class LikeButtonState extends State<LikeButton> with TickerProviderStateMixin {
                     clipBehavior: Clip.hardEdge,
                     children: <Widget>[
                       Opacity(
-                        child: currentSameWidget,
                         opacity: _opacityAnimation.value,
+                        child: currentSameWidget,
                       ),
                       Opacity(
-                        child: preSameWidget,
                         opacity: 1.0 - _opacityAnimation.value,
+                        child: preSameWidget,
                       ),
                     ],
                   ),
@@ -399,8 +398,8 @@ class LikeButtonState extends State<LikeButton> with TickerProviderStateMixin {
     }
 
     result = ClipRect(
-      child: result,
       clipper: LikeCountClip(),
+      child: result,
     );
 
     return result;

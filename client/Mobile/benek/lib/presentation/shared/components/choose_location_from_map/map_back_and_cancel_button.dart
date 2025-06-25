@@ -53,7 +53,7 @@ class _MapBackAndCancelButtonState extends State<MapBackAndCancelButton> {
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
             color: !didHovered
-                ? AppColors.benekBlack.withOpacity(0.8)
+                ? AppColors.benekBlack.withAlpha(204)
                 : AppColors.benekLightRed,
             borderRadius: BorderRadius.circular(6.0),
           ),

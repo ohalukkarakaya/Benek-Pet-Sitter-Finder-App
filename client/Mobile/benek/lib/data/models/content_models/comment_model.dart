@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:developer';
 
 // Import necessary files for DateTimeHelpers and API services
@@ -151,7 +150,7 @@ class CommentModel {
     replies = replies ?? <CommentModel>[];
     replies = replyList + replies!;
 
-    final uniqueReplies = LinkedHashMap<String, CommentModel>();
+    final uniqueReplies = <String, CommentModel>{};
 
     for( var reply in replies! ){
       uniqueReplies[reply.id!] = reply;

@@ -25,7 +25,6 @@ class _AnimatedCharacterSlotState extends State<AnimatedCharacterSlot> {
   late String currentChar;
   late Timer _timer;
   late DateTime _startTime;
-  bool _finished = false;
 
   @override
   void initState() {
@@ -39,7 +38,6 @@ class _AnimatedCharacterSlotState extends State<AnimatedCharacterSlot> {
       if (elapsed >= widget.duration) {
         setState(() {
           currentChar = widget.targetChar.toUpperCase();
-          _finished = true;
         });
         _timer.cancel();
       } else {

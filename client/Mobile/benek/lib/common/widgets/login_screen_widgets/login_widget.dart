@@ -1,9 +1,9 @@
 import 'dart:ui';
 
-// ignore: depend_on_referenced_packages
 import 'package:benek/store/actions/app_actions.dart';
 import 'package:benek/store/app_redux_store.dart';
 import 'package:benek/store/app_state.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 
 import 'package:benek/common/utils/benek_string_helpers.dart';
@@ -49,7 +49,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.85),
+      backgroundColor: AppColors.benekBlack.withAlpha(217),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: LayoutBuilder(
@@ -301,8 +301,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                                     filter: ImageFilter.blur(
                                                         sigmaX: 10, sigmaY: 10),
                                                     child: Container(
-                                                      color: Colors.black
-                                                          .withOpacity(0.3),
+                                                      color: AppColors.benekBlack.withAlpha(77),
                                                     ),
                                                   ),
                                                 ),

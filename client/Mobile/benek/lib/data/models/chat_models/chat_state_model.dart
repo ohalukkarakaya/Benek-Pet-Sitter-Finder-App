@@ -29,7 +29,7 @@ class ChatStateModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['totalChatCount'] = totalChatCount;
     if (chats != null) {
       data['chats'] = chats!.map((v) => v!.toJson()).toList();

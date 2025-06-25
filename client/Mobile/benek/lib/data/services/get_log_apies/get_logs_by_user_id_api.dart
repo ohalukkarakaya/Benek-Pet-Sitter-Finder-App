@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../api.dart';
 
 class LogApi {
   final ApiClient apiClient;
@@ -6,7 +6,6 @@ class LogApi {
   LogApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
 
   Future<dynamic> getLogsByUserId( String userId ) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 
@@ -38,7 +37,6 @@ class LogApi {
   }
 
   Future<dynamic> getLogsApi(DateTime startDate, DateTime endDate) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 

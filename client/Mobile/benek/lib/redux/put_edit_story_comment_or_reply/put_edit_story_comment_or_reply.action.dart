@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:benek/data/models/content_models/comment_model.dart';
 import 'package:benek/data/services/api.dart';
 
 // ignore: depend_on_referenced_packages

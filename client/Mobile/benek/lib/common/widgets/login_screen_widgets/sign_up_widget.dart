@@ -1,4 +1,6 @@
 import 'package:benek/common/constants/benek_icons.dart';
+import 'package:benek/common/utils/benek_string_helpers.dart';
+import 'package:benek/common/utils/benek_toast_helper.dart';
 import 'package:benek/common/utils/client_id.dart';
 import 'package:benek/common/utils/get_current_location_helper.dart';
 import 'package:benek/common/utils/show_md_modal_sheet.dart';
@@ -52,7 +54,7 @@ class _SignupWidgetState extends State<SignupWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.85),
+      backgroundColor: AppColors.benekBlack.withAlpha(217),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: LayoutBuilder(
@@ -335,6 +337,25 @@ class _SignupWidgetState extends State<SignupWidget> {
                               Store<AppState> store = AppReduxStore.currentStore!;
                               await LocationHelper.getCurrentLocation(store);
 
+                              final currentLoc = store.state.currentLocation;
+
+                              if (currentLoc != null) {
+                                final lat = currentLoc.latitude;
+                                final lng = currentLoc.longitude;
+
+                                final isInsideTurkey = lat >= 36.0 && lat <= 42.0 && lng >= 26.0 && lng <= 45.0;
+
+                                if (!isInsideTurkey) {
+                                  BenekToastHelper.showErrorToast(
+                                    BenekStringHelpers.locale('operationFailed'),
+                                    "Türkiyenin dışındasınız, uygulamamız şimdilik yalnızca Türkiye içerisinde işlemektedir.",
+                                    context,
+                                  );
+
+                                  return;
+                                }
+                              }
+
                               final adress = await Navigator.push(
                                 context,
                                 PageRouteBuilder(
@@ -348,7 +369,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                                 print("Adres seçildi: $adress");
                               }
 
-                              print( "clientId: ${clientId}, username: ${_username}, email: ${_email}, firstname: ${firstname}, middlename: ${middlename}, lastname: ${lastname}, password: ${_password}, isConsentGiven: ${_isConsentGiven}");
+                              print( "clientId: $clientId, username: $_username, email: $_email, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $_password, isConsentGiven: $_isConsentGiven");
                             },
                           ),
                         ],

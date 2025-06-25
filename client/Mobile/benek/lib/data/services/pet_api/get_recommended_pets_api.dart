@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../api.dart';
 
 class RecommendedPetsApi {
 
@@ -8,13 +8,12 @@ class RecommendedPetsApi {
 
   // Get Logged In User Info
   Future<dynamic> getRecommendedPetsRequest() async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 
       String path = '/api/pet/getRecommendedPets';
 
-      Object? postBody = null;
+      Object? postBody;
 
       // Query Params
       List<QueryParam> queryParams = [];

@@ -14,11 +14,11 @@ class PetCareGiverHistoryModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['careGiver'] = this.careGiver;
-    data['startDate'] = this.startDate;
-    data['endDate'] = this.endDate;
-    data['price'] = this.price;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['careGiver'] = careGiver;
+    data['startDate'] = startDate;
+    data['endDate'] = endDate;
+    data['price'] = price;
     return data;
   }
 }

@@ -12,9 +12,6 @@ import 'package:redux/redux.dart';
 import 'package:benek/store/app_state.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-import '../../data/models/story_models/story_model.dart';
-import '../../data/models/user_profile_models/user_info_model.dart';
-
 ThunkAction<AppState> getSelectedUserStarDataAction( String? userId ) {
   return (Store<AppState> store) async {
     SelectedUserStarDataApi api = SelectedUserStarDataApi();

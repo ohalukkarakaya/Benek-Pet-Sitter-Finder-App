@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:benek/data/models/story_models/story_about_data_model.dart';
 import '../../../presentation/features/date_helpers/date_time_helpers.dart';
 import '../user_profile_models/user_info_model.dart';
@@ -56,7 +54,7 @@ class StoryModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['_id'] = storyId;
     if (about != null) {
       data['about'] = about!.toJson();
@@ -90,7 +88,7 @@ class StoryModel {
     comments ??= <CommentModel>[];
     comments = commentList + comments!;
 
-    final uniqueComments = LinkedHashMap<String, CommentModel>();
+    final uniqueComments = <String, CommentModel>{};
 
     for (var comment in comments!) {
       uniqueComments[comment.id!] = comment;

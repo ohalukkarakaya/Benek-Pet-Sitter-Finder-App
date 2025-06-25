@@ -92,8 +92,8 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
         && petList!.isNotEmpty
         && ( petList![0] is! PetModel && petList![0] is! UserInfo )
           ? Shimmer.fromColors(
-              baseColor: AppColors.benekBlack.withOpacity(0.4),
-              highlightColor: AppColors.benekBlack.withOpacity(0.2),
+              baseColor: AppColors.benekBlack.withAlpha(102),
+              highlightColor: AppColors.benekBlack.withAlpha(51),
               child: _buildChild()
           )
           : petList != null

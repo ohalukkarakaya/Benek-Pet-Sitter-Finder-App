@@ -17,7 +17,7 @@ class BenekMessageBoxWidget extends StatefulWidget {
     this.radius = 6.0,
     this.size = const Size(600, 250),
   }) : backgroundColor = backgroundColor
-            ?? AppColors.benekBlack.withOpacity(0.2);
+            ?? AppColors.benekBlack.withAlpha(51);
 
   @override
   State<BenekMessageBoxWidget> createState() => _BenekMessageBoxWidgetState();

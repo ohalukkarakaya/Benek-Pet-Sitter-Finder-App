@@ -2,7 +2,6 @@
 
 import 'dart:developer';
 
-import 'package:benek/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek/data/models/pet_models/pet_model.dart';
 import 'package:benek/data/models/user_profile_models/user_info_model.dart';
 import 'package:benek/data/services/api.dart';

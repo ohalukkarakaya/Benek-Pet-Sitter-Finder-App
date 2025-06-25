@@ -5,7 +5,7 @@ class AppColors {
   static const Color benekBlack = Colors.black;
   static const Color benekGrey = Colors.grey;
   static Color? benekDarkGrey = Colors.grey[700];
-  static Color benekBlackWithOpacity = Colors.black.withOpacity(0.2);
+  static Color benekBlackWithOpacity = Colors.black.withAlpha(51);
   static const Color benekUltraLightBlue = Color.fromARGB(255, 227, 237, 239);
   static const Color benekLightBlue = Color(0xffD1EBF3);
   static const Color benekBlue = Color(0xffB1DCE1);

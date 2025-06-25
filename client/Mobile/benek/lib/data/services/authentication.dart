@@ -1,4 +1,4 @@
-part of benek.api;
+part of 'api.dart';
 
 abstract class Authentication {
   /// Apply authentication settings to header and query params.

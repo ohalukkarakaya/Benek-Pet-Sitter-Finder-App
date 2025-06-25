@@ -1,5 +1,4 @@
-import 'dart:developer';
-import 'dart:ui'; // <-- blur için eklendi
+import 'dart:ui';
 
 import 'package:benek/data/services/api.dart';
 import 'package:benek/presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
@@ -62,7 +61,7 @@ class _PasswordTextfieldState extends State<PasswordTextfield> {
         BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
-            color: Colors.black.withOpacity(0.3), // biraz karartma + şeffaflık
+            color: AppColors.benekBlack.withAlpha((0.3 * 255).round()),
           ),
         ),
 

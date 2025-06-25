@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../api.dart';
 
 class PetApi {
 
@@ -8,7 +8,6 @@ class PetApi {
 
   // Get Logged In User Info
   Future<List<PetModel>?> getPetsByUserIdRequest( String userId ) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 
@@ -55,7 +54,6 @@ class PetApi {
   }
 
   Future<PetModel?> getPetByIdRequest( String petId ) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 
@@ -97,7 +95,6 @@ class PetApi {
   }
 
   Future<List<PetImageModel>?> getPetPhotosByIdRequest( String petId ) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 

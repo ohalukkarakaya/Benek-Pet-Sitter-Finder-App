@@ -19,8 +19,8 @@ class BenekBluredModalBarier extends StatelessWidget {
         children: [
           ModalBarrier(
             color: !isLightColor
-                      ? AppColors.benekBlack.withOpacity(0.5)
-                      : Colors.grey.withOpacity(0.5),
+                      ? AppColors.benekBlack.withAlpha(128)
+                      : Colors.grey.withAlpha(128),
             dismissible: isDismissible,
           ),
           BackdropFilter(

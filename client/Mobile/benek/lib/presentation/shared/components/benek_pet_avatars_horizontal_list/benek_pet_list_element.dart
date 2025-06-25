@@ -96,8 +96,8 @@ class _BenekPetListElementWidgetState extends State<BenekPetListElementWidget> {
                     ],
                   ),
 
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20.0),
+                  const Padding(
+                    padding: EdgeInsets.only(right: 20.0),
                     child: Icon(
                       BenekIcons.right,
                       color: AppColors.benekBlack,

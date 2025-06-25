@@ -67,7 +67,7 @@ class MessageModel {
     data['messageType'] = getMessageTypeString(messageType ?? MessageTypeEnum.UNDEFINED);
     data['message'] = message;
     data['fileUrl'] = fileUrl;
-    data['paymentOffer'] = paymentOffer != null ? paymentOffer!.toJson() : null;
+    data['paymentOffer'] = paymentOffer?.toJson();
     data['seenBy'] = seenBy;
     data['sendDate'] = sendDate;
     data['_id'] = id;

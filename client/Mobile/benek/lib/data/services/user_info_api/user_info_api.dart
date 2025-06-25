@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../api.dart';
 
 class UserInfoApi {
 
@@ -51,7 +51,6 @@ class UserInfoApi {
   }
 
   Future<UserProfileImg?> putUpdateProfileImage(String? filePath) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try {
       await AuthUtils.getAccessToken();
 
@@ -203,6 +202,7 @@ class UserInfoApi {
     catch( err ){
       log('ERROR: putBecomeCareGiver - $err');
     }
+    return null;
   }
 
   Future<Map<String, dynamic>?> putUpdateFullname(String fullname) async {

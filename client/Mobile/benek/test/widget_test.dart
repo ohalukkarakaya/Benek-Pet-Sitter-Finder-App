@@ -5,15 +5,22 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:benek/app/app.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:benek/main.dart';
+import 'package:benek/store/app_redux_store.dart';
+import 'package:benek/store/app_state.dart';
+// ignore: depend_on_referenced_packages
+import 'package:redux/redux.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    final Store<AppState> store = AppReduxStore.getInitialStore();
+
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(BenekApp(store));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

@@ -3,7 +3,7 @@ class AppStaticTextsTr{
     'appName': 'Kulübe',
     'appDescription': 'Benek, evcil hayvan sahipleri ve bakıcıları için tasarlanmış bir platformdur.',
     'error': 'Hata',
-    'welcomeMessage': "Kulübe\''ye Hoş Geldin",
+    'welcomeMessage': "Kulübe'ye Hoş Geldin",
     'qrCodeDescription': 'Giriş yapmak için aşağıdaki kodu Benek uygulamasına okut.',
     'toGetNewQrCode': 'Yeni bi QR kod almak için butona tıkla :)',
     'qrCodeExpireTime': 'Bu kodun süresi, bir saat içinde dolar!',

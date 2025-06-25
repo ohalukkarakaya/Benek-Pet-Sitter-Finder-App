@@ -1,12 +1,9 @@
-import 'dart:developer';
 
 import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/styles.text.dart';
-import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../common/constants/app_colors.dart';
-import '../../../../data/models/pet_models/pet_model.dart';
 import 'benek_avatar_grid_view.dart';
 
 class BenekAvatarGridWidget extends StatefulWidget {
@@ -25,7 +22,6 @@ class BenekAvatarGridWidget extends StatefulWidget {
 }
 
 class _BenekAvatarGridWidgetState extends State<BenekAvatarGridWidget> {
-  final ElTooltipController _tooltipControllerGeneralGrid = ElTooltipController();
   @override
   Widget build(BuildContext context) {
     // log('First Pet: ${list[4].name?.toString()}');

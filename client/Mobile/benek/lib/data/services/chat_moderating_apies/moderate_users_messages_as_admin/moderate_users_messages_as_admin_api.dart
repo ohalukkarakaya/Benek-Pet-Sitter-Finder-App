@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../../api.dart';
 
 class ModerateUsersMessagesAsAdmin {
 
@@ -47,7 +47,6 @@ class ModerateUsersMessagesAsAdmin {
   }
 
   Future<dynamic> postSendMessage( String chatId, String message ) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 
@@ -64,7 +63,6 @@ class ModerateUsersMessagesAsAdmin {
       String contentType = contentTypes.isNotEmpty ? contentTypes[0] : "application/json";
 
       if( contentType.startsWith("multipart/form-data") ){
-        bool hasFields = false;
         MultipartRequest mp = MultipartRequest("POST", Uri.parse(AppConfig.baseUrl + path));
 
         mp.fields.addAll({

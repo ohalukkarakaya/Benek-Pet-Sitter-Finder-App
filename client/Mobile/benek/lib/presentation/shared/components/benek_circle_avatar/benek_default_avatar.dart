@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/widgets.dart';
 
 class BenekDefaultAvatar extends StatelessWidget {
@@ -45,7 +47,7 @@ class BenekDefaultAvatar extends StatelessWidget {
               fit: BoxFit.cover,
               errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
                 if(error != null){
-                  print('Error: $error');
+                  log('Error: $error');
                 }
                 return const SizedBox();
               }

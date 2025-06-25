@@ -160,8 +160,6 @@ ThunkAction<AppState> resendEmailOtpRequestAction(String email) {
     UserInfoApi api = UserInfoApi();
 
     try {
-      String userId = store.state.userInfo!.userId!;
-
       bool? _email = await api.postResendEmailOtp(email);
       if(_email != true){
         throw CustomException(1, BenekStringHelpers.locale('operationFailed'));

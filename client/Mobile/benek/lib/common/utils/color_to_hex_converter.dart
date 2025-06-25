@@ -1,19 +1,17 @@
 import 'dart:ui';
 
 extension HexColor on Color {
-  String _generateAlpha({required int alpha, required bool withAlpha}) {
-    if (withAlpha) {
-      return alpha.toRadixString(16).padLeft(2, '0');
-    } else {
-      return '';
-    }
+  int _to255(double component) => (component * 255.0).round() & 0xff;
+
+  String _generateAlpha({required bool withAlpha}) {
+    return withAlpha ? _to255(a).toRadixString(16).padLeft(2, '0') : '';
   }
 
   String toHex({bool leadingHashSign = false, bool withAlpha = false}) =>
       '${leadingHashSign ? '#' : ''}'
-              '${_generateAlpha(alpha: alpha, withAlpha: withAlpha)}'                  
-              '${red.toRadixString(16).padLeft(2, '0')}'              
-              '${green.toRadixString(16).padLeft(2, '0')}'              
-           '${blue.toRadixString(16).padLeft(2, '0')}'
-          .toUpperCase();
+      '${_generateAlpha(withAlpha: withAlpha)}'
+      '${_to255(r).toRadixString(16).padLeft(2, '0')}'
+      '${_to255(g).toRadixString(16).padLeft(2, '0')}'
+      '${_to255(b).toRadixString(16).padLeft(2, '0')}'
+      .toUpperCase();
 }

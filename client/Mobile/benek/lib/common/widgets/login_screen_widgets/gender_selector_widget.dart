@@ -30,8 +30,8 @@ Widget build(BuildContext context) {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected
-                ? AppColors.benekLightBlue.withOpacity(0.7)
-                : AppColors.benekWhite.withOpacity(0.1),
+                ? AppColors.benekLightBlue.withAlpha(179)
+                : AppColors.benekWhite.withAlpha(26),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected ? AppColors.benekBlack : AppColors.benekGrey,
@@ -40,7 +40,7 @@ Widget build(BuildContext context) {
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: Colors.blueAccent.withOpacity(0.3),
+                      color: Colors.blueAccent.withAlpha(77),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     )

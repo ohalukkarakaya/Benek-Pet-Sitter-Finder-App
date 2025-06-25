@@ -9,12 +9,12 @@ class BenekCustomScrollListWidget extends StatefulWidget {
   final void Function(VisibilityInfo visibilityInfo, int index)? onVisibilityChangedCB; // It trigers this function when a widgets visibility gets changed.
 
   const BenekCustomScrollListWidget({
-    Key? key,
+    super.key,
     this.isShouldNotBeScrollable = false,
     required this.itemDataList,
     required this.child,
     this.onVisibilityChangedCB,
-  }) : super(key: key);
+  });
 
   @override
   State<BenekCustomScrollListWidget> createState() => _BenekCustomScrollListWidgetState();

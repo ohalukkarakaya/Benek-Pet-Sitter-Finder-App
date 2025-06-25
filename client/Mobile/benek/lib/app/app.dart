@@ -76,7 +76,7 @@ class _BenekHomePageState extends State<BenekHomePage> {
 
         if (_hasInternet == null || !_hasInternet!) {
           log( 'No internet connection' );
-          return SizedBox(); // NoInternetConnectionScreen( store: store );
+          return const SizedBox(); // NoInternetConnectionScreen( store: store );
         }
 
         if(
@@ -104,10 +104,10 @@ class _BenekHomePageState extends State<BenekHomePage> {
                                 ? LoginScreen() // Login Screen
                                 : store.state.activeScreen == AppScreenEnums.HOME_SCREEN
 
-                                      ? SizedBox() // HomeScreen( store: store)
+                                      ? const SizedBox() // HomeScreen( store: store)
                                       : store.state.activeScreen == AppScreenEnums.ERROR_SCREEN
 
-                                          ? SizedBox() // ErrorScreen( store: store, )
+                                          ? const SizedBox() // ErrorScreen( store: store, )
                                           : const SizedBox()
                 ),
           ],

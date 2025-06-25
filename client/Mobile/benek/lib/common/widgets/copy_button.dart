@@ -68,7 +68,7 @@ class _BenekCopyButtonState extends State<BenekCopyButton> {
                 color: !isHovering
                     ? !widget.isLight
                       ? AppColors.benekBlackWithOpacity
-                      : AppColors.benekWhite.withOpacity(0.1)
+                      : AppColors.benekWhite.withAlpha(26)
                     : AppColors.benekLightBlue,
                 borderRadius: const BorderRadius.all(Radius.circular(6.0)),
               ),

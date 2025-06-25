@@ -1,5 +1,4 @@
 import 'package:benek/app/app.dart';
-import 'package:benek/common/utils/client_id.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -14,7 +13,7 @@ void main() async {
   await dotenv.load(fileName: ".env");
   final Store<AppState> store = AppReduxStore.getInitialStore();
 
-  String deviceLanguage = ui.window.locale.languageCode;
+  String deviceLanguage = ui.PlatformDispatcher.instance.locale.languageCode;
   await store.dispatch(SetDeviceLanguageAction(deviceLanguage));
 
   runApp(BenekApp(store));

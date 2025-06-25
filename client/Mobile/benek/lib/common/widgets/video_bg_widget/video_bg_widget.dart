@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:benek/common/constants/app_colors.dart';
 import 'package:benek/common/widgets/video_bg_widget/background_video_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -21,13 +22,13 @@ class VideoBgWidget extends StatelessWidget {
         BackdropFilter(
           filter: ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
           child: Container(
-            color: Colors.black.withOpacity(opacity),
+            color: AppColors.benekBlack.withAlpha((opacity * 255).round()),
           ),
         ),
         // Hafif kenarlık efekti (isteğe bağlı)
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: AppColors.benekWhite.withAlpha(13)),
             color: Colors.transparent,
           ),
         ),

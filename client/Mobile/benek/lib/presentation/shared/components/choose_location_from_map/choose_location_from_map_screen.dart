@@ -1,11 +1,7 @@
 import 'package:benek/common/constants/turkish_cities_data_list.dart';
 import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/benek_toast_helper.dart';
-import 'package:benek/common/utils/get_current_location_helper.dart';
 import 'package:benek/store/app_redux_store.dart';
-// ignore: depend_on_referenced_packages
-import 'package:redux/redux.dart';
-import 'package:benek/store/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -68,7 +64,7 @@ class _ChooseLocationFromMapScreenState
         store.state.currentLocation!.longitude,
       );
     } else {
-      initialMapCenter = LatLng(39.925054, 32.836944); // Anıtkabir fallback
+      initialMapCenter = const LatLng(39.925054, 32.836944); // Anıtkabir fallback
     }
 
     return Scaffold(
@@ -159,7 +155,7 @@ class _ChooseLocationFromMapScreenState
               width: markerSize,
               height: markerSize,
               decoration: BoxDecoration(
-                color: AppColors.benekUltraDarkBlue.withOpacity(0.3),
+                color: AppColors.benekUltraDarkBlue.withAlpha(77),
                 shape: BoxShape.circle,
               ),
               child: Center(

@@ -27,7 +27,7 @@ class BenekHorizontalButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final backgroundColor = !isLight
         ? AppColors.benekBlackWithOpacity
-        : AppColors.benekWhite.withOpacity(0.1);
+        : AppColors.benekWhite.withAlpha(26);
 
     final textColor =
         isPassive ? AppColors.benekGrey : AppColors.benekWhite;

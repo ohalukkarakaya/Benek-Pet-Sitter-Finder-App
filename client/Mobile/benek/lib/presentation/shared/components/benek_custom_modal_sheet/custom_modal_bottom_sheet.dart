@@ -61,14 +61,14 @@ class _BlurDialogContentState extends State<_BlurDialogContent>
 
   @override
   void didChangeMetrics() {
-    final newInset = WidgetsBinding.instance.window.viewInsets.bottom;
 
     if (mounted) {
       setState(() {
-        bottomInset = EdgeInsets.fromWindowPadding(
-          WidgetsBinding.instance.window.viewInsets,
-          WidgetsBinding.instance.window.devicePixelRatio,
+        bottomInset = EdgeInsets.fromViewPadding(
+          View.of(context).viewInsets,
+          View.of(context).devicePixelRatio,
         ).bottom;
+
       });
     }
   }
@@ -81,7 +81,7 @@ class _BlurDialogContentState extends State<_BlurDialogContent>
         children: [
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(color: Colors.black.withOpacity(0.5)),
+            child: Container(color: Colors.black.withAlpha(128)),
           ),
           Align(
             alignment: Alignment.bottomCenter,

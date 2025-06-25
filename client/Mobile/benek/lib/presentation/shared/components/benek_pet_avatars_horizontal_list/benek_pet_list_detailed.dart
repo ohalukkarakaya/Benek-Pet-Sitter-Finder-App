@@ -2,6 +2,7 @@ import 'package:benek/data/models/pet_models/pet_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
+// ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
 import 'package:benek/store/app_state.dart';
 
@@ -55,7 +56,7 @@ class _BenekPetListDetailedScreenState extends State<BenekPetListDetailedScreen>
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                      color:  AppColors.benekBlack.withOpacity(0.6),
+                                      color:  AppColors.benekBlack.withAlpha(153),
                                       borderRadius: BorderRadius.circular(6.0),
                                     ),
                                     padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
@@ -63,7 +64,7 @@ class _BenekPetListDetailedScreenState extends State<BenekPetListDetailedScreen>
                                       children: List.generate(
                                           selectedPet == null ? selectedUserInfo.pets!.length : selectedPet.allOwners!.length,
                                           (index) => Padding(
-                                            padding: EdgeInsets.only(bottom: 25.0),
+                                            padding: const EdgeInsets.only(bottom: 25.0),
                                             child: BenekPetListElementWidget(
                                               onDispatchFunction: () async {
                                                 Navigator.of(context).pop();
@@ -73,7 +74,7 @@ class _BenekPetListDetailedScreenState extends State<BenekPetListDetailedScreen>
                                                 UserInfo? selectedUser = store.state.selectedUserInfo;
                                                 PetModel? selectedPetState = store.state.selectedPet;
 
-                                                await store.dispatch( IsLoadingStateAction( isLoading: true ) );
+                                                await store.dispatch( const IsLoadingStateAction( isLoading: true ) );
 
                                                 await store.dispatch( setSelectedPetAction(null) );
                                                 await store.dispatch( setSelectedUserAction(null) );
@@ -86,7 +87,7 @@ class _BenekPetListDetailedScreenState extends State<BenekPetListDetailedScreen>
                                                   await store.dispatch( setSelectedUserAction( selectedPetState.allOwners![index] ) );
                                                 }
 
-                                                await store.dispatch( IsLoadingStateAction( isLoading: false ) );
+                                                await store.dispatch( const IsLoadingStateAction( isLoading: false ) );
                                               },
                                               pet: selectedPet == null ? selectedUserInfo.pets![index] : null,
                                               user: selectedPet == null ? null : selectedPet.allOwners![index],

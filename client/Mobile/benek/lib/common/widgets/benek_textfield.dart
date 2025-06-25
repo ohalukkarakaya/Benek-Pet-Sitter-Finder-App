@@ -36,11 +36,11 @@ class BenekTextField extends StatelessWidget {
         hintStyle: TextStyle(
           fontFamily: defaultFontFamily(),
           fontSize: 14,
-          color: AppColors.benekWhite.withOpacity(0.4),
+          color: AppColors.benekWhite.withAlpha(102),
           fontWeight: getFontWeight('regular'),
         ),
         filled: true,
-        fillColor: AppColors.benekWhite.withOpacity(0.1), // isLight: true stili
+        fillColor: AppColors.benekWhite.withAlpha(26), // isLight: true stili
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),

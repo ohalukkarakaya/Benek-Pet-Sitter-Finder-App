@@ -9,7 +9,7 @@ class Triangle extends StatelessWidget {
   Triangle({
     super.key,
     Color? color,
-  }) : color = color ?? AppColors.benekBlack.withOpacity(0.2);
+  }) : color = color ?? AppColors.benekBlack.withAlpha(51);
   @override
   Widget build(BuildContext context) {
     return CustomPaint(

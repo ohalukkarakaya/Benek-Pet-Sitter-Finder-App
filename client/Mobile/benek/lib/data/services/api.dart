@@ -17,6 +17,7 @@ import 'package:benek/data/services/api_exception.dart';
 import 'package:benek/store/app_redux_store.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
+// ignore: depend_on_referenced_packages
 import 'package:http_parser/http_parser.dart';
 
 import 'package:benek/data/models/user_profile_models/user_info_model.dart';

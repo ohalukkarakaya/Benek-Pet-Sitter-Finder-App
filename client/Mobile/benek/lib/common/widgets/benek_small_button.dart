@@ -57,7 +57,7 @@ class _BenekSmallButtonState extends State<BenekSmallButton> {
                 ? AppColors.benekLightBlue
                 : !widget.isLight
                     ? AppColors.benekBlackWithOpacity
-                    : AppColors.benekWhite.withOpacity(0.1),
+                    : AppColors.benekWhite.withAlpha(26),
             borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
           ),
           child: Center(

@@ -23,9 +23,9 @@ class TrianglePainter extends CustomPainter {
     );
     path_0.close();
 
-    Paint paint_0_fill = Paint()..style=PaintingStyle.fill;
-    paint_0_fill.color = color;
-    canvas.drawPath(path_0,paint_0_fill);
+    Paint paint0Fill = Paint()..style=PaintingStyle.fill;
+    paint0Fill.color = color;
+    canvas.drawPath(path_0,paint0Fill);
 
   }
 

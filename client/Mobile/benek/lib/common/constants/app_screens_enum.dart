@@ -17,7 +17,5 @@ String getRouteName( AppScreenEnums activeScreen ){
       return "/homeScreen";
     case AppScreenEnums.ERROR_SCREEN:
       return "/errorScreen";
-    default:
-      return "/errorScreen";
-  }
+    }
 }

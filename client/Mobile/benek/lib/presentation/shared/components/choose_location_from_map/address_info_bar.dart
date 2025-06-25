@@ -26,7 +26,7 @@ class InfoBar extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
           decoration: BoxDecoration(
-            color: AppColors.benekBlack.withOpacity(0.8),
+            color: AppColors.benekBlack.withAlpha(204),
             borderRadius: const BorderRadius.all(Radius.circular(6.0)),
           ),
           child: Text(

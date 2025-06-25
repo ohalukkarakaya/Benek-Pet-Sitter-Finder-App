@@ -28,14 +28,14 @@ class ImageVideoHelpers {
   static Widget getThumbnail(String url) {
     if (isImage(url)) {
       return Image.network(
-        '${ImageVideoHelpers.mediaServerBaseUrlHelper()}getAsset?assetPath=${url}',
+        '${ImageVideoHelpers.mediaServerBaseUrlHelper()}getAsset?assetPath=$url',
         headers: { "private-key": dotenv.env['MEDIA_SERVER_API_KEY']! },
         fit: BoxFit.cover,
       );
     } else if (isVideo(url)) {
       try{
         return Image.network(
-          '${ImageVideoHelpers.mediaServerBaseUrlHelper()}getVideoThumbnail?videoPath=${url}',
+          '${ImageVideoHelpers.mediaServerBaseUrlHelper()}getVideoThumbnail?videoPath=$url',
             headers: { "private-key": dotenv.env['MEDIA_SERVER_API_KEY']! },
             fit: BoxFit.cover,
         );

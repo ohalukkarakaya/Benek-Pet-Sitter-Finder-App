@@ -63,7 +63,7 @@ ThunkAction<AppState> sendReportResponseAction( String reportId, bool adminrespo
       if (result) {
         // If the response is successful, fetch the updated report list
         ReportStateModel? _reports = store.state.reports;
-        _reports?.totalReportCount = _reports.totalReportCount != null && _reports!.totalReportCount! > 0
+        _reports?.totalReportCount = _reports.totalReportCount != null && _reports.totalReportCount! > 0
             ? _reports.totalReportCount! - 1
             : 0;
 

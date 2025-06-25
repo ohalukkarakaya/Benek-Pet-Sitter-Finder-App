@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../api.dart';
 
 class  PunishmentApi {
 
@@ -128,8 +128,8 @@ class  PunishmentApi {
         // await AuthUtils.killUserSessionAndRestartApp( store );
       }
     }catch( err ){
-      return false;
       log('ERROR: punishUserRequest - $err');
+      return false;
     }
   }
 }

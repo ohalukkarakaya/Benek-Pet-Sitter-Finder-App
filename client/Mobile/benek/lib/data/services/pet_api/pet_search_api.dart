@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../api.dart';
 
 class PetSearchApi {
 
@@ -8,7 +8,6 @@ class PetSearchApi {
 
   // Get Logged In User Info
   Future<dynamic> getPetSearchRequest(String? lastItemId, String searchValue ) async {
-    Store<AppState> store = AppReduxStore.currentStore!;
     try{
       await AuthUtils.getAccessToken();
 
@@ -17,7 +16,7 @@ class PetSearchApi {
 
       String path = '/api/pet/getPetsBySearchValue/$searchValue/$lastItemIdString/$limit';
 
-      Object? postBody = null;
+      Object? postBody;
 
       // Query Params
       List<QueryParam> queryParams = [];

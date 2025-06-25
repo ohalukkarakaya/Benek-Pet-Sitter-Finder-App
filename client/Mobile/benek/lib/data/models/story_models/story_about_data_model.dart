@@ -12,7 +12,7 @@ class StoryAboutDataModel{
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['aboutType'] = aboutType;
     if (pet != null) {
       data['taged'] = pet!.toJson();

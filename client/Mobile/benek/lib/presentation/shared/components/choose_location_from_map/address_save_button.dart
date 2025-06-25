@@ -2,10 +2,6 @@ import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/styles.text.dart';
 import 'package:benek/presentation/shared/components/benek_dashed_border/benek_dashed_border.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
-import 'package:benek/store/app_state.dart';
 import '../edit_text_screen.dart';
 import '../../../../../../../../../common/constants/app_colors.dart';
 
@@ -36,86 +32,79 @@ class _AddressSaveButtonState extends State<AddressSaveButton> {
 
   @override
   Widget build(BuildContext context) {
-    final store = StoreProvider.of<AppState>(context);
 
-    return MouseRegion(
-      cursor:
-          widget.didEdit ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      onEnter: (_) => setState(() => didHovered = true),
-      onExit: (_) => setState(() => didHovered = false),
-      child: GestureDetector(
-        onTap: () async {
-          if (!widget.didEdit) return;
-
-          final text = await Navigator.push(
-            context,
-            PageRouteBuilder(
-              opaque: false,
-              barrierDismissible: false,
-              pageBuilder: (context, _, __) => EditTextScreen(
-                textToEdit: widget.address ?? '',
-              ),
+    return GestureDetector(
+      onTap: () async {
+        if (!widget.didEdit) return;
+    
+        final text = await Navigator.push(
+          context,
+          PageRouteBuilder(
+            opaque: false,
+            barrierDismissible: false,
+            pageBuilder: (context, _, __) => EditTextScreen(
+              textToEdit: widget.address ?? '',
             ),
-          );
-
-          if (text != null && context.mounted) {
-            final resultAddressObj = {
-              'address': text,
-              'city': widget.city,
-              'lat': widget.lat,
-              'lng': widget.lng,
-            };
-
-            widget.onSave
-                ?.call(resultAddressObj); // sadece callback çağır, pop yapma!
-          }
-        },
-        child: Container(
-          width: double.infinity,
-          height: 55.0,
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-          decoration: BoxDecoration(
-            color: !didHovered || !widget.didEdit
-                ? AppColors.benekBlack.withOpacity(0.8)
-                : AppColors.benekLightGreen,
-            borderRadius: BorderRadius.circular(6.0),
           ),
-          child: BenekDottedBorder(
-            color: !widget.didEdit
-                ? AppColors.benekGrey
-                : !didHovered
-                    ? AppColors.benekWhite
-                    : AppColors.benekSuccessGreen,
-            strokeWidth: 2,
-            borderType: BorderType.RRect,
-            radius: const Radius.circular(4.0),
-            child: Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.check,
-                    color: !widget.didEdit
+        );
+    
+        if (text != null && context.mounted) {
+          final resultAddressObj = {
+            'address': text,
+            'city': widget.city,
+            'lat': widget.lat,
+            'lng': widget.lng,
+          };
+    
+          widget.onSave
+              ?.call(resultAddressObj); // sadece callback çağır, pop yapma!
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        height: 55.0,
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+        decoration: BoxDecoration(
+          color: !didHovered || !widget.didEdit
+              ? AppColors.benekBlack.withValues(alpha: 204)
+              : AppColors.benekLightGreen,
+          borderRadius: BorderRadius.circular(6.0),
+        ),
+        child: BenekDottedBorder(
+          color: !widget.didEdit
+              ? AppColors.benekGrey
+              : !didHovered
+                  ? AppColors.benekWhite
+                  : AppColors.benekSuccessGreen,
+          strokeWidth: 2,
+          borderType: BorderType.RRect,
+          radius: const Radius.circular(4.0),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.check,
+                  color: !widget.didEdit
+                      ? AppColors.benekGrey
+                      : !didHovered
+                          ? AppColors.benekWhite
+                          : AppColors.benekSuccessGreen,
+                  size: 24.0,
+                ),
+                const SizedBox(width: 10.0),
+                Text(
+                  BenekStringHelpers.locale('save'),
+                  style: boldTextStyle(
+                    textColor: !widget.didEdit
                         ? AppColors.benekGrey
                         : !didHovered
                             ? AppColors.benekWhite
                             : AppColors.benekSuccessGreen,
-                    size: 24.0,
+                    textFontSize: 16.0,
                   ),
-                  const SizedBox(width: 10.0),
-                  Text(
-                    BenekStringHelpers.locale('save'),
-                    style: boldTextStyle(
-                      textColor: !widget.didEdit
-                          ? AppColors.benekGrey
-                          : !didHovered
-                              ? AppColors.benekWhite
-                              : AppColors.benekSuccessGreen,
-                      textFontSize: 16.0,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

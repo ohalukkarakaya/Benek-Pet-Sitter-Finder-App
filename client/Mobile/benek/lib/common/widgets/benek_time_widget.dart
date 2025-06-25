@@ -26,7 +26,7 @@ class _BenekTimeState extends State<BenekTime> {
   void initState() {
     // İlk değeri al ve güncelleme timer'ını başlat
     currentTime = BenekDateTimeHelpers.getCurrentDateTime();
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
       updateCurrentTime();
     });
     super.initState();

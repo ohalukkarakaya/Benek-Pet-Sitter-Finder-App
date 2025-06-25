@@ -1,4 +1,4 @@
-part of benek.api;
+part of '../../api.dart';
 
 class ModerateUsersChatAsAdmin {
 

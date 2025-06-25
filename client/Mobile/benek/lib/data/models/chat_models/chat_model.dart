@@ -52,7 +52,7 @@ class ChatModel {
       messages = [ MessageModel.fromJson(json['message']) ];
     }else{
       messages = <MessageModel>[];
-    };
+    }
     chatImageUrl = json['chatImageUrl'];
     chatName = json['chatName'];
     unreadMessageCount = json['unreadMessageCount'] ?? 0;

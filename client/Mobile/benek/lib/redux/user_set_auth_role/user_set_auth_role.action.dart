@@ -2,7 +2,6 @@
 
 import 'dart:developer';
 
-import 'package:benek/data/models/user_profile_models/private_info_model.dart';
 import 'package:benek/data/services/api.dart';
 import 'package:benek/data/services/api_exception.dart';
 // ignore: depend_on_referenced_packages
