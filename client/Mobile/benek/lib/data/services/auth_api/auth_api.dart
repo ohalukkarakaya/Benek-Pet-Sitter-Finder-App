@@ -134,44 +134,22 @@ class AuthApi {
       final data = jsonDecode(response.body);
 
       // TO DO: buraya bak yarın haluk
-      if (response.statusCode >= 400 && response.statusCode != 401) {
+      if (response.statusCode > 400) {
         throw ApiException(code: response.statusCode, message: response.body);
-      } else if (response.statusCode == 401 && ((data['isEmailVerified'] != null && !(data['isEmailVerified']) || data['isLoggedInIpTrusted'] != null && !(data['isLoggedInIpTrusted']) ) )) {
-        String? refreshtoken;
-        String? accessToken;
-        int? userRole;
-
+      } else if(response.statusCode == 400) {
         return {
-          'error': false,
-          "isVerifiyingEmail": true,
-          'refreshToken': refreshtoken,
-          'accessToken': accessToken,
-          'userRole': userRole
+          "error": true,
+          "message": data["message"]
         };
-      } else if (data['error'] == false) {
-        String? refreshtoken = data['refreshToken'];
-        String? accessToken = data['accessToken'];
-        int? userRole = data['roleId'];
-
-        print( refreshtoken );
-
-        return {
-          'error': false,
-          "isVerifiyingEmail": false,
-          'refreshToken': refreshtoken,
-          'accessToken': accessToken,
-          'userRole': userRole
-        };
-
       } else {
         return {
-          'error': true,
-          'message': data['message'],
-          'isVerifiyingEmail': data['isVerifiyingEmail'] ?? false
+          "error": false,
+          "message": data["message"],
+          "user": data["data"],
         };
       }
     } catch (e) {
-      log('ERROR: postLoginRequest - $e');
+      log('ERROR: postSignupRequest - $e');
     }
   }
 }

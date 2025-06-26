@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:benek/common/utils/shared_preferences_helper.dart';
 import 'package:benek/data/services/api.dart';
-import 'package:benek/data/services/api_exception.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<Map<String, dynamic>> loginAction(String email, String password, String clientId) async {

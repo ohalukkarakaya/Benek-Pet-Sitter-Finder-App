@@ -7,12 +7,12 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const verifyOtpController = async (req, res) => {
-    try{
+    try {
         let { userId, email, otp, ip } = req.body;
 
         // Email varsa, userId'yi bul
         if (!userId && email) {
-            const user = await User.findOne({ email });
+            const user = await User.findOne({ email }).clone();
             if (!user) {
                 return res.status(404).json({
                     error: true,
@@ -22,106 +22,79 @@ const verifyOtpController = async (req, res) => {
             userId = user._id;
         }
 
-      const UserOTPVerificationRecords = await UserOTPVerification.find({ userId });
+        const otpRecords = await UserOTPVerification.find({ userId }).clone();
 
-      if( UserOTPVerificationRecords.length <= 0 ){
-        //no record found
-        return res.status(404 )
-                  .json({
-                      error: true,
-                      message: "Account record doesn't exist or has been verified already"
-                    });
-      }
-
-      //user otp record exists
-      const { expiresAt } = UserOTPVerificationRecords[ 0 ];
-      const hashedOTP = UserOTPVerificationRecords[ 0 ].otp;
-
-      if( expiresAt < Date.now() ){
-        //user Otp record has expired
-        await UserOTPVerification.deleteMany({ userId });
-        res.status( 405 )
-           .json(
-              {
+        if (!otpRecords || otpRecords.length === 0) {
+            return res.status(404).json({
                 error: true,
-                message: "Code has expired. Please request again"
-              }
-            );
-      }
-
-      const validOTP = await bcrypt.compare( otp, hashedOTP );
-
-        if( !validOTP ){
-          //supplied OTP is wrong
-          return res.status( 406 )
-                    .json({
-                      error: true,
-                      message: "Invalid code passed. Check your inbox"
-                    });
+                message: "Kayıt bulunamadı veya zaten doğrulanmış",
+            });
         }
-        await User.findOne(
-          { _id: userId },
-          async ( err, user ) => {
-            if( err ){
-              res.status( 404 )
-                 .json({
-                      error: true,
-                      message: "User not found"
-                  });
-            }
-            if(
-              !user.trustedIps.includes( ip ) 
-              && user.isLoggedInIpTrusted
-            ){
-              return res.status( 405 )
-                        .json({
-                            error: true,
-                            message: "Ip is not trusted. Please try to login from your device"
-                        });
-            }else if(
-              !user.trustedIps.includes( ip ) 
-              && !user.isLoggedInIpTrusted 
-              && user.isEmailVerified
-            ){
-              await User.updateOne(
-                { _id: userId },
-                { $push: { trustedIps: ip } }
-              );
-              await User.updateOne(
-                { _id: userId }, 
-                { isLoggedInIpTrusted: true }
-              );
-              await UserOTPVerification.deleteMany({ userId });
-              return res.status( 200 )
-                        .json({
-                            error: false,
-                            message: "Ip verified succesfuly"
-                        });
-            }
-            //success
-            await User.updateOne(
-              { _id: userId }, 
-              { isEmailVerified: true }
-            );
 
+        const { expiresAt, otp: hashedOTP } = otpRecords[0];
+
+        if (expiresAt < Date.now()) {
             await UserOTPVerification.deleteMany({ userId });
-            return res.status( 200 )
-                      .json({
-                          error: false,
-                          message: "User email verified succesfuly"
-                      });
-          }
-        ).clone();
-    }catch( err ){
-      console.log( "ERROR: verifyOtpController - ", err );
-      return res.status( 500 )
-                .json(
-                  {
-                    error: true,
-                    message: "Internal server error"
-                  }
-                );
+            return res.status(405).json({
+                error: true,
+                message: "Kodun süresi dolmuş. Lütfen tekrar isteyin",
+            });
+        }
+
+        const validOTP = await bcrypt.compare(otp, hashedOTP);
+        if (!validOTP) {
+            return res.status(406).json({
+                error: true,
+                message: "Geçersiz kod girdiniz. Gelen kutunuzu kontrol edin.",
+            });
+        }
+
+        // Kullanıcıyı getir
+        const user = await User.findById(userId).clone();
+
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                message: "Kullanıcı bulunamadı",
+            });
+        }
+
+        // IP kontrolü
+        if (user.isLoggedInIpTrusted && !user.trustedIps.includes(ip)) {
+            return res.status(405).json({
+                error: true,
+                message: "Bu IP adresi güvenilir değil. Kendi cihazınızdan giriş yapın.",
+            });
+        }
+
+        // Yeni IP ve doğrulanmış email ise: IP güvenilir hale getir
+        if (!user.trustedIps.includes(ip) && !user.isLoggedInIpTrusted && user.isEmailVerified) {
+            await User.updateOne({ _id: userId }, {
+                $push: { trustedIps: ip },
+                isLoggedInIpTrusted: true
+            });
+            await UserOTPVerification.deleteMany({ userId });
+            return res.status(200).json({
+                error: false,
+                message: "IP başarıyla doğrulandı",
+            });
+        }
+
+        // Her şey yolundaysa: Email doğrula
+        await User.updateOne({ _id: userId }, { isEmailVerified: true });
+        await UserOTPVerification.deleteMany({ userId });
+
+        return res.status(200).json({
+            error: false,
+            message: "Kullanıcı email'i başarıyla doğrulandı",
+        });
+    } catch (err) {
+        console.error("ERROR: verifyOtpController -", err);
+        return res.status(500).json({
+            error: true,
+            message: "Sunucu hatası oluştu",
+        });
     }
-}
+};
 
 export default verifyOtpController;

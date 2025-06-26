@@ -149,3 +149,26 @@ String? findCityForCoordinates(double latitude, double longitude) {
 
   return null;
 }
+
+Map<String, double> getCityCenterLatLng(City city) {
+  final coordinates = city.coordinates;
+
+  if (coordinates.length % 2 != 0) {
+    throw Exception("Hatalı koordinat verisi: lat-lng çift sayısı eşleşmiyor.");
+  }
+
+  double totalLat = 0;
+  double totalLng = 0;
+  int count = 0;
+
+  for (int i = 0; i < coordinates.length; i += 2) {
+    totalLat += coordinates[i];
+    totalLng += coordinates[i + 1];
+    count++;
+  }
+
+  return {
+    'lat': totalLat / count,
+    'lng': totalLng / count,
+  };
+}

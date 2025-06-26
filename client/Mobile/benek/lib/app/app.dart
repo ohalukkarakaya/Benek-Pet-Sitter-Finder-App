@@ -27,6 +27,7 @@ class BenekApp extends StatelessWidget {
     return StoreProvider(
       store: store,
       child: MaterialApp(
+        scrollBehavior: const ScrollBehavior().copyWith(scrollbars: false),
         title: 'Benek App',
         debugShowCheckedModeBanner: false,
         color: Colors.transparent,
@@ -58,6 +59,10 @@ class _BenekHomePageState extends State<BenekHomePage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // don't remove untill logout writen
+      // final Store<AppState> store = AppReduxStore.getInitialStore();
+      // AuthUtils.removeCredentials(store);
+
       var connectivityResult = await Connectivity().checkConnectivity();
       setState(() {
         _hasInternet = connectivityResult != ConnectivityResult.none;

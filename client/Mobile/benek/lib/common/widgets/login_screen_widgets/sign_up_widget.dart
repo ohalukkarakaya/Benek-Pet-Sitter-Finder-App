@@ -1,22 +1,25 @@
+import 'dart:ui';
+
 import 'package:benek/common/constants/benek_icons.dart';
+import 'package:benek/common/constants/app_colors.dart';
+import 'package:benek/common/constants/turkish_cities_data_list.dart';
 import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/benek_toast_helper.dart';
 import 'package:benek/common/utils/client_id.dart';
-import 'package:benek/common/utils/get_current_location_helper.dart';
 import 'package:benek/common/utils/show_md_modal_sheet.dart';
-import 'package:benek/common/widgets/login_screen_widgets/tc_no_popup.dart';
-import 'package:benek/presentation/shared/components/choose_location_from_map/choose_location_from_map_screen.dart';
-import 'package:benek/store/app_redux_store.dart';
-import 'package:benek/store/app_state.dart';
+import 'package:benek/common/utils/state_utils/auth_utils/auth_utils.dart';
+import 'package:benek/common/widgets/login_screen_widgets/password_text_field.dart';
+import 'package:benek/data/models/city_data_model.dart';
+import 'package:benek/data/services/api.dart';
+import 'package:benek/redux/login_and_signup/login.action.dart';
+import 'package:benek/redux/login_and_signup/signup.action.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:benek/common/constants/app_colors.dart';
 import 'package:benek/common/utils/styles.text.dart';
 import 'package:benek/common/widgets/benek_small_button.dart';
 import 'package:benek/common/widgets/benek_textfield.dart';
 import 'package:benek/common/widgets/login_screen_widgets/gender_selector_widget.dart';
-// ignore: depend_on_referenced_packages
-import 'package:redux/redux.dart';
+import 'package:benek/common/widgets/benek_dropdown_field.dart';
 
 class SignupWidget extends StatefulWidget {
   final dynamic Function()? defaultOnTap;
@@ -42,10 +45,11 @@ class _SignupWidgetState extends State<SignupWidget> {
   String _email = "";
   String _fullname = "";
   String _password = "";
-  String _lat = "";
-  String _lng = "";
-  String _city= "";
-  String _country = "TUR";
+
+  City? _selectedCity;
+  String _city = '';
+  String _lat = '';
+  String _lng = '';
 
   Gender _selectedGender = Gender.male;
   bool _isConsentGiven = false;
@@ -73,7 +77,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      /// Üstteki header
+                      /// Header
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -150,7 +154,8 @@ class _SignupWidgetState extends State<SignupWidget> {
                               begin: Alignment.bottomLeft,
                               end: Alignment.topRight,
                             ).createShader(
-                                const Rect.fromLTWH(0.0, 0.0, 200.0, 0.0)),
+                              const Rect.fromLTWH(0.0, 0.0, 200.0, 0.0),
+                            ),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -163,7 +168,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                       ),
                       const SizedBox(height: 20),
 
-                      /// TextField'lar
+                      /// TextFields
                       BenekTextField(
                         hintText: "Kullanıcı adı",
                         controller: _userNameController,
@@ -187,7 +192,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                       BenekTextField(
                         hintText: "Kimlikte yazan tam isim",
                         controller: _fullnameController,
-                        onChanged: (value){
+                        onChanged: (value) {
                           setState(() {
                             _fullname = value;
                             _isimler = _fullname.split(" ");
@@ -195,6 +200,48 @@ class _SignupWidgetState extends State<SignupWidget> {
                         },
                       ),
                       const SizedBox(height: 16),
+
+                      BenekModalPickerField<City>(
+                        hintText: "İkamet ettiğiniz şehri seçiniz",
+                        value: _selectedCity,
+                        options: turkishCities,
+                        display: (city) {
+                          final postalCode = city.code.toString().padLeft(2, '0');
+                          return Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    city.name,
+                                    style: regularTextStyle(
+                                      textColor: AppColors.benekWhite,
+                                      textFontSize: 15
+                                    ),
+                                  ),
+                                  const SizedBox( width: 10, ),
+                                  Text(
+                                    postalCode,
+                                    style: regularTextStyle(
+                                      textColor: AppColors.benekWhite,
+                                      textFontSize: 15
+                                    ),  
+                                  )
+                                ],
+                              );
+                        },
+                        onChanged: (selectedCity) {
+                          final center = getCityCenterLatLng(selectedCity!);
+
+                          setState(() {
+                            _selectedCity = selectedCity;
+                            _city = selectedCity.name;
+                            _lat = center['lat']!.toString();
+                            _lng = center['lng']!.toString();
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+
                       GenderSelector(
                         selectedGender: _selectedGender,
                         onChanged: (gender) {
@@ -205,188 +252,300 @@ class _SignupWidgetState extends State<SignupWidget> {
                       ),
                       const SizedBox(height: 16),
                       BenekTextField(
-                          hintText: "Password", 
-                          obscureText: true,
-                          controller: _passwordController,
-                          onChanged: (value) {
-                            setState(() {
-                              _password = value;
-                            });
-                          },
+                        hintText: "Password",
+                        obscureText: true,
+                        controller: _passwordController,
+                        onChanged: (value) {
+                          setState(() {
+                            _password = value;
+                          });
+                        },
                       ),
                       const SizedBox(height: 20),
 
-                      /// Alt kısım
+                      /// Alt kısım (Checkbox + Buton)
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: Align(
-                              alignment: Alignment
-                                  .centerLeft, // ✅ Yatayda sola yapıştır
-                              child: IntrinsicWidth(
-                                // ✅ Taşmadan sar
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Checkbox(
-                                      value: _isConsentGiven,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _isConsentGiven = value ?? false;
-                                        });
-                                      },
-                                      activeColor: AppColors.benekBlue,
-                                      materialTapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                      visualDensity: const VisualDensity(
-                                          horizontal: -4, vertical: -4),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: RichText(
-                                        text: TextSpan(
-                                          style: lightTextStyle(
-                                            textColor: AppColors.benekGrey,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Checkbox(
+                                  value: _isConsentGiven,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _isConsentGiven = value ?? false;
+                                    });
+                                  },
+                                  activeColor: AppColors.benekBlue,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  visualDensity: const VisualDensity(
+                                      horizontal: -4, vertical: -4),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: RichText(
+                                    text: TextSpan(
+                                      style: lightTextStyle(
+                                        textColor: AppColors.benekGrey,
+                                        textFontSize: 12,
+                                      ),
+                                      children: [
+                                        const TextSpan(
+                                          text:
+                                              "Aşağıdaki belgeleri okudum ve kabul ediyorum: ",
+                                        ),
+                                        TextSpan(
+                                          text: "Hizmet Sözleşmesi",
+                                          style: regularTextStyleUnderLine(
+                                            textColor: AppColors.benekBlue,
                                             textFontSize: 12,
                                           ),
-                                          children: [
-                                            const TextSpan(
-                                              text: "Aşağıdaki belgeleri okudum ve kabul ediyorum: ",
-                                            ),
-                                            TextSpan(
-                                              text: "Hizmet Sözleşmesi",
-                                              style: regularTextStyleUnderLine(
-                                                  textColor:AppColors.benekBlue,
-                                                  textFontSize: 12),
-                                              recognizer: TapGestureRecognizer()
-                                                ..onTap = () {
-                                                  showMarkdownModalSheet(context, 'assets/sozlesmeler/benek_hizmet_sozlesmesi.md');
-                                                },
-                                            ),
-                                            const TextSpan(text: ", "),
-                                            TextSpan(
-                                              text:
-                                                  "Kişisel Verilerin Korunması Açık Rıza Metni ve Beyanı",
-                                              style: regularTextStyleUnderLine(
-                                                  textColor:
-                                                      AppColors.benekBlue,
-                                                  textFontSize: 12),
-                                              recognizer: TapGestureRecognizer()
-                                                ..onTap = () {
-                                                  showMarkdownModalSheet(context, 'assets/sozlesmeler/kisisel_verilerin_korunmasi_acik_riza_beyani.md');
-                                                },
-                                            ),
-                                            const TextSpan(text: ", "),
-                                            TextSpan(
-                                              text:
-                                                  "Kullanıcı Aydınlatma Metni",
-                                              style: regularTextStyleUnderLine(
-                                                  textColor:
-                                                      AppColors.benekBlue,
-                                                  textFontSize: 12),
-                                              recognizer: TapGestureRecognizer()
-                                                ..onTap = () {
-                                                  showMarkdownModalSheet(context, 'assets/sozlesmeler/kisisel_verilerin_korunmasi_kullanici_aydinlatma_metni.md');
-                                                },
-                                            ),
-                                            const TextSpan(text: ", "),
-                                            TextSpan(
-                                              text: "Gizlilik Politikamız",
-                                              style: regularTextStyleUnderLine(
-                                                  textColor:
-                                                      AppColors.benekBlue,
-                                                  textFontSize: 12),
-                                              recognizer: TapGestureRecognizer()
-                                                ..onTap = () {
-                                                  showMarkdownModalSheet(context, 'assets/sozlesmeler/kisisel_verilerin_korunmasi_ve_gizlilik_politikasi.md');
-                                                },
-                                            ),
-                                            const TextSpan(text: "."),
-                                          ],
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              showMarkdownModalSheet(context,
+                                                  'assets/sozlesmeler/benek_hizmet_sozlesmesi.md');
+                                            },
                                         ),
-                                      ),
+                                        const TextSpan(text: ", "),
+                                        TextSpan(
+                                          text:
+                                              "Kişisel Verilerin Korunması Açık Rıza Metni ve Beyanı",
+                                          style: regularTextStyleUnderLine(
+                                              textColor: AppColors.benekBlue,
+                                              textFontSize: 12),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              showMarkdownModalSheet(context,
+                                                  'assets/sozlesmeler/kisisel_verilerin_korunmasi_acik_riza_beyani.md');
+                                            },
+                                        ),
+                                        const TextSpan(text: ", "),
+                                        TextSpan(
+                                          text: "Kullanıcı Aydınlatma Metni",
+                                          style: regularTextStyleUnderLine(
+                                              textColor: AppColors.benekBlue,
+                                              textFontSize: 12),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              showMarkdownModalSheet(context,
+                                                  'assets/sozlesmeler/kisisel_verilerin_korunmasi_kullanici_aydinlatma_metni.md');
+                                            },
+                                        ),
+                                        const TextSpan(text: ", "),
+                                        TextSpan(
+                                          text: "Gizlilik Politikamız",
+                                          style: regularTextStyleUnderLine(
+                                              textColor: AppColors.benekBlue,
+                                              textFontSize: 12),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              showMarkdownModalSheet(context,
+                                                  'assets/sozlesmeler/kisisel_verilerin_korunmasi_ve_gizlilik_politikasi.md');
+                                            },
+                                        ),
+                                        const TextSpan(text: "."),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 10),
                           BenekSmallButton(
                             iconData: Icons.arrow_forward_ios,
                             isLight: true,
-                            isPassive: !(
-                              _username.isNotEmpty
-                              && _email.contains("@") 
-                              && _email.contains(".com") 
-                              && _email.isNotEmpty 
-                              && _isimler != null
-                              && _isimler!.isNotEmpty
-                              && _isimler!.length > 1
-                              && _password.isNotEmpty
-                              && _isConsentGiven
-                            ),
+                            isPassive: !(_username.isNotEmpty &&
+                                _email.contains("@") &&
+                                _email.contains(".com") &&
+                                _isimler != null &&
+                                _isimler!.length > 1 &&
+                                _password.isNotEmpty &&
+                                _isConsentGiven &&
+                                _city.isNotEmpty),
                             onTap: () async {
                               String clientId = await getClientId();
 
                               String? firstname = _isimler![0];
-                              String? middlename = _isimler!.length > 2 ? _isimler![1] : null;
-                              String? lastname = _isimler!.length > 2 ? _isimler![2] : _isimler![1];
+                              String? middlename =
+                                  _isimler!.length > 2 ? _isimler![1] : null;
+                              String? lastname = _isimler!.length > 2
+                                  ? _isimler![2]
+                                  : _isimler![1];
 
-                              Store<AppState> store = AppReduxStore.currentStore!;
-                              await LocationHelper.getCurrentLocation(store);
-
-                              final currentLoc = store.state.currentLocation;
-
-                              if (currentLoc != null) {
-                                final lat = currentLoc.latitude;
-                                final lng = currentLoc.longitude;
-
-                                final isInsideTurkey = lat >= 36.0 && lat <= 42.0 && lng >= 26.0 && lng <= 45.0;
-
-                                if (!isInsideTurkey) {
-                                  BenekToastHelper.showErrorToast(
-                                    BenekStringHelpers.locale('operationFailed'),
-                                    "Türkiyenin dışındasınız, üye olabilmek için Türkiye'de olmalısınız.",
-                                    context,
-                                  );
-
-                                  return;
-                                }
-                              }
-
-                              final adress = await Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  opaque: false,
-                                  barrierDismissible: false,
-                                  pageBuilder: (context, _, __) => const ChooseLocationFromMapScreen(),
-                                ),
+                              var result = await signUpAction(
+                                _username,
+                                _email,
+                                _selectedGender,
+                                firstname,
+                                lastname,
+                                _city,
+                                _lat,
+                                _lng,
+                                _password,
+                                clientId,
+                                middlename,
                               );
 
-                              if (adress != null && adress is Map<String, dynamic>) {
-                                print("Adres seçildi: $adress");
-
-                                // final tc = await showTcKimlikPopup(context);
-                                // if (tc != null) {
-                                //   print("Girilen TC: $tc");
-                                //   // 🔐 Burada server'a gönderilebilir vs.
-                                // } else {
-                                //   BenekToastHelper.showErrorToast(
-                                //     "İptal Edildi", "TC Kimlik numarası girilmeden işlem devam edemez.", context,
-                                //   );
-                                //   return;
-                                // }
+                              if (!(result['success'] ?? true)) {
+                                BenekToastHelper.showErrorToast(
+                                  BenekStringHelpers.locale('operationFailed'),
+                                  result["message"],
+                                  context,
+                                );
+                                return;
                               }
 
-                              print( "clientId: $clientId, username: $_username, email: $_email, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $_password, isConsentGiven: $_isConsentGiven");
+                              // print('--- Signup Form Values ---');
+                              // print('Username: $_username');
+                              // print('Email: $_email');
+                              // print('Gender: $_selectedGender');
+                              // print('Firstname: $firstname');
+                              // print('Lastname: $lastname');
+                              // print('City: $_city');
+                              // print('Latitude: $_lat');
+                              // print('Longitude: $_lng');
+                              // print('Password: $_password');
+                              // print('Client ID: $clientId');
+                              // print('Middlename: $middlename');
+                              // print('---------------------------');
+
+                              // Başarılı ise ne yapılacağı
+
+                              showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    barrierColor: Colors.transparent,
+                                    builder: (context) {
+                                      return GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () =>
+                                            FocusScope.of(context).unfocus(),
+                                        child: LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            return Stack(
+                                              children: [
+                                                // 🔹 BLUR
+                                                Positioned.fill(
+                                                  child: BackdropFilter(
+                                                    filter: ImageFilter.blur(
+                                                        sigmaX: 10, sigmaY: 10),
+                                                    child: Container(
+                                                      color: AppColors
+                                                          .benekBlack
+                                                          .withAlpha(77),
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                // 🔹 KONTROLLÜ YÜKSEKLİK (yalnızca içerik kadar)
+                                                Align(
+                                                  alignment:
+                                                      Alignment.bottomCenter,
+                                                  child: AnimatedPadding(
+                                                    duration: const Duration(
+                                                        milliseconds: 150),
+                                                    curve: Curves.easeOut,
+                                                    padding: EdgeInsets.only(
+                                                      bottom:
+                                                          MediaQuery.of(context)
+                                                              .viewInsets
+                                                              .bottom,
+                                                    ),
+                                                    child: IntrinsicHeight(
+                                                      child: Container(
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                          color: Colors.black,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .vertical(
+                                                            top:
+                                                                Radius.circular(
+                                                                    20),
+                                                          ),
+                                                        ),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(24.0),
+                                                        child:
+                                                            PasswordTextfield(
+                                                                message:
+                                                                    "Epostana bir kod gönderdik :) "
+                                                                    "Lütfen e-postanı kontrol et ve kodu gir.",
+                                                                verifyingString:
+                                                                    _email,
+                                                                onDispatch: (String
+                                                                    code) async {
+                                                                  print(
+                                                                      "Kullanıcı kod girdi: $code");
+
+                                                                  bool
+                                                                      isSuccesful =
+                                                                      await UserInfoApi().postVerifyEmailOtpTrustedId(
+                                                                              code,
+                                                                              _email,
+                                                                              clientId) ??
+                                                                          false;
+
+                                                                  if (!isSuccesful) {
+                                                                    BenekToastHelper
+                                                                        .showErrorToast(
+                                                                      BenekStringHelpers
+                                                                          .locale(
+                                                                              'Error'),
+                                                                      "Hata oluştu!",
+                                                                      context,
+                                                                    );
+                                                                    return;
+                                                                  }
+
+                                                                  // Modal'ı kapat
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+
+                                                                  // Biraz bekle, sonra tekrar login olmaya çalış
+                                                                  await Future.delayed(
+                                                                      const Duration(
+                                                                          milliseconds:
+                                                                              300));
+
+                                                                  var result = await loginAction(
+                                                                      _email,
+                                                                      _password,
+                                                                      clientId
+                                                                  );
+
+                                                                  if (result['success'] ==  true) {
+                                                                    AuthUtils.setCredentials();
+                                                                  } else {
+                                                                    BenekToastHelper.showErrorToast(
+                                                                      BenekStringHelpers.locale('Error'),
+                                                                      "Email veya şifre hatalı!",
+                                                                      context,
+                                                                    );
+                                                                  }
+                                                                }),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  );
                             },
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 20),
                     ],
                   ),
