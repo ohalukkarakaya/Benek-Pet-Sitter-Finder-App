@@ -4,6 +4,7 @@ import 'package:benek/common/constants/app_screens_enum.dart';
 import 'package:benek/common/utils/state_utils/auth_utils/auth_utils.dart';
 import 'package:benek/common/utils/styles.text.dart';
 import 'package:benek/common/widgets/video_bg_widget/video_bg_widget.dart';
+import 'package:benek/presentation/shared/screens/home_screen.dart';
 import 'package:benek/presentation/shared/screens/login_screen.dart';
 
 import 'package:benek/store/app_redux_store.dart';
@@ -109,7 +110,7 @@ class _BenekHomePageState extends State<BenekHomePage> {
                                 ? LoginScreen() // Login Screen
                                 : store.state.activeScreen == AppScreenEnums.HOME_SCREEN
 
-                                      ? const SizedBox() // HomeScreen( store: store)
+                                      ? const HomeScreen() // HomeScreen( store: store)
                                       : store.state.activeScreen == AppScreenEnums.ERROR_SCREEN
 
                                           ? const SizedBox() // ErrorScreen( store: store, )
