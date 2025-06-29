@@ -1,3 +1,4 @@
+import 'package:benek/common/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -83,10 +84,11 @@ class _StoryWatchScreenState extends State<StoryWatchScreen> {
                           maxChildSize: 0.9,
                           builder: (context, scrollController) {
                             return Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                              decoration: BoxDecoration(
+                                color: AppColors.benekBlack.withAlpha((0.8 * 255).toInt()),
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                               ),
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
                               child: SingleChildScrollView(
                                 controller: scrollController,
                                 child: StoryContextWidget(

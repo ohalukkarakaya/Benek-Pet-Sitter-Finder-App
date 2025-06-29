@@ -1,7 +1,8 @@
 import 'package:benek/common/utils/styles.text.dart';
 import 'package:benek/common/widgets/story_context_component/tagged_pet_button_widget.dart';
 import 'package:benek/data/models/user_profile_models/user_profile_image_model.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 
 import '../../../data/models/story_models/story_about_data_model.dart';
 

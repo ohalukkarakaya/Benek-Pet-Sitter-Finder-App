@@ -85,7 +85,7 @@ class AppStaticTextsEn{
     'yearsOld': 'Years Old',
     'Female': 'Female',
     'Male': 'Male',
-    'beTheFirstOneToLike': 'Be the first one to like!',
+    'beTheFirstOneToLike': 'Be first one!',
     'peopleLiked': 'People Liked',
     'justYou': 'Just You',
     'post': 'Post',

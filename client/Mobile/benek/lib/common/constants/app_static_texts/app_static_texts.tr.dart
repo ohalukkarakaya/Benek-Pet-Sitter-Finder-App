@@ -85,7 +85,7 @@ class AppStaticTextsTr{
     'yearsOld': 'Yaşında',
     'Female': 'Dişi',
     'Male': 'Erkek',
-    'beTheFirstOneToLike': 'İlk Beğenen Sen Ol!',
+    'beTheFirstOneToLike': 'İlk Sen Beğen!',
     'peopleLiked': 'Kişi Beğendi',
     'justYou': 'Sadece Sen',
     'post': 'Gönder',

@@ -1,5 +1,6 @@
 import 'package:benek/common/utils/benek_string_helpers.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 import 'package:toastification/toastification.dart';
 
 import '../constants/app_colors.dart';

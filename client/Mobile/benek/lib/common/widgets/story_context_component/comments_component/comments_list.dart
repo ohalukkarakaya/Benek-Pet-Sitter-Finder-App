@@ -1,7 +1,8 @@
 import 'dart:developer';
 
 import 'package:benek/common/widgets/story_context_component/comments_component/comment_loading_element.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 import 'package:flutter_redux/flutter_redux.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';

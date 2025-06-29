@@ -1,7 +1,8 @@
 import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/styles.text.dart';
 import 'package:el_tooltip/el_tooltip.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 
 import '../../../../../../../common/constants/app_colors.dart';
 import '../../../../../../../common/constants/benek_icons.dart';

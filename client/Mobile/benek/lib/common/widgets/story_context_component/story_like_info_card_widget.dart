@@ -111,13 +111,15 @@ class _StoryLikeInfoCardWidgetState extends State<StoryLikeInfoCardWidget> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(
-                width: 150,
-                height: 35,
-                child: StoryFirstFiveLikedUserStackedWidget(
-                  totalLikeCount: story.likeCount ?? 0,
-                  users: story.firstFiveLikedUser ?? <UserInfo>[],
-                )
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 100), // veya istediğin bir limit
+                child: SizedBox(
+                  height: 35,
+                  child: StoryFirstFiveLikedUserStackedWidget(
+                    totalLikeCount: story.likeCount ?? 0,
+                    users: story.firstFiveLikedUser ?? <UserInfo>[],
+                  ),
+                ),
               ),
               Text(
                 '${BenekStringHelpers.formatNumberToReadable(story.likeCount ?? 0)} ${BenekStringHelpers.locale('peopleLiked')}',

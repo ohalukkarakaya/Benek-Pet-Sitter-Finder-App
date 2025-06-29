@@ -8,103 +8,58 @@ class PastCareGiversLoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final avatarSize = screenWidth * 0.08;       // İlk avatar boyutu (ör: %8)
+    final smallAvatarSize = screenWidth * 0.07;  // Üstteki ikinci avatar (ör: %7)
+    final smallBoxWidth = screenWidth * 0.02;    // Küçük kutucuk
+    final mediumBoxWidth = screenWidth * 0.12;   // Orta kutucuk
+    final shortBoxWidth = screenWidth * 0.10;    // Daha kısa kutucuk
+    final buttonWidth = screenWidth * 0.18;      // Sağdaki buton
+    final buttonHeight = avatarSize;             // Aynı yükseklik
+
     return Shimmer.fromColors(
       baseColor: AppColors.benekBlack.withAlpha((0.5 * 255).toInt()),
       highlightColor: AppColors.benekBlack.withAlpha((0.2 * 255).toInt()),
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      width: 35,
-                      height: 35,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    width: avatarSize,
+                    height: avatarSize,
+                    decoration: const BoxDecoration(
+                      color: AppColors.benekWhite,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: avatarSize * 0.4, top: avatarSize * 0.15),
+                    child: Container(
+                      width: smallAvatarSize,
+                      height: smallAvatarSize,
                       decoration: const BoxDecoration(
                         color: AppColors.benekWhite,
                         shape: BoxShape.circle,
                       ),
                     ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15.0, top: 5.0),
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: const BoxDecoration(
-                          color: AppColors.benekWhite,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(width: 10.0),
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 15,
-                          height: 15,
-                          decoration: BoxDecoration(
-                            color: AppColors.benekBlack,
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Container(
-                          width: 50,
-                          height: 15,
-                          decoration: BoxDecoration(
-                            color: AppColors.benekBlack,
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 5),
-
-                    Row(
-                      children: [
-                        Container(
-                          width: 15,
-                          height: 15,
-                          decoration: BoxDecoration(
-                            color: AppColors.benekBlack,
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Container(
-                          width: 40,
-                          height: 15,
-                          decoration: BoxDecoration(
-                            color: AppColors.benekBlack,
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-              ],
-            ),
-            Container(
-              width: 70,
-              height: 35,
-              decoration: BoxDecoration(
-                color: AppColors.benekBlack,
-                borderRadius: BorderRadius.circular(2.0),
+                  ),
+                ],
               ),
+            ],
+          ),
+          Container(
+            width: buttonWidth,
+            height: buttonHeight,
+            decoration: BoxDecoration(
+              color: AppColors.benekBlack,
+              borderRadius: BorderRadius.circular(2.0),
             ),
-          ]
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:benek/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 
 import '../../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../constants/app_colors.dart';

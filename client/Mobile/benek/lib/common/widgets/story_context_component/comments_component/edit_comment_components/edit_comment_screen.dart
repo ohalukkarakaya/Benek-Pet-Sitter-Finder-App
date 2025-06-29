@@ -5,7 +5,8 @@ import 'package:benek/presentation/shared/components/benek_process_indicator/ben
 import 'package:benek/presentation/shared/components/loading_components/benek_blured_modal_barier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 import 'package:flutter_redux/flutter_redux.dart';
 // ignore: depend_on_referenced_packages
 import 'package:redux/redux.dart';
@@ -38,7 +39,6 @@ class EditCommentScreen extends StatefulWidget {
 }
 
 class _EditCommentScreenState extends State<EditCommentScreen> {
-  late FocusNode _focusNodeEditComment;
   late final FocusScopeNode _focusScopeNodeEditComment;
   late final FocusNode _textFocusNodeEditComment;
   late final TextEditingController _textControllerEditComment;
@@ -56,7 +56,6 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
   @override
   void initState() {
     super.initState();
-    _focusNodeEditComment = FocusNode();
     _focusScopeNodeEditComment = FocusScopeNode();
     _textFocusNodeEditComment = FocusNode();
     _textControllerEditComment = TextEditingController();
@@ -74,7 +73,6 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
 
   @override
   void dispose() {
-    _focusNodeEditComment.dispose();
     _focusScopeNodeEditComment.dispose();
     _textFocusNodeEditComment.dispose();
     _textControllerEditComment.dispose();
@@ -84,9 +82,9 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
   @override
   Widget build(BuildContext context) {
     Store<AppState> store = StoreProvider.of<AppState>(context);
-    StoryModel story = store.state.storiesToDisplay!.firstWhere((StoryModel story) => story.storyId == widget.storyId);
-    CommentModel commentObject = story.comments!.firstWhere((CommentModel comment) => comment.id == widget.commentId);
-    CommentModel? replyObject = isReply ? commentObject.replies!.firstWhere((CommentModel reply) => reply.id == widget.replyId) : null;
+    StoryModel story = store.state.storiesToDisplay!.firstWhere((StoryModel s) => s.storyId == widget.storyId);
+    CommentModel commentObject = story.comments!.firstWhere((CommentModel c) => c.id == widget.commentId);
+    CommentModel? replyObject = isReply ? commentObject.replies!.firstWhere((CommentModel r) => r.id == widget.replyId) : null;
     CommentModel editingObject = isReply ? replyObject! : commentObject;
 
     return BenekBluredModalBarier(
@@ -98,15 +96,16 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
         backgroundColor: Colors.transparent,
         body: Center(
           child: Container(
-            width: 500,
-            height: 169,
+            width: MediaQuery.of(context).size.width > 600 ? 500 : MediaQuery.of(context).size.width * 0.9,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               color: isFocused ? AppColors.benekLightBlue : AppColors.benekBlack,
               borderRadius: BorderRadius.circular(6.0),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+            child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -117,8 +116,8 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
                         return Stack(
                           children: [
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 BenekCircleAvatar(
                                   imageUrl: editingObject.user!.profileImg!.imgUrl!,
@@ -128,27 +127,26 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
                                   bgColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
                                   borderWidth: 2.0,
                                 ),
-                                editingObject.lastThreeRepliedUsers != null && editingObject.lastThreeRepliedUsers!.isNotEmpty
-                                    ? LastThreeCommentReplierProfileStackWidget(
-                                  size: 30.0,
-                                  users: editingObject.lastThreeRepliedUsers!,
-                                  borderColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                )
-                                    : const SizedBox(),
+                                const SizedBox(height: 8),
+                                if (editingObject.lastThreeRepliedUsers != null && editingObject.lastThreeRepliedUsers!.isNotEmpty)
+                                  LastThreeCommentReplierProfileStackWidget(
+                                    size: 30.0,
+                                    users: editingObject.lastThreeRepliedUsers!,
+                                    borderColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                  ),
                               ],
                             ),
-                            editingObject.lastThreeRepliedUsers != null && editingObject.lastThreeRepliedUsers!.isNotEmpty
-                                ? Positioned(
-                              top: 40,
-                              bottom: 40,
-                              left: 15,
-                              child: Container(
-                                width: 1.0,
-                                color: AppColors.benekGrey,
-                                height: constraints.maxHeight,
+                            if (editingObject.lastThreeRepliedUsers != null && editingObject.lastThreeRepliedUsers!.isNotEmpty)
+                              Positioned(
+                                top: 40,
+                                bottom: 40,
+                                left: 15,
+                                child: Container(
+                                  width: 1.0,
+                                  color: AppColors.benekGrey,
+                                  height: constraints.maxHeight,
+                                ),
                               ),
-                            )
-                                : const SizedBox(),
                           ],
                         );
                       },
@@ -157,14 +155,18 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                editingObject.user!.userName!,
-                                style: semiBoldTextWithoutColorStyle().copyWith(
-                                  color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                              Flexible(
+                                child: Text(
+                                  editingObject.user!.userName!,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: semiBoldTextWithoutColorStyle().copyWith(
+                                    color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                  ),
                                 ),
                               ),
                               Text(
@@ -177,38 +179,22 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
                             ],
                           ),
                           const SizedBox(height: 4.0),
-                          SizedBox(
-                            height: 50.0,
-                            child: ScrollConfiguration(
-                              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                              child: SingleChildScrollView(
-                                physics: const BouncingScrollPhysics(),
-                                child: FocusScope(
-                                  node: _focusScopeNodeEditComment,
-                                  child: TextFormField(
-                                    focusNode: _textFocusNodeEditComment,
-                                    controller: _textControllerEditComment,
-                                    maxLength: 200,
-                                    onChanged: (value) {
-                                      setState(() {});
-                                    },
-                                    maxLines: null,
-                                    keyboardType: TextInputType.multiline,
-                                    cursorColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                    style: lightTextStyle(textColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite),
-                                    textAlignVertical: TextAlignVertical.top,
-                                    decoration: InputDecoration(
-                                      counterText: '',
-                                      hintText: isReply
-                                          ? BenekStringHelpers.locale('writeAReply')
-                                          : BenekStringHelpers.locale('writeAComment'),
-                                      hintStyle: isFocused ? lightTextStyle(textColor: AppColors.benekGrey) : null,
-                                      contentPadding: EdgeInsets.zero,
-                                      border: InputBorder.none,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                          TextFormField(
+                            focusNode: _textFocusNodeEditComment,
+                            controller: _textControllerEditComment,
+                            maxLength: 200,
+                            onChanged: (value) => setState(() {}),
+                            maxLines: null,
+                            keyboardType: TextInputType.multiline,
+                            cursorColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                            style: lightTextStyle(textColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite),
+                            decoration: InputDecoration(
+                              counterText: '',
+                              hintText: isReply
+                                  ? BenekStringHelpers.locale('writeAReply')
+                                  : BenekStringHelpers.locale('writeAComment'),
+                              hintStyle: isFocused ? lightTextStyle(textColor: AppColors.benekGrey) : null,
+                              border: InputBorder.none,
                             ),
                           ),
                           const SizedBox(height: 10.0),
@@ -217,16 +203,11 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
                             children: [
                               Row(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      log('Reply to comment');
-                                    },
-                                    child: Text(
-                                      '${editingObject.replyCount} ${BenekStringHelpers.locale('reply')}',
-                                      style: regularTextWithoutColorStyle().copyWith(
-                                        color: AppColors.benekGrey,
-                                        fontSize: 12.0,
-                                      ),
+                                  Text(
+                                    '${editingObject.replyCount} ${BenekStringHelpers.locale('reply')}',
+                                    style: regularTextWithoutColorStyle().copyWith(
+                                      color: AppColors.benekGrey,
+                                      fontSize: 12.0,
                                     ),
                                   ),
                                   Text(
@@ -268,15 +249,15 @@ class _EditCommentScreenState extends State<EditCommentScreen> {
                                 },
                                 icon: !isSendingRequest
                                     ? Icon(
-                                      Icons.send,
-                                      color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                      size: 15,
-                                    )
+                                        Icons.send,
+                                        color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                        size: 15,
+                                      )
                                     : BenekProcessIndicator(
-                                      color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                      width: 15.0,
-                                      height: 15.0,
-                                    ),
+                                        color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                        width: 15.0,
+                                        height: 15.0,
+                                      ),
                               ),
                             ],
                           ),

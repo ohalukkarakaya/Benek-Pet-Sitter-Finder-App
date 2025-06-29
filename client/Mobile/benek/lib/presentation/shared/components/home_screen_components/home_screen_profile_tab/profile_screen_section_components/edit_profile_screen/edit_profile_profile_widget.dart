@@ -1,7 +1,8 @@
 import 'package:benek/data/models/user_profile_models/user_profile_image_model.dart';
 import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/edit_profile_screen/upload_profile_image_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 
 import '../../../../../../../../common/utils/benek_string_helpers.dart';
 import '../../../../../../../../common/utils/styles.text.dart';

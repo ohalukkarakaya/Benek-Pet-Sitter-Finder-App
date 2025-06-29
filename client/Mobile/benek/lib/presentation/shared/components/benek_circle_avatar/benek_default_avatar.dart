@@ -1,6 +1,7 @@
 import 'dart:developer';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 
 class BenekDefaultAvatar extends StatelessWidget {
   final String backgroundImagePath;

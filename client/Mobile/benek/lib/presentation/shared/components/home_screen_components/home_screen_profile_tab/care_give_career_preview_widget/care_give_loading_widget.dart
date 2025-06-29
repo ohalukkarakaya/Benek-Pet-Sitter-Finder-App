@@ -8,87 +8,42 @@ class CareGiveLoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Profil dairesinin boyutu
+    final avatarSize = screenWidth * 0.08; // ör: %8
+    final smallBoxWidth = screenWidth * 0.04; // ör: %4
+    final mediumBoxWidth = screenWidth * 0.15; // ör: %15
+    final largeBoxWidth = screenWidth * 0.25; // ör: %25
+    final buttonWidth = screenWidth * 0.25; // ör: %25
+
     return Shimmer.fromColors(
-      baseColor: AppColors.benekBlack.withOpacity(0.4),
-      highlightColor: AppColors.benekBlack.withOpacity(0.2),
+      baseColor: AppColors.benekBlack.withAlpha((0.4 * 255).toInt()),
+      highlightColor: AppColors.benekBlack.withAlpha((0.2 * 255).toInt()),
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 35,
-                  height: 35,
-                  decoration: const BoxDecoration(
-                    color: AppColors.benekWhite,
-                    shape: BoxShape.circle,
-                  ),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: avatarSize,
+                height: avatarSize,
+                decoration: const BoxDecoration(
+                  color: AppColors.benekWhite,
+                  shape: BoxShape.circle,
                 ),
-
-                const SizedBox(width: 10.0),
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 15,
-                          height: 15,
-                          decoration: BoxDecoration(
-                            color: AppColors.benekBlack,
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Container(
-                          width: 70,
-                          height: 15,
-                          decoration: BoxDecoration(
-                            color: AppColors.benekBlack,
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 5),
-
-                    Row(
-                      children: [
-                        Container(
-                          width: 15,
-                          height: 15,
-                          decoration: BoxDecoration(
-                            color: AppColors.benekBlack,
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Container(
-                          width: 60,
-                          height: 15,
-                          decoration: BoxDecoration(
-                            color: AppColors.benekBlack,
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-              ],
-            ),
-            Container(
-              width: 100,
-              height: 35,
-              decoration: BoxDecoration(
-                color: AppColors.benekBlack,
-                borderRadius: BorderRadius.circular(2.0),
               ),
+            ],
+          ),
+          Container(
+            width: buttonWidth,
+            height: avatarSize,
+            decoration: BoxDecoration(
+              color: AppColors.benekBlack,
+              borderRadius: BorderRadius.circular(2.0),
             ),
-          ]
+          ),
+        ],
       ),
     );
   }

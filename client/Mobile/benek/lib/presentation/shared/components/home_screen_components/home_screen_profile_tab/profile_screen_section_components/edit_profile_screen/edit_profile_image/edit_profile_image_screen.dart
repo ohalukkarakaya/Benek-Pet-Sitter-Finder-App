@@ -4,7 +4,8 @@ import 'package:benek/presentation/shared/components/benek_circle_avatar/benek_d
 import 'package:benek/presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
 import 'package:benek/presentation/shared/components/loading_components/benek_blured_modal_barier.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';

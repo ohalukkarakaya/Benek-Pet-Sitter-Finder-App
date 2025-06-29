@@ -3,7 +3,8 @@ import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/styles.text.dart';
 import 'package:benek/data/models/pet_models/pet_model.dart';
 import 'package:benek/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 
 class TaggedPetButtonWidget extends StatefulWidget {
   final PetModel pet;

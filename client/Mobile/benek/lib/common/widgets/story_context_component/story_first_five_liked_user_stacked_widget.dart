@@ -2,7 +2,8 @@ import 'package:avatar_stack/avatar_stack.dart';
 import 'package:avatar_stack/positions.dart';
 import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/styles.text.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 
 import '../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
