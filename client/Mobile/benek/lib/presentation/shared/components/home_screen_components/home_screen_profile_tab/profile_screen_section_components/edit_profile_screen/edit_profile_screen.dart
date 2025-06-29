@@ -55,6 +55,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final Store<AppState> store = StoreProvider.of<AppState>(context);
 
     UserInfo userInfo = store.state.userInfo!;
+    double horizontalPadding = MediaQuery.of(context).size.width > 800 ? 260.0 : 20.0;
+
 
     return BenekBluredModalBarier(
       isDismissible: true,
@@ -64,7 +66,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 260.0),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Center(
             child: ScrollConfiguration(
               behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),

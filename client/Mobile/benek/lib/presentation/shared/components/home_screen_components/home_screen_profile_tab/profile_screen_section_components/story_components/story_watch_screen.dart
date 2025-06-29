@@ -1,4 +1,7 @@
 import 'package:benek/common/constants/app_colors.dart';
+import 'package:benek/common/constants/benek_icons.dart';
+import 'package:benek/common/utils/benek_string_helpers.dart';
+import 'package:benek/common/widgets/story_context_component/story_desc_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -17,6 +20,7 @@ class StoryWatchScreen extends StatefulWidget {
 class _StoryWatchScreenState extends State<StoryWatchScreen> {
   late PageController _pageController;
   final FocusNode _focusNode = FocusNode();
+  bool isContextOpen = false;
 
   @override
   void initState() {
@@ -68,45 +72,75 @@ class _StoryWatchScreenState extends State<StoryWatchScreen> {
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
                 ),
+                // Sol üst köşe çıkış ikonu
                 Positioned(
-                  bottom: 40,
-                  right: 20,
+                  top: 40,
+                  left: 20,
                   child: IconButton(
-                    icon: const Icon(Icons.more_vert, color: Colors.white, size: 28),
+                    icon: const Icon(BenekIcons.left, color: Colors.white),
                     onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) => DraggableScrollableSheet(
-                          initialChildSize: 0.7,
-                          minChildSize: 0.3,
-                          maxChildSize: 0.9,
-                          builder: (context, scrollController) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.benekBlack.withAlpha((0.8 * 255).toInt()),
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: SingleChildScrollView(
-                                controller: scrollController,
-                                child: StoryContextWidget(
-                                  story: story,
-                                  closeFunction: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      );
+                      Navigator.of(context).pop( story.storyId );
                     },
                   ),
                 ),
+                // Alt açıklama ve context
+                !isContextOpen 
+                  ? Positioned(
+                    bottom: 40,
+                    left: MediaQuery.of(context).size.width * 0.05,
+                    right: MediaQuery.of(context).size.width * 0.05,
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: GestureDetector(
+                        onTap: () async {
+                          setState(() {
+                            isContextOpen = true;
+                          });
+                          await showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => DraggableScrollableSheet(
+                              initialChildSize: 0.7,
+                              minChildSize: 0.3,
+                              maxChildSize: 0.9,
+                              builder: (context, scrollController) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.benekBlack.withAlpha((0.8 * 255).toInt()),
+                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: SingleChildScrollView(
+                                    controller: scrollController,
+                                    child: StoryContextWidget(
+                                      story: story,
+                                      closeFunction: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                          setState(() {
+                            isContextOpen = false;
+                          });
+                        },
+                        child: StoryDescWidget(
+                          profileImg: story.user?.profileImg,
+                          desc: story.desc,
+                          about: story.about,
+                          createdAt: BenekStringHelpers.getDateAsString(story.createdAt!),
+                        ),
+                      ),
+                    ),
+                  )
+                  : const SizedBox(),
               ],
             );
+
           },
         ),
       ),

@@ -2,15 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:benek/common/widgets/vertical_video_companent/video_loading_widget.dart';
-import 'package:benek/presentation/shared/components/benek_circle_avatar/benek_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 
 import '../../../data/models/user_profile_models/user_info_model.dart';
 import '../../../presentation/features/image_video_helpers/image_video_helpers.dart';
-
-import '../../constants/app_colors.dart';
 
 class VerticalContentComponent extends StatefulWidget {
   final bool isLocalAsset;
@@ -158,34 +155,6 @@ class _VerticalContentComponentState extends State<VerticalContentComponent> {
             ),
           )
               : const SizedBox(),
-          Positioned(
-            bottom: 20,
-            left: 20,
-            child: Row(
-              children: [
-                BenekCircleAvatar(
-                  borderWidth: 2,
-                  isDefaultAvatar: widget.user.profileImg!.isDefaultImg!,
-                  imageUrl: widget.user.profileImg!.imgUrl!,
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withAlpha((0.5 * 255).toInt()),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    widget.user.userName ?? '',
-                    style: const TextStyle(
-                      color: AppColors.benekWhite,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
 
         ],
       )

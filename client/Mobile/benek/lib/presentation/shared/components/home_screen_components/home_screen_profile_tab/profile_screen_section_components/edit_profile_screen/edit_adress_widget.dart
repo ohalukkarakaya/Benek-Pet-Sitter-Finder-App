@@ -20,37 +20,52 @@ class EditAdressWidget extends StatefulWidget {
 
 class _EditAdressWidgetState extends State<EditAdressWidget> {
   bool idle = true;
+  
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        ProfileAdresMapWidget(
-          userLocation: widget.userInfo.location!,
-        ),
-        ProfileAdressWidget(
-          isEdit: true,
-          openAdress: widget.userInfo.identity?.openAdress,
-          isDark: true,
-          location: widget.userInfo.location,
-          width: 450,
-          longButtonWidth: 350,
-          onEdit: () async {
-            await Navigator.push(
-              context,
-              PageRouteBuilder(
-                opaque: false,
-                barrierDismissible: false,
-                pageBuilder: (context, _, __) => ChooseLocationFromMapScreen( userInfo: widget.userInfo,),
-              ),
-            );
+Widget build(BuildContext context) {
+  double screenWidth = MediaQuery.of(context).size.width;
 
-            setState(() {
-              idle = !idle;
-            });
-          },
-        ),
-      ],
-    );
+  double widgetWidth;
+  double longButtonWidth;
+
+  if (screenWidth > 1000) {
+    widgetWidth = 450;
+    longButtonWidth = 350;
+  } else if (screenWidth > 700) {
+    widgetWidth = screenWidth * 0.6;
+    longButtonWidth = screenWidth * 0.5;
+  } else {
+    widgetWidth = screenWidth * 0.9;
+    longButtonWidth = screenWidth * 0.8;
   }
+
+  return Center( // 👈 Row yerine Center kullan
+    child: ProfileAdressWidget(
+      isEdit: true,
+      openAdress: widget.userInfo.identity?.openAdress,
+      isDark: true,
+      location: widget.userInfo.location,
+      width: widgetWidth,
+      longButtonWidth: longButtonWidth,
+      onEdit: () async {
+        await Navigator.push(
+          context,
+          PageRouteBuilder(
+            opaque: false,
+            barrierDismissible: false,
+            pageBuilder: (context, _, __) => ChooseLocationFromMapScreen(
+              userInfo: widget.userInfo,
+            ),
+          ),
+        );
+
+        setState(() {
+          idle = !idle;
+        });
+      },
+    ),
+  );
+}
+
+
 }

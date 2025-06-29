@@ -67,7 +67,9 @@ class _EditTextScreenState extends State<EditTextScreen> {
 
   @override
   Widget build(BuildContext context) {
-
+    double containerWidth = MediaQuery.of(context).size.width > 550
+        ? 500
+        : MediaQuery.of(context).size.width * 0.9;
 
     return BenekBluredModalBarier(
       isDismissible: true,
@@ -78,15 +80,18 @@ class _EditTextScreenState extends State<EditTextScreen> {
         backgroundColor: Colors.transparent,
         body: Center(
           child: Container(
-            width: 500,
-            height: 148,
+            width: containerWidth,
+            constraints: const BoxConstraints(
+              minHeight: 148,
+              maxHeight: 160
+            ),
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               color: isFocused ? AppColors.benekLightBlue : AppColors.benekBlack,
               borderRadius: BorderRadius.circular(6.0),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -96,8 +101,7 @@ class _EditTextScreenState extends State<EditTextScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            height: 50.0,
+                          Flexible(
                             child: ScrollConfiguration(
                               behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
                               child: SingleChildScrollView(
@@ -114,7 +118,9 @@ class _EditTextScreenState extends State<EditTextScreen> {
                                     maxLines: null,
                                     keyboardType: TextInputType.multiline,
                                     cursorColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                    style: lightTextStyle(textColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite),
+                                    style: lightTextStyle(
+                                      textColor: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                    ),
                                     textAlignVertical: TextAlignVertical.top,
                                     decoration: InputDecoration(
                                       counterText: '',
@@ -135,7 +141,7 @@ class _EditTextScreenState extends State<EditTextScreen> {
                               IconButton(
                                 padding: EdgeInsets.zero,
                                 onPressed: () async {
-                                  if( widget.onDispatch != null ){ // edit bio
+                                  if (widget.onDispatch != null) {
                                     if (!isSendingRequest) {
                                       setState(() {
                                         isSendingRequest = true;
@@ -146,22 +152,21 @@ class _EditTextScreenState extends State<EditTextScreen> {
                                       });
                                       Navigator.of(context).pop(_textControllerEditProfileTex.text);
                                     }
-                                  }else{ // punishment
+                                  } else {
                                     Navigator.of(context).pop(_textControllerEditProfileTex.text);
                                   }
-
                                 },
                                 icon: !isSendingRequest
                                     ? Icon(
-                                      Icons.send,
-                                      color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                      size: 15,
-                                    )
+                                        Icons.send,
+                                        color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                        size: 15,
+                                      )
                                     : BenekProcessIndicator(
-                                      color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
-                                      width: 15.0,
-                                      height: 15.0,
-                                    ),
+                                        color: isFocused ? AppColors.benekBlack : AppColors.benekWhite,
+                                        width: 15.0,
+                                        height: 15.0,
+                                      ),
                               ),
                             ],
                           ),

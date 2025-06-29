@@ -36,67 +36,69 @@ class _EditedBioRowState extends State<EditedBioRow> {
   Widget build(BuildContext context) {
     Store<AppState> store = StoreProvider.of<AppState>(context);
 
-    return Row(
-      children: [
-        Stack(
-          children: [
-            Container(
-              width: 680,
-              decoration: const BoxDecoration(
-                color: AppColors.benekBlack,
-                borderRadius: BorderRadius.all(Radius.circular(6.0)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 35.0),
-                child: Center(
-                  child: Wrap(
-                    children: [
-                      Text(
-                        bioToDisplay,
-                        textAlign: TextAlign.center,
-                        style: planeTextWithoutWeightStyle(
-                          textColor: AppColors.benekWhite,
-                        ),
+    double containerWidth = MediaQuery.of(context).size.width > 700
+        ? 680
+        : MediaQuery.of(context).size.width * 0.9;
+
+    return Center(
+      child: Stack(
+        children: [
+          Container(
+            width: containerWidth,
+            decoration: const BoxDecoration(
+              color: AppColors.benekBlack,
+              borderRadius: BorderRadius.all(Radius.circular(6.0)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 35.0),
+              child: Center(
+                child: Wrap(
+                  children: [
+                    Text(
+                      bioToDisplay,
+                      textAlign: TextAlign.center,
+                      style: planeTextWithoutWeightStyle(
+                        textColor: AppColors.benekWhite,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            Positioned(
-              top: 0,
-              left: 0,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(6.0),
-                ),
-                child: EditBioButton(
-                  onTap: () async {
-
-                    String? newBio = await Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        opaque: false,
-                        barrierDismissible: false,
-                        pageBuilder: (context, _, __) => EditTextScreen(
-                          textToEdit: widget.bio,
-                          onDispatch: (text) => store.dispatch(updateBioRequestAction(text)),
-                        ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(6.0),
+              ),
+              child: EditBioButton(
+                onTap: () async {
+                  String? newBio = await Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      opaque: false,
+                      barrierDismissible: false,
+                      pageBuilder: (context, _, __) => EditTextScreen(
+                        textToEdit: widget.bio,
+                        onDispatch: (text) => store.dispatch(updateBioRequestAction(text)),
                       ),
-                    );
+                    ),
+                  );
 
-                    if(newBio == null)return;
+                  if (newBio == null) return;
 
-                    setState(() {
-                      bioToDisplay = newBio;
-                    });
-                  },
-                ),
+                  setState(() {
+                    bioToDisplay = newBio;
+                  });
+                },
               ),
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
+
 }
