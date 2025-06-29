@@ -1,6 +1,5 @@
 import 'package:benek/presentation/shared/components/benek_process_indicator/benek_process_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
 // ignore: depend_on_referenced_packages

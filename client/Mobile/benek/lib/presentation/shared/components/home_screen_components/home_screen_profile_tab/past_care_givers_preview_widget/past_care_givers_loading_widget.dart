@@ -12,9 +12,6 @@ class PastCareGiversLoadingWidget extends StatelessWidget {
 
     final avatarSize = screenWidth * 0.08;       // İlk avatar boyutu (ör: %8)
     final smallAvatarSize = screenWidth * 0.07;  // Üstteki ikinci avatar (ör: %7)
-    final smallBoxWidth = screenWidth * 0.02;    // Küçük kutucuk
-    final mediumBoxWidth = screenWidth * 0.12;   // Orta kutucuk
-    final shortBoxWidth = screenWidth * 0.10;    // Daha kısa kutucuk
     final buttonWidth = screenWidth * 0.18;      // Sağdaki buton
     final buttonHeight = avatarSize;             // Aynı yükseklik
 

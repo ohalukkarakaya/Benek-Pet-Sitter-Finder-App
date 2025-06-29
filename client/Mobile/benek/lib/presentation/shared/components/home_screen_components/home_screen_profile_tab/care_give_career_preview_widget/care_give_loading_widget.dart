@@ -12,9 +12,6 @@ class CareGiveLoadingWidget extends StatelessWidget {
 
     // Profil dairesinin boyutu
     final avatarSize = screenWidth * 0.08; // ör: %8
-    final smallBoxWidth = screenWidth * 0.04; // ör: %4
-    final mediumBoxWidth = screenWidth * 0.15; // ör: %15
-    final largeBoxWidth = screenWidth * 0.25; // ör: %25
     final buttonWidth = screenWidth * 0.25; // ör: %25
 
     return Shimmer.fromColors(

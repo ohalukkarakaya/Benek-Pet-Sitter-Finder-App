@@ -3,7 +3,6 @@ import 'package:benek/common/widgets/reset_password_info_page.dart';
 import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/edit_profile_screen/password_input_widget.dart';
 import 'package:benek/presentation/shared/components/loading_components/benek_blured_modal_barier.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../../../../../common/constants/app_colors.dart';

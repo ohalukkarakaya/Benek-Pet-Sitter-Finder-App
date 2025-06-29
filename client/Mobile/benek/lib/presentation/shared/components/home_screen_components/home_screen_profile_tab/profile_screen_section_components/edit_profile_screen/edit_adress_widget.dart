@@ -1,8 +1,6 @@
 import 'package:benek/data/models/user_profile_models/user_info_model.dart';
 import 'package:flutter/material.dart';
 
-
-import '../adress_row/adress_map.dart';
 import '../profile_adress_widget.dart';
 import 'choose_location_from_map/choose_location_from_map_screen.dart';
 
