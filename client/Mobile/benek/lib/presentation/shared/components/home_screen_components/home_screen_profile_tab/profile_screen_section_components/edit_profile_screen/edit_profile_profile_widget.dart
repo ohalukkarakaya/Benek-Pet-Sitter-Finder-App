@@ -26,50 +26,54 @@ class _EditProfileProfileWidgetState extends State<EditProfileProfileWidget> {
   bool idle = false;
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        UploadProfileImageButton(
-          userInfo: widget.userInfo,
-          onTap: () async {
-            UserProfileImg? newImage = await Navigator.push(
-              context,
-              PageRouteBuilder(
-                opaque: false,
-                barrierDismissible: false,
-                pageBuilder: (context, _, __) => const EditProfileImageScreen(),
-              ),
-            );
+Widget build(BuildContext context) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      UploadProfileImageButton(
+        userInfo: widget.userInfo,
+        onTap: () async {
+          UserProfileImg? newImage = await Navigator.push(
+            context,
+            PageRouteBuilder(
+              opaque: false,
+              barrierDismissible: false,
+              pageBuilder: (context, _, __) => const EditProfileImageScreen(),
+            ),
+          );
 
-            if (newImage != null) {
-              widget.userInfo.profileImg = newImage;
-              setState(() { idle = !idle; });
-            }
-          },
-        ),
-        const SizedBox(width: 20.0,),
-        Column(
+          if (newImage != null) {
+            widget.userInfo.profileImg = newImage;
+            setState(() { idle = !idle; });
+          }
+        },
+      ),
+      const SizedBox(width: 20.0),
+      Expanded( // 👈 burada
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextWithCharacterLimitControlledComponent(
               text: BenekStringHelpers.getUsersFullName(
-                  widget.userInfo.identity!.firstName!,
-                  widget.userInfo.identity!.lastName!,
-                  widget.userInfo.identity!.middleName
+                widget.userInfo.identity!.firstName!,
+                widget.userInfo.identity!.lastName!,
+                widget.userInfo.identity!.middleName,
               ),
               characterLimit: 20,
               fontSize: 15.0,
             ),
-            const SizedBox(height: 2.0,),
+            const SizedBox(height: 2.0),
             Text(
-                "@${widget.userInfo.userName}",
-                style: regularTextWithoutColorStyle()
+              "@${widget.userInfo.userName}",
+              style: regularTextWithoutColorStyle(),
+              overflow: TextOverflow.ellipsis, // ek güvenlik
             ),
           ],
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
+
 }

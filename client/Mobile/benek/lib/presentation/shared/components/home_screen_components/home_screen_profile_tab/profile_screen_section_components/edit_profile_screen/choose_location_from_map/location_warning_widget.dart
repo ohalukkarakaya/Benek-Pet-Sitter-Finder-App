@@ -10,58 +10,62 @@ class LocationWarningWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double containerWidth = screenWidth > 600 ? 500 : screenWidth * 0.9;
+    double contentWidth = screenWidth > 600 ? 450 : screenWidth * 0.8;
+
     return Padding(
-      padding: const EdgeInsets.only(top: 30.0, left: 20),
+      padding: const EdgeInsets.only(top: 30.0, left: 20, right: 20),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(6.0),
         child: Container(
-          width: 500,
-          height: 80,
-          color: AppColors.benekBlack.withOpacity(0.8), // Açık turuncu arkaplan rengi
+          width: containerWidth,
+          constraints: const BoxConstraints(minHeight: 80, maxHeight: 80),
+          color: AppColors.benekBlack.withAlpha((0.8 * 255).toInt()),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
-                width: 5.0, // Sol taraf ince koyu turuncu dikdörtgen
+                width: 5.0,
                 height: 80.0,
-                color: AppColors.benekWarningOrange, // Koyu turuncu renk
+                color: AppColors.benekWarningOrange,
               ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: SizedBox(
-                  width: 450.0,
-                  height: 80,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        Icons.warning_rounded, // Uyarı ikonu
-                        color: AppColors.benekWarningOrange, // Koyu turuncu renk
-                      ),
-                      const SizedBox(width: 10.0), // Boşluk
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                BenekStringHelpers.locale('chooseYourLocationCaption'), // Başlık
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: SizedBox(
+                    width: contentWidth,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.warning_rounded,
+                          color: AppColors.benekWarningOrange,
+                        ),
+                        const SizedBox(width: 10.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                BenekStringHelpers.locale('chooseYourLocationCaption'),
                                 style: boldTextStyle(
-                                  textColor: AppColors.benekWarningOrange, // Koyu turuncu renk
+                                  textColor: AppColors.benekWarningOrange,
                                   textFontSize: 14.0,
-                                )
-                            ),
-                            SizedBox(height: 5.0), // Başlık ile açıklama arası boşluk
-                            Text(
-                                BenekStringHelpers.locale('chooseYourLocationDesc'), // Açıklama
+                                ),
+                              ),
+                              const SizedBox(height: 5.0),
+                              Text(
+                                BenekStringHelpers.locale('chooseYourLocationDesc'),
                                 style: regularTextStyle(
                                   textColor: AppColors.benekWhite,
-                                )
-                            ),
-                          ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               )

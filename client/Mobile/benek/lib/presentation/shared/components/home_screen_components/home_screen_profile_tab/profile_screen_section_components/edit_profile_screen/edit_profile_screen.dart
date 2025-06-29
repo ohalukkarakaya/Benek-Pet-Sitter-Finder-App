@@ -185,41 +185,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                decoration: const BoxDecoration(
-                                  color: AppColors.benekBlack,
-                                  borderRadius: BorderRadius.all(Radius.circular(6.0)),
-                                ),
-                                padding: const EdgeInsets.symmetric( horizontal: 21.2, vertical: 25.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const FaIcon(
-                                        FontAwesomeIcons.lock,
-                                        color: AppColors.benekWhite,
-                                        size: 20.0
-                                    ),
-                                    const SizedBox(width: 10.0,),
-                                    Text(
-                                      BenekStringHelpers.locale('changePassword'),
-                                      style: semiBoldTextStyle(
-                                        textColor: AppColors.benekWhite,
-                                        textFontSize: 14.0,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              const SizedBox(width: 10.0,),
-
-                              PasswordInputWidget(
-                                onDispatch: (oldPassword, newPassword) => store.dispatch(updatePasswordRequestAction(newPassword, oldPassword, oldPassword)),
-                              )
-                            ],
+                          
+                          PasswordInputWidget(
+                            onDispatch: (oldPassword, newPassword) => store.dispatch(updatePasswordRequestAction(newPassword, oldPassword, oldPassword)),
                           ),
 
                           const SizedBox(height: 20.0,),

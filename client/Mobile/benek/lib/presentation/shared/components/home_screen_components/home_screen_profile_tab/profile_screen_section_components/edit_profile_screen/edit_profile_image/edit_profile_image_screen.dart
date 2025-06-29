@@ -41,165 +41,171 @@ class _EditProfileImageScreenState extends State<EditProfileImageScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final Store<AppState> store = StoreProvider.of<AppState>(context);
-    UserInfo userInfo = store.state.userInfo!;
-    bool isNetWorkImage = !(userInfo.profileImg!.isDefaultImg!);
+Widget build(BuildContext context) {
+  final double screenWidth = MediaQuery.of(context).size.width;
 
-    DefaultAvatarUrl? defaultAvatarUrlObject;
-    if( userInfo.profileImg!.isDefaultImg! ){
-      defaultAvatarUrlObject = parseDefaultAvatarUrl(userInfo.profileImg!.imgUrl!);
-    }
+  // Sadece mobil (600 px ve altı)
+  if (screenWidth > 600) {
+    return const SizedBox.shrink(); // Render etmiyoruz
+  }
 
-    double generalWidth = 250;
+  final Store<AppState> store = StoreProvider.of<AppState>(context);
+  UserInfo userInfo = store.state.userInfo!;
+  bool isNetWorkImage = !(userInfo.profileImg!.isDefaultImg!);
 
-    return BenekBluredModalBarier(
-      isDismissible: true,
-      onDismiss: () {
-        Navigator.of(context).pop();
-      },
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 260.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      width: generalWidth,
-                      height: generalWidth,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6.0),
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 4.0,
-                        ),
-                        image: isNetWorkImage
-                        ? DecorationImage(
-                            image: NetworkImage(
-                                imagePath,
-                                headers: { "private-key": dotenv.env['MEDIA_SERVER_API_KEY']! },
-                            ),
-                            fit: BoxFit.cover,
-                          )
-                        : null
+  DefaultAvatarUrl? defaultAvatarUrlObject;
+  if (userInfo.profileImg!.isDefaultImg!) {
+    defaultAvatarUrlObject = parseDefaultAvatarUrl(userInfo.profileImg!.imgUrl!);
+  }
+
+  double generalWidth = 250;
+
+  return BenekBluredModalBarier(
+    isDismissible: true,
+    onDismiss: () {
+      Navigator.of(context).pop();
+    },
+    child: Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0), // mobilde daralt
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 👇 Senin mevcut container avatar kodların
+              Stack(
+                children: [
+                  Container(
+                    width: generalWidth,
+                    height: generalWidth,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6.0),
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 4.0,
                       ),
-                      child: !isNetWorkImage
-                        ? BenekDefaultAvatar(
-                          backgroundImagePath: defaultAvatarUrlObject!.backgroundPath,
-                          avatarImagePath: defaultAvatarUrlObject.avatarPath,
-                          width: generalWidth,
-                          height: generalWidth,
-                          borderRadius: 0.0,
-                          isPet: userInfo.profileImg!.imgUrl!.startsWith('P/'),
-                        )
-                        : null,
+                      image: isNetWorkImage
+                          ? DecorationImage(
+                              image: NetworkImage(
+                                imagePath,
+                                headers: {
+                                  "private-key": dotenv.env['MEDIA_SERVER_API_KEY']!
+                                },
+                              ),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
                     ),
+                    child: !isNetWorkImage
+                        ? BenekDefaultAvatar(
+                            backgroundImagePath: defaultAvatarUrlObject!.backgroundPath,
+                            avatarImagePath: defaultAvatarUrlObject.avatarPath,
+                            width: generalWidth,
+                            height: generalWidth,
+                            borderRadius: 0.0,
+                            isPet: userInfo.profileImg!.imgUrl!.startsWith('P/'),
+                          )
+                        : null,
+                  ),
+                  isLoading
+                      ? const Positioned(
+                          top: 100,
+                          left: 100,
+                          child: BenekProcessIndicator(
+                            width: 50,
+                            height: 50,
+                            color: AppColors.benekWhite,
+                          ),
+                        )
+                      : const SizedBox(),
+                ],
+              ),
+              const SizedBox(height: 20.0),
+              SizedBox(
+                width: generalWidth,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        bool didApprove = false;
+                        if (!isNetWorkImage) return;
+                        didApprove = await Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            opaque: false,
+                            barrierDismissible: false,
+                            pageBuilder: (context, _, __) => ApproveScreen(title: BenekStringHelpers.locale('approveProfilePhotoDelete')),
+                          ),
+                        );
+                        if (didApprove != true) return;
 
-                    isLoading
-                    ? const Positioned(
-                        top: 100,
-                        left: 100,
-                        child: BenekProcessIndicator(
-                          width: 50,
-                          height: 50,
-                          color: AppColors.benekWhite,
-                        ),
-                      )
-                    : const SizedBox(),
-                  ],
-                ),
+                        setState(() {
+                          isLoading = true;
+                        });
 
-                const SizedBox(height: 20.0,),
-
-                SizedBox(
-                  width: generalWidth,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          bool didApprove = false;
-                          if( !isNetWorkImage ) return;
-                          didApprove = await Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              opaque: false,
-                              barrierDismissible: false,
-                              pageBuilder: (context, _, __) => ApproveScreen(title: BenekStringHelpers.locale('approveProfilePhotoDelete')),
-                            ),
-                          );
-
-                          if(didApprove != true) return;
-
+                        await store.dispatch(updateProfileImageRequestAction(null));
+                        Navigator.of(context).pop(store.state.userInfo!.profileImg);
+                      },
+                      child: MouseRegion(
+                        cursor: isNetWorkImage ? SystemMouseCursors.click : SystemMouseCursors.basic,
+                        onHover: (_) {
+                          if (!isNetWorkImage) return;
                           setState(() {
-                            isLoading = true;
+                            isIconHovered = true;
                           });
-
-                          await store.dispatch(updateProfileImageRequestAction(null));
-                          Navigator.of(context).pop(store.state.userInfo!.profileImg);
                         },
-                        child: MouseRegion(
-                          cursor: isNetWorkImage ? SystemMouseCursors.click: SystemMouseCursors.basic,
-                          onHover: (_) {
-                            if( !isNetWorkImage ) return;
-                            setState(() {
-                              isIconHovered = true;
-                            });
-                          },
-                          onExit: (_) {
-                            setState(() {
-                              isIconHovered = false;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 20.0),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
-                              decoration: BoxDecoration(
-                                color: !isIconHovered
-                                    ? AppColors.benekWhite.withAlpha((0.1 * 255).toInt())
-                                    : AppColors.benekRed,
-                                borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
-                              ),
-                              child: const Icon(
-                                Icons.delete_outline,
-                                color: AppColors.benekWhite,
-                                size: 20,
-                              ),
+                        onExit: (_) {
+                          setState(() {
+                            isIconHovered = false;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 20.0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
+                            decoration: BoxDecoration(
+                              color: !isIconHovered
+                                  ? AppColors.benekWhite.withAlpha((0.1 * 255).toInt())
+                                  : AppColors.benekRed,
+                              borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+                            ),
+                            child: const Icon(
+                              Icons.delete_outline,
+                              color: AppColors.benekWhite,
+                              size: 20,
                             ),
                           ),
                         ),
                       ),
+                    ),
+                    BenekHorizontalButton(
+                      text: BenekStringHelpers.locale('uploadNewOne'),
+                      isLight: true,
+                      width: 180.0,
+                      onTap: () async {
+                        String? newImagePath = await ImageVideoHelpers.pickFile(['jpg', 'jpeg']);
+                        if (newImagePath == null) return;
 
-                      BenekHorizontalButton(
-                          text: BenekStringHelpers.locale('uploadNewOne'),
-                          isLight: true,
-                          width: 180.0,
-                          onTap: () async {
-                            String? newImagePath = await ImageVideoHelpers.pickFile(['jpg', 'jpeg']);
-                            if( newImagePath == null ) return;
+                        setState(() {
+                          isLoading = true;
+                        });
 
-                            setState(() {
-                              isLoading = true;
-                            });
+                        await store.dispatch(updateProfileImageRequestAction(newImagePath));
 
-                            await store.dispatch(updateProfileImageRequestAction(newImagePath));
-
-                            Navigator.of(context).pop(store.state.userInfo!.profileImg);
-                          }
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
+                        Navigator.of(context).pop(store.state.userInfo!.profileImg);
+                      },
+                    )
+                  ],
+                ),
+              )
+            ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

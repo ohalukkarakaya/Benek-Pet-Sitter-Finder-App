@@ -15,37 +15,32 @@ class InfoBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 5.0),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minWidth: 50.0,
-          maxWidth: isOpenAdress ? 550.0 : double.infinity,
-        ),
-        child: Container(
-          height: 60.0,
-          alignment: Alignment.bottomLeft,
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-          decoration: BoxDecoration(
-            color: AppColors.benekBlack.withOpacity(0.8),
-            borderRadius: const BorderRadius.all(Radius.circular(6.0)),
-          ),
-          child: Text(
-            infoText,
-            style: isOpenAdress
+    return Container(
+      constraints: BoxConstraints(
+        minWidth: 50.0,
+        maxWidth: isOpenAdress ? 550.0 : 200.0, // 👈 Şehir ve ülke için 200 sabit
+      ),
+      height: 60.0,
+      alignment: Alignment.bottomLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20.0),
+      decoration: BoxDecoration(
+        color: AppColors.benekBlack.withOpacity(0.8),
+        borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+      ),
+      child: Text(
+        infoText,
+        style: isOpenAdress
             ? regularTextStyle(
-              textColor: AppColors.benekWhite,
-              textFontSize: 14.0,
-            )
+                textColor: AppColors.benekWhite,
+                textFontSize: 14.0,
+              )
             : boldTextStyle(
-              textColor: AppColors.benekWhite,
-              textFontSize: 15.0,
-            ),
-            overflow: TextOverflow.ellipsis, // Taşmayı önler ve ... ile keser
-            maxLines: 1, // Tek satırda gösterir
-            textAlign: TextAlign.left,
-          ),
-        ),
+                textColor: AppColors.benekWhite,
+                textFontSize: 15.0,
+              ),
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        textAlign: TextAlign.left,
       ),
     );
   }

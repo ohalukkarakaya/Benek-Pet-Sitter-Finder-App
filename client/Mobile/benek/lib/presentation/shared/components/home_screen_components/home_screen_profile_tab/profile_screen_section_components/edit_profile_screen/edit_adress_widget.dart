@@ -53,9 +53,7 @@ Widget build(BuildContext context) {
           PageRouteBuilder(
             opaque: false,
             barrierDismissible: false,
-            pageBuilder: (context, _, __) => ChooseLocationFromMapScreen(
-              userInfo: widget.userInfo,
-            ),
+            pageBuilder: (context, _, __) => ChooseLocationFromMapScreen(),
           ),
         );
 

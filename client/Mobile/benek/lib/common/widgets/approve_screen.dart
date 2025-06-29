@@ -39,6 +39,9 @@ class _ApproveScreenState extends State<ApproveScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double containerWidth = screenWidth * 0.9;
+
     return KeyboardListener(
       focusNode: _focusNodeApproveCreen,
       onKeyEvent: (KeyEvent event) {
@@ -53,37 +56,42 @@ class _ApproveScreenState extends State<ApproveScreen> {
         },
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          body: Center(
-            child: SizedBox(
-              width: 500,
-              child: Builder(builder: (context) {
-                return SlideAction(
-                  text: widget.title,
-                  textColor: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
-                  borderRadius: 6.0,
-                  textStyle: regularTextStyle(
+          body: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 40.0),
+              child: SizedBox(
+                width: containerWidth,
+                child: Builder(builder: (context) {
+                  return SlideAction(
+                    text: widget.title,
                     textColor: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
-                    textFontSize: 15.0,
-                  ),
-                  onSubmit: () async {
-                    setState(() {
-                      didApprove = true;
-                    });
-                    Navigator.of(context).pop(didApprove);
-                  },
-                  innerColor: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
-                  outerColor: !widget.isNegative ? AppColors.benekLightBlue : AppColors.benekLightRed,
-                  submittedIcon: Icon(
-                    Icons.done,
-                    color: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
-                    size: 32,
-                  ),
-                );
-              }),
+                    borderRadius: 6.0,
+                    textStyle: regularTextStyle(
+                      textColor: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
+                      textFontSize: 15.0,
+                    ),
+                    onSubmit: () async {
+                      setState(() {
+                        didApprove = true;
+                      });
+                      Navigator.of(context).pop(didApprove);
+                    },
+                    innerColor: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
+                    outerColor: !widget.isNegative ? AppColors.benekLightBlue : AppColors.benekLightRed,
+                    submittedIcon: Icon(
+                      Icons.done,
+                      color: !widget.isNegative ? AppColors.benekBlack : AppColors.benekRed,
+                      size: 32,
+                    ),
+                  );
+                }),
+              ),
             ),
           ),
         ),
       ),
     );
   }
+
 }

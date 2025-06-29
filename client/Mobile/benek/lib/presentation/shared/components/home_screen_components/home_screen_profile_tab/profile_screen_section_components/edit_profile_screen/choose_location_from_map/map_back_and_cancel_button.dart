@@ -8,9 +8,12 @@ import '../../../../../../../../../common/widgets/approve_screen.dart';
 
 class MapBackAndCancelButton extends StatefulWidget {
   final bool didEdit;
+  final bool shouldTakeApprovement;
+
   const MapBackAndCancelButton({
     super.key,
     required this.didEdit,
+    this.shouldTakeApprovement = true
   });
 
   @override
@@ -36,6 +39,7 @@ class _MapBackAndCancelButtonState extends State<MapBackAndCancelButton> {
       child: GestureDetector(
         onTap: () async {
           bool didApprove = widget.didEdit
+            && widget.shouldTakeApprovement
               ? await Navigator.push(
                 context,
                 PageRouteBuilder(
@@ -50,27 +54,24 @@ class _MapBackAndCancelButtonState extends State<MapBackAndCancelButton> {
             Navigator.pop(context);
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Container(
-            width: 60.0,
-            height: 60.0,
-            alignment: Alignment.bottomLeft,
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-            decoration: BoxDecoration(
+        child: Container(
+          width: 60.0,
+          height: 60.0,
+          alignment: Alignment.bottomLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+          decoration: BoxDecoration(
+            color: !didHovered
+                ? AppColors.benekBlack.withOpacity(0.8)
+                : AppColors.benekLightRed,
+            borderRadius: BorderRadius.all(Radius.circular(6.0)),
+          ),
+          child: Center(
+            child: Icon(
+              BenekIcons.left,
               color: !didHovered
-                  ? AppColors.benekBlack.withOpacity(0.8)
-                  : AppColors.benekLightRed,
-              borderRadius: BorderRadius.all(Radius.circular(6.0)),
-            ),
-            child: Center(
-              child: Icon(
-                BenekIcons.left,
-                color: !didHovered
-                    ? AppColors.benekWhite
-                    : AppColors.benekRed,
-                size: 15.0,
-              ),
+                  ? AppColors.benekWhite
+                  : AppColors.benekRed,
+              size: 15.0,
             ),
           ),
         ),
