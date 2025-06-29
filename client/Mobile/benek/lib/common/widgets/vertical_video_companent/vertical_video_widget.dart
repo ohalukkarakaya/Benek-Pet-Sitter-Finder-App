@@ -117,7 +117,7 @@ class _VerticalContentComponentState extends State<VerticalContentComponent> {
     bool isMp4 = ImageVideoHelpers.isVideo(widget.src);
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(25.0),
+      borderRadius: BorderRadius.circular(0.0),
       child: _isPlayerInitialized || !isMp4
           ? Stack(
         children: [

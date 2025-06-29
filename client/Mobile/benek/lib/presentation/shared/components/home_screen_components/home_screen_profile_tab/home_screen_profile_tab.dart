@@ -8,7 +8,6 @@ import 'package:benek/presentation/shared/components/home_screen_components/home
 import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_preview_widget.dart';
 import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/pet_profile_screen_components/pet_images_widget.dart';
 import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/adress_row/adress_map.dart';
-import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/care_giver_badge.dart';
 import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/profile_adress_widget.dart';
 import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/profile_bio_widget.dart';
 import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/profile_contact_row.dart';

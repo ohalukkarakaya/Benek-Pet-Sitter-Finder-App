@@ -16,16 +16,16 @@ Future<void> generateStyledPaymentsExcel(List<PaymentDataModel> payments) async 
   print("Export edilen kayıt sayısı: ${payments.length}");
 
   sheet.appendRow([
-    BenekStringHelpers.locale('careGiverFullName'),
-    BenekStringHelpers.locale('careGiverTc'),
-    BenekStringHelpers.locale('careGiverEmail'),
-    BenekStringHelpers.locale('careGiverPhone'),
-    BenekStringHelpers.locale('careGiverOpenAddress'),
-    BenekStringHelpers.locale('petOwnerFullName'),
-    BenekStringHelpers.locale('petOwnerEmail'),
-    BenekStringHelpers.locale('petOwnerPhone'),
-    BenekStringHelpers.locale('paymentAmount'),
-    BenekStringHelpers.locale('paymentDate'),
+    TextCellValue(BenekStringHelpers.locale('careGiverFullName')),
+    TextCellValue(BenekStringHelpers.locale('careGiverTc')),
+    TextCellValue(BenekStringHelpers.locale('careGiverEmail')),
+    TextCellValue(BenekStringHelpers.locale('careGiverPhone')),
+    TextCellValue(BenekStringHelpers.locale('careGiverOpenAddress')),
+    TextCellValue(BenekStringHelpers.locale('petOwnerFullName')),
+    TextCellValue(BenekStringHelpers.locale('petOwnerEmail')),
+    TextCellValue(BenekStringHelpers.locale('petOwnerPhone')),
+    TextCellValue(BenekStringHelpers.locale('paymentAmount')),
+    TextCellValue(BenekStringHelpers.locale('paymentDate')),
   ]);
 
   for (final payment in payments) {
@@ -50,16 +50,16 @@ Future<void> generateStyledPaymentsExcel(List<PaymentDataModel> payments) async 
     final formattedDate = BenekStringHelpers.getDateAsString(payment.date!);
 
     sheet.appendRow([
-      caregiverFullName,
-      cgIdentity.nationalIdentityNumber ?? "",
-      caregiver?.email ?? "",
-      caregiver?.phone ?? "",
-      cgIdentity.openAdress ?? "",
-      petOwnerFullName,
-      petOwner?.email ?? "",
-      petOwner?.phone ?? "",
-      payment.amount ?? "",
-      formattedDate,
+      TextCellValue(caregiverFullName),
+      TextCellValue(cgIdentity.nationalIdentityNumber ?? ""),
+      TextCellValue(caregiver?.email ?? ""),
+      TextCellValue(caregiver?.phone ?? ""),
+      TextCellValue(cgIdentity.openAdress ?? ""),
+      TextCellValue(petOwnerFullName),
+      TextCellValue(petOwner?.email ?? ""),
+      TextCellValue(petOwner?.phone ?? ""),
+      TextCellValue(payment.amount?.toString() ?? ""),
+      TextCellValue(formattedDate),
     ]);
   }
 

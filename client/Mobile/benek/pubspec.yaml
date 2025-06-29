@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.5.4
+  sdk: '>=3.2.3 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -47,16 +47,16 @@ dependencies:
   path_drawing: ^1.0.1
   socket_io_client: ^3.0.2
   flutter_dotenv: ^5.1.0
-  geolocator: ^13.0.2
+  geolocator: ^14.0.1
   visibility_detector: ^0.4.0+2
   shimmer: ^3.0.0
   el_tooltip: ^2.0.0
   intl: ^0.20.1
-  flutter_map: ^7.0.2
+  flutter_map: ^8.1.1
   latlong2: ^0.9.1
   url_launcher: ^6.3.0
-  avatar_stack: ^1.2.0
-  fl_chart: ^0.69.2
+  avatar_stack: ^3.0.0
+  fl_chart: ^1.0.0
   chewie: ^1.8.3
   video_player: ^2.9.1
   video_player_media_kit: ^1.0.5
@@ -64,13 +64,13 @@ dependencies:
   media_kit_video: ^1.2.4
   media_kit_libs_video: ^1.0.4
   path_provider: ^2.1.4
-  file_picker: ^8.0.7
-  toastification: ^2.1.0
+  file_picker: ^10.2.0
+  toastification: ^3.0.3
   slide_to_act: ^2.0.2
   font_awesome_flutter: ^10.7.0
   point_in_polygon: ^1.0.0
-  flutter_sticky_header: ^0.7.0
-  excel: ^2.0.0
+  flutter_sticky_header: ^0.8.0
+  excel: ^4.0.6
   flutter_markdown: ^0.7.7
   connectivity_plus: ^6.1.4
 
@@ -83,7 +83,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -106,18 +106,18 @@ flutter:
     - assets/images/avatar_assets/male/
     - assets/images/avatar_assets/female/
     - assets/images/avatar_assets/pet/
-    - assets/sozlesmeler/
     - assets/benek_hizmet_sozlesmesi.md
     - assets/kisisel_verilerin_korunması_acik_riza_metni_ve_beyani.md
     - assets/kisisel_verilerin_korunması_ kullanici_aydinlatma.md
     - assets/pricing.md
     - .env
+  #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/to/resolution-aware-images
+  # https://flutter.dev/assets-and-images/#resolution-aware
 
   # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/to/asset-from-package
+  # https://flutter.dev/assets-and-images/#from-packages
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
@@ -175,6 +175,12 @@ flutter:
         - asset: assets/fonts/QanelasUltraLightItalic.otf
           weight: 100
           style: italic
+
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
   #
   # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+  # see https://flutter.dev/custom-fonts/#from-packages

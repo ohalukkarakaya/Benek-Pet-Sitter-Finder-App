@@ -1,10 +1,7 @@
-import 'package:benek/common/constants/benek_icons.dart';
 import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/styles.text.dart';
-import 'package:benek/common/widgets/benek_small_button.dart';
 import 'package:benek/data/services/google_services/google_maps_helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:benek/data/models/user_profile_models/user_location_model.dart';
 import 'package:benek/common/constants/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
@@ -37,7 +34,6 @@ class ProfileAdressWidget extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         double calculatedWidth = constraints.maxWidth < width ? constraints.maxWidth : width;
-        double calculatedLongButtonWidth = calculatedWidth < 250 ? calculatedWidth * 0.9 : longButtonWidth;
 
         return location == null || openAdress == null
             ? Shimmer.fromColors(

@@ -58,7 +58,7 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
                           );
               }).toList()
             : [],
-        buildInfoWidget: (surplus) {
+        buildInfoWidget: (context, surplus) {
           return Container(
             height: size,
             width: size,

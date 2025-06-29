@@ -88,11 +88,12 @@ class StoryFirstFiveLikedUserStackedWidget extends StatelessWidget {
           align: isCentered ? StackAlign.center : StackAlign.right,
         ),
         stackedWidgets: _buildUserAvatars(),
-        buildInfoWidget: ( surplus ){
+        buildInfoWidget: (surplus, context) {
           return users!.length > 5 || totalLikeCount - users!.length > 0
-          ? _buildInfoWidget(surplus)
-          : const SizedBox();
-        }
+              ? _buildInfoWidget(surplus)
+              : const SizedBox();
+        },
+
     );
   }
 

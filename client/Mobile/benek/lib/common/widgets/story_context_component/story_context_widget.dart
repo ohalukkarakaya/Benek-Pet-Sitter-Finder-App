@@ -1,14 +1,11 @@
-import 'dart:math' as MainAxisSize;
-
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:benek/common/constants/app_colors.dart';
 import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/widgets/story_context_component/comments_component/comment_card.dart';
 import 'package:benek/common/widgets/story_context_component/story_desc_widget.dart';
 import 'package:benek/common/widgets/story_context_component/story_like_info_card_widget.dart';
 import 'package:benek/data/models/story_models/story_model.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-
 import '../../../data/models/content_models/comment_model.dart';
 import '../../../redux/get_story_comment_replies/get_story_comment_replies.action.dart';
 import 'comments_component/comments_component.dart';
@@ -35,17 +32,15 @@ class _StoryContextWidgetState extends State<StoryContextWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-      },
-      child: Column(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Stack(
         children: [
-          Expanded(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 90),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min, // ⚡️ ÇOK ÖNEMLİ
                 children: [
                   StoryDescWidget(
                     profileImg: widget.story.user?.profileImg,
@@ -59,13 +54,18 @@ class _StoryContextWidgetState extends State<StoryContextWidget> {
                     closeFunction: widget.closeFunction,
                   ),
                   const SizedBox(height: 20.0),
+                  LeaveCommentComponent(
+                    storyId: widget.story.storyId!,
+                    selectedCommentId: selectedComment?.id,
+                  ),
+                  const SizedBox(height: 20.0),
                   if (selectedComment != null)
                     Container(
                       decoration: BoxDecoration(
                         color: AppColors.benekBlack,
                         borderRadius: BorderRadius.circular(6.0),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: CommentCardWidget(
                         isSelectedComment: true,
                         resetSelectedCommentFunction: () async {
@@ -115,14 +115,6 @@ class _StoryContextWidgetState extends State<StoryContextWidget> {
                   ),
                 ],
               ),
-            ),
-          ),
-          AnimatedPadding(
-            duration: const Duration(milliseconds: 200),
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: LeaveCommentComponent(
-              storyId: widget.story.storyId!,
-              selectedCommentId: selectedComment?.id,
             ),
           ),
         ],

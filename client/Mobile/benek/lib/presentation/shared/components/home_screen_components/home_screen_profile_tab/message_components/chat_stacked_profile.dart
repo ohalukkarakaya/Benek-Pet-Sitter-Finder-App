@@ -63,7 +63,7 @@ class ChatStackedProfile extends StatelessWidget {
               : const SizedBox();
         }).toList()
         : [],
-        buildInfoWidget: ( surplus ){
+        buildInfoWidget: ( context, surplus ){
           return Container(
             height: 35,
             width: 35,
