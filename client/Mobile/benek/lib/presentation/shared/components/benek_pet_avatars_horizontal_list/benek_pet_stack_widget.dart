@@ -21,17 +21,20 @@ class BenekPetStackWidget extends StatefulWidget {
 }
 
 class _BenekPetStackWidgetState extends State<BenekPetStackWidget> {
-
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final containerWidth = screenWidth < 600 ? screenWidth * 0.2 : 200.0;
+
     return Center(
       child: GestureDetector(
         onTap: () {
-      
-          if(widget.petList == null || widget.petList!.isEmpty || ( widget.petList![0] !is! PetModel && widget.petList![0] !is! UserInfo ) ){
+          if (widget.petList == null ||
+              widget.petList!.isEmpty ||
+              (widget.petList![0] is! PetModel && widget.petList![0] is! UserInfo)) {
             return;
           }
-      
+
           Navigator.push(
             context,
             PageRouteBuilder(
@@ -42,16 +45,16 @@ class _BenekPetStackWidgetState extends State<BenekPetStackWidget> {
           );
         },
         child: Container(
-          width: 200,
+          width: containerWidth,
           decoration: widget.petList == null || widget.petList!.isEmpty
-            ? BoxDecoration(
-              color: AppColors.benekBlackWithOpacity,
-              borderRadius: const BorderRadius.all( Radius.circular( 6.0 ) ),
-            )
-            : null,
+              ? BoxDecoration(
+                  color: AppColors.benekBlackWithOpacity,
+                  borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+                )
+              : null,
           padding: widget.petList == null || widget.petList!.isEmpty
-            ? const EdgeInsets.symmetric( horizontal: 10.0, vertical: 5.0 )
-            : null,
+              ? const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0)
+              : null,
           child: BenekHorizontalStackedPetAvatarWidget(
             size: 40,
             petList: widget.petList,

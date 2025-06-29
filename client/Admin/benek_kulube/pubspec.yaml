@@ -47,7 +47,7 @@ dependencies:
   path_drawing: ^1.0.1
   socket_io_client: ^3.0.2
   flutter_dotenv: ^5.1.0
-  geolocator: ^13.0.2
+  geolocator: ^14.0.1
   visibility_detector: ^0.4.0+2
   shimmer: ^3.0.0
   el_tooltip: ^2.0.0
@@ -69,7 +69,7 @@ dependencies:
   slide_to_act: ^2.0.2
   font_awesome_flutter: ^10.7.0
   point_in_polygon: ^1.0.0
-  flutter_sticky_header: ^0.7.0
+  flutter_sticky_header: ^0.8.0
   excel: ^2.0.0
   flutter_markdown: ^0.7.7
   connectivity_plus: ^6.1.4

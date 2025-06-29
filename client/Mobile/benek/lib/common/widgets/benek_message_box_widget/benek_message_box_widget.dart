@@ -26,28 +26,34 @@ class BenekMessageBoxWidget extends StatefulWidget {
 class _BenekMessageBoxWidgetState extends State<BenekMessageBoxWidget> {
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double maxAllowedWidth = screenWidth * 0.95;
+
+    double containerWidth = widget.size.width > maxAllowedWidth ? maxAllowedWidth : widget.size.width;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: widget.size.width,
+          width: containerWidth,
           height: widget.size.height,
-          padding: const EdgeInsets.all( 8.0 ),
+          // height sabit istiyorsan, yine de ekran yüksekliğini kontrol et
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.6,
+          ),
+          padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
             color: widget.backgroundColor,
             borderRadius: BorderRadius.only(
-                topLeft: Radius.circular( widget.radius ),
-                topRight: Radius.circular( widget.radius ),
-                bottomRight: Radius.circular( widget.radius ),
+              topLeft: Radius.circular(widget.radius),
+              topRight: Radius.circular(widget.radius),
+              bottomRight: Radius.circular(widget.radius),
             ),
           ),
-          child: widget.child != null
-                  ? widget.child!
-                  : const SizedBox(),
+          child: widget.child ?? const SizedBox(),
         ),
-
-        Triangle()
+        Triangle(),
       ],
     );
   }

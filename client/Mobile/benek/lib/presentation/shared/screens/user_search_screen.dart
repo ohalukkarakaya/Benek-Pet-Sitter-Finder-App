@@ -1,8 +1,8 @@
 import 'package:benek/data/models/user_profile_models/user_info_model.dart';
 import 'package:benek/presentation/shared/components/loading_components/benek_blured_modal_barier.dart';
 import 'package:benek/presentation/shared/components/loading_components/benek_loading_component.dart';
-import 'package:benek/presentation/shared/components/user_search_companents/user_search_bar/user_search_bar.dart';
-import 'package:benek/presentation/shared/components/user_search_companents/user_search_result_list/user_search_result_list.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/user_search_companents/user_search_bar/user_search_bar.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/user_search_companents/user_search_result_list/user_search_result_list.dart';
 import 'package:benek/store/actions/app_actions.dart';
 import 'package:benek/store/app_redux_store.dart';
 import 'package:benek/store/app_state.dart';
@@ -81,8 +81,6 @@ class _KulubeUserSearchScreenState extends State<KulubeUserSearchScreen> {
       if (hoveringUser != null && widget.isForUserProfile) {
         _updateSelectedUser(hoveringUser!);
       }
-      // Hovering yoksa veya user profile değilse, sadece yukarıda setState çalışır. 
-      // Pop işlemi _updateSelectedUser içinde yapılır.
     }
 
     return BenekBluredModalBarier(

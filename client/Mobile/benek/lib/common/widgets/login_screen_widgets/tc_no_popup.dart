@@ -1,31 +1,12 @@
 import 'dart:ui';
 
 import 'package:benek/common/constants/app_colors.dart';
-import 'package:benek/common/utils/state_utils/auth_utils/auth_utils.dart';
-import 'package:benek/common/utils/styles.text.dart';
 
-import 'package:benek/common/utils/benek_toast_helper.dart';
 import 'package:benek/common/widgets/login_screen_widgets/password_text_field.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 Future<String?> showTcKimlikPopup(BuildContext context) {
-  final TextEditingController controller = TextEditingController();
-  final FocusNode focusNode = FocusNode();
-
-  String getMasked(String input) {
-    if (input.length <= 3) return input;
-    if (input.length <= 6)
-      return input.substring(0, 3) + '•' * (input.length - 3);
-    if (input.length <= 11) {
-      return input.substring(0, 3) +
-          '•' * (input.length - 6) +
-          input.substring(input.length - 3);
-    }
-    return input;
-  }
-
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,

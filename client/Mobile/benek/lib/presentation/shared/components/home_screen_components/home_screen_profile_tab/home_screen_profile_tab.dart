@@ -1,0 +1,262 @@
+import 'dart:io';
+
+import 'package:benek/common/utils/benek_string_helpers.dart';
+import 'package:benek/data/models/pet_models/pet_model.dart';
+import 'package:benek/presentation/features/image_video_helpers/image_video_helpers.dart';
+import 'package:benek/presentation/shared/components/benek_pet_avatars_horizontal_list/benek_pet_stack_widget.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/care_give_career_preview_widget/care_give_preview_widget.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/past_care_givers_preview_widget/past_care_givers_preview_widget.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/pet_profile_screen_components/pet_images_widget.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/adress_row/adress_map.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/care_giver_badge.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/profile_adress_widget.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/profile_bio_widget.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/profile_contact_row.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/profile_row.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/story_components/create_story_screen.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/story_components/kulube_stories_board.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/story_components/story_watch_screen.dart';
+import 'package:benek/presentation/shared/screens/pet_search_screen.dart';
+
+import 'package:benek/store/app_state.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import '../../../../../../common/utils/benek_toast_helper.dart';
+import '../../../../../../common/widgets/benek_message_box_widget/benek_message_box_widget.dart';
+import '../../../../../../data/models/story_models/story_model.dart';
+import '../../../../../../data/models/user_profile_models/user_info_model.dart';
+import 'benek_profile_stars_widget/benek_profile_star_widget.dart';
+import 'package:benek/store/actions/app_actions.dart';
+
+class ProfileTab extends StatefulWidget {
+  const ProfileTab({super.key});
+
+  @override
+  State<ProfileTab> createState() => _ProfileTabState();
+}
+
+class _ProfileTabState extends State<ProfileTab> {
+  bool didRequestSend = false;
+  Size storyBoardSize = const Size(540, 250);
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Store<AppState> store = StoreProvider.of<AppState>(context);
+
+      if (!didRequestSend) {
+        await store.dispatch(IncreaseProcessCounterAction());
+        didRequestSend = true;
+
+        await store.dispatch(getUserInfoByUserIdAction(store.state.selectedUserInfo?.userId));
+
+        if (store.state.selectedPet != null) {
+          await store.dispatch(getStoriesByPetIdRequestAction(store.state.selectedPet?.id));
+          await store.dispatch(getPetPhotosByIdRequestAction(store.state.selectedPet?.id));
+        } else {
+          await store.dispatch(getStoriesByUserIdRequestAction(store.state.selectedUserInfo?.userId));
+          await store.dispatch(getSelectedUserStarDataAction(store.state.selectedUserInfo?.userId));
+          await store.dispatch(getPetsByUserIdRequestAction(store.state.selectedUserInfo?.userId));
+          await store.dispatch(initPastCareGiversAction());
+          await store.dispatch(initCareGiveDataAction());
+        }
+      }
+
+      if (store.state.userInfo?.userId != store.state.selectedUserInfo?.userId || store.state.selectedPet != null) {
+        updateStoryBoardSize();
+      }
+
+      await store.dispatch(DecreaseProcessCounterAction());
+    });
+  }
+
+  void updateStoryBoardSize() {
+    setState(() {
+      storyBoardSize = calculateStoryBoardSize();
+    });
+  }
+
+  Size calculateStoryBoardSize() {
+    Store<AppState> store = StoreProvider.of<AppState>(context);
+    return Size(
+      540,
+      store.state.storiesToDisplay != null && store.state.storiesToDisplay!.isEmpty ? 150 : 250,
+    );
+  }
+
+  Future<void> createStoryPageBuilderFunction() async {
+    final String? directoryPath = await ImageVideoHelpers.pickFile(['jpg', 'jpeg', 'mp4', 'mov', 'avi']);
+    if (directoryPath == null) return;
+
+    final File file = File(directoryPath);
+    if (!await file.exists()) {
+      BenekToastHelper.showErrorToast(BenekStringHelpers.locale('invalidPath'), BenekStringHelpers.locale('invalidPathDesc'), context);
+      return;
+    }
+
+    final pickedPet = await Navigator.push(
+      context,
+      PageRouteBuilder(opaque: false, barrierDismissible: false, pageBuilder: (context, _, __) => const KulubePetSearchScreen()),
+    );
+    if (pickedPet == null) return;
+
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible: false,
+        pageBuilder: (context, _, __) => CreateStoryScreen(src: directoryPath, pet: pickedPet),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StoreConnector<AppState, Map<String, Object?>?>(
+        converter: (Store<AppState> store) => {
+              "selectedUser": store.state.selectedUserInfo,
+              "selectedPet": store.state.selectedPet
+            },
+        builder: (BuildContext context, Map<String, Object?>? selectedDataInfo) {
+          UserInfo? selectedUserInfo = selectedDataInfo?["selectedUser"] as UserInfo?;
+          PetModel? selectedPetInfo = selectedDataInfo?["selectedPet"] as PetModel?;
+          bool isCareGiver = selectedUserInfo!.isCareGiver != null && selectedUserInfo.isCareGiver!;
+
+          Store<AppState> store = StoreProvider.of<AppState>(context);
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      BenekMessageBoxWidget(
+                        size: storyBoardSize,
+                        child: KulubeStoriesBoard(
+                          isUsersProfile: selectedPetInfo == null && store.state.userInfo?.userId == selectedUserInfo.userId,
+                          onTapPageBuilder: (dynamic Function() selectStoryFunction, List<StoryModel>? stories, int index) async {
+                            bool isUsersProfile = selectedPetInfo == null && store.state.userInfo?.userId == selectedUserInfo.userId;
+                            int indx = isUsersProfile && stories != null ? index - 1 : index;
+            
+                            if (stories?[indx] != null) await selectStoryFunction();
+            
+                            String storyId = await Navigator.push(
+                              context,
+                              PageRouteBuilder(opaque: false, barrierDismissible: false, pageBuilder: (context, _, __) => const StoryWatchScreen()),
+                            );
+            
+                            if (storyId.isNotEmpty) {
+                              await Future.delayed(const Duration(milliseconds: 200));
+                              await store.dispatch(resetStoryCommentsAction(storyId));
+                            }
+                          },
+                          createStoryPageBuilderFunction: createStoryPageBuilderFunction,
+                        ),
+                      ),
+                    ],
+                  ),
+                  ProfileRowWidget(
+                      authRoleId: store.state.userRoleId,
+                      isUsersProfile: store.state.userInfo!.userId == selectedUserInfo.userId,
+                      selectedUserInfo: selectedUserInfo,
+                      selectedPet: selectedPetInfo,
+                      isCareGiver: isCareGiver,
+                  ),
+                  ProfileContactRowWidget(
+                    userId: selectedPetInfo == null ? selectedUserInfo.userId : selectedPetInfo.id,
+                    email: selectedPetInfo == null ? selectedUserInfo.email : BenekStringHelpers.isLanguageTr() ? selectedPetInfo.kind?.tr : selectedPetInfo.kind?.en,
+                    phoneNumber: selectedPetInfo == null ? selectedUserInfo.phone : "${BenekStringHelpers.getAgeAsInt(selectedPetInfo.birthDay!)} ${BenekStringHelpers.locale('yearsOld')}",
+                  ),
+                  if ((selectedUserInfo.identity?.bio != null) || (selectedPetInfo?.bio != null))
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: ProfileBioWidget(
+                            text: '" ${selectedPetInfo == null ? selectedUserInfo.identity!.bio! : selectedPetInfo.bio} "',
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (selectedPetInfo?.images != null && selectedPetInfo!.images!.isNotEmpty)
+                    PetImagesWidget(images: selectedPetInfo.images),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (selectedPetInfo == null)
+                          BenekProfileStarWidget(
+                            star: selectedUserInfo.starAverage ?? 0,
+                            starCount: selectedUserInfo.totalStar ?? 0,
+                            starList: selectedUserInfo.stars,
+                          ),
+                        if (selectedPetInfo == null)
+                          BenekPetStackWidget(
+                            isPetList: selectedPetInfo == null,
+                            petList: selectedUserInfo.pets,
+                          ),
+                      ],
+                    ),
+                  ),
+                  
+            
+                  if (selectedPetInfo == null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: PastCareGiverPreviewWidget(
+                            title: BenekStringHelpers.locale('pastCareGiversTitle'),
+                            pastCareGiversEmptyStateTitle: BenekStringHelpers.locale('pastCareGiversEmptyMessage'),
+                            pastCareGiveList: selectedUserInfo.pastCaregivers,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: CareGivePreviewWidget(
+                            title: BenekStringHelpers.locale('givenCareGivesTitle'),
+                            emptyStateTitle: BenekStringHelpers.locale('givenCareGivesEmptyMessage'),
+                            careGiveList: selectedUserInfo.caregiverCareer,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+            
+            
+                 if (selectedUserInfo.location != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: ProfileAdresMapWidget(userLocation: selectedUserInfo.location!),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ProfileAdressWidget(
+                              openAdress: selectedUserInfo.identity?.openAdress,
+                              location: selectedUserInfo.location,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+            
+                ],
+              ),
+            ),
+          );
+        });
+  }
+}

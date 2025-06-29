@@ -19,67 +19,68 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
     this.size = 50.0,
   });
 
-  Widget _buildChild(){
+  Widget _buildChild(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final containerWidth = screenWidth < 600 ? screenWidth * 0.8 : 200.0;
+
     return SizedBox(
       height: size,
-      width: 200,
+      width: containerWidth,
       child: WidgetStack(
         positions: RestrictedPositions(
           maxCoverage: 0.4,
           minCoverage: 0.1,
           align: StackAlign.center,
         ),
-        stackedWidgets: petList!.isNotEmpty ?
-          petList!.map((pet) {
-            return pet is PetModel
-              && pet.petProfileImg != null
-                ? BenekCircleAvatar(
-                  isDefaultAvatar: pet.petProfileImg!.isDefaultImg!,
-                  imageUrl: pet.petProfileImg!.imgUrl!,
-                  width: size,
-                  height: size,
-                )
-                : pet is UserInfo
-                  && pet.profileImg != null
-                  ? BenekCircleAvatar(
-                    isDefaultAvatar: pet.profileImg!.isDefaultImg!,
-                    imageUrl: pet.profileImg!.imgUrl!,
-                    width: size,
-                    height: size,
-                  )
-                  : Container(
-                      width: size,
-                      height: size,
-                      decoration: const BoxDecoration(
-                        color: Colors.grey,
-                        shape: BoxShape.circle,
-                      ),
-                    );
-          }).toList()
-          : [],
-          buildInfoWidget: ( surplus ){
-            return Container(
-              height: size,
-              width: size,
+        stackedWidgets: petList!.isNotEmpty
+            ? petList!.map((pet) {
+                return pet is PetModel && pet.petProfileImg != null
+                    ? BenekCircleAvatar(
+                        isDefaultAvatar: pet.petProfileImg!.isDefaultImg!,
+                        imageUrl: pet.petProfileImg!.imgUrl!,
+                        width: size,
+                        height: size,
+                      )
+                    : pet is UserInfo && pet.profileImg != null
+                        ? BenekCircleAvatar(
+                            isDefaultAvatar: pet.profileImg!.isDefaultImg!,
+                            imageUrl: pet.profileImg!.imgUrl!,
+                            width: size,
+                            height: size,
+                          )
+                        : Container(
+                            width: size,
+                            height: size,
+                            decoration: const BoxDecoration(
+                              color: Colors.grey,
+                              shape: BoxShape.circle,
+                            ),
+                          );
+              }).toList()
+            : [],
+        buildInfoWidget: (surplus) {
+          return Container(
+            height: size,
+            width: size,
+            decoration: BoxDecoration(
+              color: AppColors.benekWhite,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            padding: const EdgeInsets.all(4),
+            child: Container(
               decoration: BoxDecoration(
-                color: AppColors.benekWhite,
                 borderRadius: BorderRadius.circular(100),
+                color: AppColors.benekLightBlue,
               ),
-              padding: const EdgeInsets.all(4),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: AppColors.benekLightBlue,
-                ),
-                child: Center(
-                  child: Text(
-                    "+ $surplus",
-                    style: boldTextStyle( textFontSize: 15.0 ),
-                  ),
+              child: Center(
+                child: Text(
+                  "+ $surplus",
+                  style: boldTextStyle(textFontSize: 15.0),
                 ),
               ),
-            );
-          },
+            ),
+          );
+        },
       ),
     );
   }
@@ -88,27 +89,27 @@ class BenekHorizontalStackedPetAvatarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: size,
-      child: petList != null
-        && petList!.isNotEmpty
-        && ( petList![0] is! PetModel && petList![0] is! UserInfo )
+      child: petList != null &&
+              petList!.isNotEmpty &&
+              (petList![0] is! PetModel && petList![0] is! UserInfo)
           ? Shimmer.fromColors(
               baseColor: AppColors.benekBlack.withAlpha(102),
               highlightColor: AppColors.benekBlack.withAlpha(51),
-              child: _buildChild()
-          )
-          : petList != null
-            && petList!.isNotEmpty
-            && ( petList![0] is PetModel || petList![0] is UserInfo )
-              ? _buildChild()
-              : Center(
-                child: Text(
-                  BenekStringHelpers.locale('noPetMessage'),
-                  style: thinTextStyle(
-                    textColor: AppColors.benekWhite,
-                    textFontSize: 15.0,
-                  ),
-                )
+              child: _buildChild(context),
             )
+          : petList != null &&
+                  petList!.isNotEmpty &&
+                  (petList![0] is PetModel || petList![0] is UserInfo)
+              ? _buildChild(context)
+              : Center(
+                  child: Text(
+                    BenekStringHelpers.locale('noPetMessage'),
+                    style: thinTextStyle(
+                      textColor: AppColors.benekWhite,
+                      textFontSize: 15.0,
+                    ),
+                  ),
+                ),
     );
   }
 }

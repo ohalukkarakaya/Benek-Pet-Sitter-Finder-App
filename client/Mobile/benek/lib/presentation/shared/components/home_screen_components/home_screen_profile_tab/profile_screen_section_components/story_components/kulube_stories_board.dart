@@ -1,0 +1,69 @@
+import 'package:benek/common/utils/benek_string_helpers.dart';
+import 'package:benek/common/widgets/kulube_horizontal_listview_widget/kulube_horizontal_listview_widget.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/story_components/add_story_button.dart';
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/story_components/story_element.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+
+import '../../../../../../../../data/models/story_models/story_model.dart';
+import '../../../../../../../../store/app_state.dart';
+import 'package:redux/redux.dart';
+
+class KulubeStoriesBoard extends StatelessWidget {
+  final void Function(dynamic Function() selectStoryFunction, List<StoryModel>? stories, int index) onTapPageBuilder;
+  final void Function()? createStoryPageBuilderFunction;
+  final bool isUsersProfile;
+
+  const KulubeStoriesBoard({
+    super.key,
+    required this.onTapPageBuilder,
+    required this.createStoryPageBuilderFunction,
+    this.isUsersProfile = false
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StoreConnector<AppState, List<StoryModel>?>(
+      converter: (Store<AppState> store) => store.state.storiesToDisplay,
+      builder: (BuildContext context, List<StoryModel>? stories) {
+        return KulubeHorizontalListViewWidget(
+            isEmpty: stories != null && stories.isEmpty,
+            isUsersProfile: isUsersProfile,
+            emptyListMessage: BenekStringHelpers.locale('noStoryMessage'),
+            shouldShowShimmer: stories == null,
+            createStoryPageBuilderFunction: createStoryPageBuilderFunction,
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: stories != null
+                  && (
+                      !isUsersProfile
+                      && stories.length >= 3
+                      || isUsersProfile
+                      && stories.length >= 2
+                  )
+                  ? const BouncingScrollPhysics()
+                  : const NeverScrollableScrollPhysics(),
+
+              itemCount: stories != null && stories.isNotEmpty
+                  ? !isUsersProfile ? stories.length : stories.length + 1
+                  : !isUsersProfile ? 5 : 6,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                int indx = isUsersProfile && stories != null ? index - 1 : index;
+                return indx < 0
+                ? AddStoryButton(
+                    createStoryPageBuilderFunction: createStoryPageBuilderFunction??(){},
+                )
+                : StoryElement(
+                    onTapPageBuilder: onTapPageBuilder,
+                    index: index,
+                    stories: stories,
+                    story: stories != null && stories.isNotEmpty ? stories[indx] : null
+                );
+              },
+            ),
+        );
+      }
+    );
+  }
+}
