@@ -2,8 +2,6 @@ import 'package:benek/common/constants/app_colors.dart';
 import 'package:benek/common/utils/benek_string_helpers.dart';
 import 'package:benek/common/utils/styles.text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-
 
 class LocationWarningWidget extends StatelessWidget {
   const LocationWarningWidget({super.key});

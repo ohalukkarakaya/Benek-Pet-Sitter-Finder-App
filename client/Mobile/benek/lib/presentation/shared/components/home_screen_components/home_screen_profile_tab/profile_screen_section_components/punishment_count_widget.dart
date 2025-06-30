@@ -5,7 +5,6 @@ import 'package:benek/presentation/shared/components/home_screen_components/home
 import 'package:benek/store/app_state.dart';
 import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:shimmer/shimmer.dart';
