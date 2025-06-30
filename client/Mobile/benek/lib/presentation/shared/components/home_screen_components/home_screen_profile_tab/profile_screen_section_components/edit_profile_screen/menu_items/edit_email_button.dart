@@ -1,9 +1,9 @@
+import 'package:benek/presentation/shared/components/home_screen_components/home_screen_profile_tab/profile_screen_section_components/edit_profile_screen/password_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../../../../common/utils/benek_string_helpers.dart';
 import '../../../../../../../../../data/models/user_profile_models/user_info_model.dart';
 import '../edit_account_info_menu_item.dart';
-import '../password_textfield.dart';
 import '../single_line_edit_text.dart';
 
 class EditEmailButton extends StatefulWidget {
@@ -81,17 +81,22 @@ class _EditEmailButtonState extends State<EditEmailButton> {
             continue;
           }
 
-          String? resp = await Navigator.push(
-            context,
-            PageRouteBuilder(
-              opaque: false,
-              barrierDismissible: false,
-              pageBuilder: (context, _, __) => PasswordTextfield(
-                verifyingString: newEmail,
-                onDispatch: (text) => widget.onVerifyDispatch(newEmail.toLowerCase(), text.toLowerCase()),
-              ),
-            ),
+          String? resp = await PasswordWidget.show(
+            context: context,
+            verifyingString: newEmail,
+            onDispatch: (text) => widget.onVerifyDispatch(newEmail.toLowerCase(), text.toLowerCase()),
           );
+          // String? resp = await Navigator.push(
+          //   context,
+          //   PageRouteBuilder(
+          //     opaque: false,
+          //     barrierDismissible: false,
+          //     pageBuilder: (context, _, __) => PasswordTextfield(
+          //       verifyingString: newEmail,
+          //       onDispatch: (text) => widget.onVerifyDispatch(newEmail.toLowerCase(), text.toLowerCase()),
+          //     ),
+          //   ),
+          // );
 
           if(resp != null && resp.isNotEmpty && resp == "reSend"){
             setState(() {

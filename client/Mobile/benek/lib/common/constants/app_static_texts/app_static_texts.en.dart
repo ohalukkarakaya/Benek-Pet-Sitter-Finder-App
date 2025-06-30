@@ -202,5 +202,7 @@ class AppStaticTextsEn{
     'unAthorizedAccess': "Unauthorized Access",
     'youCantEnterHere': "You can't enter here!",
     'errorCapital': "ERROR",
+    'emailOtpMessage': "Enter OTP code send to your email.",
+    'smsOtpMessage': "Enter OTP code send to your phone number."
   };
 }

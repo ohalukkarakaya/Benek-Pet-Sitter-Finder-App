@@ -155,12 +155,12 @@ ThunkAction<AppState> updateEmailRequestAction(String email) {
   };
 }
 
-ThunkAction<AppState> resendEmailOtpRequestAction(String email) {
+ThunkAction<AppState> resendEmailOtpRequestAction(String email, String? oldEmail) {
   return (Store<AppState> store) async {
     UserInfoApi api = UserInfoApi();
 
     try {
-      bool? _email = await api.postResendEmailOtp(email);
+      bool? _email = await api.postResendEmailOtp(email, oldEmail);
       if(_email != true){
         throw CustomException(1, BenekStringHelpers.locale('operationFailed'));
       }

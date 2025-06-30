@@ -302,8 +302,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                     builder: (context) {
                                       return GestureDetector(
                                         behavior: HitTestBehavior.opaque,
-                                        onTap: () =>
-                                            FocusScope.of(context).unfocus(),
+                                        onTap: () => FocusScope.of(context).unfocus(),
                                         child: LayoutBuilder(
                                           builder: (context, constraints) {
                                             return Stack(
@@ -321,17 +320,13 @@ class _LoginWidgetState extends State<LoginWidget> {
                                                   ),
                                                 ),
 
-                                                // 🔹 KONTROLLÜ YÜKSEKLİK (yalnızca içerik kadar)
                                                 Align(
-                                                  alignment:
-                                                      Alignment.bottomCenter,
+                                                  alignment: Alignment.bottomCenter,
                                                   child: AnimatedPadding(
-                                                    duration: const Duration(
-                                                        milliseconds: 150),
+                                                    duration: const Duration( milliseconds: 150 ),
                                                     curve: Curves.easeOut,
                                                     padding: EdgeInsets.only(
-                                                      bottom:
-                                                          MediaQuery.of(context)
+                                                      bottom: MediaQuery.of(context)
                                                               .viewInsets
                                                               .bottom,
                                                     ),
@@ -348,28 +343,17 @@ class _LoginWidgetState extends State<LoginWidget> {
                                                                     20),
                                                           ),
                                                         ),
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(24.0),
-                                                        child:
-                                                            PasswordTextfield(
+                                                        padding: const EdgeInsets.all(24.0),
+                                                        child: PasswordTextfield(
                                                                 message:
                                                                     "Görünüşe göre farklı bir cihazdan giriş yapıyorsun. Güvenliğin için epostana bir kod gönderdik. "
                                                                     "Lütfen e-postanı kontrol et ve kodu gir.",
-                                                                verifyingString:
-                                                                    _email,
-                                                                onDispatch: (String
-                                                                    code) async {
-                                                                  print(
-                                                                      "Kullanıcı kod girdi: $code");
+                                                                verifyingString: _email,
+                                                                onDispatch: (String code) async {
+                                                                  print("Kullanıcı kod girdi: $code");
 
-                                                                  bool
-                                                                      isSuccesful =
-                                                                      await UserInfoApi().postVerifyEmailOtpTrustedId(
-                                                                              code,
-                                                                              _email,
-                                                                              clientId) ??
-                                                                          false;
+                                                                  bool isSuccesful = await UserInfoApi().postVerifyEmailOtpTrustedId( code, _email, clientId ) 
+                                                                                     ?? false;
 
                                                                   if (!isSuccesful) {
                                                                     BenekToastHelper
@@ -405,11 +389,8 @@ class _LoginWidgetState extends State<LoginWidget> {
                                                                     AuthUtils
                                                                         .setCredentials();
                                                                   } else {
-                                                                    BenekToastHelper
-                                                                        .showErrorToast(
-                                                                      BenekStringHelpers
-                                                                          .locale(
-                                                                              'Error'),
+                                                                    BenekToastHelper.showErrorToast(
+                                                                      BenekStringHelpers.locale('Error'),
                                                                       "Email veya şifre hatalı!",
                                                                       context,
                                                                     );

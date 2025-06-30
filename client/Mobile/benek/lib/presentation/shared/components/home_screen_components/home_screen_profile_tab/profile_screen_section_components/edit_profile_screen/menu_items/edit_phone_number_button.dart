@@ -1,7 +1,6 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 
 
 import '../../../../../../../../../common/utils/benek_string_helpers.dart';
@@ -92,7 +91,6 @@ class _EditPhoneNumberButtonState extends State<EditPhoneNumberButton> {
               opaque: false,
               barrierDismissible: false,
               pageBuilder: (context, _, __) => PasswordTextfield(
-                isResendButtonActive: false,
                 verifyingString: newPhoneNumber,
                 onDispatch: (text) => widget.onVerifyDispatch(newPhoneNumber.toLowerCase(), text.toLowerCase()),
               ),

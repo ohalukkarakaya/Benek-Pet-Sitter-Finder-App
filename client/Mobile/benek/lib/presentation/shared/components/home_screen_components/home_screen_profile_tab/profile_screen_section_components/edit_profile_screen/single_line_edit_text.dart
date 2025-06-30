@@ -93,7 +93,7 @@ class _SingleLineEditTextScreenState extends State<SingleLineEditTextScreen> {
         backgroundColor: Colors.transparent,
         body: Center(
           child: Container(
-            width: 400,
+            width: MediaQuery.of(context).size.width * 0.9,
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               color: isFocused ? AppColors.benekLightBlue : AppColors.benekBlack,
@@ -197,6 +197,12 @@ class _SingleLineEditTextScreenState extends State<SingleLineEditTextScreen> {
                         }
 
                         if (!isSendingRequest) {
+
+                          // if(
+                          //   widget.textToEdit?.toLowerCase() == _textControllerEditProfileTex.text.toLowerCase()
+                          // ){
+                          //   return;
+                          // }
 
                           if(widget.shouldApprove){
                             bool didApprove = await Navigator.push(

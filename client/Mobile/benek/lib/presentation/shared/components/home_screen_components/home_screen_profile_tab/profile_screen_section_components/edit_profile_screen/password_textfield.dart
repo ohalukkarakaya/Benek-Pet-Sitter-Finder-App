@@ -15,7 +15,7 @@ class PasswordTextfield extends StatefulWidget {
   final String verifyingString;
   final Future<void> Function(String) onDispatch;
   final int passwordCharacterCount;
-  final bool isResendButtonActive;
+  final bool isResendButtonActive; 
 
   const PasswordTextfield({
     super.key,

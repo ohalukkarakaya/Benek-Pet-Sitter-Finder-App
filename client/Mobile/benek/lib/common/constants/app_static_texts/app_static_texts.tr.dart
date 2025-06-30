@@ -202,5 +202,7 @@ class AppStaticTextsTr{
     'unAthorizedAccess': "Yetkisiz Erişim",
     'youCantEnterHere': "Buraya giremezsin!",
     'errorCapital': "HATA",
+    'emailOtpMessage': "Epostanıza gelen OTP şifresini girin.",
+    'smsOtpMessage': "Cep telefonunuza gelen OTP kodunuzu giriniz."
   };
 }

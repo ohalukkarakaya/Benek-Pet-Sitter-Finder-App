@@ -310,7 +310,7 @@ class UserInfoApi {
     }
   }
 
-  Future<bool?> postResendEmailOtp(String email) async {
+  Future<bool?> postResendEmailOtp(String email, String? oldEmail) async {
     try{
       await AuthUtils.getAccessToken();
 
@@ -318,6 +318,7 @@ class UserInfoApi {
 
       Object? postBody = {
         'email': email,
+        'oldEmail': oldEmail
       };
       List<QueryParam> queryParams = [];
       Map<String, String> headerParams = {};

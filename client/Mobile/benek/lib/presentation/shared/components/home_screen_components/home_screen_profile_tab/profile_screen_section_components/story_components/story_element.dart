@@ -11,7 +11,8 @@ import 'package:benek/store/actions/app_actions.dart';
 import 'package:benek/store/app_state.dart';
 
 class StoryElement extends StatelessWidget {
-  final void Function(dynamic Function() selectStoryFunction, List<StoryModel>? stories, int index) onTapPageBuilder;
+  final void Function(dynamic Function() selectStoryFunction,
+      List<StoryModel>? stories, int index) onTapPageBuilder;
   final int index;
   final List<StoryModel>? stories;
   final StoryModel? story;
@@ -35,7 +36,8 @@ class StoryElement extends StatelessWidget {
         () async {
           await store.dispatch(IncreaseProcessCounterAction());
           await store.dispatch(resetStoryCommentsAction(story!.storyId));
-          store.dispatch(getStoryCommentsByStoryIdRequestAction(story!.storyId, null));
+          store.dispatch(
+              getStoryCommentsByStoryIdRequestAction(story!.storyId, null));
           await store.dispatch(selectStoryAction(story!));
           await store.dispatch(DecreaseProcessCounterAction());
         },
@@ -45,26 +47,31 @@ class StoryElement extends StatelessWidget {
       child: Container(
         width: width,
         height: height,
-        margin: const EdgeInsets.all(8.0),
+        margin: const EdgeInsets.all(
+            8), // <— köşe dışında kalacağı için kırpılmayacak
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8), // tek yerde yarıçap
+        ),
+        clipBehavior: Clip.hardEdge, // <— çocukları kırpar
         child: Stack(
+          fit: StackFit.expand,
           children: [
-            story != null && story!.contentUrl != null
-                ? ImageVideoHelpers.getThumbnail(story!.contentUrl!)
-                : const SizedBox(),
+            if (story?.contentUrl != null)
+              ImageVideoHelpers.getThumbnail(story!.contentUrl!),
             Container(
-              decoration: BoxDecoration(
+              // gradient overlay
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    AppColors.benekBlack.withAlpha(255),
-                    AppColors.benekBlack.withAlpha(0),
+                    AppColors.benekBlack,
+                    Colors.transparent,
                   ],
                 ),
-                borderRadius: BorderRadius.circular(8.0),
               ),
             ),
-            if (story != null && story!.about != null && story!.about!.pet != null)
+            if (story?.about?.pet != null)
               Positioned(
                 left: 7,
                 bottom: 7,
@@ -73,8 +80,9 @@ class StoryElement extends StatelessWidget {
                     BenekCircleAvatar(
                       width: 20,
                       height: 20,
-                      borderWidth: 2.0,
-                      isDefaultAvatar: story!.about!.pet!.petProfileImg!.isDefaultImg!,
+                      borderWidth: 2,
+                      isDefaultAvatar:
+                          story!.about!.pet!.petProfileImg!.isDefaultImg!,
                       imageUrl: story!.about!.pet!.petProfileImg!.imgUrl!,
                     ),
                     const SizedBox(width: 5),

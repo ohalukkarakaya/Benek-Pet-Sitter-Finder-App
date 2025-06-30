@@ -64,164 +64,164 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Center(
-            child: ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 150.0, bottom: 80),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      EditProfileProfileWidget(
+        body: Center(
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 150.0, bottom: 80),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                      child: EditProfileProfileWidget(
                         userInfo: userInfo,
                       ),
-                      const SizedBox(height: 20.0,),
-
-                      EditedBioRow(bio: userInfo.identity!.bio!),
-
-                      const SizedBox(height: 20.0,),
-
-                      EditAdressWidget(userInfo: userInfo),
-
-                      const SizedBox(height: 20.0,),
-
-                      userInfo.isCareGiver == null
-                      || userInfo.isCareGiver != null
-                         && !(userInfo.isCareGiver!)
-                          ? BecomeCareGiverButton(
-                              userInfo: userInfo,
-                              onDispatch: () async {
-                                await store.dispatch(becomeCareGiverAction(context));
-                                setState(() {
-                                  idle = !idle;
-                                });
-                              },
-                            )
-                          : const SizedBox(),
-
-                              const SizedBox(height: 20.0,),
-
-                              Container(
-                              padding: const EdgeInsets.all(25.0),
-                              decoration: const BoxDecoration(
-                              color: AppColors.benekBlack,
-                              borderRadius: BorderRadius.all(Radius.circular(6.0)),
-                              ),
-                              child: isLoading
-                              ? Column(
-                              children: List.generate(6, (index) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5.0),
-                              child: Shimmer.fromColors(
-                                  baseColor: AppColors.benekWhite.withAlpha((0.4 * 255).toInt()),
-                                  highlightColor: AppColors.benekWhite.withAlpha((0.2 * 255).toInt()),
-                                  child: Container(
-                                    height: 50.0,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.benekBlack.withAlpha((0.4 * 255).toInt()),
-                                      borderRadius: BorderRadius.circular(6.0),
-                                    ),
+                    ),
+                    const SizedBox(height: 20.0,),
+        
+                    EditedBioRow(bio: userInfo.identity!.bio!),
+        
+                    const SizedBox(height: 20.0,),
+        
+                    EditAdressWidget(userInfo: userInfo),
+        
+                    const SizedBox(height: 20.0,),
+        
+                    userInfo.isCareGiver == null
+                    || userInfo.isCareGiver != null
+                       && !(userInfo.isCareGiver!)
+                        ? BecomeCareGiverButton(
+                            userInfo: userInfo,
+                            onDispatch: () async {
+                              await store.dispatch(becomeCareGiverAction(context));
+                              setState(() {
+                                idle = !idle;
+                              });
+                            },
+                          )
+                        : const SizedBox(),
+        
+                            const SizedBox(height: 20.0,),
+        
+                            Container(
+                            padding: const EdgeInsets.all(25.0),
+                            decoration: const BoxDecoration(
+                            color: AppColors.benekBlack,
+                            borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                            ),
+                            child: isLoading
+                            ? Column(
+                            children: List.generate(6, (index) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5.0),
+                            child: Shimmer.fromColors(
+                                baseColor: AppColors.benekWhite.withAlpha((0.4 * 255).toInt()),
+                                highlightColor: AppColors.benekWhite.withAlpha((0.2 * 255).toInt()),
+                                child: Container(
+                                  height: 50.0,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.benekBlack.withAlpha((0.4 * 255).toInt()),
+                                    borderRadius: BorderRadius.circular(6.0),
                                   ),
                                 ),
-                              )
-                              )
-                          )
-                         : Column(
-                          children: [
-
-                            EditFullNameButton(
-                              userInfo: userInfo,
-                              onDispatch: (text) => store.dispatch(updateFullNameRequestAction(text)),
-                            ),
-
-                            const Divider(color: AppColors.benekGrey,),
-
-                            EditUserNameButton(
-                              userInfo: userInfo,
-                              onDispatch: (text) => store.dispatch(updateUserNameAction(text)),
-                              updateParentWidgetFunction: () => setState(() { idle = !idle; }),
-                            ),
-
-                            const Divider(color: AppColors.benekGrey,),
-
-                            EditEmailButton(
-                              userInfo: userInfo,
-                              onDispatch: (text) => store.dispatch(updateEmailRequestAction(text)),
-                              onVerifyDispatch: (email, text) => store.dispatch(verifyEmailOtpRequestAction(email, text)),
-                              onResendDispatch: (text) => store.dispatch(resendEmailOtpRequestAction(text)),
-                            ),
-
-                            const Divider(color: AppColors.benekGrey,),
-
-                            EditPhoneNumberButton(
-                              userInfo: userInfo,
-                              onDispatch: (text) => store.dispatch(updatePhoneRequestAction(text)),
-                              onVerifyDispatch: (phoneNumber, text) => store.dispatch(verifyPhoneOtpRequestAction(phoneNumber, text)),
-                            ),
-
-                            const Divider(color: AppColors.benekGrey,),
-
-                            EditTcNoButton(
-                              userInfo: userInfo,
-                              onDispatch: (text) => store.dispatch(updateTcIdNoAction(text)),
-                            ),
-
-                            const Divider(color: AppColors.benekGrey,),
-
-                            EditPaymenInfoButton(
-                              userInfo: userInfo,
-                              onDispatch: (text) => store.dispatch(updatePaymentInfoAction(text)),
-                            ),
-                          ],
-                        ),
+                              ),
+                            )
+                            )
+                        )
+                       : Column(
+                        children: [
+        
+                          EditFullNameButton(
+                            userInfo: userInfo,
+                            onDispatch: (text) => store.dispatch(updateFullNameRequestAction(text)),
+                          ),
+        
+                          const Divider(color: AppColors.benekGrey,),
+        
+                          EditUserNameButton(
+                            userInfo: userInfo,
+                            onDispatch: (text) => store.dispatch(updateUserNameAction(text)),
+                            updateParentWidgetFunction: () => setState(() { idle = !idle; }),
+                          ),
+        
+                          const Divider(color: AppColors.benekGrey,),
+        
+                          EditEmailButton(
+                            userInfo: userInfo,
+                            onDispatch: (text) => store.dispatch(updateEmailRequestAction(text)),
+                            onVerifyDispatch: (email, text) => store.dispatch(verifyEmailOtpRequestAction(email, text)),
+                            onResendDispatch: (text) => store.dispatch(updateEmailRequestAction(text)),
+                          ),
+        
+                          const Divider(color: AppColors.benekGrey,),
+        
+                          EditPhoneNumberButton(
+                            userInfo: userInfo,
+                            onDispatch: (text) => store.dispatch(updatePhoneRequestAction(text)),
+                            onVerifyDispatch: (phoneNumber, text) => store.dispatch(verifyPhoneOtpRequestAction(phoneNumber, text)),
+                          ),
+        
+                          const Divider(color: AppColors.benekGrey,),
+        
+                          EditTcNoButton(
+                            userInfo: userInfo,
+                            onDispatch: (text) => store.dispatch(updateTcIdNoAction(text)),
+                          ),
+        
+                          const Divider(color: AppColors.benekGrey,),
+        
+                          EditPaymenInfoButton(
+                            userInfo: userInfo,
+                            onDispatch: (text) => store.dispatch(updatePaymentInfoAction(text)),
+                          ),
+                        ],
                       ),
-
-                      const SizedBox(height: 20.0,),
-
-                      Column(
+                    ),
+        
+                    const SizedBox(height: 20.0,),
+        
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           
                           PasswordInputWidget(
                             onDispatch: (oldPassword, newPassword) => store.dispatch(updatePasswordRequestAction(newPassword, oldPassword, oldPassword)),
                           ),
-
+                              
                           const SizedBox(height: 20.0,),
-
-                          MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                              onTap: () async {
-                                await Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    opaque: false,
-                                    barrierDismissible: false,
-                                    pageBuilder: (context, _, __) => ResetPasswordInfoPage(
-                                      onDispatch: () => store.dispatch(forgetMyPasswordRequestAction(userInfo.email!)),
-                                    ),
-                                  )
-                                );
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 21.2),
-                                child: Text(
-                                  BenekStringHelpers.locale('forgetPassword'),
-                                  style: regularTextStyle(
-                                    textColor: AppColors.benekWhite,
-                                    textFontSize: 14.0,
+                              
+                          GestureDetector(
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  opaque: false,
+                                  barrierDismissible: false,
+                                  pageBuilder: (context, _, __) => ResetPasswordInfoPage(
+                                    onDispatch: () => store.dispatch(forgetMyPasswordRequestAction(userInfo.email!)),
                                   ),
+                                )
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 21.2),
+                              child: Text(
+                                BenekStringHelpers.locale('forgetPassword'),
+                                style: regularTextStyle(
+                                  textColor: AppColors.benekWhite,
+                                  textFontSize: 14.0,
                                 ),
                               ),
                             ),
                           )
                         ],
-                      )
-                    ],
-                  ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),

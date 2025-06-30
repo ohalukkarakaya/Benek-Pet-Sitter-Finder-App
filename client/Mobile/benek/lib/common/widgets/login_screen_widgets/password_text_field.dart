@@ -136,14 +136,8 @@ class _PasswordTextfieldState extends State<PasswordTextfield> {
                       children: [
                         widget.isResendButtonActive
                             ? GestureDetector(
-                                onTap: () async {
-                                  await UserInfoApi().postResendEmailOtp(
-                                      widget.verifyingString);
-                                  BenekToastHelper.showSuccessToast(
-                                      BenekStringHelpers.locale(
-                                          'operationSucceeded'),
-                                      "Eposta yeniden gönderildi",
-                                      context);
+                                onTap: (){
+                                  Navigator.of(context).pop('reSend');
                                 },
                                 child: Text(
                                   BenekStringHelpers.locale('reSendEmail'),
@@ -158,8 +152,7 @@ class _PasswordTextfieldState extends State<PasswordTextfield> {
                         IconButton(
                           padding: EdgeInsets.zero,
                           onPressed: () async {
-                            if (_controller.text.length !=
-                                widget.passwordCharacterCount) {
+                            if (_controller.text.length !=  widget.passwordCharacterCount) {
                               BenekToastHelper.showErrorToast(
                                 BenekStringHelpers.locale('error'),
                                 BenekStringHelpers.locale('missingOtpCode'),
@@ -174,6 +167,9 @@ class _PasswordTextfieldState extends State<PasswordTextfield> {
                               });
                               try {
                                 await widget.onDispatch(_controller.text);
+                                setState(() {
+                                  isSendingRequest = false;
+                                });
                               } on CustomException catch (e) {
                                 setState(() {
                                   isSendingRequest = false;
@@ -184,6 +180,7 @@ class _PasswordTextfieldState extends State<PasswordTextfield> {
                                   context,
                                 );
                               }
+                              Navigator.of(context).pop(widget.verifyingString);
                             }
                           },
                           icon: !isSendingRequest

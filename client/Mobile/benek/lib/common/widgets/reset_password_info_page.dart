@@ -22,6 +22,16 @@ class ResetPasswordInfoPage extends StatefulWidget {
 class _ResetPasswordInfoPageState extends State<ResetPasswordInfoPage> {
   @override
   Widget build(BuildContext context) {
+    // Container genişliği dinamik: ekran %90, max 500
+    final containerWidth = MediaQuery.of(context).size.width * 0.9 > 500
+        ? 500
+        : MediaQuery.of(context).size.width * 0.9;
+
+    // Button genişliği dinamik: ekran %80, max 450
+    final buttonWidth = MediaQuery.of(context).size.width * 0.8 > 450
+        ? 450
+        : MediaQuery.of(context).size.width * 0.8;
+
     return BenekBluredModalBarier(
       isDismissible: true,
       onDismiss: () async {
@@ -32,7 +42,7 @@ class _ResetPasswordInfoPageState extends State<ResetPasswordInfoPage> {
         body: Center(
           child: Container(
             height: 200,
-            width: 500,
+            width: containerWidth.toDouble(),
             padding: const EdgeInsets.only(
               left: 16.0,
               top: 16.0,
@@ -47,32 +57,30 @@ class _ResetPasswordInfoPageState extends State<ResetPasswordInfoPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                // Başlık
+                Text(
+                  BenekStringHelpers.locale('resetPassword'),
+                  style: mediumTextStyle(textColor: AppColors.benekWhite),
+                ),
+
+                // Açıklama
+                Wrap(
                   children: [
                     Text(
-                      BenekStringHelpers.locale('resetPassword'),
-                      style: mediumTextStyle( textColor: AppColors.benekWhite ),
+                      BenekStringHelpers.locale('resetPasswordInfo'),
+                      style: regularTextStyle(textColor: AppColors.benekWhite),
                     ),
                   ],
                 ),
-                Wrap(
-                    children: [
-                      Text(
-                        BenekStringHelpers.locale('resetPasswordInfo'),
-                        style: regularTextStyle( textColor: AppColors.benekWhite ),
-                      ),
-                    ]
-                ),
 
+                // Buton
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     BenekHorizontalButton(
                       text: BenekStringHelpers.locale('resetPasswordAndLogout'),
                       isLight: true,
-                      width: 450,
+                      width: buttonWidth.toDouble(),
                       onTap: () async {
                         bool didApprove = await Navigator.push(
                           context,
@@ -83,7 +91,7 @@ class _ResetPasswordInfoPageState extends State<ResetPasswordInfoPage> {
                           ),
                         );
 
-                        if(didApprove != true) return;
+                        if (didApprove != true) return;
 
                         widget.onDispatch();
 
@@ -96,7 +104,7 @@ class _ResetPasswordInfoPageState extends State<ResetPasswordInfoPage> {
               ],
             ),
           ),
-        )
+        ),
       ),
     );
   }
