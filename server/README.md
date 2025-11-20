@@ -1,4 +1,4 @@
-# Benek – NoSQL Backend (Operational Data Store)
+# Benek Backend 
 
 Benek is a mobile application that allows users to find trusted caregivers nearby and manage pet ownership and task submission processes. The project's backend is developed on Node.js, Express.js, and MongoDB (NoSQL). The system has a complex data model that includes task management, payment records, user authentication, OTP mechanisms, pet-owner relationships, story sharing, and moderation tools.
 
@@ -147,4 +147,83 @@ Redirects HTTP requests to the service layer Authorization / Input validation is
 * TTL index → ​​UserToken (30 days)
 * Embedded documents → "comments", "replies", "missionCalendar" (no joins → high speed)
 * Sharding-ready ObjectId usage strategy
+
+---
+
+## 10. Cyber Security
+
+### 10.1 Threat Model
+
+| Threat                  | Risk                                          | Mitigation                                              |
+|------------------------|-----------------------------------------------|----------------------------------------------------------|
+| **Spoofing**           | Stolen JWT                                    | RS256 private/public key pair, token rotation           |
+| **Tampering**          | Manipulation of mission videos                | AWS S3 signed URLs, checksum validation                 |
+| **Repudiation**        | User denies performing an action              | Server-side logging, IP tracking                        |
+| **Information Disclosure** | Leakage of sensitive personal data        | AES-256 encryption for nationalId fields                |
+| **DoS**                | OTP flooding / brute force                    | Rate limiting (express-rate-limit)                      |
+| **Elevation of Privilege** | Abuse of admin-only endpoints            | Strict RBAC, admin-only middleware                      |
+
+---
+
+### 10.2 Implemented Security Measures
+
+#### ✔ Secure Authentication
+- JWT (RS256)
+- Short-lived tokens with TTL
+- Token blacklist for revocation
+
+#### ✔ Secure Authorization
+- Role-Based Access Control (RBAC)
+- User roles: admin, caregiver, regular user
+
+#### ✔ Input Validation & Sanitization
+- express-validator for schema validation
+- Input sanitization
+- XSS protection layer
+- File size and MIME-type validation
+
+#### ✔ Encryption & Signing
+- AES-256 encryption for national identity fields
+- bcrypt for password hashing
+- Signed URLs for protected media access
+
+#### ✔ Transport Layer Security
+- HTTPS enforcement
+- HSTS enabled
+- Strict CORS policy
+
+#### ✔ Database Security
+- Safe query patterns (no dynamic eval)
+- Rate limiting on login and OTP requests
+- No exposure of MongoDB root roles
+
+#### ✔ Secure DevOps Practices
+- Environment isolation (.env)
+- No secrets in repository
+- Hardened production build
+- Application logs & security monitoring
+
+---
+
+## 11. How Security Works in Benek
+
+### Authentication
+- JWT RS256 with asymmetric keypair
+- No refresh tokens → short-lived access tokens + revoke list
+
+### Authorization
+Middleware layers:
+- isAuthenticated
+- isAdmin
+- isCaregiver
+
+### TLS
+- SSL termination via Nginx reverse proxy (when it was deployed)
+- Full transport-layer encryption between client and server
+
+### Attack Prevention
+- CSRF: Stateless API → naturally protected
+- NoSQL Injection: mongoose validation + sanitizer
+- XSS mitigation: sanitization + strict payload validation
+- File upload hardening: MIME-type & size validation
 
