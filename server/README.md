@@ -1,4 +1,7 @@
-# Benek Backend (This Documentation Prepared For SE_09 && SE_06 Both)
+# Benek Backend 
+# This Documentation Prepared For SE_09 && SE_06 Both
+# First Part is for SE_06
+# [Cyber Security Section](#10-cyber-security)
 
 Benek is a mobile application that allows users to find trusted caregivers nearby and manage pet ownership and task submission processes. The project's backend is developed on Node.js, Express.js, and MongoDB (NoSQL). The system has a complex data model that includes task management, payment records, user authentication, OTP mechanisms, pet owner relationships, story sharing, and moderation tools.
 
@@ -150,7 +153,7 @@ Redirects HTTP requests to the service layer Authorization / Input validation is
 
 ---
 
-## 10. Cyber Security
+# 10. Cyber Security
 
 ## 10.1 Threat Model
 
