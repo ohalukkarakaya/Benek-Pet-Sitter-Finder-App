@@ -1,6 +1,6 @@
-# Benek Backend 
+# Benek Backend (This Documentation Prepared For SE_09 && SE_06 Both)
 
-Benek is a mobile application that allows users to find trusted caregivers nearby and manage pet ownership and task submission processes. The project's backend is developed on Node.js, Express.js, and MongoDB (NoSQL). The system has a complex data model that includes task management, payment records, user authentication, OTP mechanisms, pet-owner relationships, story sharing, and moderation tools.
+Benek is a mobile application that allows users to find trusted caregivers nearby and manage pet ownership and task submission processes. The project's backend is developed on Node.js, Express.js, and MongoDB (NoSQL). The system has a complex data model that includes task management, payment records, user authentication, OTP mechanisms, pet owner relationships, story sharing, and moderation tools.
 
 ---
 
@@ -11,16 +11,16 @@ The main use cases currently implemented in the application are listed below:
 ## ✔ User & Identity Management
 
 User registration, login, email and phone OTP verification
-JWT-based session token generation
+JWT based session token generation
 OTP for email change
-One-time temporary password for password reset
+One time temporary password for password reset
 
 ## ✔ Pet Management
 
 Creating and editing pets, profile pictures
 Multiple owners (primary and secondary owners) structure
 Comments/replies on pet profile photos and media
-Creating pet stories (24-hour story system)
+Creating pet stories (24 hour story system)
 
 ## ✔ Caregiver Management
 
@@ -43,7 +43,7 @@ Admin cancellation records
 
 ## ✔ Invitation Systems
 
-Pet hand-over invitation
+Pet hand over invitation
 Secondary owner invitation
 Caregiver invitation
 
@@ -90,11 +90,11 @@ The project uses MongoDB. The connection is made via `mongoose`.
 This project has a highly complex, relationally intensive structure that requires the flexibility of NoSQL.
 ### Model Highlights
 
-* Document-based MongoDB model
+* Document based MongoDB model
 * Heavyly embedded documents (comments, replies, missions, addresses, identity, price data, story replies, etc.)
 * Use of "soft relations" instead of references → consistent with NoSQL's design philosophy
 * Nested structures in critical locations for performance
-* Use of sharding-friendly UUID/ObjectID
+* Use of sharding friendly UUID/ObjectID
 
 ## Model Diagram
 <img width="10044" height="10531" alt="Benek" src="https://github.com/user-attachments/assets/1c92caa0-11dc-4acb-a586-a6838d81ec16" />
@@ -107,7 +107,7 @@ The system consists of the following:
 
 * A limited number of real sample records to test application functions
 * Manually generated test data for some collections
-* Small-scale fake data generated with scripts where necessary
+* Small scale fake data generated with scripts where necessary
 ---
 # 6. Data Layer
 
@@ -143,10 +143,10 @@ Redirects HTTP requests to the service layer Authorization / Input validation is
 * Index created for frequently used fields
 * Partial index for story and pet media
 * Array indexing for followers/following
-* Time-based indexing for caregiver missions
+* Time based indexing for caregiver missions
 * TTL index → ​​UserToken (30 days)
 * Embedded documents → "comments", "replies", "missionCalendar" (no joins → high speed)
-* Sharding-ready ObjectId usage strategy
+* Sharding ready ObjectId usage strategy
 
 ---
 
@@ -156,39 +156,39 @@ Redirects HTTP requests to the service layer Authorization / Input validation is
 
 This threat model reflects the real security architecture of Benek, including:
 - Trusted Device Validation (`clientId` + `trustedDeviceIds`)
-- QR-based Admin Login (WhatsApp Web–style)
+- QR based Admin Login (WhatsApp Web–style)
 - Custom dedicated media server (NO S3)
 - AES-256 (crypto) encryption with salted secrets for sensitive fields (TC No, IBAN, etc.)
-- Mission video verification using time-bound recording + one-time spoken code
+- Mission video verification using time bound recording + one time spoken code
 - Complaint → human moderation → penalty system
 - JWT RS256 authentication with strict RBAC
 - Payment flows via Moka POS
 - Admin panel WebSocket binding
 
-# MISSION VIDEO VERIFICATION — ANTI-FRAUD MODEL
+# MISSION VIDEO VERIFICATION
 
 A pet owner assigns a mission (e.g., *feed Pasha*).  
 The caregiver must record video during the defined mission time window.  
 Critical risks include:
-- Re-submitting old videos  
+- Re submitting old videos  
 - Uploading unrelated footage  
 - Editing/forging mission content  
 - Submitting videos outside permitted time  
 
 ### Controls
 
-1. **Strict client-side enforcement**
-   - Only IN-APP camera recording allowed  
+1. **Strict client side enforcement**
+   - Only in app camera recording allowed  
    - No gallery uploads (no reusing old clips)
-   - Video cannot be edited; only deleted & re-recorded
+   - Video cannot be edited; only deleted & re recorded
 
-2. **Time-window bound recording**
+2. **Time window bound recording**
    - Backend enforces mission window:
      - Example: missionDate ± 10 minutes
    - Video upload attempted outside the window fails
 
-3. **One-time mission code (speech required)**
-   - Backend generates a mission-specific one-time code (`timePassword`)
+3. **One time mission code**
+   - Backend generates a mission specific one time code (`timePassword`)
    - Caregiver must clearly speak the code aloud
    - Ensures:
      - The video belongs to *that mission*
@@ -207,19 +207,19 @@ Critical risks include:
    - Caregiver is notified **1 week AFTER** pet returned  
      (to prevent retaliation)
 
-This is one of the strongest anti-fraud / integrity assurance mechanisms in the app.
+This is one of the strongest anti fraud / integrity assurance mechanisms in the app.
 
 ---
 
 # STRIDE Threat Model
 
-# S — SPOOFING
+# * SPOOFING
 
 ### **Threat: JWT token theft / impersonation**
 **Risk:** Attacker impersonates a caregiver or pet owner  
 **Mitigations:**
 - RS256 asymmetric JWT signing  
-- Short-lived access tokens, long-lived refresh tokens  
+- Short lived access tokens, long lived refresh tokens  
 - Mandatory token rotation  
 - IP logging & anomaly detection  
 
@@ -228,18 +228,18 @@ This is one of the strongest anti-fraud / integrity assurance mechanisms in the 
 ### **Threat: Fake client device impersonation**
 **Risk:** Attacker fakes a `clientId` to skip email verification  
 **Mitigations:**
-- `trustedDeviceIds` list stored server-side  
+- `trustedDeviceIds` list stored server side  
 - Unknown device → forced email verification flow  
 - Every token issuance checks device trust state  
 - ClientId generated on first run (UUID), stored securely  
 
 ---
 
-### **Threat: QR-based admin login spoofing**
+### **Threat: QR admin login spoofing**
 **Risk:** Attacker prints or replays QR codes  
 **Mitigations:**
 - QR contains `{adminPanelClientId, oneTimeLoginCode}`  
-- One-time code = single use + short expiry (30–60s)  
+- One time code = single use + short expiry (30–60s)  
 - Code bound to the exact admin panel client  
 - After scanning:
   - User identity extracted from JWT
@@ -255,17 +255,17 @@ This is one of the strongest anti-fraud / integrity assurance mechanisms in the 
 - Short expiration times  
 - Rate limiting  
 - OTP bound to the target userId  
-- OTP auto-invalidation after error attempts  
+- OTP auto invalidation after error attempts  
 
 ---
 
-# T — TAMPERING
+# * TAMPERING
 
 ### **Threat: Caregiver uploads old or unrelated mission video**  
 **Mitigations:**
 - Only live recording allowed  
 - Recording locked to mission time window  
-- One-time mission code (spoken aloud)  
+- One time mission code (spoken aloud)  
 - Moderator review workflow  
 - Mission state locked after approval  
 - Backend rejects uploads that do not match mission context  
@@ -275,7 +275,7 @@ This is one of the strongest anti-fraud / integrity assurance mechanisms in the 
 ### **Threat: Video tampering on media server**
 Risk: replacing or altering video files  
 Mitigations:
-- Media server requires API-key + user authentication  
+- Media server requires API key + user authentication  
 - Backend signs upload requests using HMAC or JWT  
 - Video filename includes:
   - missionId
@@ -288,15 +288,15 @@ Mitigations:
 
 ### **Threat: Payment or mission record modification**
 Mitigations:
-- All write operations must go through RBAC-checked backend endpoints  
+- All write operations must go through RBAC checked backend endpoints  
 - Schema validation in DB layer  
-- No client-side trust for IDs or updates  
+- No client side trust for IDs or updates  
 - Audit logs for admin actions  
 
 ---
 
 
-# R — REPUDIATION
+# * REPUDIATION
 
 ### **Threat: Caregiver denies performing a mission**
 Mitigations:
@@ -321,7 +321,7 @@ Mitigations:
 
 ---
 
-# I — INFORMATION DISCLOSURE
+# * INFORMATION DISCLOSURE
 
 ### **Threat: Sensitive data leakage (TC No, IBAN, real name, address)**
 Mitigations:
@@ -342,8 +342,8 @@ Risk: Private mission videos leaked publicly
 Mitigations:
 - Media server is fully private  
 - Access controlled via:
-  - Backend-signed URLs  
-  - Short-lived tokens  
+  - Backend signed URLs  
+  - Short lived tokens  
   - Permission checks based on mission.owner or admin  
 
 ---
@@ -356,7 +356,7 @@ Mitigations:
 
 ---
 
-# D — DENIAL OF SERVICE
+# * DENIAL OF SERVICE
 
 ### **Threat: OTP spam**
 Mitigations:
@@ -374,7 +374,7 @@ Mitigations:
 
 ---
 
-### **Threat: Mission brute-force / heavy DB queries**
+### **Threat: Mission brute force / heavy DB queries**
 Mitigations:
 - DB indexes on missionId, userId, petId  
 - Pagination  
@@ -382,12 +382,12 @@ Mitigations:
 
 ---
 
-# E — ELEVATION OF PRIVILEGE
+# * ELEVATION OF PRIVILEGE
 
 ### **Threat: Normal user tries to act as caregiver/admin**
 Mitigations:
 - Strict RBAC (role verified on every endpoint)  
-- Role stored server-side  
+- Role stored server side  
 - Admin login must go through QR login + mobile token flow  
 
 ---
@@ -405,7 +405,7 @@ Mitigations:
 
 ### **Threat: Abusing trusted devices**
 Mitigations:
-- trustedDeviceIds stored and verified server-side  
+- trustedDeviceIds stored and verified server side  
 - Unknown device → email verification required  
 - Admin roles require both:
   - trusted device  
@@ -419,7 +419,7 @@ Mitigations:
 
 #### ✔ Secure Authentication
 - JWT (RS256)
-- Short-lived tokens with TTL
+- Short lived tokens with TTL
 - Token blacklist for revocation
 
 #### ✔ Secure Authorization
@@ -427,13 +427,13 @@ Mitigations:
 - User roles: admin, caregiver, regular user
 
 #### ✔ Input Validation & Sanitization
-- express-validator for schema validation
+- express validator for schema validation
 - Input sanitization
 - XSS protection layer
-- File size and MIME-type validation
+- File size and MIME type validation
 
 #### ✔ Encryption & Signing
-- AES-256 encryption for national identity fields
+- AES 256 encryption for national identity fields
 - bcrypt for password hashing
 - Signed URLs for protected media access
 
@@ -459,7 +459,7 @@ Mitigations:
 
 ### Authentication
 - JWT RS256 with asymmetric keypair
-- No refresh tokens → short-lived access tokens + revoke list
+- No refresh tokens - short lived access tokens + revoke list
 
 ### Authorization
 Middleware layers:
@@ -469,7 +469,7 @@ Middleware layers:
 
 ### TLS
 - SSL termination via Nginx reverse proxy (when it was deployed)
-- Full transport-layer encryption between client and server
+- Full transport layer encryption between client and server
 
 ### Attack Prevention
 - CSRF: Stateless API → naturally protected
