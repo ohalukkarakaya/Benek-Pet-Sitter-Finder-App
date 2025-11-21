@@ -467,8 +467,8 @@ Middleware layers:
 - isAdmin
 - isCaregiver
 
-### TLS
-- SSL termination via Nginx reverse proxy (when it was deployed)
+### TLS (when it was deployed)
+- SSL termination via Nginx reverse proxy
 - Full transport layer encryption between client and server
 
 ### Attack Prevention
