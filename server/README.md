@@ -165,9 +165,7 @@ This threat model reflects the real security architecture of Benek, including:
 - Payment flows via Moka POS
 - Admin panel WebSocket binding
 
-=====================================================================
-MISSION VIDEO VERIFICATION — ANTI-FRAUD MODEL
-=====================================================================
+# MISSION VIDEO VERIFICATION — ANTI-FRAUD MODEL
 
 A pet owner assigns a mission (e.g., *feed Pasha*).  
 The caregiver must record video during the defined mission time window.  
@@ -215,9 +213,7 @@ This is one of the strongest anti-fraud / integrity assurance mechanisms in the 
 
 # STRIDE Threat Model
 
-=====================================================================
-S — SPOOFING
-=====================================================================
+# S — SPOOFING
 
 ### **Threat: JWT token theft / impersonation**
 **Risk:** Attacker impersonates a caregiver or pet owner  
@@ -263,9 +259,7 @@ S — SPOOFING
 
 ---
 
-=====================================================================
-T — TAMPERING
-=====================================================================
+# T — TAMPERING
 
 ### **Threat: Caregiver uploads old or unrelated mission video**  
 **Mitigations:**
@@ -301,9 +295,8 @@ Mitigations:
 
 ---
 
-=====================================================================
-R — REPUDIATION
-=====================================================================
+
+# R — REPUDIATION
 
 ### **Threat: Caregiver denies performing a mission**
 Mitigations:
@@ -328,9 +321,7 @@ Mitigations:
 
 ---
 
-=====================================================================
-I — INFORMATION DISCLOSURE
-=====================================================================
+# I — INFORMATION DISCLOSURE
 
 ### **Threat: Sensitive data leakage (TC No, IBAN, real name, address)**
 Mitigations:
@@ -365,9 +356,7 @@ Mitigations:
 
 ---
 
-=====================================================================
-D — DENIAL OF SERVICE
-=====================================================================
+# D — DENIAL OF SERVICE
 
 ### **Threat: OTP spam**
 Mitigations:
@@ -393,9 +382,7 @@ Mitigations:
 
 ---
 
-=====================================================================
-E — ELEVATION OF PRIVILEGE
-=====================================================================
+# E — ELEVATION OF PRIVILEGE
 
 ### **Threat: Normal user tries to act as caregiver/admin**
 Mitigations:
