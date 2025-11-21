@@ -8,40 +8,40 @@ Benek is a mobile application that allows users to find trusted caregivers nearb
 
 The main use cases currently implemented in the application are listed below:
 
-## ✔ User & Identity Management
+## User & Identity Management
 
 User registration, login, email and phone OTP verification
 JWT based session token generation
 OTP for email change
 One time temporary password for password reset
 
-## ✔ Pet Management
+## Pet Management
 
 Creating and editing pets, profile pictures
 Multiple owners (primary and secondary owners) structure
 Comments/replies on pet profile photos and media
 Creating pet stories (24 hour story system)
 
-## ✔ Caregiver Management
+## Caregiver Management
 
 Task creation, task schedule
 Task video upload + timecode verification
 Task rejection/complaint
 Extra task purchase management
 
-## ✔ Payment System & Invoices
+## Payment System & Invoices
 
 Payment processes via Moka POS
 Virtual POS ID matching
 E-invoice and expense records (expense/invoice records)
 
-## ✔ Moderation & Penalty System
+## Moderation & Penalty System
 
 Ban mechanism (banned users + ban ASAP)
 Punishment records
 Admin cancellation records
 
-## ✔ Invitation Systems
+## Invitation Systems
 
 Pet hand over invitation
 Secondary owner invitation
@@ -92,7 +92,7 @@ This project has a highly complex, relationally intensive structure that require
 
 * Document based MongoDB model
 * Heavyly embedded documents (comments, replies, missions, addresses, identity, price data, story replies, etc.)
-* Use of "soft relations" instead of references → consistent with NoSQL's design philosophy
+* Use of "soft relations" instead of references consistent with NoSQL's design philosophy
 * Nested structures in critical locations for performance
 * Use of sharding friendly UUID/ObjectID
 
@@ -144,8 +144,8 @@ Redirects HTTP requests to the service layer Authorization / Input validation is
 * Partial index for story and pet media
 * Array indexing for followers/following
 * Time based indexing for caregiver missions
-* TTL index → ​​UserToken (30 days)
-* Embedded documents → "comments", "replies", "missionCalendar" (no joins → high speed)
+* TTL index ​​UserToken (30 days)
+* Embedded documents "comments", "replies", "missionCalendar" (no joins → high speed)
 * Sharding ready ObjectId usage strategy
 
 ---
@@ -160,7 +160,7 @@ This threat model reflects the real security architecture of Benek, including:
 - Custom dedicated media server (NO S3)
 - AES-256 (crypto) encryption with salted secrets for sensitive fields (TC No, IBAN, etc.)
 - Mission video verification using time bound recording + one time spoken code
-- Complaint → human moderation → penalty system
+- Complaint human moderation penalty system
 - JWT RS256 authentication with strict RBAC
 - Payment flows via Moka POS
 - Admin panel WebSocket binding
@@ -406,7 +406,7 @@ Mitigations:
 ### **Threat: Abusing trusted devices**
 Mitigations:
 - trustedDeviceIds stored and verified server side  
-- Unknown device → email verification required  
+- Unknown device email verification required  
 - Admin roles require both:
   - trusted device  
   - correct QR login flow  
@@ -417,37 +417,37 @@ Mitigations:
 
 ### 10.2 Implemented Security Measures
 
-#### ✔ Secure Authentication
+#### Secure Authentication
 - JWT (RS256)
 - Short lived tokens with TTL
 - Token blacklist for revocation
 
-#### ✔ Secure Authorization
+#### Secure Authorization
 - Role-Based Access Control (RBAC)
 - User roles: admin, caregiver, regular user
 
-#### ✔ Input Validation & Sanitization
+#### Input Validation & Sanitization
 - express validator for schema validation
 - Input sanitization
 - XSS protection layer
 - File size and MIME type validation
 
-#### ✔ Encryption & Signing
+#### Encryption & Signing
 - AES 256 encryption for national identity fields
 - bcrypt for password hashing
 - Signed URLs for protected media access
 
-#### ✔ Transport Layer Security
+#### Transport Layer Security
 - HTTPS enforcement
 - HSTS enabled
 - Strict CORS policy
 
-#### ✔ Database Security
+#### Database Security
 - Safe query patterns (no dynamic eval)
 - Rate limiting on login and OTP requests
 - No exposure of MongoDB root roles
 
-#### ✔ Secure DevOps Practices
+#### Secure DevOps Practices
 - Environment isolation (.env)
 - No secrets in repository
 - Hardened production build
@@ -472,7 +472,7 @@ Middleware layers:
 - Full transport layer encryption between client and server
 
 ### Attack Prevention
-- CSRF: Stateless API → naturally protected
+- CSRF: Stateless API naturally protected
 - NoSQL Injection: mongoose validation + sanitizer
 - XSS mitigation: sanitization + strict payload validation
 - File upload hardening: MIME-type & size validation
