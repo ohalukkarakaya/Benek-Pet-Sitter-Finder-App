@@ -145,7 +145,7 @@ Redirects HTTP requests to the service layer Authorization / Input validation is
 * Array indexing for followers/following
 * Time based indexing for caregiver missions
 * TTL index ​​UserToken (30 days)
-* Embedded documents "comments", "replies", "missionCalendar" (no joins → high speed)
+* Embedded documents "comments", "replies", "missionCalendar" (no joins, high speed)
 * Sharding ready ObjectId usage strategy
 
 ---
@@ -195,7 +195,7 @@ Critical risks include:
      - The recording’s audio proves recency
      - Fraud becomes extremely difficult
 
-4. **Complaint → Moderator Review → Penalty System**
+4. **Complaint, Moderator Review, Punisment System**
    - Owner can file a complaint if:
      - Code not spoken correctly
      - Wrong pet, wrong context
@@ -229,7 +229,7 @@ This is one of the strongest anti fraud / integrity assurance mechanisms in the 
 **Risk:** Attacker fakes a `clientId` to skip email verification  
 **Mitigations:**
 - `trustedDeviceIds` list stored server side  
-- Unknown device → forced email verification flow  
+- Unknown device, forced email verification flow  
 - Every token issuance checks device trust state  
 - ClientId generated on first run (UUID), stored securely  
 
